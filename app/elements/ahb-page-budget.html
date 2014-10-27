@@ -55,8 +55,8 @@
         <div style="padding:10px">
 
             <div style="padding:10px;margin-bottom:10px;border-bottom:1px solid #ccc">
-                <a class="btn btn-link" on-tap="{{expandAll}}"><ahb-icon icon="fa-plus-square-o"></ahb-icon> Expand</a>
-                <a class="btn btn-link" on-tap="{{collapseAll}}"><ahb-icon icon="fa-minus-square-o"></ahb-icon> Collapse</a>
+                <a class="btn btn-link" on-tap="{{expandAll}}"><ahb-icon icon="fa-plus-square-o"></ahb-icon>&nbsp;Expand</a>
+                <a class="btn btn-link" on-tap="{{collapseAll}}"><ahb-icon icon="fa-minus-square-o"></ahb-icon>&nbsp;Collapse</a>
             </div>
 
             <template repeat="{{itemSchema in schema}}">
@@ -76,7 +76,7 @@
 
                             <template bind if="{{removed[itemSchema.name]}}">
                                 <a class="btn btn-link" style="vertical-align:middle" on-tap="{{toggleRemoved}}" category="{{itemSchema.name}}">
-                                    <ahb-icon icon="fa-plus"></ahb-icon> Add
+                                    <ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add
                                 </a>
                                 <div style="display:inline;position:relative">
                                     <core-collapse opened="{{removed[itemSchema.name].opened}}" class="addItem">
@@ -85,7 +85,7 @@
                                                     on-tap="{{addItem}}"
                                                     category="{{itemSchema.name}}"
                                                     index="{{i}}">
-                                                    <ahb-icon icon="fa-plus"></ahb-icon> {{item.item}}
+                                                    <ahb-icon icon="fa-plus"></ahb-icon>&nbsp;{{item.item}}
                                                 </a>
                                             </div>
                                         </template>
@@ -123,7 +123,7 @@
                                     <ahb-icon icon="fa-times"></ahb-icon>
                                 </td>
                                 <td removing?="{{budgetItem.removing}}">
-                                    <span style="vertical-align:middle">&nbsp;$</span>
+                                    <span style="vertical-align:middle">$&nbsp;</span>
                                     <input 
                                         type="number" 
                                         class="form-control" 
@@ -137,7 +137,7 @@
                                         category="{{itemSchema.name}}"
                                         name="{{budgetItem.item}}"
                                         on-tap="{{removeItem}}">
-                                        <ahb-icon icon="fa-remove"></ahb-icon> Remove
+                                        <ahb-icon icon="fa-remove"></ahb-icon>&nbsp;Remove
                                     </a>
                                 </td>
                             </tr>
