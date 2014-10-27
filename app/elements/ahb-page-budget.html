@@ -257,6 +257,8 @@
 
                 if( this.removed[category].items.length == 0 ) delete this.removed[category];
                 else this.removed[category].opened = false;
+
+                this.updateTotals();
             },
 
             toggleRemoved : function(e) {
