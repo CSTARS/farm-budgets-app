@@ -107,6 +107,7 @@
                                 <th># Units</th>
                                 <td></th>
                                 <th>Unit Cost</th>
+                                <th>Item Total</th>
                                 <th></th>
                             </tr>
                             <tr template repeat="{{budgetItem in itemSchema.schema}}" removing?="{{budgetItem.removing}}">
@@ -132,6 +133,8 @@
                                         on-change="{{updateTotals}}" />
                                     <span hidden?="{{budgetItem.unit == ''}}">&nbsp;/&nbsp;</span>
                                     <span style="vertical-align:middle">{{budgetItem.unit}}</span>
+                                </td>
+                                <td>${{budgetItem.total}}</td>
                                 <td align="right" removing?="{{budgetItem.removing}}">
                                     <a class="btn btn-link" 
                                         category="{{itemSchema.name}}"
@@ -169,6 +172,7 @@
                         item = tmpSchema[key][i];
                         item.value = (100 / tmpSchema[key].length).toFixed(2);
                         item.unitCost = 1;
+                        item.total = 0;
                         item.removing = false; 
                     }
 
@@ -189,7 +193,8 @@
                     this.schema[i].total = 0;
                     for( var j = 0; j < this.schema[i].schema.length; j++ ) {
                         item = this.schema[i].schema[j];
-                        this.schema[i].total += parseFloat(item.value) * parseFloat(item.unitCost);
+                        item.total = parseFloat(item.value) * parseFloat(item.unitCost)
+                        this.schema[i].total += item.total;
                     }
                     this.total += this.schema[i].total;
                 }
