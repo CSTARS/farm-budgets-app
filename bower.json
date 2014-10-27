@@ -1,0 +1,15 @@
+{
+  "name": "farm-budgets",
+  "version": "0.0.0",
+  "dependencies": {
+    "core-elements": "Polymer/core-elements#^0.4.0",
+    "polymer": "Polymer/polymer#^0.4.0",
+    "bootstrap": "~3.2.0",
+    "animate-css": "~3.2.0",
+    "font-awesome": "~4.2.0",
+    "google-map": "~0.3.2"
+  },
+  "devDependencies": {
+    "polymer-test-tools": "Polymer/polymer-test-tools#^0.4.0"
+  }
+}

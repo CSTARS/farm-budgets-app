@@ -1,0 +1,275 @@
+<polymer-element name="ahb-page-budget">
+    <template>
+        <style>
+            tr {
+                opacity: 1;
+                background-color: white;
+
+                transition: all linear 200ms;
+                -webkit-transition: all linear 200ms;
+                -moz-transition: all linear 200ms;
+                -ms-transition: all linear 200ms;
+            }
+            tr[removing] {
+                opacity: 0;
+            }
+            ahb-icon {
+                display: inline-block;
+
+                transition: all 300ms linear;
+                -moz-transition: all 300ms linear;
+                -webkit-transition: all 300ms linear;
+                -ms-transition: all 300ms linear;
+
+                transform: rotate(0deg);
+                -webkit-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -ms-transform: rotate(0deg);
+            }
+            ahb-icon[opened] {
+                transform: rotate(90deg);
+                -webkit-transform: rotate(90deg);
+                -moz-transform: rotate(90deg);
+                -ms-transform: rotate(90deg);
+            }
+            .total {
+                border-top: 1px solid #ccc;
+                text-align: right;
+                padding-top: 10px;
+            }
+            .addItem {
+                position:absolute;
+                left:0;
+                top:0;
+                background-color: white;
+                padding: 10px;
+                margin: 3px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-shadow: 0 0 5px #ccc;
+            }
+            tr:hover {
+                background-color: #eee;
+            }
+        </style>
+        <div style="padding:10px">
+
+            <div style="padding:10px;margin-bottom:10px;border-bottom:1px solid #ccc">
+                <a class="btn btn-link" on-tap="{{expandAll}}"><ahb-icon icon="fa-plus-square-o"></ahb-icon> Expand</a>
+                <a class="btn btn-link" on-tap="{{collapseAll}}"><ahb-icon icon="fa-minus-square-o"></ahb-icon> Collapse</a>
+            </div>
+
+            <template repeat="{{itemSchema in schema}}">
+                <h2>
+                    <div layout horizontal>
+                        <div flex>
+                            <a class="btn btn-link"
+                                name="{{itemSchema.name}}" 
+                                on-tap="{{toggle}}">
+                                <ahb-icon 
+                                    style="font-size:25px"
+                                    icon="fa-arrow-right" 
+                                    opened?="{{opened[itemSchema.name]}}" >
+                                </ahb-icon>
+                            </a> 
+                            <span style="vertical-align:middle">{{itemSchema.name}}</span>
+
+                            <template bind if="{{removed[itemSchema.name]}}">
+                                <a class="btn btn-link" style="vertical-align:middle" on-tap="{{toggleRemoved}}" category="{{itemSchema.name}}">
+                                    <ahb-icon icon="fa-plus"></ahb-icon> Add
+                                </a>
+                                <div style="display:inline;position:relative">
+                                    <core-collapse opened="{{removed[itemSchema.name].opened}}" class="addItem">
+                                        <template repeat="{{item, i in removed[itemSchema.name].items}}">
+                                            <div><a class="btn btn-link" 
+                                                    on-tap="{{addItem}}"
+                                                    category="{{itemSchema.name}}"
+                                                    index="{{i}}">
+                                                    <ahb-icon icon="fa-plus"></ahb-icon> {{item.item}}
+                                                </a>
+                                            </div>
+                                        </template>
+                                    </core-collapse>
+                                </div>
+                            </template>
+                        </div>
+                        <div>
+                            ${{itemSchema.total}}
+                        </div>
+                    </div>
+                </h2>
+
+                <core-collapse opened="{{opened[itemSchema.name]}}">
+                    <div style="margin-left:15px">
+                        <table class="table">
+                            <tr>
+                                <th>Item</th>
+                                <th># Units</th>
+                                <td></th>
+                                <th>Unit Cost</th>
+                                <th></th>
+                            </tr>
+                            <tr template repeat="{{budgetItem in itemSchema.schema}}" removing?="{{budgetItem.removing}}">
+                                <td removing?="{{budgetItem.removing}}" >{{budgetItem.item}}</td>
+                                <td removing?="{{budgetItem.removing}}">
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        style="width:100px;display:inline-block" 
+                                        value="{{budgetItem.value}}" 
+                                        on-change="{{updateTotals}}" /> 
+                                </td>
+                                <td style="vertical-align:middle" removing?="{{budgetItem.removing}}">
+                                    <ahb-icon icon="fa-times"></ahb-icon>
+                                </td>
+                                <td removing?="{{budgetItem.removing}}">
+                                    <span style="vertical-align:middle">&nbsp;$</span>
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        style="width:100px;display:inline-block" 
+                                        value="{{budgetItem.unitCost}}" 
+                                        on-change="{{updateTotals}}" />
+                                    <span hidden?="{{budgetItem.unit == ''}}">&nbsp;/&nbsp;</span>
+                                    <span style="vertical-align:middle">{{budgetItem.unit}}</span>
+                                <td align="right" removing?="{{budgetItem.removing}}">
+                                    <a class="btn btn-link" 
+                                        category="{{itemSchema.name}}"
+                                        name="{{budgetItem.item}}"
+                                        on-tap="{{removeItem}}">
+                                        <ahb-icon icon="fa-remove"></ahb-icon> Remove
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </core-collapse>
+            </template>
+            <h2 class="total">
+                ${{total}}
+            </h2>
+        </div>
+
+    </template>
+    <script>
+        Polymer('ahb-page-budget', {
+            schema : [],
+            removed : {},
+            opened : {},
+            total : 0,
+
+            ready : function() {
+                var tmpSchema = $.extend(true, {}, BUDGET_SCHEMA);
+
+                for( var key in tmpSchema ) {
+                    this.opened[key] = false;
+
+                    // this should come from API
+                    for( var i = 0; i < tmpSchema[key].length; i++ ) {
+                        item = tmpSchema[key][i];
+                        item.value = (100 / tmpSchema[key].length).toFixed(2);
+                        item.unitCost = 1;
+                        item.removing = false; 
+                    }
+
+                    this.schema.push({
+                        total : 0,
+                        name : key,
+                        schema : tmpSchema[key]
+                    });
+                }
+                this.updateTotals();
+            },
+
+            updateTotals : function() {
+                this.total = 0;
+                var item;
+
+                for( var i = 0; i < this.schema.length; i++ ) {
+                    this.schema[i].total = 0;
+                    for( var j = 0; j < this.schema[i].schema.length; j++ ) {
+                        item = this.schema[i].schema[j];
+                        this.schema[i].total += parseFloat(item.value) * parseFloat(item.unitCost);
+                    }
+                    this.total += this.schema[i].total;
+                }
+                this.total = this.total.toFixed(2);
+            },
+
+            removeItem : function(e) {
+                var name = e.currentTarget.getAttribute('name');
+                var category = e.currentTarget.getAttribute('category');
+                var item = this.getBudgetItemByName(category, name);
+                
+                if( !item ) return;
+
+                item.removing = true;
+                setTimeout(function(){
+                    item.removing = false;
+                    this.removeBudgetItemByName(category, name);
+                    this.updateTotals();
+                }.bind(this), 300);
+            },
+
+            getBudgetItemByName : function(category, name) {
+                for( var i = 0; i < this.schema.length; i++ ) {
+                    if( this.schema[i].name == category ) {
+                        var items = this.schema[i].schema;
+                        for( var j = 0; j < items.length; j++ ) {
+                            if( items[j].item == name ) return items[j];
+                        }
+                    }
+                }
+                return null;
+            },
+
+            removeBudgetItemByName : function(category, name) {
+                for( var i = 0; i < this.schema.length; i++ ) {
+                    if( this.schema[i].name == category ) {
+                        var items = this.schema[i].schema;
+                        for( var j = 0; j < items.length; j++ ) {
+                            if( items[j].item == name ) {
+                                if( !this.removed[category] ) this.removed[category] = { opened: false, items : []};
+                                this.removed[category].items.push(items.splice(j,1)[0]);
+                                return;
+                            }
+                        }
+                    }
+                }
+            },
+
+            addItem : function(e) {
+                var category = e.currentTarget.getAttribute('category');
+                var index = parseInt(e.currentTarget.getAttribute('index'));
+
+                var item = this.removed[category].items.splice(index, 1)[0];
+                for( var i = 0; i < this.schema.length; i++ ) {
+                    if( this.schema[i].name == category ) {
+                        this.schema[i].schema.push(item);
+                        break;
+                    }
+                }
+
+                if( this.removed[category].items.length == 0 ) delete this.removed[category];
+                else this.removed[category].opened = false;
+            },
+
+            toggleRemoved : function(e) {
+                var category = e.currentTarget.getAttribute('category');
+                this.removed[category].opened = !this.removed[category].opened;
+            },
+
+            toggle : function(e) {
+                var name = e.currentTarget.getAttribute('name');
+                this.opened[name] = !this.opened[name];
+            },
+
+            expandAll : function() {
+                for( var key in this.opened ) this.opened[key] = true;
+            },
+            collapseAll : function() {
+                for( var key in this.opened ) this.opened[key] = false;
+            }
+        });
+    </script>
+</polymer-element>

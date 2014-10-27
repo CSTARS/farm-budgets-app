@@ -1,0 +1,134 @@
+<polymer-element name="ahb-page-location" attributes="location">
+    <template>
+        <style>
+            :host {
+                display: block;
+                height: 100%;
+            }
+            google-map {
+                display: block;
+                height: 100%;
+            }
+            .location {
+                position: absolute;
+                top: 0;
+                left: 100px;
+                /*border: 1px solid black;*/
+                background-color: rgba(0,0,0, .7);
+                color: white;
+                padding: 5px;
+                border-radius: 0 0 4px 4px;
+            }
+            ahb-icon {
+                display: inline-block;
+                margin: 5px;
+                cursor: pointer;
+            }
+        </style>
+        <google-map-search map="{{map}}" query="Pizza" result="{{result}}"></google-map-search>
+        <google-map id="map" map="{{map}}" latitude="37.77493" longitude="-122.41942" on-google-map-ready="{{initMap}}">
+            <google-map-marker hidden?="{{location == null}}" latitude="{{lat}}" longitude="{{lng}}"></google-map-marker>
+        </google-map>
+
+        <div class="location">
+            <core-collapse opened="{{!searching && location == null}}">
+                <ahb-icon icon="fa-search" on-tap="{{startSearch}}"></ahb-icon> | Click map to select Location
+            </core-collapse>
+            <core-collapse opened="{{!searching && location != null}}">
+                <ahb-icon icon="fa-search" on-tap="{{startSearch}}"></ahb-icon> | Selected: {{location.latitude}}, {{location.longitude}}
+            </core-collapse>
+            <core-collapse opened="{{searching}}">
+                <div layout horizontal>
+                    <div flex>
+                        <input type="text" class="form-control" value="{{query}}" id="textBox" />
+                    </div>
+                    <div>
+                        <ahb-icon icon="fa-circle-o-notch fa-spin" hidden?="{{!loading}}"></ahb-icon>
+                    </div>
+                    <div>
+                        <ahb-icon icon="fa-remove" on-tap="{{stopSearch}}"></ahb-icon>
+                    </div>
+                </div>
+                <template repeat="{{loc, i in results}}">
+                    <div><a index="{{i}}" class="btn btn-link" style="margin-bottom:0" on-tap="{{selectLocation}}">{{loc.formatted_address}}</a></div>
+                </template>
+            </core-collapse>
+        </div>
+    </template>
+    <script>
+        Polymer('ahb-page-location', {
+            map : null, // actual js map
+            results : [],
+            query : '',
+            searching : false,
+            loading : false,
+            location : null,
+            searchTimer : -1,
+
+            lat : 0,
+            lng : 0,
+
+            observe : {
+                query : 'setSearchTimer'
+            },
+
+            resize : function() {
+                this.$.map.resize();
+            },
+
+            startSearch : function() {
+                this.searching = true;
+                this.async(function(){
+                    this.$.textBox.focus();
+                });
+            },
+
+            stopSearch : function() {
+                this.searching = false;
+            },
+
+            setSearchTimer : function() {
+                this.loading = true;
+                if( this.searchTimer != -1 ) clearTimeout(this.searchTimer);
+                this.searchTimer = setTimeout(this.search.bind(this), 500);
+            },
+
+            search: function() {
+                if (this.query && this.map) {
+                  var places = new google.maps.places.PlacesService(this.map);
+                  places.textSearch({query: this.query+' United States'}, this.gotResults.bind(this));
+                }
+            },
+
+            gotResults: function(results, status) {
+                this.loading = false;
+                this.results = results.splice(0,5);
+            },
+
+            selectLocation : function(e) {
+                var loc = this.results[parseInt(e.currentTarget.getAttribute('index'))];
+                this.map.setCenter(loc.geometry.location);
+                this.location = {
+                    latitude : loc.geometry.location.lat(),
+                    longitude : loc.geometry.location.lng(),
+                };
+
+                this.lat = this.location.latitude;
+                this.lng = this.location.longitude;
+                this.searching = false;
+            },
+
+            initMap : function() {
+                google.maps.event.addListener(this.map, 'click', function(e) {
+                    this.location = {
+                        latitude: e.latLng.lat(),
+                        longitude: e.latLng.lng()
+                    }
+
+                    this.lat = this.location.latitude;
+                    this.lng = this.location.longitude;
+                }.bind(this));
+            }
+        });
+    </script>
+</polymer-element>

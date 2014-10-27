@@ -1,0 +1,54 @@
+<polymer-element name="ahb-page-crop" attributes="selectedCrop location">
+    <template>
+        <style>
+            google-map {
+                height: 300px;
+                display: block;
+            }
+        </style>
+
+        <div style="padding: 10px">
+
+            <h2>Set Crop and Farm Parameters</h2>
+
+            <table class="table">
+                <tr>
+                    <td>Select Crop:</td>
+                    <td>
+                            <select value="{{selectedCrop}}">
+                            <option></option>
+                            <template repeat="{{crop in crops}}">
+                                <option value="{{crop}}">{{crop}}</option>
+                            </template>
+                        </select> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>Farm Size:</td>
+                    <td>
+                        <input type="number" class="form-control" style="width:100px;display:inline-block" /> ac
+                    </td>
+                </tr>
+                <!--<tr>
+                    <td>Location:</td>
+                    <td>
+                        <template bind if="{{location != null}}">
+                            <div style="display:none">{{location.longitude}}, {{location.latitude}}</div>
+                            <google-map latitude="{{location.latitude}}" longitude="{{location.longitude}}" on-google-map-ready="{{initMap}}">
+                                <google-map-marker hidden?="{{location == null}}" latitude="{{location.latitude}}" longitude="{{location.longitude}}"></google-map-marker>
+                            </google-map>
+                        </template>
+                    </td>
+                </tr>-->
+            </table>
+
+        </div>
+    </template>
+    <script>
+        Polymer('ahb-page-crop', {
+            crops : ['Alfalfa','Alfalfa Seed','Asparagus','Barley','Blueberries','Broccoli','Canola','Corn Grains','Corn Silage','Cotton','Dry Beans','Fescue Seed','Grass / Hay','Lentil','Oats','Orchard Grass Seed','Potatoes','Ryegrass Seed','Sorghum','Spring Wheat','Sudangrass','Sugar Beet','Winter Wheat'],
+            selectedCrop : ''
+
+        })
+    </script>
+</polymer-element>
