@@ -52,12 +52,23 @@
             tr.hover:hover {
                 background-color: #eee;
             }
-            .addTable {
-                float: right;
-            }
             .addTable td, .addTable th {
                 padding: 5px;
                 vertical-align: middle;
+            }
+            table tr td, table th  {
+                white-space: nowrap;
+            }
+            .arrowIcon {
+                font-size:25px
+            }
+            @media(max-width: 768px) {
+                h2 {
+                    font-size: 18px !important;
+                }
+                .arrowIcon {
+                    font-size: 18px
+                }
             }
         </style>
 
@@ -66,8 +77,8 @@
             <p>Please select a location, crop and farm size first!  Then we can calculate your budget.</a>
         </div>
 
-        <div style="padding:10px; overflow-x:auto" hidden?="{{farmSize == '' || farmSize == 0 || selectedCrop == '' || location == null}}">
-        <!--<div style="padding:10px; overflow-x:auto">-->
+        <div style="padding:10px;" hidden?="{{farmSize == '' || farmSize == 0 || selectedCrop == '' || location == null}}">
+        <!--<div style="padding:10px;">-->
 
 
             <div style="padding:10px;margin-bottom:10px;border-bottom:1px solid #ccc">
@@ -82,41 +93,43 @@
                 </div>
 
                 <core-collapse opened="{{showAddCustom}}">
-                    <table class="addTable">
-                        <tr>
-                            <th>Category</th>
-                            <th>Item</th>
-                            <th># Units</th>
-                            <th>Unit Cost</th>
-                            <th>Measurement Units</th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td>
-                                <select value="{{custom.category}}">
-                                    <option></option>
-                                    <template repeat="{{category in schema}}">
-                                        <option value="{{category.name}}">{{category.name}}</option>
-                                    </template>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control" value="{{custom.item}}" style="width:125px" />
-                            </td>
-                            <td style="white-space:nowrap">
-                                #&nbsp;<input type="number" class="form-control" value="{{custom.amount}}" style="width:75px;display:inline-block"/>
-                            </td>
-                            <td>
-                                $&nbsp;<input type="number" class="form-control" value="{{custom.cost}}" style="width:75px;display:inline-block" />
-                            </td>
-                            <td>
-                                <input type="text" class="form-control" value="{{custom.units}}" style="width:75px" />
-                            </td>
-                            <td>
-                                <a class="btn btn-link" on-click="{{addCustomItem}}"><ahb-icon icon="fa-plus-square-o" ></ahb-icon>&nbsp;Add</a>
-                            </td>
-                        </tr>
-                    </table>
+                    <div style="overflow:auto" horizontal end-justified layout>
+                        <table class="addTable">
+                            <tr>
+                                <th>Category</th>
+                                <th>Item</th>
+                                <th># Units</th>
+                                <th>Unit Cost</th>
+                                <th>Measurement Units</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <select value="{{custom.category}}">
+                                        <option></option>
+                                        <template repeat="{{category in schema}}">
+                                            <option value="{{category.name}}">{{category.name}}</option>
+                                        </template>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" value="{{custom.item}}" style="width:125px" />
+                                </td>
+                                <td style="white-space:nowrap">
+                                    #&nbsp;<input type="number" class="form-control" value="{{custom.amount}}" style="width:75px;display:inline-block"/>
+                                </td>
+                                <td>
+                                    $&nbsp;<input type="number" class="form-control" value="{{custom.cost}}" style="width:75px;display:inline-block" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" value="{{custom.units}}" style="width:75px" />
+                                </td>
+                                <td>
+                                    <a class="btn btn-link" on-click="{{addCustomItem}}"><ahb-icon icon="fa-plus-square-o" ></ahb-icon>&nbsp;Add</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </core-collapse>
             </div>
 
@@ -129,7 +142,7 @@
                                 name="{{itemSchema.name}}" 
                                 on-click="{{toggle}}">
                                 <ahb-icon 
-                                    style="font-size:25px"
+                                    class="arrowIcon"
                                     icon="fa-arrow-right" 
                                     opened?="{{opened[itemSchema.name]}}" >
                                 </ahb-icon>
@@ -156,13 +169,13 @@
                             </template>
                         </div>
                         <div>
-                            ${{itemSchema.total}}
+                            <span style="vertical-align:middle;">${{itemSchema.total}}</span>
                         </div>
                     </div>
                 </h2>
 
                 <core-collapse opened="{{opened[itemSchema.name]}}">
-                    <div style="margin-left:15px">
+                    <div style="margin-left:15px;overflow:auto">
                         <table class="table">
                             <tr>
                                 <th>Item</th>
