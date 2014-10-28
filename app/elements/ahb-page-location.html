@@ -11,33 +11,39 @@
             }
             .location {
                 position: absolute;
-                top: 0;
-                left: 100px;
-                /*border: 1px solid black;*/
-                background-color: rgba(0,0,0, .7);
+                bottom: 0;
+                left: 0;
+                width:100%;
+                background-color: rgba(0,0,0, .8);
                 color: white;
                 padding: 5px;
-                border-radius: 0 0 4px 4px;
+                border-top: 1px solid black;
             }
             ahb-icon {
                 display: inline-block;
                 margin: 5px;
                 cursor: pointer;
             }
+            
+            .phoneBreak {
+                display: none;
+            }
+            @media(max-width: 768px) {
+                .phoneBreak {
+                    display: block;
+                }
+            }
         </style>
         <google-map-search map="{{map}}" query="Pizza" result="{{result}}"></google-map-search>
         <google-map id="map" map="{{map}}" latitude="37.77493" longitude="-122.41942" on-google-map-ready="{{initMap}}">
-            <google-map-marker hidden?="{{location == null}}" latitude="{{lat}}" longitude="{{lng}}"></google-map-marker>
+            <google-map-marker hidden?="{{location == null}}" latitude="{{location.latitude}}" longitude="{{location.longitude}}"></google-map-marker>
         </google-map>
 
         <div class="location">
-            <core-collapse opened="{{!searching && location == null}}">
-                <ahb-icon icon="fa-search" on-tap="{{startSearch}}"></ahb-icon> | Click map to select Location
-            </core-collapse>
-            <core-collapse opened="{{!searching && location != null}}">
-                <ahb-icon icon="fa-search" on-tap="{{startSearch}}"></ahb-icon> | Selected: {{location.latitude}}, {{location.longitude}}
-            </core-collapse>
             <core-collapse opened="{{searching}}">
+                <template repeat="{{loc, i in results}}">
+                    <div><a index="{{i}}" class="btn btn-link" style="margin-bottom:0" on-tap="{{selectLocation}}"><ahb-icon icon="fa-map-marker"></ahb-icon>&nbsp;{{loc.formatted_address}}</a></div>
+                </template>
                 <div layout horizontal>
                     <div flex>
                         <input type="text" class="form-control" value="{{query}}" id="textBox" />
@@ -49,9 +55,26 @@
                         <ahb-icon icon="fa-remove" on-tap="{{stopSearch}}"></ahb-icon>
                     </div>
                 </div>
-                <template repeat="{{loc, i in results}}">
-                    <div><a index="{{i}}" class="btn btn-link" style="margin-bottom:0" on-tap="{{selectLocation}}">{{loc.formatted_address}}</a></div>
-                </template>
+            </core-collapse>
+            <core-collapse opened="{{!searching && location == null}}">
+                <div layout horizontal>
+                    <div flex>
+                        <div style="display:inline-block;cursor:pointer" on-tap="{{startSearch}}"><ahb-icon icon="fa-search" ></ahb-icon>&nbsp;Search</div>
+                    </div>
+                    <div style="text-align:right;padding-top:4px;color: #888">
+                        Click map to select Location
+                    </div>
+                </div>
+            </core-collapse>
+            <core-collapse opened="{{!searching && location != null}}">
+                <div layout horizontal>
+                    <div flex>
+                        <div style="display:inline-block;cursor:pointer;white-space:nowrap" on-tap="{{startSearch}}"><ahb-icon icon="fa-search" ></ahb-icon>&nbsp;Search</div>
+                    </div>
+                    <div style="text-align:right;padding-top:4px;color: #888">
+                        {{location.fixedLat}}, {{location.fixedLng}}:<br class="phoneBreak" /> {{location.county}}, {{location.state}}, {{location.zipCode}}
+                    </div>
+                </div>
             </core-collapse>
         </div>
     </template>
@@ -65,8 +88,6 @@
             location : null,
             searchTimer : -1,
 
-            lat : 0,
-            lng : 0,
 
             observe : {
                 query : 'setSearchTimer'
@@ -95,38 +116,64 @@
 
             search: function() {
                 if (this.query && this.map) {
-                  var places = new google.maps.places.PlacesService(this.map);
-                  places.textSearch({query: this.query+' United States'}, this.gotResults.bind(this));
+                  /*var places = new google.maps.places.PlacesService(this.map);
+                  places.textSearch({query: this.query+' United States'}, this.gotResults.bind(this));*/
+                  $.get('https://maps.googleapis.com/maps/api/geocode/json?address='+this.query+'&components=country:USA', this.gotResults.bind(this));
                 }
             },
 
-            gotResults: function(results, status) {
+            gotResults: function(resp, status) {
                 this.loading = false;
-                this.results = results.splice(0,5);
+                this.results = resp.results.splice(0,5);
+                console.log(this.results);
             },
 
             selectLocation : function(e) {
                 var loc = this.results[parseInt(e.currentTarget.getAttribute('index'))];
                 this.map.setCenter(loc.geometry.location);
-                this.location = {
-                    latitude : loc.geometry.location.lat(),
-                    longitude : loc.geometry.location.lng(),
-                };
-
-                this.lat = this.location.latitude;
-                this.lng = this.location.longitude;
+                
+                this.setLocation(loc, true);
                 this.searching = false;
             },
 
             initMap : function() {
                 google.maps.event.addListener(this.map, 'click', function(e) {
-                    this.location = {
-                        latitude: e.latLng.lat(),
-                        longitude: e.latLng.lng()
-                    }
+                    this.llLookUp(e.latLng.lat(), e.latLng.lng(), true);
+                }.bind(this));
+            },
 
-                    this.lat = this.location.latitude;
-                    this.lng = this.location.longitude;
+            setLocation : function(loc, recheck) {
+                this.location = {};
+
+                if( loc.geometry && loc.geometry.location ) {
+                    this.location.latitude = loc.geometry.location.lat;
+                    this.location.longitude = loc.geometry.location.lng;
+                    this.location.fixedLat = this.location.latitude.toFixed(4);
+                    this.location.fixedLng = this.location.longitude.toFixed(4);
+                }
+
+                for( var i = 0; i < loc.address_components.length; i++ ) {
+                    if( loc.address_components[i].types.indexOf('administrative_area_level_2') > -1 ) {
+                        this.location.county = loc.address_components[i].long_name;
+                    } else if ( loc.address_components[i].types.indexOf('administrative_area_level_1') > -1 ) {
+                        this.location.state = loc.address_components[i].long_name;
+                    } else if ( loc.address_components[i].types.indexOf('postal_code') > -1) {
+                        this.location.zipCode = loc.address_components[i].long_name;
+                    }
+                }
+
+                if( !this.location.county || !this.location.state || !this.location.zipCode ) {
+                    if( recheck ) this.llLookUp(this.location.latitude, this.location.longitude, false);
+                    else alert('Location Lookup Error :(');
+                }
+            },
+
+            llLookUp : function(lat, lng, recheck) {
+                $.get('http://maps.googleapis.com/maps/api/geocode/json?latlng='+lat+','+lng+'&sensor=false', function(resp) {
+                    if( resp.results.length > 0 ) {
+                        this.setLocation(resp.results[0], recheck);
+                    }
+                    // TODO: how do we want to handle case w/ no resp?
                 }.bind(this));
             }
         });

@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-crop" attributes="selectedCrop location">
+<polymer-element name="ahb-page-crop" attributes="selectedCrop farmSize location">
     <template>
         <style>
             google-map {
@@ -8,6 +8,31 @@
         </style>
 
         <div style="padding: 10px">
+
+            <div hidden?="{{location == null}}">
+                <h4>Location</h4>
+                <table class="table">
+                    <tr>
+                        <td>Lat / Lng</td>
+                        <td>{{location.fixedLat}}, {{location.fixedLng}}</td>
+                    </tr>
+                    <tr>
+                        <td>County</td>
+                        <td>{{location.county}}</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>{{location.state}}</td>
+                    </tr>
+                    <tr>
+                        <td>Zip Code</td>
+                        <td>{{location.zipCode}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div hidden?="{{location != null}}">
+                <h4><ahb-icon icon="fa-warning"></ahb-icon>&nbsp;Don't forget to select a location!</h4>
+            </div>
 
             <h2>Set Crop and Farm Parameters</h2>
 
@@ -26,20 +51,9 @@
                 <tr>
                     <td>Farm Size:</td>
                     <td>
-                        <input type="number" class="form-control" style="width:100px;display:inline-block" /> ac
+                        <input type="number" class="form-control" style="width:100px;display:inline-block" value="{{farmSize}}" /> ac
                     </td>
                 </tr>
-                <!--<tr>
-                    <td>Location:</td>
-                    <td>
-                        <template bind if="{{location != null}}">
-                            <div style="display:none">{{location.longitude}}, {{location.latitude}}</div>
-                            <google-map latitude="{{location.latitude}}" longitude="{{location.longitude}}" on-google-map-ready="{{initMap}}">
-                                <google-map-marker hidden?="{{location == null}}" latitude="{{location.latitude}}" longitude="{{location.longitude}}"></google-map-marker>
-                            </google-map>
-                        </template>
-                    </td>
-                </tr>-->
             </table>
 
         </div>
@@ -47,8 +61,8 @@
     <script>
         Polymer('ahb-page-crop', {
             crops : ['Alfalfa','Alfalfa Seed','Asparagus','Barley','Blueberries','Broccoli','Canola','Corn Grains','Corn Silage','Cotton','Dry Beans','Fescue Seed','Grass / Hay','Lentil','Oats','Orchard Grass Seed','Potatoes','Ryegrass Seed','Sorghum','Spring Wheat','Sudangrass','Sugar Beet','Winter Wheat'],
-            selectedCrop : ''
-
+            selectedCrop : '',
+            farmSize : 0,
         })
     </script>
 </polymer-element>

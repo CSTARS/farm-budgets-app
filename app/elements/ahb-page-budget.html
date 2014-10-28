@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-budget">
+<polymer-element name="ahb-page-budget" attributes="farmSize selectedCrop location">
     <template>
         <style>
             tr {
@@ -49,16 +49,77 @@
                 box-shadow: 0 0 5px #ccc;
                 z-index: 1000;
             }
-            tr:hover {
+            tr.hover:hover {
                 background-color: #eee;
             }
+            .addTable {
+                float: right;
+            }
+            .addTable td, .addTable th {
+                padding: 5px;
+                vertical-align: middle;
+            }
         </style>
-        <div style="padding:10px">
+
+        <div style="padding:10px" hidden?="{{!(farmSize == '' || farmSize == 0 || selectedCrop == '' || location == null)}}">
+            <h4><ahb-icon icon="fa-warning"></ahb-icon> Actions Required</h4>
+            <p>Please select a location, crop and farm size first!  Then we can calculate your budget.</a>
+        </div>
+
+        <div style="padding:10px; overflow-x:auto" hidden?="{{farmSize == '' || farmSize == 0 || selectedCrop == '' || location == null}}">
+        <!--<div style="padding:10px; overflow-x:auto">-->
+
 
             <div style="padding:10px;margin-bottom:10px;border-bottom:1px solid #ccc">
-                <a class="btn btn-link" on-tap="{{expandAll}}"><ahb-icon icon="fa-plus-square-o"></ahb-icon>&nbsp;Expand</a>
-                <a class="btn btn-link" on-tap="{{collapseAll}}"><ahb-icon icon="fa-minus-square-o"></ahb-icon>&nbsp;Collapse</a>
+                <div layout horizontal>
+                    <div>
+                        <a class="btn btn-link" on-click="{{expandAll}}"><ahb-icon icon="fa-toggle-down"></ahb-icon>&nbsp;Expand</a>
+                        <a class="btn btn-link" on-click="{{collapseAll}}"><ahb-icon icon="fa-toggle-right"></ahb-icon>&nbsp;Collapse</a>
+                    </div>
+                    <div flex style="text-align:right">
+                        <a class="btn btn-link" on-click="{{toggleAddCustom}}"><ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add Custom</a>
+                    </div>
+                </div>
+
+                <core-collapse opened="{{showAddCustom}}">
+                    <table class="addTable">
+                        <tr>
+                            <th>Category</th>
+                            <th>Item</th>
+                            <th># Units</th>
+                            <th>Unit Cost</th>
+                            <th>Measurement Units</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select value="{{custom.category}}">
+                                    <option></option>
+                                    <template repeat="{{category in schema}}">
+                                        <option value="{{category.name}}">{{category.name}}</option>
+                                    </template>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" value="{{custom.item}}" style="width:125px" />
+                            </td>
+                            <td style="white-space:nowrap">
+                                #&nbsp;<input type="number" class="form-control" value="{{custom.amount}}" style="width:75px;display:inline-block"/>
+                            </td>
+                            <td>
+                                $&nbsp;<input type="number" class="form-control" value="{{custom.cost}}" style="width:75px;display:inline-block" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" value="{{custom.units}}" style="width:75px" />
+                            </td>
+                            <td>
+                                <a class="btn btn-link" on-click="{{addCustomItem}}"><ahb-icon icon="fa-plus-square-o" ></ahb-icon>&nbsp;Add</a>
+                            </td>
+                        </tr>
+                    </table>
+                </core-collapse>
             </div>
+
 
             <template repeat="{{itemSchema in schema}}">
                 <h2>
@@ -66,7 +127,7 @@
                         <div flex>
                             <a class="btn btn-link"
                                 name="{{itemSchema.name}}" 
-                                on-tap="{{toggle}}">
+                                on-click="{{toggle}}">
                                 <ahb-icon 
                                     style="font-size:25px"
                                     icon="fa-arrow-right" 
@@ -76,14 +137,14 @@
                             <span style="vertical-align:middle">{{itemSchema.name}}</span>
 
                             <template bind if="{{removed[itemSchema.name]}}">
-                                <a class="btn btn-link" style="vertical-align:middle" on-tap="{{toggleRemoved}}" category="{{itemSchema.name}}">
+                                <a class="btn btn-link" style="vertical-align:middle" on-click="{{toggleRemoved}}" category="{{itemSchema.name}}">
                                     <ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add
                                 </a>
                                 <div style="display:inline;position:relative">
                                     <core-collapse opened="{{removed[itemSchema.name].opened}}" class="addItem">
                                         <template repeat="{{item, i in removed[itemSchema.name].items}}">
                                             <div><a class="btn btn-link" 
-                                                    on-tap="{{addItem}}"
+                                                    on-click="{{addItem}}"
                                                     category="{{itemSchema.name}}"
                                                     index="{{i}}">
                                                     <ahb-icon icon="fa-plus"></ahb-icon>&nbsp;{{item.item}}
@@ -111,7 +172,7 @@
                                 <th>Item Total</th>
                                 <th></th>
                             </tr>
-                            <tr template repeat="{{budgetItem in itemSchema.schema}}" removing?="{{budgetItem.removing}}">
+                            <tr template repeat="{{budgetItem in itemSchema.schema}}" removing?="{{budgetItem.removing}}" class="hover">
                                 <td removing?="{{budgetItem.removing}}" >{{budgetItem.item}}</td>
                                 <td removing?="{{budgetItem.removing}}">
                                     <input 
@@ -140,8 +201,8 @@
                                     <a class="btn btn-link" 
                                         category="{{itemSchema.name}}"
                                         name="{{budgetItem.item}}"
-                                        on-tap="{{removeItem}}">
-                                        <ahb-icon icon="fa-remove"></ahb-icon>&nbsp;Remove
+                                        on-click="{{removeItem}}">
+                                        <ahb-icon icon="fa-minus-square-o"></ahb-icon>&nbsp;Remove
                                     </a>
                                 </td>
                             </tr>
@@ -161,6 +222,16 @@
             removed : {},
             opened : {},
             total : 0,
+            showAddCustom : false,
+
+            // for add custom items
+            custom : {
+                category : '',
+                item : '',
+                amount : '',
+                cost : '',
+                units : ''
+            },
 
             ready : function() {
                 var tmpSchema = $.extend(true, {}, BUDGET_SCHEMA);
@@ -270,6 +341,43 @@
             toggle : function(e) {
                 var name = e.currentTarget.getAttribute('name');
                 this.opened[name] = !this.opened[name];
+            },
+
+            toggleAddCustom : function() {
+                this.showAddCustom = !this.showAddCustom;
+                if( !this.showAddCustom ) {
+                    this.custom = {
+                        category : '',
+                        item : '',
+                        amount : '',
+                        cost : '',
+                        units : ''
+                    }
+                }
+            },
+
+            addCustomItem : function() {
+                if( this.custom.category == '' ) return alert('Please provide a category');
+                if( this.custom.item == '' ) return alert('Please provide an item name');
+                if( this.custom.amount == '' ) return alert('Please provide the number of units');
+                if( this.custom.cost == '' ) return alert('Please provide the cost per unit');
+
+                for( var i = 0; i < this.schema.length; i++ ) {
+                    if( this.schema[i].name == this.custom.category ) {
+                        this.schema[i].schema.push({
+                            item : this.custom.item,
+                            value : this.custom.amount,
+                            unitCost : this.custom.cost,
+                            unit : this.custom.units,
+                            total : 0,
+                            removing : false,
+                            custom : true
+                        })
+                    }
+                }
+
+                this.toggleAddCustom();
+                this.updateTotals();
             },
 
             expandAll : function() {
