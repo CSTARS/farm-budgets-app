@@ -62,6 +62,13 @@ module.exports = function (grunt) {
           },
           command: 'mv <%= yeoman.app %>/bower_components/font-awesome/fonts <%= yeoman.app %>/'
       },
+      'serve' : {
+          options: {
+              stdout: true,
+              stderr: true
+          },
+          command: 'node server.js --dev'
+      }
     },
 
     watch: {
@@ -298,7 +305,7 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('server', function (target) {
+  /*grunt.registerTask('server', function (target) {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run(['serve:' + target]);
   });
@@ -316,6 +323,10 @@ module.exports = function (grunt) {
       'open',
       'watch'
     ]);
+  });*/
+
+  grunt.registerTask('server', function (target) {
+    grunt.task.run(['shell:serve']);
   });
 
   grunt.registerTask('test', [

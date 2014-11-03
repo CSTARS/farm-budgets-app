@@ -35,10 +35,18 @@
                 <ahb-page-location id="location" location="{{location}}"></ahb-page-location>
               </div> 
               <div class="page">
-                <ahb-page-crop location="{{location}}" selectedCrop="{{selectedCrop}}" farmSize="{{farmSize}}"></ahb-page-crop>
+                <ahb-page-crop 
+                  location="{{location}}" 
+                  selectedCrop="{{selectedCrop}}" 
+                  farmSize="{{farmSize}}"
+                  crops="{{crops}}">
+                </ahb-page-crop>
               </div>
               <div class="page">
                 <ahb-page-budget location="{{location}}" selectedCrop="{{selectedCrop}}" farmSize="{{farmSize}}"></ahb-page-budget>
+              </div>
+              <div class="page">
+                <ahb-page-admin crops="{{crops}}"></ahb-page-admin>
               </div>
             </core-animated-pages>
         </ahb-app-layout>
@@ -50,18 +58,19 @@
             PAGES : {
               MAP : 0,
               CROP : 1,
-              RESULTS : 2
+              RESULTS : 2,
+              ADMIN : 3
             },
             loc : '',
             hack : '',
             selectedPage : 0,
 
             ready : function() {
-              window.addEventListener('polymer-ready', function(e) { 
+              //window.addEventListener('polymer-ready', function(e) { 
                 $(window).on('hashchange', function(){
                   this.setLocation();
                 }.bind(this));
-              }.bind(this));
+              //}.bind(this));
               
               this.setLocation();
             },
@@ -81,6 +90,9 @@
                 this.$.pages.selected = this.selectedPage;
               } else if ( this.loc == 'budget' ) {
                 this.selectedPage = this.PAGES.RESULTS;
+                this.$.pages.selected = this.selectedPage;
+              } else if ( this.loc == 'admin' ) {
+                this.selectedPage = this.PAGES.ADMIN;
                 this.$.pages.selected = this.selectedPage;
               }
             }

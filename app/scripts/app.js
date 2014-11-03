@@ -13,11 +13,58 @@
             "unit": "lb"
         },
         {
+            "item": "10-34-00",
+            "unit": "lb"
+        },
+        {
+            "item": "16-16-16",
+            "unit": "lb N"
+        },
+        {
+            "item": "80-00-00",
+            "unit": "lb N"
+        },
+        {
+            "item": "40-0-0-6",
+            "units": "lb"
+        },
+        {
+            "item": "32-0-0",
+            "units": "lb"
+        },
+        {
+            "item": "80-0-0",
+            "units": ""
+        },
+        {
+            "item": "33-0-0-12",
+            "units": ""
+        },
+        {
+            "item": "16-20-0-14",
+            "units": "lb"
+        },
+        {
+            "item": "46-0-0",
+            "alt" : ["Urea 46-0-0"],
+            "unit": "lb N"
+        },
+        {
+            "item": "Dry P2O5",
+            "unit": "lb"
+        },
+        {
+            "item": "Sulfur",
+            "unit": "lb"
+        },
+        {
             "item": "Dry Nitrogen",
+            "alt" : ["Nitrogen", "Nitrogen (dry)", "Dry Nitrogen - Preplant"],
             "unit": "lb"
         },
         {
             "item": "Dry Phosphate",
+            "alt" : ["Phosphorous","Phosphorous (dry)"],
             "unit": "lb"
         },
         {
@@ -26,6 +73,7 @@
         },
         {
             "item": "Dry Sulfur",
+            "alt" : ["Sulfur (dry)"],
             "unit": "lb"
         },
         {
@@ -39,16 +87,130 @@
         {
             "item": "UN32",
             "unit": "lbN"
-        }
+        },
+        {
+            "item": "K20",
+            "alt": ["K2O"],
+            "unit": "lb"
+        },
+        {
+            "item": "Zinc",
+            "unit": "lb"
+        },
+        {
+            "item": "Micronutrients",
+            "units": "ac"
+        },
+        {
+            "item": "Liquid Nitrogen",
+            "units": "lb"
+        },
+        {
+            "item": "Liquid P2O5",
+            "units": "lb"
+        } 
     ],
     "Pesticides": [
         {
             "item": "Roundup",
-            "unit": ""
+            "alt": ["Roundup Original Max"],
+            "unit": "oz"
+        },
+        {
+            "item": "Ridomil Gold EC",
+            "units": "oz"
+        },
+        {
+            "item": "Rally 40 WSP",
+            "units": "oz"
+        },
+        {
+            "item": "Karmex DF",
+            "units": "lb"
+        },
+        {
+            "item": "Di-Syston",
+            "units": "pt"
         },
         {
             "item": "Ammonium Sulfate",
             "unit": ""
+        },
+        {
+            "item": "Metam Sodium",
+            "units": "gal"
+        },
+        {
+            "item": "Admire Pro",
+            "units": "oz"
+        },
+        {
+            "item": "MCPA Amine",
+            "units": "gal"
+        },
+        {
+            "item": "Diomethate",
+            "units": "gal"
+        },
+        {
+            "item": "Mustang 1.5 EW",
+            "units": "gal"
+        },
+        {
+            "item": "2,4-D",
+            "units": "oz"
+        },
+        {
+            "item": "Maverick1",
+            "units": "oz"
+        },
+        {
+            "item": "Discover",
+            "units": "oz"
+        },
+        {
+            "item": "Axiom OZ",
+            "units": "oz"
+        },
+        {
+            "item": "Brox M",
+            "units": "oz"
+        },
+        {
+            "item": "Puma 1EC",
+            "units": "oz"
+        },
+        {
+            "item": "Starane-Salvo",
+            "units": "oz"
+        },
+        {
+            "item": "Stratego",
+            "units": "oz"
+        },
+        {
+            "item": "Slug Bait",
+            "units": "lb"
+        },
+        {
+            "item": "Shark EW",
+            "units": "oz"
+        },
+        {
+            "item": "Excel 90",
+            "units": "oz"
+        },
+        {
+            "item": "Harmony Extra",
+            "units": "oz"
+        },
+        {
+            "item": "Osprey",
+            "units": "oz"
+        },
+        {
+            "item": "Lorsban 15G",
+            "units": "oz"
         },
         {
             "item": "M90",
@@ -61,6 +223,78 @@
         {
             "item": "Starane+Sword",
             "unit": ""
+        },
+        {
+            "item": "Pursuit",
+            "unit": "oz"
+        },
+        {
+            "item": "Prowl",
+            "unit": "oz"
+        },
+        {
+            "item": "Dimethoate",
+            "unit": "oz"
+        },
+        {
+            "item": "Far-GO",
+            "unit": "pt"
+        },
+        {
+            "item": "Quadris",
+            "units": "oz"
+        },
+        {
+            "item": "Outlook 6EC",
+            "units": "oz"
+        },
+        {
+            "item": "Sencor 75DF",
+            "units": "lb"
+        },
+        {
+            "item": "Prowl 3.3EC",
+            "units": "qt"
+        },
+        {
+            "item": "Endura (2x)",
+            "units": "oz"
+        },
+        {
+            "item": "Dithane F45 Rainshield",
+            "units": "qt"
+        },
+        {
+            "item": "Headline",
+            "units": "oz"
+        },
+        {
+            "item": "Leverage 2.7",
+            "units": "oz"
+        },
+        {
+            "item": "Reglone",
+            "units": "qt"
+        },
+        {
+            "item": "Telone II",
+            "units": "gal"
+        },
+        {
+            "item": "Poncho Beta Seed Treatment",
+            "units": "unit"
+        },
+        {
+            "item": "AMS",
+            "units": "lb"
+        },
+        {
+            "item": "Gen 25WG",
+            "units": "oz"
+        },
+        {
+            "item": "Treflan 4HFP",
+            "units": "pt"
         },
         {
             "item": "Lorsban 4E",
@@ -121,6 +355,54 @@
         {
             "item": "Pristine",
             "unit": "oz"
+        },
+        {
+            "item": "Yukon",
+            "unit": "oz"
+        },
+        {
+            "item": "Prowl H20",
+            "unit": "pint"
+        },
+        {
+            "item": "Lorban 15G",
+            "unit": "oz"
+        },
+        {
+            "item": "Oberon 25C",
+            "unit": "floz"
+        },
+        {
+            "item": "Micro-Tech",
+            "unit": "qt"
+        },
+        {
+            "item": "Counter 15G L-N-L",
+            "unit": "lb"
+        },
+        {
+            "item": "Assure II",
+            "unit": "oz"
+        },
+        {
+            "item": "Capture",
+            "unit": "acre"
+        },
+        {
+            "item": "Sonalan HFP",
+            "unit": "pt"
+        },
+        {
+            "item": "Eptam 7EC",
+            "unit": "pt"
+        },
+        {
+            "item": "Clarity",
+            "unit": "pint"
+        },
+        {
+            "item": "Prowl H2O",
+            "unit": "pint"
         }
     ],
     "Labor": [
@@ -133,25 +415,28 @@
             "unit": "hrs"
         },
         {
-            "item": "Labor (Machine)",
+            "item": "Labor (Irrigation)",
             "unit": "hr"
         },
         {
-            "item": "Labor (non-machine)",
+            "item": "Labor (Other)",
+            "alt" : ["Labor (other)"],
             "unit": "hr"
         }
     ],
     "Fuel": [
         {
             "item": "Gas",
+            "alt" : ["Fuel - Gas"],
             "unit": "gal"
         },
         {
             "item": "Diesel",
+            "alt" : ["Fuel - Diesel"],
             "unit": "gal"
         },
         {
-            "item": "Diesel",
+            "item": "Fuel",
             "unit": "gal"
         }
     ],
@@ -165,18 +450,36 @@
             "unit": ""
         },
         {
+            "item": "Maintenance and Repair",
+            "units": ""
+        },
+        {
             "item": "Lubricants",
-            "unit": " "
+            "alt" : ["Lube"],
+            "unit": ""
         },
         {
             "item": "Repair",
-            "unit": " "
+            "unit": ""
         }
     ],
     "Custom & Consultant": [
         {
             "item": "Air Application",
-            "unit": ""
+            "alt" : ["Custom Aerial Spray", "Custom Air Spray"],
+            "unit": "acre"
+        },
+        {
+            "item": "Custom Air Spray - 5G",
+            "units": "acre"
+        },
+        {
+            "item": "Custom Sidedress",
+            "units": "acre"
+        },
+        {
+            "item": "Consultant",
+            "units": "acre"
         },
         {
             "item": "Ground Application",
@@ -187,7 +490,32 @@
             "unit": ""
         },
         {
+            "item": "Packing",
+            "units": "crt"
+        },
+        {
+            "item": "Swathing",
+            "unit": "acre"
+        },
+        {
+            "item": "Rake",
+            "unit": "acre"
+        },
+        {
+            "item": "Injection-Sidedress NH3",
+            "units": ""
+        },
+        {
+            "item": "Harvest Combine Grain",
+            "units": ""
+        },
+        {
+            "item": "Harvest: Haul Grain",
+            "units": ""
+        },
+        {
             "item": "Bale",
+            "alt" : ["Baling"],
             "unit": ""
         },
         {
@@ -224,24 +552,141 @@
         },
         {
             "item": "Harvest",
+            "alt" : ["Harvest for Grain"],
             "unit": ""
         },
         {
             "item": "Bee Hives",
             "unit": "hive"
-        }
+        },
+        {
+            "item": "Rental Sprayer",
+            "unit": "acre"
+        },
+        {
+            "item": "Custom Fertilize",
+            "unit": "acre"
+        },
+        {
+            "item": "Custom Combining",
+            "unit": "acre"
+        },
+        {
+            "item": "Rental Ripper Shooter",
+            "unit": "acre"
+        },
+        {
+            "item": "Plant",
+            "unit": "acre"
+        },
+        {
+            "item": "Cut/Windrow",
+            "unit": "acre"
+        },
+        {
+            "item": "Combine",
+            "unit": "acre"
+        },
+        {
+            "item": "Application",
+            "unit": ""
+        },
+        {
+            "item": "Custom Fumigate - Deep",
+            "units": ""
+        },
+        {
+            "item": "Fumigation",
+            "units": "acre"
+        },
+        {
+            "item": "Rental Fertilizer Applicator",
+            "units": ""
+        },
+        {
+            "item": "Combine Wheat",
+            "units": ""
+        },
+        {
+            "item": "Pest Control Consultant",
+            "units": ""
+        },
+        {
+            "item": "Sprayer",
+            "units": "acre"
+        },
+        {
+            "item": "Riper Shooter",
+            "units": "acre"
+        },
+        {
+            "item": "Stuble Shredder",
+            "units": "acre"
+        },
+        {
+            "item": "Injection-Sidedress",
+            "units": "acre"
+        },
+        {
+            "item": "Swath",
+            "units": "acre"
+        },
+        {
+            "item": "Roadside Bales",
+            "units": "acre"
+        } 
     ],
     "Transport And Assesment": [
         {
-            "item": "Wheat Assesment",
-            "unit": ""
+            "item": "Assesment",
+            "unit": "cwt"
+        },
+        {
+            "item" : "Wheat Assesment",
+            "unit": "cwt"
+        },
+        {
+            "item": "Water Assesment",
+            "unit": "acre"
+        },
+        {
+            "item": "Haul Local",
+            "unit": "cwt"
+        },
+        {
+            "item": "Transport",
+            "unit": "cwt"
+        },
+        {
+            "item": "Commision Assess",
+            "unit": "cwt"
+        },
+        {
+            "item": "Seed Test",
+            "unit": "cwt"
         },
         {
             "item": "Transport to PDX",
             "unit": ""
-        }
+        },
+        {
+            "item": "Fees Assesment",
+            "units": "cwt"
+        },
     ],
     "Others": [
+        {
+            "item": "Storage Repairs",
+            "units": "ac"
+        },
+        {
+            "item": "Additional Cost of harvest",
+            "units": "crt"
+        },
+        {
+            "item": "Irrigation",
+            "units": "acin"
+        },
         {
             "item": "Water",
             "unit": "acin"
@@ -289,12 +734,52 @@
         {
             "item": "Interest on Operative Capital",
             "unit": ""
+        },
+        {
+            "item":"Storage Operating Costs",
+            "units":"cwt"
         }
     ],
     "Seed": [
         {
             "item": "Barley Seed",
             "unit": ""
+        },
+        {
+            "item": "Corn",
+            "unit": "bag"
+        },
+        {
+            "item": "Canola",
+            "unit": "lb"
+        },
+        {
+            "item": "Been Seed",
+            "unit": "lb"
+        },
+        {
+            "item": "Lentil Seed",
+            "unit": "lb"
+        },
+        {
+            "item": "Potato Seed",
+            "units": "cwt"
+        },
+        {
+            "item": "Sugarbeet",
+            "units": "unit"
+        },
+        {
+            "item": "Wheat",
+            "units": ""
+        },
+        {
+            "item": "Susan Seed",
+            "units": ""
+        },
+        {
+            "item": "Sorghum",
+            "units": "lb"
         }
     ]
 }

@@ -1,0 +1,507 @@
+<polymer-element name="ahb-page-admin" attributes="crops">
+    <template>
+        <style>
+            .card {
+                padding: 10px;
+                margin: 10px;
+                box-shadow: 0 0 5px #888;
+            }
+            .margin {
+                margin-left: 15px;
+            }
+            .add {
+                margin: 5px;
+                padding: 10px;
+                background-color: #f8f8f8;
+                border-radius: 3px;
+            }
+            paper-tabs::shadow #selectionBar {
+              background-color: #ccc;
+            }
+            paper-tabs /deep/ paper-ripple#ink {
+              color: #eee;
+            }
+        </style>
+        <div style="padding:10px">
+            <div hidden?="{{!checking}}">
+                Checking auth....
+            </div>
+            <div hidden?="{{checking || loggedIn}}">
+                <a class="btn btn-primary" href="/auth/google">Login</a>
+            </div>
+            <div hidden?="{{checking || !loggedIn}}">
+                Hello {{user.emails[0].value}},
+
+                <paper-tabs selected="{{currentTab}}">
+                    <paper-tab>Edit</paper-tab>
+                    <paper-tab>Import</paper-tab>
+                </paper-tabs>
+
+                <div hidden?="{{currentTab != 0}}">
+                    <h4>Select a state and crop to admin budget</h4>
+                    <table class="table">
+                        <tr>
+                            <td>State</td>
+                            <td>
+                                <select value="{{selectedState}}" class="form-control">
+                                    <option></option>
+                                    <template repeat="{{state in states}}">
+                                        <option value="{{state}}">{{state}}</option>
+                                    </template>
+                                </select>
+                            </td>
+                        <tr>
+                        <tr>
+                            <td>Crop</td>
+                            <td>
+                                <select value="{{selectedCrop}}" class="form-control">
+                                    <option></option>
+                                    <template repeat="{{crop in crops}}">
+                                        <option value="{{crop}}">{{crop}}</option>
+                                    </template>
+                                </select>
+                            </td>
+                        <tr>
+                    </table>           
+
+                    <div hidden?="{{selectedState == ''}}" class="card">
+                        <h4>State Costs: <span style="color:#888">{{selectedState}}</span></h4>
+                        <div class="margin">
+                            <table class="table">
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>$ Cost</th>
+                                    <th>Unit</th>
+                                    <th></th>
+                                </tr>
+                                <tr template repeat="{{cost in stateCosts}}">
+                                    <td>{{cost.item}}</td>
+                                    <td>{{catLookup[cost.item]}}</td>
+                                    <td>{{cost.cost}}</td>
+                                    <td>{{cost.unit}}</td>
+                                    <td><a class="btn btn-link" on-click="{{removeCost}}" item="{{cost.item}}">
+                                        <ahb-icon icon="fa-trash"></ahb-icon>&nbsp;Remove</a>
+                                    </td>
+                                </tr>
+                                <tr style="background-color:#eee">
+                                    <td>
+                                        <select value="{{new.cost.item}}" class="form-control">
+                                            <option></option>
+                                            <template repeat="{{item in items}}">
+                                                <option value="{{item.key}}">{{item.label}}</option>
+                                            </template>
+                                        </select>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <input type="number" value="{{new.cost.cost}}" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <input type="text" value="{{new.cost.unit}}" class="form-control" />
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-default" on-click="{{addCost}}"><ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add / Update</a>
+                                    </td>
+                                </tr>
+                            </table> 
+
+                        </div>
+                    </div>
+
+                    <div hidden?="{{selectedState == '' || selectedCrop == ''}}" class="card">
+                        <h4>Crop Items: <span style="color:#888">{{selectedState}}, {{selectedCrop}}</span></h4>
+                        <div class="margin">
+                            <table class="table">
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th># Amount</th>
+                                    <th>Cost</th>
+                                    <th>Unit</th>
+                                    <th></th>
+                                </tr>
+                                <tr template repeat="{{item in cropItems}}">
+                                    <td>{{item.item}}</td>
+                                    <td>{{catLookup[item.item]}}</td>
+                                    <td>{{item.amount}}</td>
+                                    <td>
+                                        <span hidden?="{{item.cCost.value == ''}}">${{item.cCost.value}}</span>
+                                        <span hidden?="{{item.cCost.error == ''}}" style="color:red">{{item.cCost.error}}</span>
+                                    </td>
+                                    <td>{{item.unit}}</td>
+                                    <td><a class="btn btn-link" on-click="{{removeCropItem}}" item="{{item.item}}">
+                                        <ahb-icon icon="fa-trash"></ahb-icon>&nbsp;Remove</a>
+                                    </td>
+                                </tr>
+                                <tr style="background-color:#eee">
+                                        <td>
+                                            <select value="{{new.cropItem.item}}" class="form-control">
+                                                <option></option>
+                                                <template repeat="{{item in items}}">
+                                                    <option value="{{item.key}}">{{item.label}}</option>
+                                                </template>
+                                            </select>
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            <input type="number" value="{{new.cropItem.amount}}" class="form-control" />
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            <input type="text" value="{{new.cropItem.unit}}" class="form-control" />
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-default" on-click="{{addCropItem}}"><ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add / Update</a>
+                                        </td>
+                                    </tr>
+                            </table> 
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end tab panel -->
+
+                <div hidden?="{{currentTab != 1}}">
+                    <h4>Import Text</h4>
+                    <div>Seperator: tab</div>
+                    <textarea class="form-control" value="{{importText}}" on-change="{{parseImport}}" style="height:200px"></textarea>
+
+                    <template bind if="{{importArray.length > 0}}">
+                        <h4>Raw Parse</h4>
+                        <div style="overflow:auto; max-height:200px">
+                            <table class="table">
+                                <tr template repeat="{{row in importArray}}">
+                                    <td template repeat="{{cell in row}}">
+                                        {{cell}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </template>
+
+
+                </div>
+                
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer('ahb-page-admin', {
+            loggedIn : false,
+            checking : true,
+            user : null,
+            db : null,
+
+            currentTab : 0,
+
+            states : ["Alabama","Alaska","American Samoa","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District Of Columbia","Federated States Of Micronesia","Florida","Georgia","Guam","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Marshall Islands","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Northern Mariana Islands","Ohio","Oklahoma","Oregon","Palau","Pennsylvania","Puerto Rico","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virgin Islands","Virginia","Washington","West Virginia","Wisconsin","Wyoming"],
+
+            items : [],
+
+            selectedCrop : '',
+            selectedState : '',
+
+            importText : '',
+            importArray : [],
+            importItems : [],
+
+            observe : {
+                selectedState : 'update',
+                selectedCrop : 'update'
+            },
+
+            cropItems : [],
+            stateCosts : [],
+
+            'new' : {
+                cost : {
+                    item : '',
+                    unit : '',
+                    cost : ''
+                },
+                cropItem : {
+                    item : '',
+                    unit : '',
+                    amount : ''
+                }
+            },
+
+            catLookup : {},
+
+            ready : function() {
+                $.get('/rest/user', this.onAuthCheckComplete.bind(this));
+
+                for( var key in BUDGET_SCHEMA ) {
+                    for( var i = 0; i < BUDGET_SCHEMA[key].length; i++ ) {
+                        this.items.push({
+                            key : BUDGET_SCHEMA[key][i].item,
+                            label : BUDGET_SCHEMA[key][i].item+' : '+key
+                        });
+                        this.catLookup[BUDGET_SCHEMA[key][i].item] = key;
+
+                        if( BUDGET_SCHEMA[key][i].alt ) {
+                            for( var j = 0; j < BUDGET_SCHEMA[key][i].alt.length; j++ ) {
+                                this.catLookup[BUDGET_SCHEMA[key][i].alt[j]] = key;
+                            }
+                        }
+                        
+                    }
+                }
+            },
+
+            onAuthCheckComplete : function(resp) {
+                this.checking = false;
+                if( resp.error ) return;
+
+                this.loggedIn = true;
+                this.user = resp;
+                $.get('/rest/db', this.onDbLoad.bind(this));
+            },
+
+            onDbLoad : function(resp) {
+                this.db = resp;
+            },
+
+            parseImport : function() {
+                this.importItems = [];
+                this.importArray = [];
+
+                var rows = this.importText.split('\n');
+                for( var i = 0; i < rows.length; i++ ) {
+                    this.importArray.push(this._cleanArray(rows[i].split('\t')));
+                }
+
+                // now lets remove items we don't care about
+                for( var i = 0; i < this.importArray.length; i++ ) {
+                    this.addRowFromImport(this.importArray[i]);
+                }
+
+            },
+
+            addRowFromImport : function(row) {
+                var hasText = false;
+                for( var i = 1; i < row.length; i++ ) {
+                    if( row[i].length > 0 ) {
+                        hasText = true;
+                        break;
+                    }
+                }   
+                if( !hasText ) return;// console.log('Ignoring empty row: '+row[0]);
+
+                var item = row[0];
+                if( !this.catLookup[item] ) {
+                    console.log('Ignoring unrecoginzed item row: ');
+                    item = {"item":item, units:""};
+                    console.log(JSON.stringify(item,'', '    '));
+                    return;
+                }
+            },
+            
+            _cleanArray : function(arr) {
+                for( var i = 0; i < arr.length; i++ ) {
+                    arr[i] = arr[i].replace(/^\s*\$?\s*/,'').replace(/\s*$/,'');
+                }
+                return arr;
+            },         
+
+            update : function() {
+                this.cropItems = [];
+                this.stateCosts = [];
+
+                if( this.selectedState == '' ) return;
+
+                for( var state in this.db.costs ) {
+                    if( state != this.selectedState) continue;
+
+                    for( var item in this.db.costs[state] ) {
+                        this.stateCosts.push({
+                            item : item,
+                            cost : this.db.costs[state][item].cost,
+                            unit : this.db.costs[state][item].unit,
+                            sortVal : this.catLookup[item]+item
+                        });
+                    }
+                }
+                this.stateCosts.sort(function(a, b){
+                    if( a.sortVal < b.sortVal ) return -1;
+                    if( a.sortVal > b.sortVal ) return 1;
+                    return 0;
+                });
+
+                if( this.selectedCrop == '' ) return;
+
+                for( var state in this.db.cropItems ) {
+                    if( state != this.selectedState) continue;
+
+                    for( var crop in this.db.cropItems[state] ) {
+                        if( crop != this.selectedCrop ) continue;
+
+                        for( var item in this.db.cropItems[state][crop] ) {
+                            this.cropItems.push({
+                                item : item,
+                                amount : this.db.cropItems[state][crop][item].amount,
+                                unit : this.db.cropItems[state][crop][item].unit,
+                                sortVal : this.catLookup[item]+item,
+                                cCost : this.getCurrentCost(item),
+                            });
+                        }
+                    }   
+                }
+
+                this.cropItems.sort(function(a, b){
+                    if( a.sortVal < b.sortVal ) return -1;
+                    if( a.sortVal > b.sortVal ) return 1;
+                    return 0;
+                });
+            },
+
+            getCurrentCost : function(item) {
+                var noCost = false;
+                if( !this.db.costs[this.selectedState] ) noCost = true;
+                else if ( !this.db.costs[this.selectedState][item] ) noCost = true;
+                if( noCost ) {
+                    return {
+                        value : '',
+                        error : 'No state cost set'
+                    }
+                }
+
+                var cost = this.db.costs[this.selectedState][item]; 
+                var amount = this.db.cropItems[this.selectedState][this.selectedCrop][item]; 
+                
+                if( cost.unit != amount.unit ) {
+                    return {
+                        value : '',
+                        error : 'Units do not match'
+                    }
+                }
+
+                return {
+                    value : parseFloat(cost.cost) * parseFloat(amount.amount),
+                    error : ''
+                }
+            },
+
+            removeCost : function(e) {
+                var item = e.currentTarget.getAttribute('item');
+                if( !confirm('Are your sure you want to remove: '+item+'?') ) return;
+
+                item = {
+                    state : this.selectedState,
+                    item : item,
+                    'delete' : true
+                }
+
+                $.ajax({
+                    type : 'POST',
+                    url : '/rest/addCost',
+                    data : item,
+                    success : function(resp) {}
+                });
+
+                delete this.db.costs[this.selectedState][item.item];
+
+                this.update();
+            },
+
+            addCost : function() {
+                if( this.new.cost.item == '' || this.new.cost.cost == '' || this.new.cost.cost == '0' ) {
+                    return alert('Please provide a unit and a cost');
+                }
+
+                var item = {
+                    state : this.selectedState,
+                    item : this.new.cost.item,
+                    cost : this.new.cost.cost,
+                    unit : this.new.cost.unit
+                }
+
+                $.ajax({
+                    type : 'POST',
+                    url : '/rest/addCost',
+                    data : item,
+                    success : function(resp) {}
+                });
+
+                if( !this.db.costs[item.state] ) this.db.costs[item.state] = {};
+                var itemName = item.item;
+                delete item.item;
+                delete item.state;
+                this.db.costs[this.selectedState][itemName] = item;
+                
+                this.new.cost = {
+                    item : '',
+                    unit : '',
+                    cost : ''
+                };
+
+                this.update();
+            },
+
+            removeCropItem : function(e) {
+                var item = e.currentTarget.getAttribute('item');
+                if( !confirm('Are your sure you want to remove: '+item+'?') ) return;
+
+                item = {
+                    state : this.selectedState,
+                    crop : this.selectedCrop,
+                    item : item,
+                    'delete' : true
+                }
+
+                $.ajax({
+                    type : 'POST',
+                    url : '/rest/addCropItem',
+                    data : item,
+                    success : function(resp) {}
+                });
+
+                delete this.db.cropItems[this.selectedState][this.selectedCrop][item.item];
+
+                this.update();
+            },
+
+            addCropItem : function() {
+                if( this.new.cropItem.item == '' || this.new.cropItem.amount == '' || this.new.cropItem.unit == '0' ) {
+                    return alert('Please provide a unit and amount');
+                }
+
+                var item = {
+                    state : this.selectedState,
+                    crop : this.selectedCrop,
+                    item : this.new.cropItem.item,
+                    amount : this.new.cropItem.amount,
+                    unit : this.new.cropItem.unit
+                }
+
+                $.ajax({
+                    type : 'POST',
+                    url : '/rest/addCropItem',
+                    data : item,
+                    success : function(resp) {}
+                });
+
+                if( !this.db.cropItems[item.state] ) this.db.cropItems[item.state] = {};
+                if( !this.db.cropItems[item.state][item.crop] ) this.db.cropItems[item.state][item.crop] = {};
+                
+                var itemName = item.item;
+                delete item.state;
+                delete item.crop;
+                delete item.item;
+
+                this.db.cropItems[this.selectedState][this.selectedCrop][itemName] = item;
+
+                this.new.cropItem = {
+                    item : '',
+                    unit : '',
+                    amount : ''
+                };
+
+
+                this.update();
+            }
+
+        });
+    </script>
+</polymer-element>
