@@ -45,9 +45,29 @@
             "units": "lb"
         },
         {
+            "item": "18-0-5-4",
+            "units": "lb"
+        },
+        {
             "item": "46-0-0",
             "alt" : ["Urea 46-0-0"],
             "unit": "lb N"
+        },
+        {
+            "item": "13-0-45",
+            "units": ""
+        },
+        {
+            "item": "0-0-60",
+            "units": ""
+        },
+        {
+            "item": "Surfactant-Induce",
+            "units": "gal"
+        },
+        {
+            "item": "Apogee",
+            "units": "lb"
         },
         {
             "item": "Dry P2O5",
@@ -113,7 +133,7 @@
     "Pesticides": [
         {
             "item": "Roundup",
-            "alt": ["Roundup Original Max"],
+            "alt": ["Roundup Original Max", "Roundup Ultra Max"],
             "unit": "oz"
         },
         {
@@ -403,6 +423,122 @@
         {
             "item": "Prowl H2O",
             "unit": "pint"
+        },
+        {
+            "item": "Orthene",
+            "units": "oz"
+        },
+        {
+            "item": "Zephyr",
+            "units": "floz"
+        },
+        {
+            "item": "Carbine 50WG",
+            "units": "oz"
+        },
+        {
+            "item": "Leverage",
+            "units": "floz"
+        },
+        {
+            "item": "Assail 70WP",
+            "units": "oz"
+        },
+        {
+            "item": "Finish 6 Pro",
+            "units": "pint"
+        },
+        {
+            "item": "Ginstar",
+            "units": "floz"
+        },
+        {
+            "item": "Defol 5",
+            "units": "gal"
+        },
+        {
+            "item": "Triflurex HFP",
+            "units": ""
+        },
+        {
+            "item": "Staple",
+            "units": "floz"
+        },
+        {
+            "item": "Mepex Gin Our",
+            "units": "floz"
+        },
+        {
+            "item": "Dacthal",
+            "units": "lb"
+        },
+        {
+            "item": "Goal Tender",
+            "units": "oz"
+        },
+        {
+            "item": "Admire",
+            "units": "oz"
+        },
+        {
+            "item": "Synapse WG",
+            "units": "oz"
+        },
+        {
+            "item": "LI 700",
+            "units": "oz"
+        },
+        {
+            "item": "Axiom LB",
+            "units": "lb"
+        },
+        {
+            "item": "Goal",
+            "units": "gal"
+        },
+        {
+            "item": "Diuron",
+            "units": "lb"
+        },
+        {
+            "item": "Banvel",
+            "units": "gal"
+        },
+        {
+            "item": "Quilt",
+            "units": "gal"
+        },
+        {
+            "item": "Kerb",
+            "units": "lb"
+        },
+        {
+            "item": "Bravo",
+            "units": "gal"
+        },
+        {
+            "item": "Glyphosate GAL1",
+            "units": ""
+        },
+        {
+            "item": "Disyston",
+            "units": "gal"
+        },
+        {
+            "item": "Sencor",
+            "units": "lb"
+        },
+        {
+            "item": "Sevin XLR Plus",
+            "units": "gal"
+        },
+        {
+            "item": "Treflan FP",
+            "units": "gal"
+        },
+        {
+            "item": "Spot Spray Roundup",
+            "units": "gal"
         }
     ],
     "Labor": [
@@ -466,7 +602,7 @@
     "Custom & Consultant": [
         {
             "item": "Air Application",
-            "alt" : ["Custom Aerial Spray", "Custom Air Spray"],
+            "alt" : ["Custom Aerial Spray", "Custom Air Spray", "Aerial Spraying"],
             "unit": "acre"
         },
         {
@@ -634,12 +770,58 @@
         {
             "item": "Roadside Bales",
             "units": "acre"
-        } 
+        },
+        {
+            "item": "PCA Consultant",
+            "units": ""
+        },
+        {
+            "item": "Planting",
+            "units": "thou"
+        },
+        {
+            "item": "Certification",
+            "units": ""
+        },
+        {
+            "item" : "Fertilize",
+            "alt": ["Application of fertilizer", "Fertilizer Application", "Fertilization"],
+            "units": ""
+        },
+        {
+            "item": "Postharvest and packaging",
+            "units": ""
+        },
+        {
+            "item": "Combining",
+            "units": ""
+        },
+        {
+            "item": "Commission Assess",
+            "units": ""
+        },
+        {
+            "item": "Purity and Germ",
+            "units": "cwt"
+        },
+        {
+            "item": "Seed Cleand and Bag",
+            "alt" : ["Seed Clean and Bag", "Clean Seed Orchdgr"],
+            "units": "cwt"
+        },
+        {
+            "item": "Lime",
+            "units": "ton"
+        }
     ],
     "Transport And Assesment": [
         {
             "item": "Assesment",
             "unit": "cwt"
+        },
+        {
+            "item": "Cotton Assesment",
+            "units": "bale"
         },
         {
             "item" : "Wheat Assesment",
@@ -779,6 +961,14 @@
         },
         {
             "item": "Sorghum",
+            "units": "lb"
+        },
+        {
+            "item": "Alcala",
+            "units": ""
+        },
+        {
+            "item": "Alfalfa",
             "units": "lb"
         }
     ]
