@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-budget" attributes="farmSize selectedCrop location">
+<polymer-element name="ahb-page-budget" attributes="farmSize selectedCrop selectedLocality location">
     <template>
         <style>
             tr {
@@ -237,6 +237,12 @@
             total : 0,
             showAddCustom : false,
 
+            observe : {
+                selectedCrop : '_checkUpdate',
+                farmSize : '_checkUpdate',
+                location : '_checkUpdate'
+            },
+
             // for add custom items
             custom : {
                 category : '',
@@ -393,9 +399,24 @@
                 this.updateTotals();
             },
 
+            _checkUpdate : function() {
+                if( this.location && this.selectedCrop && this.selectedCrop != '' && this.farmSize && this.farmSize != '' ) {
+                    this.loadLocalityBudget();
+                }
+            },
+
+            loadLocalityBudget : function() {
+                console.log(this.selectedCrop);
+                console.log(this.location);
+                console.log(this.selectedLocality);
+                console.log(this.farmSize);
+            },
+
+
             expandAll : function() {
                 for( var key in this.opened ) this.opened[key] = true;
             },
+
             collapseAll : function() {
                 for( var key in this.opened ) this.opened[key] = false;
             }

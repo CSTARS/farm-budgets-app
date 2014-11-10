@@ -9,8 +9,13 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 var fs = require('fs');
+var mongo = require('./lib/mongo.js');
+var schema = require('./lib/schema.json');
 
 var sessions = {};
+
+
+var authEndpoints = ['/rest/addCropItem','/rest/addCost', '/rest/updateSchema'];
 
 // are we on dev or prod?
 var dev = false;
@@ -25,7 +30,7 @@ var authFile = require(baseLocation+'auth.json');
 var db = require(baseLocation+'db.json');
 
 // set up our express application
-app.use(morgan('dev')); // log every request to the console
+//app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,8 +41,23 @@ app.use(session({ secret: 'ilovescotchscotchyscotchscotch',
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 
+
+app.use(function(req, res, next) {
+    if( authEndpoints.indexOf(req.originalUrl) > -1 && !req.user ) {
+        resp.send({error: true, message: 'Auth Error'});
+    }
+    next();
+});
+
 // serve static files
 app.use(express.static(__dirname + (dev ? '/app' : '/dist')));
+
+mongo.connect(function(err){
+    if( err ) {
+        console.log(err);
+        process.exit();
+    }
+});
 
 
 var url = dev ? 'http://localhost:3000' : 'http://alder.bioenergy.casil.ucdavis.edu';
@@ -73,12 +93,26 @@ app.get('/rest/user', function(req, resp){
 /** end google oauth **/
 
 // demo function for now
+/*
 app.post('/rest/addCropItem', function(req, resp) {
     if( !req.user ) return resp.send({error: true, message: 'Auth Error'});
     var item = req.body;
 
+    if( item.items ) {
+        for( var i = 0; i < item.items.length; i++ ) {
+            if( !addCropItem(item.items[i], resp) ) return;
+        }
+    } else {
+        addCropItem(item, resp);
+    }
+    
+    fs.writeFileSync(baseLocation+'db.json', JSON.stringify(db), 'utf8');
+    resp.send({success:true});
+});
+function addCropItem(item, resp) {
     if( !item.state || !item.crop || !item.item ) {
-        return resp.send({error:true, message:'you must provide stuff'});
+        resp.send({error:true, message:'you must provide stuff'});
+        return false;
     }
 
     if( item.delete ) {
@@ -95,16 +129,28 @@ app.post('/rest/addCropItem', function(req, resp) {
 
         db.cropItems[state][crop][itemName] = item;
     }
-        
-    fs.writeFileSync(baseLocation+'db.json', JSON.stringify(db), 'utf8');
-    resp.send({success:true});
-});
+    return true;
+}
+
 app.post('/rest/addCost', function(req, resp) {
     if( !req.user ) return resp.send({error: true, message: 'Auth Error'});
     var item = req.body;
 
+    if( item.costs ) {
+        for( var i = 0; i < item.costs.length; i++ ) {
+            if( !addCost(item.costs[i], resp) ) return;
+        }
+    } else {
+        addCost(item, resp);
+    }    
+
+    fs.writeFileSync(baseLocation+'db.json', JSON.stringify(db), 'utf8');
+    resp.send({success:true});
+});
+function addCost(item, resp) {
     if( !item.state || !item.item ) {
-        return resp.send({error:true, message:'you must provide stuff'});
+        resp.send({error:true, message:'you must provide stuff'});
+        return false;
     }
 
     if( item.delete ) {
@@ -117,13 +163,64 @@ app.post('/rest/addCost', function(req, resp) {
         delete item.item;
 
         db.costs[state][itemName] = item;
-    }    
+    }
+    return true;
+}*/
 
-    fs.writeFileSync(baseLocation+'db.json', JSON.stringify(db), 'utf8');
-    resp.send({success:true});
+app.post('/rest/addCropItem', function(req, resp) {
+    var item = req.body;
+
+    if( item.items ) mongo.addCropItem(item.items, resp);
+    else mongo.addCropItem(item, resp);
 });
-app.get('/rest/db', function(req, resp){
-    resp.send(db);
+
+app.post('/rest/addCost', function(req, resp) {
+    var item = req.body;
+
+    if( item.costs ) mongo.addCost(item.costs, resp);
+    else mongo.addCost(item, resp);
+});
+
+app.get('/rest/schema', function(req, resp) {
+    resp.send(schema);
+});
+
+app.post('/rest/updateSchema', function(req, resp) {
+    var newSchema = JSON.parse(req.body.json);
+    if( !newSchema ) return resp.send({error:true, message:'No schema found!'});
+
+    schema = newSchema;
+
+    for( var key in schema ) {
+        console.log(key+': '+(Array.isArray(schema[key])));
+    }
+
+    fs.writeFileSync(__dirname+'/lib/schema.json', JSON.stringify(schema), 'utf8');
+    resp.send({success: true});
+});
+
+app.get('/rest/getCropItems', function(req, resp){
+    var budget = req.query.budget;
+    var location = req.query.location;
+    if( location ) location = JSON.parse(location);
+    var crop = req.query.crop;
+
+    mongo.getCropItems(budget, location, crop, resp);
+});
+
+app.get('/rest/getCosts', function(req, resp){
+    var budget = req.query.budget;
+    var location = req.query.location;
+    if( location ) location = JSON.parse(location);
+
+    mongo.getCosts(budget, location, resp);
+});
+
+app.get('/rest/getCropsForLocation', function(req, resp){
+    var location = req.query.location;
+    if( location ) location = JSON.parse(location);
+
+    mongo.getCropsForLocation(location, resp);
 });
 
 app.listen(port);

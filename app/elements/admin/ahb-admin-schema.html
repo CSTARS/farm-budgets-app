@@ -1,0 +1,197 @@
+<polymer-element name="ahb-admin-schema" attributes="schema">
+    <template>
+        <style>
+            input {
+                width: 100%;
+                border: none;
+                background-color: transparent;
+                cursor: pointer;
+                border-radius: 3px;
+                padding: 5px;
+            }
+            input:focus {
+                border: none;
+                background-color: transparent;
+            }
+            input:hover {
+                background-color: #f8f8f8;
+            }
+
+            .add {
+                padding: 15px;
+                margin: 20px;
+                border-radius: 6px;
+                border: 1px solid #eee;
+            }
+        </style>
+
+        <div style="margin:20px;text-align:right">
+            <a class="btn btn-default" on-tap="{{save}}">
+                <ahb-icon icon="fa-save"></ahb-icon>&nbsp;
+                <span hidden?="{{saving}}">Save Schema</span>
+                <span hidden?="{{!saving}}">Saving...</span>
+            </a>
+        </div>
+
+        <div class="add">
+            <h2>Add Item</h2>
+            <table class="table">
+                <tr>
+                    <td>Category</td>
+                    <td>Item</td>
+                    <td>Description</td>
+                    <td>Units</td>
+                </tr>
+                <tr>
+                    <td>
+                        <select value="{{new.category}}">
+                            <option></option>
+                            <template repeat="{{cat in schemaArray}}">
+                                <option value="{{cat.name}}">{{cat.name}}</option>
+                            </template>
+                        </select>
+                    </td>
+                    <td><input class="form-control" value="{{new.item}}" /></td>
+                    <td><input class="form-control" value="{{new.description}}" /></td>
+                    <td><input class="form-control" value="{{new.units}}" /></td>
+                </tr>
+            </table>
+            <a class="btn btn-default" on-tap="{{addNew}}"><ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add</a>
+        </div>
+
+        <div>
+            Filter: <input type="text" value="{{filter}}" class="form-control" style="display:inline-block; width: 200px"/>
+        </div>
+
+        <template repeat="{{cat in schemaArray}}">
+            <h4>{{cat.name}}</h4>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th>Item</th>
+                    <th>Description</th>
+                    <th>Units</th>
+                    <th>Alt Names</th>
+                    <td></td>
+                </tr>
+                <tr template repeat="{{item, i in cat.items}}">
+                    <td><input type="text" value="{{item.item}}" /></td>
+                    <td><input type="text" value="{{item.description}}" /></td>
+                    <td><ahb-multi-input values="{{item.unit}}" ></ahb-multi-input></td>
+                    <td><ahb-multi-input values="{{item.alt}}" ></ahb-multi-input></td>
+                    <td><a class="btn btn-link" index="{{i}}" category="{{cat.name}}" on-tap="{{remove}}"><ahb-icon icon="fa-trash"></ahb-icon></a></td>
+                </tr>
+            </table>
+        </template>
+    </template>
+    <script>
+        Polymer('ahb-admin-schema', {
+            schema : null,
+            schemaArray : [],
+            filter : '',
+
+            'new' : {
+                category : '',
+                item : '',
+                description : '',
+                units : ''
+            },
+
+            observe : {
+                'schema' : 'updateSchema',
+                'filter' : 'runFilter'
+            },
+
+            filterTimer : -1,
+            runFilter : function() {
+                if( this.filterTimer != -1 ) clearTimeout(this.filterTimer);
+
+                this.filterTimer = setTimeout(function(){
+                    this.filterTimer = -1;
+                    this.updateSchema();
+                }.bind(this), 400);
+            },
+
+            updateSchema : function() {
+                this.schemaArray = [];
+                var re = new RegExp('.*'+this.filter.toLowerCase()+'.*');
+
+                for( var key in this.schema ) {
+                    var cat = {
+                        name: key,
+                        items : []
+                    }
+                    
+
+                    for( var i = 0; i < this.schema[key].length; i++ ) {
+                         if( !re.test(this.schema[key][i].item.toLowerCase()) ) continue;
+
+                         cat.items.push(this.schema[key][i]);
+                    }
+                    if( cat.items.length > 0 ) this.schemaArray.push(cat);
+                }
+            },
+
+            addNew : function() {
+                if( this.new.category == '' || this.new.item == '' ) {
+                    alert('Category and Item Name required');
+                    return;
+                }
+
+                if( this.hasItem(this.new.category, this.new.item) ) {
+                    alert('Category and Item already exist');
+                    return;
+                }
+
+                this.schema[this.new.category].push({
+                    item : this.new.item,
+                    description : this.new.description,
+                    unit : this.new.units != '' ? [this.new.units] : []
+                });
+
+                this.new = {
+                    category : '',
+                    item : '',
+                    description : '',
+                    units : ''
+                }
+            },
+
+            remove : function(e) {
+                var index = parseInt(e.currentTarget.getAttribute('index'));
+                var cat = e.currentTarget.getAttribute('category');
+
+                var i;
+                for( i = 0; i < this.schemaArray.length; i++ ) {
+                    if( this.schemaArray[i].name == cat ) break;
+                }
+
+                // lookup real index;
+                var cIndex = this.schema[cat].indexOf(this.schemaArray[i].items[index]);
+
+                this.schemaArray[i].items.splice(index, 1);
+                this.schema[cat].splice(cIndex, 1);
+            },
+
+            save : function() {
+                this.saving = true;
+                $.ajax({
+                    type : 'POST',
+                    url : '/rest/updateSchema',
+                    data : {json: JSON.stringify(this.schema)},
+                    success : function(resp) {
+                        this.saving = false;
+                        alert('Schema Saved');
+                    }.bind(this)
+                });
+            },
+
+            hasItem : function(cat, item) {
+                for( var i = 0; i < this.schema[cat].length; i++ ) {
+                    if( this.schema[cat][i].item == item ) return true;
+                }
+                return false;
+            }
+
+        })
+    </script>
+</polymer-element>

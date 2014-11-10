@@ -1,0 +1,309 @@
+<polymer-element name="ahb-admin-import" attributes="states crops catLookup">
+    <template>
+        <style>
+            .changed {
+                color: red;
+            }
+            .changed .old {
+                text-decoration: line-through;
+            }
+            .same {
+                color: green;
+            }
+            .new {
+                color: blue;
+            }
+        </style>
+
+        <h4>Import Text</h4>
+        <div>Seperator: tab</div>
+        <textarea class="form-control" value="{{importText}}" on-change="{{parseImport}}" style="height:200px"></textarea>
+
+        <template bind if="{{importArray.length > 0}}">
+            <h4>Raw Parse</h4>
+            <div style="overflow:auto; max-height:200px; margin: 30px; border: 1px solid #ccc">
+                <table class="table">
+                    <tr template repeat="{{row in importArray}}">
+                        <td template repeat="{{cell in row}}">
+                            {{cell}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        Crop: 
+        <select value="{{importCrop}}" class="form-control">
+            <option></option>
+            <template repeat="{{crop in crops}}">
+                <option value="{{crop}}">{{crop}}</option>
+            </template>
+        </select>
+
+        <template bind if="{{importArray.length > 0}}">
+            <h4>States Parse</h4>
+            <template repeat="{{state, i in importStates}}">
+                <div>
+                    State: {{i}}
+                    <select value="{{state.state}}" on-change="{{loadVerification}}" index="{{i}}">
+                        <option></option>
+                        <template repeat="{{s in states}}">
+                            <option value="{{s}}">{{s}}</option>
+                        </template>
+                    </select>
+                </div>
+                <table class="table">
+                    <tr>
+                        <th>Item</th>
+                        <th>Amount</th>
+                        <th>Unit</th>
+                        <th>Cost</th>
+                    </tr>
+                    <tr template repeat="{{item in state.items}}">
+                        <td>{{item.item}}</td>
+                        <td class="{{item.amountClass}}">
+                            <span class="old">{{item.amountText}}</span>
+                            <span hidden?="{{item.amountClass != 'changed'}}">{{item.amount}}</span>
+                        </td>
+                        <td>{{item.unitText}}</td>
+                        <td class="{{item.costClass}}">
+                            <span class="old">{{item.costText}}</span>
+                            <span hidden?="{{item.costClass != 'changed'}}">{{item.cost}}</span>
+                        </td>
+                    </tr>
+                </table>
+            </template>
+        </template>
+
+        <div>
+            <h4>Color Key</h4>
+            <ul>
+                <li>Black: Not Checked</li>
+                <li class="new">Blue: New</li>
+                <li class="changed">Red: Changed</li>
+                <li class="same">Green: Not Changed</li>
+            </ul>
+        </div>
+
+        <a class="btn btn-default" on-click="{{addImport}}">Add</a>
+    </template>
+    <script>
+        Polymer('ahb-admin-import', {
+            importText : '',
+            importArray : [],
+            importItems : [],
+            importStates : [],
+            importCrop : '',
+
+            verifications : [],
+
+            parseImport : function() {
+                this.importItems = [];
+                this.importArray = [];
+                this.importStates = [];
+                this.verifications = [];
+
+                var rows = this.importText.split('\n');
+                for( var i = 0; i < rows.length; i++ ) {
+                    this.importArray.push(this._cleanArray(rows[i].split('\t')));
+                }
+
+                // now lets remove items we don't care about
+                for( var i = 0; i < this.importArray.length; i++ ) {
+                    this.addRowFromImport(this.importArray[i]);
+                }
+
+                // remove empty states
+                for( var i = this.importStates.length-1; i >= 0; i-- ) {
+                    if( this.importStates[i].items.length == 0 ) {
+                        this.importStates.splice(i,1);
+                    }
+                }
+            },
+
+            addImport : function() {
+                this.sendImport(0);
+            },
+
+            sendImport : function(index) {
+                if( index == this.importStates.length ) {
+                    alert('import complete');
+                    return;
+                } else {
+                    var amounts = [], costs = [], item;
+                    var completed = 0;
+
+                    if( this.importStates[index].state == '' ) {
+                        index++;
+                        this.sendImport(index);
+                        return;
+                    }
+
+                    function isComplete() {
+                        completed++;
+                        if( completed == 2 ) {
+                            index++;
+                            this.sendImport(index);
+                        }
+                    }
+
+                    for( var i = 0; i < this.importStates[index].items.length; i++ ) {
+                        item = this.importStates[index].items[i];
+
+                        amount = parseFloat(item.amount);
+                        if( isNaN(amount) ) amount = '0';
+
+                        item = this.importStates[index].items[i];
+                        amounts.push({
+                            budget : 'default',
+                            item : item.item,
+                            amount : amount+'',
+                            unit : item.unit,
+                            crop : this.importCrop,
+                            state : this.importStates[index].state
+                        });
+
+                        cost = parseFloat(item.cost);
+                        if( isNaN(cost) ) cost = '0';
+
+                        costs.push({
+                            budget : 'default',
+                            item : item.item,
+                            cost : cost+'',
+                            unit : item.unit,
+                            state : this.importStates[index].state
+                        });
+                    }
+
+                    $.ajax({
+                        type : 'POST',
+                        url : '/rest/addCost',
+                        data : {costs: costs},
+                        success : isComplete.bind(this)
+                    });
+
+                    $.ajax({
+                        type : 'POST',
+                        url : '/rest/addCropItem',
+                        data : {items: amounts},
+                        success : isComplete.bind(this)
+                    });
+                }
+            },
+
+            addRowFromImport : function(row) {
+                var hasText = false;
+                for( var i = 1; i < row.length; i++ ) {
+                    if( row[i].length > 0 ) {
+                        hasText = true;
+                        break;
+                    }
+                }   
+                if( !hasText ) return;// console.log('Ignoring empty row: '+row[0]);
+
+                var item = row[0];
+                if( !this.catLookup[item] ) {
+                    //console.log('Ignoring unrecoginzed item row: ');
+                    //item = {"item":item, units:""};
+                    //console.log(JSON.stringify(item,'', '    '));
+                    return;
+                }
+
+
+                var c = 0;
+                for( var i = 1; i < row.length; i += 4) {
+                    c++;
+                    if( row[0] == '' || row[i] == '' ) {
+                        if( this.importStates.length <= c-1 ) this.importStates.push({state:'',items:[]});
+                        continue;
+                    }
+
+                    var bItem = {
+                        item : item,
+                        amount : row[i],
+                        unit : row[i+1],
+                        cost : row[i+2],
+                        amountText : row[i],
+                        amountClass : '', 
+                        unitText : row[i+1],
+                        costText : row[i+2],
+                        costClass : ''
+                    }
+
+                    if( this.importStates.length <= c-1 ) this.importStates.push({ state : '', items: [bItem]});
+                    else this.importStates[c-1].items.push(bItem);
+                }
+
+            },
+            
+            _cleanArray : function(arr) {
+                for( var i = 0; i < arr.length; i++ ) {
+                    arr[i] = arr[i].replace(/^\s*\$?\s*/,'').replace(/\s*$/,'');
+                }
+                return arr;
+            },    
+
+            loadVerification : function(e) {
+                var index = parseInt(e.currentTarget.getAttribute('index'));
+                for( var i = this.verifications.length-1; i < index; i++ ) this.verifications.push({});
+
+                var state = this.importStates[index];
+
+                var location = encodeURIComponent(JSON.stringify({state: state.state}));
+                $.get('/rest/getCosts?location='+location, function(resp){
+                    if( resp.error ) return alert(resp.message);
+
+                    for( var i = 0; i < resp.results.length; i++ ) {
+                        this.verifyCosts(state.items, resp.results[i]);
+                    }
+
+                    for( var i = 0; i < state.items.length; i++ ) {
+                        if( state.items[i].costClass == '' ) state.items[i].costClass = 'new';
+                    }
+                }.bind(this));
+
+                if( this.importCrop != '' ) {
+                    $.get('/rest/getCropItems?location='+location+'&crop='+this.importCrop, function(resp){
+                        if( resp.error ) return alert(resp.message);
+
+                        for( var i = 0; i < resp.results.length; i++ ) {
+                            this.verifyAmount(state.items, resp.results[i]);
+                        }
+
+                        for( var i = 0; i < state.items.length; i++ ) {
+                            if( state.items[i].amountClass == '' ) state.items[i].amountClass = 'new';
+                        }
+                    }.bind(this));
+                }
+            },
+
+            verifyCosts : function(cItems, oldItem) {
+                for( var i = 0; i < cItems.length; i++ ) {
+                    if( cItems[i].item == oldItem.item ) {
+                        if( parseFloat(cItems[i].cost) != parseFloat(oldItem.cost) ) {
+                            cItems[i].costText = oldItem.cost;
+                            cItems[i].costClass = 'changed';
+                        } else {
+                            cItems[i].costClass = 'same';
+                        }       
+                        return;
+                    }
+                }
+            },
+
+            verifyAmount : function(cItems, oldItem) {
+                for( var i = 0; i < cItems.length; i++ ) {
+                    if( cItems[i].item == oldItem.item ) {
+                        if( parseFloat(cItems[i].amount) != parseFloat(oldItem.amount) ) {
+                            cItems[i].amountText = oldItem.amount;
+                            cItems[i].amountClass = 'changed';
+                        } else {
+                            cItems[i].amountClass = 'same';
+                        }       
+                        return;
+                    }
+                }
+            }
+        });
+    </script>
+</polymer-element>

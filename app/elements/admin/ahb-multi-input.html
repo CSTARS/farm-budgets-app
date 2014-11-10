@@ -1,0 +1,70 @@
+<polymer-element name="ahb-multi-input" attributes="values">
+    <template>
+        <style>
+            input {
+                width: 100%;
+                border-right: none;
+                border-top: none;
+                border-left: none;
+                border-bottom: 1px solid #eee;
+                background-color: transparent;
+                cursor: pointer;
+                border-radius: 3px;
+                padding: 5px;
+            }
+            input:focus {
+                border: none;
+                background-color: transparent;
+            }
+            input:hover {
+                background-color: #f8f8f8;
+            }
+        </style>
+        <template bind if="{{values.length > 0}}">
+            <table style="width:100%">
+                <tr template repeat="{{val, i in values}}">
+                    <td><input type="text" index="{{i}}" value="{{val}}" on-change="{{updateVal}}"  /></td>
+                    <td><a class="btn btn-link" index="{{i}}" on-tap="{{remove}}"><ahb-icon icon="fa-trash"></ahb-icon></a></td>
+                </tr>
+            </table>
+        </template>
+        <a class="btn btn-link" on-tap="{{add}}"><ahb-icon icon="fa-plus"></ahb-icon>&nbsp;Add</a>
+    </template>
+    <script>
+        Polymer('ahb-multi-input', {
+            values : null,
+            observe : {
+                values : 'check'
+            },
+
+            ready : function() {
+                if( !this.values ) this.values = [];
+            },
+
+            check : function() {
+                if( !this.values ) this.values = [];
+                if( typeof this.values == 'string' && this.values != '' ) this.values = [this.values];
+            },
+
+            // hack, not sure why this isn't binding
+            updateVal : function(e) {
+                var index = parseInt(e.currentTarget.getAttribute('index'));
+                this.values[index] = e.currentTarget.value;
+            },
+
+            remove : function(e) {
+                var index = parseInt(e.currentTarget.getAttribute('index'));
+                this.values.splice(index, 1);
+            },
+
+            add : function() {
+                this.values.push('');
+                setTimeout(function(){
+                    var ele = this.shadowRoot.querySelector('input[index="'+(this.values.length-1)+'"]');
+                    console.log(ele)
+                    if( ele ) ele.focus();
+                }.bind(this), 150);
+            }
+        });
+    </script>
+<polymer-element>

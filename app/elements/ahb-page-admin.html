@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-admin" attributes="crops">
+<polymer-element name="ahb-page-admin" attributes="schema">
     <template>
         <style>
             .card {
@@ -35,6 +35,7 @@
                 <paper-tabs selected="{{currentTab}}">
                     <paper-tab>Edit</paper-tab>
                     <paper-tab>Import</paper-tab>
+                    <paper-tab>Schema</paper-tab>
                 </paper-tabs>
 
                 <div hidden?="{{currentTab != 0}}">
@@ -78,7 +79,7 @@
                                 <tr template repeat="{{cost in stateCosts}}">
                                     <td>{{cost.item}}</td>
                                     <td>{{catLookup[cost.item]}}</td>
-                                    <td>{{cost.cost}}</td>
+                                    <td>${{cost.cost}}</td>
                                     <td>{{cost.unit}}</td>
                                     <td><a class="btn btn-link" on-click="{{removeCost}}" item="{{cost.item}}">
                                         <ahb-icon icon="fa-trash"></ahb-icon>&nbsp;Remove</a>
@@ -163,26 +164,16 @@
                 <!-- end tab panel -->
 
                 <div hidden?="{{currentTab != 1}}">
-                    <h4>Import Text</h4>
-                    <div>Seperator: tab</div>
-                    <textarea class="form-control" value="{{importText}}" on-change="{{parseImport}}" style="height:200px"></textarea>
-
-                    <template bind if="{{importArray.length > 0}}">
-                        <h4>Raw Parse</h4>
-                        <div style="overflow:auto; max-height:200px">
-                            <table class="table">
-                                <tr template repeat="{{row in importArray}}">
-                                    <td template repeat="{{cell in row}}">
-                                        {{cell}}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </template>
-
-
+                    <ahb-admin-import 
+                        states="{{states}}"
+                        crops="{{crops}}"
+                        catLookup="{{catLookup}}">
+                    </ahb-admin-import>
                 </div>
-                
+
+                <div hidden?="{{currentTab != 2}}">
+                    <ahb-admin-schema schema="{{schema}}"></ahb-admin-schema>
+                </div>
             </div>
         </div>
     </template>
@@ -191,7 +182,8 @@
             loggedIn : false,
             checking : true,
             user : null,
-            db : null,
+
+            crops : ['Alfalfa','Alfalfa Seed','Asparagus','Barley','Blueberries','Broccoli','Canola','Corn Grains','Corn Silage','Cotton','Dry Beans','Fescue Seed','Grass / Hay','Lentil','Oats','Orchard Grass Seed','Potatoes','Ryegrass Seed','Sorghum','Spring Wheat','Sudangrass','Sugar Beet','Winter Wheat'],
 
             currentTab : 0,
 
@@ -202,13 +194,10 @@
             selectedCrop : '',
             selectedState : '',
 
-            importText : '',
-            importArray : [],
-            importItems : [],
-
             observe : {
                 selectedState : 'update',
-                selectedCrop : 'update'
+                selectedCrop : 'update',
+                schema : 'updateSchema'
             },
 
             cropItems : [],
@@ -231,18 +220,20 @@
 
             ready : function() {
                 $.get('/rest/user', this.onAuthCheckComplete.bind(this));
+            },
 
-                for( var key in BUDGET_SCHEMA ) {
-                    for( var i = 0; i < BUDGET_SCHEMA[key].length; i++ ) {
+            updateSchema : function() {
+                for( var key in this.schema ) {
+                    for( var i = 0; i < this.schema[key].length; i++ ) {
                         this.items.push({
-                            key : BUDGET_SCHEMA[key][i].item,
-                            label : BUDGET_SCHEMA[key][i].item+' : '+key
+                            key : this.schema[key][i].item,
+                            label : this.schema[key][i].item+' : '+key
                         });
-                        this.catLookup[BUDGET_SCHEMA[key][i].item] = key;
+                        this.catLookup[this.schema[key][i].item] = key;
 
-                        if( BUDGET_SCHEMA[key][i].alt ) {
-                            for( var j = 0; j < BUDGET_SCHEMA[key][i].alt.length; j++ ) {
-                                this.catLookup[BUDGET_SCHEMA[key][i].alt[j]] = key;
+                        if( this.schema[key][i].alt ) {
+                            for( var j = 0; j < this.schema[key][i].alt.length; j++ ) {
+                                this.catLookup[this.schema[key][i].alt[j]] = key;
                             }
                         }
                         
@@ -250,60 +241,14 @@
                 }
             },
 
+
             onAuthCheckComplete : function(resp) {
                 this.checking = false;
                 if( resp.error ) return;
 
                 this.loggedIn = true;
                 this.user = resp;
-                $.get('/rest/db', this.onDbLoad.bind(this));
             },
-
-            onDbLoad : function(resp) {
-                this.db = resp;
-            },
-
-            parseImport : function() {
-                this.importItems = [];
-                this.importArray = [];
-
-                var rows = this.importText.split('\n');
-                for( var i = 0; i < rows.length; i++ ) {
-                    this.importArray.push(this._cleanArray(rows[i].split('\t')));
-                }
-
-                // now lets remove items we don't care about
-                for( var i = 0; i < this.importArray.length; i++ ) {
-                    this.addRowFromImport(this.importArray[i]);
-                }
-
-            },
-
-            addRowFromImport : function(row) {
-                var hasText = false;
-                for( var i = 1; i < row.length; i++ ) {
-                    if( row[i].length > 0 ) {
-                        hasText = true;
-                        break;
-                    }
-                }   
-                if( !hasText ) return;// console.log('Ignoring empty row: '+row[0]);
-
-                var item = row[0];
-                if( !this.catLookup[item] ) {
-                    console.log('Ignoring unrecoginzed item row: ');
-                    item = {"item":item, units:""};
-                    console.log(JSON.stringify(item,'', '    '));
-                    return;
-                }
-            },
-            
-            _cleanArray : function(arr) {
-                for( var i = 0; i < arr.length; i++ ) {
-                    arr[i] = arr[i].replace(/^\s*\$?\s*/,'').replace(/\s*$/,'');
-                }
-                return arr;
-            },         
 
             update : function() {
                 this.cropItems = [];
@@ -311,66 +256,76 @@
 
                 if( this.selectedState == '' ) return;
 
-                for( var state in this.db.costs ) {
-                    if( state != this.selectedState) continue;
 
-                    for( var item in this.db.costs[state] ) {
+                var location = encodeURIComponent(JSON.stringify({state: this.selectedState}));
+                $.get('/rest/getCosts?location='+location, function(resp){
+                    if( resp.error ) return alert(resp.message);
+
+                    console.log(resp);
+                    for( var i = 0; i < resp.results.length; i++ ) {
                         this.stateCosts.push({
-                            item : item,
-                            cost : this.db.costs[state][item].cost,
-                            unit : this.db.costs[state][item].unit,
-                            sortVal : this.catLookup[item]+item
+                            item : resp.results[i].item,
+                            cost : resp.results[i].cost,
+                            unit : resp.results[i].unit,
+                            sortVal : this.catLookup[resp.results[i].item]+resp.results[i].item
                         });
                     }
-                }
-                this.stateCosts.sort(function(a, b){
-                    if( a.sortVal < b.sortVal ) return -1;
-                    if( a.sortVal > b.sortVal ) return 1;
-                    return 0;
-                });
+
+                    this.stateCosts.sort(function(a, b){
+                        if( a.sortVal < b.sortVal ) return -1;
+                        if( a.sortVal > b.sortVal ) return 1;
+                        return 0;
+                    });
+
+                }.bind(this));
+
+                
 
                 if( this.selectedCrop == '' ) return;
 
-                for( var state in this.db.cropItems ) {
-                    if( state != this.selectedState) continue;
+                var location = encodeURIComponent(JSON.stringify({state: this.selectedState}));
+                $.get('/rest/getCropItems?location='+location+'&crop='+this.selectedCrop, function(resp){
+                    if( resp.error ) return alert(resp.message);
 
-                    for( var crop in this.db.cropItems[state] ) {
-                        if( crop != this.selectedCrop ) continue;
+                    console.log(resp);
+                    for( var i = 0; i < resp.results.length; i++ ) {
+                        this.cropItems.push({
+                            item : resp.results[i].item,
+                            amount : resp.results[i].amount,
+                            unit : resp.results[i].unit,
+                            sortVal : this.catLookup[resp.results[i].item]+resp.results[i].item,
+                            cCost : this.getCurrentCost(resp.results[i]),
+                        });
+                    }
 
-                        for( var item in this.db.cropItems[state][crop] ) {
-                            this.cropItems.push({
-                                item : item,
-                                amount : this.db.cropItems[state][crop][item].amount,
-                                unit : this.db.cropItems[state][crop][item].unit,
-                                sortVal : this.catLookup[item]+item,
-                                cCost : this.getCurrentCost(item),
-                            });
-                        }
-                    }   
-                }
-
-                this.cropItems.sort(function(a, b){
-                    if( a.sortVal < b.sortVal ) return -1;
-                    if( a.sortVal > b.sortVal ) return 1;
-                    return 0;
-                });
+                    this.cropItems.sort(function(a, b){
+                        if( a.sortVal < b.sortVal ) return -1;
+                        if( a.sortVal > b.sortVal ) return 1;
+                        return 0;
+                    });
+                }.bind(this));
             },
 
             getCurrentCost : function(item) {
                 var noCost = false;
-                if( !this.db.costs[this.selectedState] ) noCost = true;
-                else if ( !this.db.costs[this.selectedState][item] ) noCost = true;
-                if( noCost ) {
+
+                var found = false, i;
+                for( i = 0; i < this.stateCosts.length; i++ ) {
+                    if( this.stateCosts[i].item == item.item ) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if( !found ) {
                     return {
                         value : '',
                         error : 'No state cost set'
                     }
                 }
 
-                var cost = this.db.costs[this.selectedState][item]; 
-                var amount = this.db.cropItems[this.selectedState][this.selectedCrop][item]; 
-                
-                if( cost.unit != amount.unit ) {
+                var cost = this.stateCosts[i]; 
+                if( cost.unit != item.unit ) {
                     return {
                         value : '',
                         error : 'Units do not match'
@@ -378,7 +333,7 @@
                 }
 
                 return {
-                    value : parseFloat(cost.cost) * parseFloat(amount.amount),
+                    value : parseFloat(cost.cost) * parseFloat(item.amount),
                     error : ''
                 }
             },
@@ -388,14 +343,15 @@
                 if( !confirm('Are your sure you want to remove: '+item+'?') ) return;
 
                 item = {
-                    state : this.selectedState,
-                    item : item,
-                    'delete' : true
+                    location : {
+                        state : this.selectedState
+                    },
+                    item : item
                 }
 
                 $.ajax({
                     type : 'POST',
-                    url : '/rest/addCost',
+                    url : '/rest/removeCost',
                     data : item,
                     success : function(resp) {}
                 });
@@ -421,22 +377,16 @@
                     type : 'POST',
                     url : '/rest/addCost',
                     data : item,
-                    success : function(resp) {}
+                    success : function(resp) {
+                        this.update();
+                    }
                 });
-
-                if( !this.db.costs[item.state] ) this.db.costs[item.state] = {};
-                var itemName = item.item;
-                delete item.item;
-                delete item.state;
-                this.db.costs[this.selectedState][itemName] = item;
                 
                 this.new.cost = {
                     item : '',
                     unit : '',
                     cost : ''
                 };
-
-                this.update();
             },
 
             removeCropItem : function(e) {
@@ -444,22 +394,21 @@
                 if( !confirm('Are your sure you want to remove: '+item+'?') ) return;
 
                 item = {
-                    state : this.selectedState,
+                    location : {
+                        state : this.selectedState
+                    },
                     crop : this.selectedCrop,
-                    item : item,
-                    'delete' : true
+                    item : item
                 }
 
                 $.ajax({
                     type : 'POST',
-                    url : '/rest/addCropItem',
+                    url : '/rest/removeCropItem',
                     data : item,
-                    success : function(resp) {}
+                    success : function(resp) {
+                        this.update();
+                    }
                 });
-
-                delete this.db.cropItems[this.selectedState][this.selectedCrop][item.item];
-
-                this.update();
             },
 
             addCropItem : function() {
@@ -479,27 +428,16 @@
                     type : 'POST',
                     url : '/rest/addCropItem',
                     data : item,
-                    success : function(resp) {}
+                    success : function(resp) {
+                        this.update();
+                    }
                 });
-
-                if( !this.db.cropItems[item.state] ) this.db.cropItems[item.state] = {};
-                if( !this.db.cropItems[item.state][item.crop] ) this.db.cropItems[item.state][item.crop] = {};
-                
-                var itemName = item.item;
-                delete item.state;
-                delete item.crop;
-                delete item.item;
-
-                this.db.cropItems[this.selectedState][this.selectedCrop][itemName] = item;
 
                 this.new.cropItem = {
                     item : '',
                     unit : '',
                     amount : ''
                 };
-
-
-                this.update();
             }
 
         });

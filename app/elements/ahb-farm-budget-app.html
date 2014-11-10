@@ -32,21 +32,29 @@
 
             <core-animated-pages id="pages" content transitions="slide-from-right" >
               <div class="page">
-                <ahb-page-location id="location" location="{{location}}"></ahb-page-location>
+                <ahb-page-location id="location" 
+                  location="{{location}}"
+                  crops="{{crops}}">
+                </ahb-page-location>
               </div> 
               <div class="page">
                 <ahb-page-crop 
                   location="{{location}}" 
                   selectedCrop="{{selectedCrop}}" 
+                  selectedLocality="{{selectedLocality}}" 
                   farmSize="{{farmSize}}"
                   crops="{{crops}}">
                 </ahb-page-crop>
               </div>
               <div class="page">
-                <ahb-page-budget location="{{location}}" selectedCrop="{{selectedCrop}}" farmSize="{{farmSize}}"></ahb-page-budget>
+                <ahb-page-budget 
+                  location="{{location}}" 
+                  selectedCrop="{{selectedCrop}}" 
+                  selectedLocality="{{selectedLocality}}" 
+                  farmSize="{{farmSize}}"></ahb-page-budget>
               </div>
               <div class="page">
-                <ahb-page-admin crops="{{crops}}"></ahb-page-admin>
+                <ahb-page-admin schema="{{schema}}"></ahb-page-admin>
               </div>
             </core-animated-pages>
         </ahb-app-layout>
@@ -65,12 +73,16 @@
             hack : '',
             selectedPage : 0,
 
+            schema : null,
+
             ready : function() {
-              //window.addEventListener('polymer-ready', function(e) { 
-                $(window).on('hashchange', function(){
-                  this.setLocation();
-                }.bind(this));
-              //}.bind(this));
+              $(window).on('hashchange', function(){
+                this.setLocation();
+              }.bind(this));
+
+              $.get('/rest/schema', function(resp){
+                this.schema = resp;
+              }.bind(this));
               
               this.setLocation();
             },

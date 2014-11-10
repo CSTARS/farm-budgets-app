@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-location" attributes="location">
+<polymer-element name="ahb-page-location" attributes="location crops">
     <template>
         <style>
             :host {
@@ -11,18 +11,30 @@
             }
             .location {
                 position: absolute;
-                bottom: 0;
+                top: 0;
                 left: 0;
                 width:100%;
-                background-color: rgba(0,0,0, .8);
+                background-color: rgba(0,0,0, .7);
                 color: white;
                 padding: 5px;
-                border-top: 1px solid black;
+                border-bottom: 1px solid black;
             }
             ahb-icon {
                 display: inline-block;
                 margin: 5px;
                 cursor: pointer;
+            }
+            .search-btn {
+                display : inline-block;
+                cursor : pointer;
+                border: 1px solid white;
+                border-radius: 3px;
+                box-shadow : 0 0 3px black;
+                padding: 3px 6px 3px 1px;
+                margin: 3px;
+            }
+            .search-btn:hover {
+                background-color: rgba(255,255,255,.2);
             }
             
             .phoneBreak {
@@ -41,9 +53,6 @@
 
         <div class="location">
             <core-collapse opened="{{searching}}">
-                <template repeat="{{loc, i in results}}">
-                    <div><a index="{{i}}" class="btn btn-link" style="margin-bottom:0" on-tap="{{selectLocation}}"><ahb-icon icon="fa-map-marker"></ahb-icon>&nbsp;{{loc.formatted_address}}</a></div>
-                </template>
                 <div layout horizontal>
                     <div flex>
                         <input type="text" class="form-control" value="{{query}}" id="textBox" />
@@ -55,25 +64,30 @@
                         <ahb-icon icon="fa-remove" on-tap="{{stopSearch}}"></ahb-icon>
                     </div>
                 </div>
+                <template repeat="{{loc, i in results}}">
+                    <div><a index="{{i}}" class="btn btn-link" style="margin-bottom:0" on-tap="{{selectLocation}}"><ahb-icon icon="fa-map-marker"></ahb-icon>&nbsp;{{loc.formatted_address}}</a></div>
+                </template>
             </core-collapse>
             <core-collapse opened="{{!searching && location == null}}">
                 <div layout horizontal>
-                    <div flex>
-                        <div style="display:inline-block;cursor:pointer" on-tap="{{startSearch}}"><ahb-icon icon="fa-search" ></ahb-icon>&nbsp;Search</div>
+                    <div flex self-center>
+                        <div class="search-btn" on-tap="{{startSearch}}"><ahb-icon icon="fa-search" ></ahb-icon>&nbsp;Search</div>
                     </div>
-                    <div style="text-align:right;padding-top:4px;color: #888">
+                    <div self-center style="text-align:right;padding-top:4px;color: white">
                         Click map to select Location
                     </div>
                 </div>
             </core-collapse>
             <core-collapse opened="{{!searching && location != null}}">
                 <div layout horizontal>
-                    <div flex>
-                        <div style="display:inline-block;cursor:pointer;white-space:nowrap" on-tap="{{startSearch}}"><ahb-icon icon="fa-search" ></ahb-icon>&nbsp;Search</div>
+                    <div flex self-center>
+                        <div class="search-btn" on-tap="{{startSearch}}"><ahb-icon icon="fa-search" ></ahb-icon>&nbsp;Search</div>
                     </div>
-                    <div style="text-align:right;padding-top:4px;color: #888">
-                        {{location.fixedLat}}, {{location.fixedLng}}:<br class="phoneBreak" /> {{location.county}}, {{location.state}}, {{location.zipCode}}
+                    <div style="text-align:right;padding-top:4px;color: white" hidden?="{{loading}}" self-center>
+                        {{location.county}}, {{location.state}}, {{location.zipCode}}<br /> 
+                        <span>{{cropText}}</span>
                     </div>
+                    <div self-center hidden?="{{!loading}}">Loading...</div>
                 </div>
             </core-collapse>
         </div>
@@ -88,9 +102,26 @@
             location : null,
             searchTimer : -1,
 
+            cropText : '',
 
             observe : {
-                query : 'setSearchTimer'
+                query : 'setSearchTimer',
+                'crops.state' : 'updateCropText',
+                'crops.county' : 'updateCropText',
+                'crops.zipCode' : 'updateCropText',
+            },
+
+            updateCropText : function() {
+                var cropLocality = [];
+                if( this.crops.state.length > 0 ) cropLocality.push('Statewide');
+                if( this.crops.county.length > 0 ) cropLocality.push('County');
+                if( this.crops.zipCode.length > 0 ) cropLocality.push('Zipcode');
+
+                if( cropLocality.length == 0 ) {
+                    this.cropText = 'Currently no crops found for this location.'
+                } else {
+                    this.cropText = 'Crop Locality: '+cropLocality.join(', ');
+                }
             },
 
             resize : function() {
@@ -110,6 +141,7 @@
 
             setSearchTimer : function() {
                 this.loading = true;
+                this.cropText = '';
                 if( this.searchTimer != -1 ) clearTimeout(this.searchTimer);
                 this.searchTimer = setTimeout(this.search.bind(this), 500);
             },
@@ -125,7 +157,6 @@
             gotResults: function(resp, status) {
                 this.loading = false;
                 this.results = resp.results.splice(0,5);
-                console.log(this.results);
             },
 
             selectLocation : function(e) {
@@ -140,6 +171,17 @@
                 google.maps.event.addListener(this.map, 'click', function(e) {
                     this.llLookUp(e.latLng.lat(), e.latLng.lng(), true);
                 }.bind(this));
+
+                this.map.setOptions({
+                    mapTypeControl: false,
+                    panControl: false,
+                    zoomControl: true,
+                    zoomControlOptions: {
+                        style: google.maps.ZoomControlStyle.DEFAULT,
+                        position: google.maps.ControlPosition.LEFT_CENTER
+                    },
+                    streetViewControl: false
+                })
             },
 
             setLocation : function(loc, recheck) {

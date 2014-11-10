@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-crop" attributes="selectedCrop farmSize location crops">
+<polymer-element name="ahb-page-crop" attributes="selectedCrop selectedLocality farmSize location crops">
     <template>
         <style>
             google-map {
@@ -40,10 +40,16 @@
                 <tr>
                     <td>Select Crop:</td>
                     <td>
-                            <select value="{{selectedCrop}}">
+                        <select value="{{selectedCropAndLocality}}">
                             <option></option>
-                            <template repeat="{{crop in crops}}">
-                                <option value="{{crop}}">{{crop}}</option>
+                            <template repeat="{{crop in crops.state}}">
+                                <option value="{{crop}}::statewide">{{crop}} (Statewide - {{location.state}})</option>
+                            </template>
+                            <template repeat="{{crop in crops.county}}">
+                                <option value="{{crop}}::county">{{crop}} ({{location.county}})</option>
+                            </template>
+                            <template repeat="{{crop in crops.zipCode}}">
+                                <option value="{{crop}}::zipcode">{{crop}} ({{location.zipCode}})</option>
                             </template>
                         </select> 
                     </td>
@@ -60,9 +66,43 @@
     </template>
     <script>
         Polymer('ahb-page-crop', {
-            crops : ['Alfalfa','Alfalfa Seed','Asparagus','Barley','Blueberries','Broccoli','Canola','Corn Grains','Corn Silage','Cotton','Dry Beans','Fescue Seed','Grass / Hay','Lentil','Oats','Orchard Grass Seed','Potatoes','Ryegrass Seed','Sorghum','Spring Wheat','Sudangrass','Sugar Beet','Winter Wheat'],
+            crops : {
+                state : [],
+                county : [],
+                zipCode : []
+            },
+
             selectedCrop : '',
+            selectedLocality : '',
+            selectedCropAndLocality : '',
             farmSize : 0,
+
+            firstTime : true,
+
+            observe : {
+                'location.county' : 'updateCrops',
+                'location.state' : 'updateCrops',
+                'location.zipCode' : 'updateCrops',
+                'selectedCropAndLocality' : 'updateSelected'
+            },
+
+            updateSelected : function() {
+                var parts = this.selectedCropAndLocality.split('::');
+                this.selectedCrop = parts[0];
+                this.selectedLocality = parts[1];
+            },
+
+            updateCrops : function() {
+                $.get('/rest/getCropsForLocation?location='+encodeURIComponent(JSON.stringify(this.location)), function(resp) {
+                    this.crops = resp;
+
+                    if( this.firstTime && 
+                        (this.crops.state.length > 0 || this.crops.county.length > 0 || this.crops.zipCode.length > 0 ) ) {
+                        this.firstTime = false;
+                        window.location.hash = 'crop';
+                    }
+                }.bind(this));
+            }
         })
     </script>
 </polymer-element>
