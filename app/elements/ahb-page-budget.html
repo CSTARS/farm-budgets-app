@@ -1,4 +1,4 @@
-<polymer-element name="ahb-page-budget" attributes="farmSize selectedCrop selectedLocality location">
+<polymer-element name="ahb-page-budget" attributes="defaultSchema farmSize selectedCrop selectedLocality location">
     <template>
         <style>
             tr {
@@ -36,6 +36,13 @@
                 border-top: 1px solid #ccc;
                 text-align: right;
                 padding-top: 10px;
+                color: #333;
+            }
+            .grandTotal {
+                border-top: 1px solid #888;
+                text-align: right;
+                padding-top: 10px;
+                font-weight: bold;
             }
             .addItem {
                 position:absolute;
@@ -169,7 +176,7 @@
                             </template>
                         </div>
                         <div>
-                            <span style="vertical-align:middle;">${{itemSchema.total}}</span>
+                            <span style="vertical-align:middle;">${{itemSchema.totalText}}</span>
                         </div>
                     </div>
                 </h2>
@@ -209,7 +216,7 @@
                                     <span hidden?="{{budgetItem.unit == ''}}">&nbsp;/&nbsp;</span>
                                     <span style="vertical-align:middle">{{budgetItem.unit}}</span>
                                 </td>
-                                <td>${{budgetItem.total}}</td>
+                                <td>${{budgetItem.totalText}}</td>
                                 <td align="right" removing?="{{budgetItem.removing}}">
                                     <a class="btn btn-link" 
                                         category="{{itemSchema.name}}"
@@ -224,7 +231,12 @@
                 </core-collapse>
             </template>
             <h2 class="total">
-                ${{total}}
+                ${{totalText}}
+                <div style="color:#888;font-size: 18px">x {{farmSize}} acres</div>
+            </h2>
+            <h2 class="grandTotal">
+                <div style="float:left">Total</div>
+                ${{grandTotal}}
             </h2>
         </div>
 
@@ -235,12 +247,17 @@
             removed : {},
             opened : {},
             total : 0,
+            totalText : '',
+            grandTotal : '',
             showAddCustom : false,
+
+            catLookup : {},
 
             observe : {
                 selectedCrop : '_checkUpdate',
                 farmSize : '_checkUpdate',
-                location : '_checkUpdate'
+                location : '_checkUpdate',
+                defaultSchema : '_setLookup'
             },
 
             // for add custom items
@@ -252,28 +269,12 @@
                 units : ''
             },
 
-            ready : function() {
-                var tmpSchema = $.extend(true, {}, BUDGET_SCHEMA);
-
-                for( var key in tmpSchema ) {
-                    this.opened[key] = false;
-
-                    // this should come from API
-                    for( var i = 0; i < tmpSchema[key].length; i++ ) {
-                        item = tmpSchema[key][i];
-                        item.value = (100 / tmpSchema[key].length).toFixed(2);
-                        item.unitCost = 1;
-                        item.total = 0;
-                        item.removing = false; 
+            _setLookup : function() {
+                for( var key in this.defaultSchema ) {
+                    for( var i = 0; i < this.defaultSchema[key].length; i++ ) {
+                       this.catLookup[this.defaultSchema[key][i].item] = key;
                     }
-
-                    this.schema.push({
-                        total : 0,
-                        name : key,
-                        schema : tmpSchema[key]
-                    });
                 }
-                this.updateTotals();
             },
 
             updateTotals : function() {
@@ -285,11 +286,15 @@
                     for( var j = 0; j < this.schema[i].schema.length; j++ ) {
                         item = this.schema[i].schema[j];
                         item.total = parseFloat(item.value) * parseFloat(item.unitCost)
+                        item.totalText = item.total.toFixed(2);
                         this.schema[i].total += item.total;
                     }
+                    this.schema[i].totalText = this.schema[i].total.toFixed(2);
                     this.total += this.schema[i].total;
                 }
-                this.total = this.total.toFixed(2);
+                
+                this.totalText = this.total.toFixed(2);
+                this.grandTotal = (this.total * parseFloat(this.farmSize)).toFixed(2);
             },
 
             removeItem : function(e) {
@@ -406,12 +411,56 @@
             },
 
             loadLocalityBudget : function() {
-                console.log(this.selectedCrop);
-                console.log(this.location);
-                console.log(this.selectedLocality);
-                console.log(this.farmSize);
+                var loc = {};
+
+                if( this.selectedLocality == 'zipCode' ) {
+                    loc.zipCode = this.location.zipCode;
+                } else if ( this.selectedLocality == 'county' ) {
+                    loc.county = this.location.county;
+                    loc.state = this.location.state;
+                } else {
+                    loc.state = this.location.state
+                }
+
+                $.get('/rest/getBudgetForLocality?location='+encodeURIComponent(JSON.stringify(loc))+
+                            '&crop='+this.selectedCrop, 
+                    function(resp) {
+                        this.setBudget(resp);
+                    }.bind(this)
+                );
             },
 
+            setBudget : function(budgetItems) {
+                this.schema = [];
+                this.opened = {};
+
+                var tmpSchema = {};
+                for( var i = 0; i < budgetItems.length; i++ ) {
+                    var item = budgetItems[i];
+                    var cat = this.catLookup[item.item] || 'Other';
+
+                    if( !tmpSchema[cat] ) {
+                        this.opened[cat] = false;
+                        tmpSchema[cat] = {
+                            total : 0,
+                            name : cat,
+                            schema : []
+                        }
+                    }
+
+                    item.value = parseFloat(item.amount);
+                    item.unitCost = parseFloat(item.cost);
+                    item.total = 0;
+                    item.removing = false;
+
+                    tmpSchema[cat].schema.push(item);
+                }
+
+                for( var key in tmpSchema ) {
+                    this.schema.push(tmpSchema[key]);
+                }
+                this.updateTotals();
+            },
 
             expandAll : function() {
                 for( var key in this.opened ) this.opened[key] = true;

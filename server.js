@@ -223,5 +223,13 @@ app.get('/rest/getCropsForLocation', function(req, resp){
     mongo.getCropsForLocation(location, resp);
 });
 
+app.get('/rest/getBudgetForLocality', function(req, resp){
+    var location = req.query.location;
+    var crop = req.query.crop;
+    if( location ) location = JSON.parse(location);
+
+    mongo.getBudgetForLocality(crop, location, resp);
+});
+
 app.listen(port);
 console.log('Server is up and running at :'+port+' & dev='+dev);
