@@ -27,7 +27,7 @@ process.argv.forEach(function (val, index, array) {
 });
 
 var authFile = require(baseLocation+'auth.json');
-var db = require(baseLocation+'db.json');
+//var db = require(baseLocation+'db.json');
 
 // set up our express application
 //app.use(morgan('dev')); // log every request to the console
