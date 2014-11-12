@@ -30,7 +30,7 @@
                 <a class="btn btn-primary" href="/auth/google">Login</a>
             </div>
             <div hidden?="{{checking || !loggedIn}}">
-                Hello {{user.emails[0].value}},
+                Hello {{user.email}},
 
                 <paper-tabs selected="{{currentTab}}">
                     <paper-tab>Edit</paper-tab>
@@ -248,6 +248,8 @@
 
                 this.loggedIn = true;
                 this.user = resp;
+
+                if( !this.user.hasAccess ) window.location = '#';
             },
 
             update : function() {

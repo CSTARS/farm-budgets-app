@@ -81,12 +81,13 @@ passport.use(new GoogleStrategy({
     callbackURL: url+'/auth/google/return'
   },
   function(accessToken, refreshToken, profile, done) {
-    sessions[profile.id] = profile;
-    done(null, profile);
+    sessions[profile.id] = profile._json;
+    done(null, profile._json);
   }
 ));
 
 passport.serializeUser(function(user, done) {
+    if( authFile.acl.indexOf(user.email) > -1 ) user.hasAccess = true;
     sessions[user.id] = user;
     done(null, user.id);
 });
@@ -114,7 +115,8 @@ passport.use(new GoogleStrategy({
 
 **/
 
-app.get('/auth/google', passport.authenticate('google', { scope: 'https://www.googleapis.com/auth/plus.profile.emails.read' }));
+app.get('/auth/google', passport.authenticate('google', { scope: [
+        'email'] }));
 app.get('/auth/google/return', 
   passport.authenticate('google', { successRedirect: '/#admin',
                                     failureRedirect: '/' }));
