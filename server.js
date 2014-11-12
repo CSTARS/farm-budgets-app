@@ -1,7 +1,8 @@
 var express = require('express');
 var app = express();
 var passport = require('passport');
-var GoogleStrategy = require('passport-google').Strategy;
+//var GoogleStrategy = require('passport-google').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var port     = 3000;
 var passport = require('passport');
 var morgan       = require('morgan');
@@ -26,6 +27,7 @@ process.argv.forEach(function (val, index, array) {
   if( val == '--baseLocation' && array.length > index+1 ) baseLocation = array[index+1]; 
 });
 
+// TODO: switch this to js file, add cookie and oauth info
 var authFile = require(baseLocation+'auth.json');
 //var db = require(baseLocation+'db.json');
 
@@ -35,7 +37,7 @@ app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.json()); // get information from html forms
 app.use(bodyParser.urlencoded({ extended: true }));
 // required for passport
-app.use(session({ secret: 'ilovescotchscotchyscotchscotch',
+app.use(session({ secret: authFile.cookieSecret,
                   saveUninitialized: true,
                   resave: true })); // session secret
 app.use(passport.initialize());
@@ -43,9 +45,16 @@ app.use(passport.session()); // persistent login sessions
 
 
 app.use(function(req, res, next) {
-    if( authEndpoints.indexOf(req.originalUrl) > -1 && !req.user ) {
+    var isAuth = authEndpoints.indexOf(req.originalUrl);
+    if( isAuth > -1 && !req.user ) {
         resp.send({error: true, message: 'Auth Error'});
+        return;
     }
+    if( isAuth > -1 && authFile.acl.indexOf(req.user.email) == -1 ) {
+        resp.send({error: true, message: 'Nope'});
+        return;
+    }
+
     next();
 });
 
@@ -60,9 +69,37 @@ mongo.connect(function(err){
 });
 
 
-var url = dev ? 'http://localhost:3000' : 'http://alder.bioenergy.casil.ucdavis.edu';
+var url = dev ? 'http://localhost:3000' : 'http://farm-budgets.bioenergy.casil.ucdavis.edu';
 
-/** setup google oauth **/
+console.log(authFile);
+console.log(url);
+
+/*** TODO: ***/
+passport.use(new GoogleStrategy({
+    clientID: authFile.clientID,
+    clientSecret: authFile.clientSecret,
+    callbackURL: url+'/auth/google/return'
+  },
+  function(accessToken, refreshToken, profile, done) {
+    sessions[profile.id] = profile;
+    done(null, profile);
+  }
+));
+
+passport.serializeUser(function(user, done) {
+    sessions[user.id] = user;
+    done(null, user.id);
+});
+passport.deserializeUser(function(id, done) {
+    if( sessions[id] ) done(null, sessions[id]);
+    else done({error:true, message:'not logged in'});
+});
+
+
+
+
+
+/** setup google oauth 
 passport.use(new GoogleStrategy({
     returnURL: url+'/auth/google/return',
     realm: url
@@ -73,16 +110,11 @@ passport.use(new GoogleStrategy({
     done(null, profile);
   }
 ));
-passport.serializeUser(function(user, done) {
-    sessions[user.id] = user;
-    done(null, user.id);
-});
-passport.deserializeUser(function(id, done) {
-    if( sessions[id] ) done(null, sessions[id]);
-    else done({error:true, message:'not logged in'});
-});
 
-app.get('/auth/google', passport.authenticate('google'));
+
+**/
+
+app.get('/auth/google', passport.authenticate('google', { scope: 'https://www.googleapis.com/auth/plus.profile.emails.read' }));
 app.get('/auth/google/return', 
   passport.authenticate('google', { successRedirect: '/#admin',
                                     failureRedirect: '/' }));
