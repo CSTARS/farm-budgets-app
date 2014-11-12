@@ -71,9 +71,6 @@ mongo.connect(function(err){
 
 var url = dev ? 'http://localhost:3000' : 'http://farm-budgets.bioenergy.casil.ucdavis.edu';
 
-console.log(authFile);
-console.log(url);
-
 /*** TODO: ***/
 passport.use(new GoogleStrategy({
     clientID: authFile.clientID,
