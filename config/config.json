@@ -1,0 +1,22 @@
+{
+
+    "middleware": {
+        "static": {
+            "module": {
+                "arguments": [ "path:./public" ]
+            }
+        },
+
+        "router": {
+            "module": {
+                "arguments": [{ "directory": "path:./controllers" }]
+            }
+        }
+
+    },
+
+    "postgres" : {
+      "url" : "postgres://username:password@localhost/database",
+      "schema" : "farm_budget_data"
+    }
+}

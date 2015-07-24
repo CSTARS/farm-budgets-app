@@ -1,0 +1,251 @@
+<dom-module id="ahb-page-crop">
+  <style>
+      google-map {
+          height: 300px;
+          display: block;
+      }
+  </style>
+
+  <template>
+
+
+      <div style="padding: 10px">
+
+          <div id="locationTable" style="display:none">
+              <h4>Location</h4>
+              <table class="table">
+                  <tr>
+                      <td>Lat / Lng</td>
+                      <td id="llLabel"></td>
+                  </tr>
+                  <tr>
+                      <td>County</td>
+                      <td id="countyLabel"></td>
+                  </tr>
+                  <tr>
+                      <td>State</td>
+                      <td id="stateLabel"></td>
+                  </tr>
+                  <tr>
+                      <td>Zip Code</td>
+                      <td id="zipCodeLabel"></td>
+                  </tr>
+              </table>
+
+              <h3>Set Crop and Farm Parameters</h3>
+              <table class="table">
+                  <tr>
+                      <td>Select Crop:</td>
+                      <td>
+                          <select id="cropSelector" on-change="setSelected"></select>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>Farm Size:</td>
+                      <td>
+                          <input type="number"
+                            id="farmSize"
+                            class="form-control"
+                            style="width:100px;display:inline-block"
+                            value="10"
+                            on-change="setSelected"  /> ac
+                      </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td><a class="btn btn-default" style="display:none" id="viewBtn" href="#budget">View Budget</a></td>
+                  </tr>
+              </table>
+          </div>
+
+          <div id="noLocation">
+              <h4><i class="fa fa-warning"></i> You must first select a crop <a href="#location">location</a>!</h4>
+          </div>
+
+      </div>
+  </template>
+</dom-module>
+
+<script>
+    Polymer({
+      is : 'ahb-page-crop',
+
+      ready : function() {
+        this.firstTime = true;
+
+        this.data = {
+          crop : '',
+          size : 10
+        }
+
+        window.stateLookup = {};
+        for( var key in states ) stateLookup[states[key]] = key;
+      },
+
+      setSelected : function() {
+        var parts = this.$.cropSelector.value.split('::');
+        this.data = {
+          crop : parts[0],
+          locality : parts[1],
+          size : parseInt(this.$.farmSize.value),
+          location : this.location
+        }
+
+        if( this.data.crop && this.data.size ) {
+          this.fire('crop-size-update', this.data);
+          this.$.viewBtn.style.display = 'inline-block';
+        }
+      },
+
+      setFarmSize : function(size) {
+        this.data.size = size;
+        this.$.farmSize.value = size;
+      },
+
+      updateLocation : function(location) {
+        this.location = location;
+
+        if( !location ) {
+          this.$.noLocation.style.display = 'block';
+          this.$.locationTable.style.display = 'none';
+          return;
+        } else {
+          this.$.noLocation.style.display = 'none';
+          this.$.locationTable.style.display = 'block';
+        }
+
+        this.$.llLabel.innerHTML = location.fixedLat+', '+location.fixedLng;
+        this.$.countyLabel.innerHTML = location.county;
+        this.$.stateLabel.innerHTML = location.state;
+        this.$.zipCodeLabel.innerHTML = location.zipCode;
+
+        this.updateCrops();
+      },
+
+      updateSelected : function() {
+          var parts = this.selectedCropAndLocality.split('::');
+          this.selectedCrop = parts[0];
+          this.selectedLocality = parts[1];
+      },
+
+      updateCrops : function() {
+          $.get('/crops/get?location='+encodeURIComponent(JSON.stringify(this.location)), function(resp) {
+              this.processResponse(resp);
+
+              if( this.firstTime &&
+                  (this.crops.state.length > 0 || this.crops.county.length > 0 || this.crops.zipCode.length > 0 ) ) {
+                  this.firstTime = false;
+                  window.location.hash = 'crop';
+              }
+
+              this.renderCropSelector();
+          }.bind(this));
+      },
+
+      processResponse : function(resp) {
+        this.crops = {
+          state : [],
+          county : [],
+          zipCode : []
+        }
+
+        for( var i = 0; i < resp.length; i++ ) {
+
+          if( stateLookup[resp[i].location] ) {
+            this.crops.state.push(resp[i].commodity)
+          } else if ( resp[i].location.match(/\d\d\d\d\d/) ) {
+            this.crops.zipCode.push(resp[i].commodity)
+          } else {
+            this.crops.county.push(resp[i].commodity)
+          }
+
+        }
+      },
+
+      renderCropSelector : function() {
+        var html = '<option></option>', crop;
+
+
+        for( var i = 0; i < this.crops.state.length; i++ ) {
+          crop = this.crops.state[i];
+          html += '<option value="'+crop+'::statewide">'+crop+' (Statewide - '+this.location.state+')</option>';
+        }
+
+        for( var i = 0; i < this.crops.county.length; i++ ) {
+          crop = this.crops.county[i];
+          html += '<option value="'+crop+'::county">'+crop+' ('+this.location.county+')</option>';
+        }
+
+        for( var i = 0; i < this.crops.zipCode.length; i++ ) {
+          crop = this.crops.state[i];
+          html += '<option value="'+crop+'::zipcode">'+crop+' ('+this.location.zipCode+')</option>';
+        }
+
+        this.$.cropSelector.innerHTML = html;
+      }
+    })
+</script>
+
+<script>
+  var states = {
+    "Alabama": "AL",
+    "Alaska": "AK",
+    "American Samoa": "AS",
+    "Arizona": "AZ",
+    "Arkansas": "AR",
+    "California": "CA",
+    "Colorado": "CO",
+    "Connecticut": "CT",
+    "Delaware": "DE",
+    "District Of Columbia": "DC",
+    "Federated States Of Micronesia": "FM",
+    "Florida": "FL",
+    "Georgia": "GA",
+    "Guam": "GU",
+    "Hawaii": "HI",
+    "Idaho": "ID",
+    "Illinois": "IL",
+    "Indiana": "IN",
+    "Iowa": "IA",
+    "Kansas": "KS",
+    "Kentucky": "KY",
+    "Louisiana": "LA",
+    "Maine": "ME",
+    "Marshall Islands": "MH",
+    "Maryland": "MD",
+    "Massachusetts": "MA",
+    "Michigan": "MI",
+    "Minnesota": "MN",
+    "Mississippi": "MS",
+    "Missouri": "MO",
+    "Montana": "MT",
+    "Nebraska": "NE",
+    "Nevada": "NV",
+    "New Hampshire": "NH",
+    "New Jersey": "NJ",
+    "New Mexico": "NM",
+    "New York": "NY",
+    "North Carolina": "NC",
+    "North Dakota": "ND",
+    "Northern Mariana Islands": "MP",
+    "Ohio": "OH",
+    "Oklahoma": "OK",
+    "Oregon": "OR",
+    "Palau": "PW",
+    "Pennsylvania": "PA",
+    "Puerto Rico": "PR",
+    "Rhode Island": "RI",
+    "South Carolina": "SC",
+    "South Dakota": "SD",
+    "Tennessee": "TN",
+    "Texas": "TX",
+    "Utah": "UT",
+    "Vermont": "VT",
+    "Virgin Islands": "VI",
+    "Virginia": "VA",
+    "Washington": "WA",
+    "West Virginia": "WV",
+    "Wisconsin": "WI",
+    "Wyoming": "WY"
+  }
+</script>

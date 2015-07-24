@@ -2,15 +2,12 @@
   "name": "farm-budgets",
   "version": "0.0.0",
   "dependencies": {
-    "core-elements": "Polymer/core-elements#*",
-    "polymer": "Polymer/polymer#*",
     "bootstrap": "*",
     "animate-css": "*",
     "font-awesome": "*",
-    "google-map": "*",
-    "paper-elements": "Polymer/paper-elements#*"
-  },
-  "devDependencies": {
-    "polymer-test-tools": "Polymer/polymer-test-tools#*"
+    "polymer": "Polymer/polymer#^1.0.7",
+    "google-map": "~1.0.0",
+    "iron-collapse": "https://github.com/PolymerElements/iron-collapse.git#1.0.1",
+    "bootswatch-dist": "paper"
   }
 }

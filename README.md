@@ -1,4 +1,4 @@
-farm-budgets-app
-================
+kraken-framework-test
+===========
 
-Application for calculating farm budgets
+Testing out kraken
