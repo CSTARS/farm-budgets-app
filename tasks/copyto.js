@@ -10,15 +10,11 @@ module.exports = function copyto(grunt) {
         build: {
             files: [{
                 cwd: 'public',
-                src: ['**/*'],
-                dest: '.build/'
+                src: ['index.html'],
+                dest: 'dist'
             }],
             options: {
-                ignore: [
-                    
-                    'public/js/**/*',
-                    'public/templates/**/*'
-                ]
+                ignore: []
             }
         }
     };

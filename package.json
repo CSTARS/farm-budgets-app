@@ -5,9 +5,9 @@
   "author": "jrmerz@gmail.com",
   "main": "index.js",
   "scripts": {
-    "initTools" : "sudo npm install -g bower",
-    "initDev" : "npm install && bower install",
-    "initProd" : "npm install --production",
+    "initTools": "sudo npm install -g bower",
+    "initDev": "npm install && bower install",
+    "initProd": "npm install --production",
     "test": "grunt test",
     "build": "grunt build",
     "all": "npm run build && npm run test"
@@ -24,9 +24,10 @@
     "pg": "^4.4.0"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
+    "grunt": "*",
     "grunt-browserify": "^3.8.0",
-    "grunt-cli": "^0.1.13",
+    "grunt-cli": "*",
+    "grunt-usemin": "^3.0.0",
     "grunt-config-dir": "^0.3.2",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-jshint": "^0.10.0",
