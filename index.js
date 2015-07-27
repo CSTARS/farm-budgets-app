@@ -25,8 +25,17 @@ options = {
 
           for( var key in c ) {
             var tmpConfig = config.get(key);
-            if( tmpConfig ) merge(tmpConfig, c[key]);
+            if( tmpConfig ) {
+              merge(tmpConfig, c[key]);
+            }
           }
+        }
+
+        // allow command line switch from serving /dist to /app
+        if( config.get('dev') ) {
+          var middleware = config.get('middleware').static;
+          middleware.module.arguments[0] = middleware.module.arguments[0].replace(/dist$/,'public');
+          console.log('Servering ./public');
         }
 
         global.config = config;

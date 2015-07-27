@@ -170,7 +170,7 @@ Polymer({
       var data = google.visualization.arrayToDataTable(phaseData);
       var options = {
         title: 'Phase',
-        width: width,
+        width: width > 25 ? width : 25,
         is3D: true,
         animation:{
           duration: 1000,

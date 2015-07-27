@@ -1,13 +1,14 @@
 {
-  "name": "kraken-framework-test",
-  "version": "0.1.0",
-  "description": "Testing out kraken",
+  "name": "farm-budgets-app",
+  "version": "0.2.0",
+  "description": "App for viewing farm budget data",
   "author": "jrmerz@gmail.com",
   "main": "index.js",
   "scripts": {
-    "initTools": "sudo npm install -g bower",
-    "initDev": "npm install && bower install",
-    "initProd": "npm install --production",
+    "init-tools": "sudo npm install -g bower",
+    "init-dev": "npm install && bower install",
+    "init-prod": "npm install --production",
+    "run-dev": "node server --dev",
     "test": "grunt test",
     "build": "grunt build",
     "all": "npm run build && npm run test"
