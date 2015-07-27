@@ -11,7 +11,12 @@ module.exports = function copyto(grunt) {
             files: [{
                 cwd: 'public',
                 src: ['index.html'],
-                dest: 'dist'
+                dest: 'dist/'
+            },
+            {
+                cwd: 'public/bower_components/font-awesome',
+                src: ['fonts/**/*'],
+                dest: 'dist/'
             }],
             options: {
                 ignore: []

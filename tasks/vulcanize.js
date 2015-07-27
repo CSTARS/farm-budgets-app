@@ -8,13 +8,12 @@ module.exports = function(grunt) {
 	return {
     default: {
       options: {
-        strip: true,
-        //csp : true,
-        inline : true
+        inlineCss : true,
+				inlineScripts : true
       },
       files: {
-        '<%= yeoman.dist %>/require.html': [
-          '<%= yeoman.dist %>/require.html'
+        'dist/require.html': [
+        'public/require.html'
         ]
       }
     }
