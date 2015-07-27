@@ -19,6 +19,7 @@
     "construx-dustjs": "^1.0.0",
     "express": "^4.12.2",
     "kraken-js": "^1.0.3",
+    "makara": "^2.0.1",
     "merge-util": "^0.3.1",
     "mongoose": "^4.0.8",
     "pg": "^4.4.0"
