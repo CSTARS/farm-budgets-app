@@ -1,0 +1,48 @@
+<link rel="import" href="budget-item-macro" />
+
+<dom-module id="budget-item-macro">
+  <template>
+    <div class="form-horizontal">
+      <h4>Material Group</h4>
+
+      <div class="form-group">
+        <label for="nameInput" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+          <input type="text" id="nameInput" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nameInput" class="col-sm-2 control-label">Included Groups</label>
+        <div class="col-sm-10">
+          <input type="text" id="nameInput" placeholder="Search by item name" class="form-control" />
+          <div class="help-block">This material group can include of other material groups.
+            Use search box to search by name</div>
+
+          <template is="dom-repeat" items="{{existingItems}}">
+            <div>{{item}}</div>
+          </template>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nameInput" class="col-sm-2 control-label">Line Items</label>
+        <div class="col-sm-10">
+          <div><a class="btn btn-primary"><i class="fa fa-plus"></i> Add Materials</a></div>
+          <div class="help-block">Add new materials or global materials</div>
+
+          <template is="dom-repeat" items="{{newItems}}">
+            <budget-item-macro></budget-item-macro>
+          </template>
+        </div>
+      </div>
+
+    </div> <!-- end form -->
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-item-macro'
+  });
+</script>
