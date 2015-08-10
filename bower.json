@@ -5,9 +5,10 @@
     "bootstrap": "*",
     "animate-css": "*",
     "font-awesome": "*",
-    "polymer": "Polymer/polymer#^1.0.7",
+    "polymer": "Polymer/polymer#^1.0.9",
     "google-map": "~1.0.0",
     "iron-collapse": "https://github.com/PolymerElements/iron-collapse.git#1.0.1",
-    "bootswatch-dist": "paper"
+    "bootswatch-dist": "paper",
+    "bootstrap-datepicker": "~1.4.0"
   }
 }

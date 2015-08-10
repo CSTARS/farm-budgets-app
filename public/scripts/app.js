@@ -7,7 +7,7 @@
     $('ahb-page-location').on('location-select', onLocationSelected)
     $('ahb-page-crop').on('crop-size-update', onCropSizeSelected);
 
-    $('#infoModal').modal('show');
+    //$('#infoModal').modal('show');
 
     changePage();
   });
