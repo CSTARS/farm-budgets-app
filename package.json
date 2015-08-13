@@ -9,6 +9,7 @@
     "init-dev": "npm install && bower install",
     "init-prod": "npm install --production",
     "run-dev": "node server --dev",
+    "watch" : "grunt browserify:watch",
     "test": "grunt test",
     "build": "grunt build",
     "all": "npm run build && npm run test"

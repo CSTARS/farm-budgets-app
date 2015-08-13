@@ -38,7 +38,7 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'jshint',
         'clean',
-        'browserify',
+        'browserify:build',
         'copyto',
         // start usemin
           'useminPrepare',
