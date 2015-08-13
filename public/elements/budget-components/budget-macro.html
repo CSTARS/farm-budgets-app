@@ -1,48 +1,157 @@
-<link rel="import" href="budget-item-macro" />
+<link rel="import" href="budget-macro-item.html" />
 
-<dom-module id="budget-item-macro">
+<dom-module id="budget-macro">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+
   <template>
-    <div class="form-horizontal">
-      <h4>Material Group</h4>
-
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
-          <input type="text" id="nameInput" />
+    <div id="edit">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="nameInput" class="col-sm-3 control-label">Name</label>
+          <div class="col-sm-9">
+            <input type="text" id="nameInput" class="form-control" />
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Included Groups</label>
-        <div class="col-sm-10">
-          <input type="text" id="nameInput" placeholder="Search by item name" class="form-control" />
-          <div class="help-block">This material group can include of other material groups.
-            Use search box to search by name</div>
+        <div class="form-group">
+          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
+          <div class="col-sm-9" style="position: relative">
+            <input type="text" id="materialSearchInput" placeholder="Search by item name" class="form-control" on-keyup="search"/>
+            <div id="resultsPopup" style="display:none;position:absolute;background-color:white;padding:10px;border: 1px solid #ccc"></div>
 
-          <template is="dom-repeat" items="{{existingItems}}">
-            <div>{{item}}</div>
-          </template>
+            <div class="help-block">Use search box to find materials by name.  Complex materials can include
+            other complex materials. Or <a style="cursor:pointer"><i class="fa fa-plus"></i> create new material</a></div>
+
+            <template is="dom-repeat" items="{{existingItems}}">
+              <div>{{item}}</div>
+            </template>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Line Items</label>
-        <div class="col-sm-10">
-          <div><a class="btn btn-primary"><i class="fa fa-plus"></i> Add Materials</a></div>
-          <div class="help-block">Add new materials or global materials</div>
+      </div> <!-- end form -->
+    </div>
 
-          <template is="dom-repeat" items="{{newItems}}">
-            <budget-item-macro></budget-item-macro>
-          </template>
-        </div>
-      </div>
+    <div id="main"></div>
 
-    </div> <!-- end form -->
   </template>
 </dom-module>
 
 <script>
   Polymer({
-    is : 'budget-item-macro'
+    is : 'budget-macro',
+
+    ready : function() {
+      this.data = {
+        name : '[Not Set]',
+        materials : []
+      }
+
+      this.removeChild(this.$.edit);
+
+      FB.materialController.on('material-update', this.onUpdate.bind(this));
+      this.render();
+
+      // crap HACK
+      /*setTimeout(function(){
+        if( !this.popup ) this.popup = $('budget-complex-material-popup');
+      }.bind(this), 200);*/
+    },
+
+    attached : function() {
+      this.popup = document.querySelector('budget-complex-material-popup');
+    },
+
+    // render display. type
+    render : function(type) {
+      this.renderType = type;
+
+      if( this.type == 'tree' ) {
+        this.renderTree();
+      } else if( this.type == 'compressed' ) {
+        this.renderCompressed();
+      } else {
+        this.renderNormal();
+      }
+    },
+
+    renderNormal : function() {
+      var html = this.data.name+' <a class="btn btn-link"><i class="fa fa-pencil"></i></a>';
+      $(this.$.main)
+        .html(html)
+        .on('click', this.edit.bind(this));
+    },
+
+    renderTree : function() {
+
+    },
+
+    renderCompressed : function() {
+
+    },
+
+    search : function() {
+      var results = FB.materialController.find(this.$.materialSearchInput.value, this.data.name);
+
+      if( results.length > 0 ) {
+        var html = '';
+
+        for( var i = 0; i < results.length; i++ ) {
+          html += '<div>'+results[i].name+'</div>';
+        }
+        this.$.resultsPopup.innerHTML = html;
+
+        this.$.resultsPopup.style.display = 'block';
+      } else {
+        this.$.resultsPopup.style.display = 'none';
+      }
+    },
+
+    edit : function() {
+      this.popup.setBody(this.$.edit);
+      this.popup.show(this.onEditComplete.bind(this));
+    },
+
+    onEditComplete : function() {
+      var newName = this.$.nameInput.value;
+
+      if( newName !== this.data.name ) {
+        FB.materialController.remove(this.data.name);
+        this.data.name = newName;
+        FB.materialController.update(this.data);
+      }
+
+      this.render();
+    },
+
+    // fired whenever any material is updated
+    onUpdate : function(e) {
+      // if the material name is not in our chain, we can quit
+      if( !this.has(e.detail.name) ) return;
+      // rerender
+      this.render(this.renderType);
+    },
+
+    has : function(material) {
+      return this._has(material, this.data.materials);
+    },
+
+    _has : function(material, scope) {
+      if( !scope ) scope = this;
+
+      for( var i = 0; i < scope.materials.length; i++ ) {
+        var m = FB.materialController.get(this.materials[i]);
+        if( m.error ) continue;
+
+        if( m.name === material ) return true;
+        if( m.type === 'complex' && m.materials ) {
+          return this._has(material, m.materials);
+        }
+      }
+      return false;
+    }
   });
 </script>

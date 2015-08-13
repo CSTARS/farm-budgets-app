@@ -1,0 +1,45 @@
+<!-- reusable popup for complex materials -->
+
+<dom-module id="budget-complex-material-popup">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" on-click="hide"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-pencil"></i> Edit Complex Material</h4>
+          </div>
+          <div class="modal-body" id="body"></div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  </template>
+</dom-modle>
+
+<script>
+  Polymer({
+    is : 'budget-complex-material-popup',
+
+    ready : function() {
+      this.popup = $(this.$.popup).modal({show: false});
+      this.body = $(this.$.body);
+    },
+
+    show : function(closeCallback) {
+      this.closeCallback = closeCallback;
+      this.popup.modal('show');
+    },
+
+    hide : function() {
+      if( this.closeCallback ) {
+        this.closeCallback();
+        this.closeCallback = null;
+      }
+      this.popup.modal('hide');
+    },
+
+    setBody : function(ele) {
+      this.body.html('').append(ele);
+    }
+  })
+</script>
