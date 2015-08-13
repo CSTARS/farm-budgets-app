@@ -39,7 +39,7 @@ db=[db you want to add schema to]
 Now install all dependencies for client and server.  Note, [NodeJS](https://nodejs.org/) and [Bower](http://bower.io/) are required.
 
 ```
-npm run-script init-dev
+npm run init-dev
 ```
 
 Finally, create a private config file for configuring access to postgres.
@@ -60,10 +60,14 @@ module.exports = {
 ## Run Server
 Once you have initialized the PostgreSQL database and installed all development dependencies you simply run the following command to start the server.
 ```
-npm run-script run-dev
+npm run run-dev
+```
+This will serve the /public (development) code.  If you are working on the shared/isomorphic code library in /lib/shared you will want to start up the browserify watch task using the following command.  This will automatically rebuild the shared lib as you make modifications.
+```
+npm watch
 ```
 
-This will serve the /public (development) code.  To run the build/production code in /dist simply run
+To run the build/production code in /dist simply run
 ```
 npm run
 ```
@@ -71,7 +75,7 @@ npm run
 ## Build Client
 To build the project for deployment to production run:
 ```
-npm run-script build
+npm run build
 ```
 
 ## More info
