@@ -40,9 +40,9 @@
 
 </head>
 
-<body unresolved>
+<body style="padding:10px">
 
-  <budget-macro></budget-macro>
+  <div id="root"></div>
   <budget-complex-material-popup></budget-complex-material-popup>
 
   <script>
@@ -61,12 +61,47 @@
         name : 'baz',
         price : 6.75,
         units : 'gal'
+      },
+      {
+        name : 'seeds',
+        price : 65,
+        units : 'lb'
+      },
+      {
+        name : 'complex1',
+        type : 'complex',
+        materials : ['foo', 'bar']
+      },
+      {
+        name : 'complex2',
+        type : 'complex',
+        materials : ['complex1', 'bar', 'baz']
+      },
+      {
+        name : 'super cool thing',
+        type : 'complex',
+        materials : ['complex2', 'bar', 'seeds']
       }
-    ]
+    ];
+    var options = {
+      noEvent : true
+    }
 
+    var root = document.querySelector('#root');
+    
     testMaterials.forEach(function(material){
-      FB.materialController.add(material);
+      FB.materialController.add(material, options);
+
+      if( material.type == 'complex' ) {
+        var ele = document.createElement('budget-macro');
+        ele.data = material;
+        var div = document.createElement('div');
+        div.appendChild(ele);
+        root.appendChild(div);
+      }
     });
+
+
   </script>
 </body>
 </html>

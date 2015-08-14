@@ -3,12 +3,28 @@
 <dom-module id="budget-macro">
   <style>
     :host {
-      display: block;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .btn-group > .btn.btn-default {
+      transition: all 300ms linear;
+      -moz-transition: all 300ms linear;
+      -ms-transition: all 300ms linear;
+    }
+
+    .btn-group > .btn.btn-default.nohover {
+      border-top: 1px solid transparent !important;
+      border-left: 1px solid transparent !important;
+      box-shadow: none !important;
+      -moz-box-shadow: none !important;
+      -ms-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
     }
   </style>
 
   <template>
-    <div id="edit">
+    <div id="edit" class="animated fadeIn">
       <div class="form-horizontal">
         <div class="form-group">
           <label for="nameInput" class="col-sm-3 control-label">Name</label>
@@ -21,21 +37,38 @@
           <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
           <div class="col-sm-9" style="position: relative">
             <input type="text" id="materialSearchInput" placeholder="Search by item name" class="form-control" on-keyup="search"/>
-            <div id="resultsPopup" style="display:none;position:absolute;background-color:white;padding:10px;border: 1px solid #ccc"></div>
+            <div id="resultsPopup" style="display:none;z-index:1000;position:absolute;background-color:white;padding:10px;border: 1px solid #ccc"></div>
 
             <div class="help-block">Use search box to find materials by name.  Complex materials can include
             other complex materials. Or <a style="cursor:pointer"><i class="fa fa-plus"></i> create new material</a></div>
-
-            <template is="dom-repeat" items="{{existingItems}}">
-              <div>{{item}}</div>
-            </template>
           </div>
+        </div>
+
+
+        <div class="form-group">
+          <label for="materialSearchInput" class="col-sm-3 control-label">Materials</label>
+          <div class="col-sm-9" style="position: relative" id="edit-items"></div>
         </div>
 
       </div> <!-- end form -->
     </div>
 
-    <div id="main"></div>
+    <table>
+      <tr>
+        <td>
+          <div class="btn-group animated fadeIn" role="group" style="display:none">
+            <a class="btn btn-default nohover" on-click="edit"><i class="fa fa-pencil"></i></a>
+            <a class="btn btn-default nohover" on-click="toggleView" id="toggleView"><i class="fa fa-angle-down"></i></a>
+          </div>
+        </td>
+        <td style="padding-left: 5px">
+          <i class="fa fa-cubes"></i> <span style="font-weight:bold" id="nameLabel"></span>
+        </td>
+      </tr>
+      <tr>
+        <td id="main" colspan="2"></td>
+      </tr>
+    </table>
 
   </template>
 </dom-module>
@@ -44,65 +77,191 @@
   Polymer({
     is : 'budget-macro',
 
+    properties : {
+      material : {
+        type : String
+      }
+    },
+
     ready : function() {
       this.data = {
         name : '[Not Set]',
         materials : []
-      }
+      };
+      this.showingBtns = false;
 
       this.removeChild(this.$.edit);
 
       FB.materialController.on('material-update', this.onUpdate.bind(this));
-      this.render();
 
-      // crap HACK
-      /*setTimeout(function(){
-        if( !this.popup ) this.popup = $('budget-complex-material-popup');
-      }.bind(this), 200);*/
+      $(this).hover(function(){
+        $(this).find('.nohover').removeClass('nohover');
+      },function(){
+        $(this).find('.btn-group > .btn').addClass('nohover');
+      }).on('click',function() {
+        if( this.showingBtns ) {
+          $(this).find('.btn-group').hide();
+          $(this.$.main).hide();
+        } else {
+          $(this).find('.btn-group').show();
+          $(this.$.main).show();
+        }
+        this.showingBtns = !this.showingBtns;
+      });
     },
 
     attached : function() {
       this.popup = document.querySelector('budget-complex-material-popup');
+      this.render();
+
+      if( this.material ) {
+        var m = FB.materialController.get(this.material);
+        if( m.error ) return;
+        this.data = m;
+        this.render(this.renderType);
+      }
     },
 
     // render display. type
     render : function(type) {
       this.renderType = type;
 
-      if( this.type == 'tree' ) {
+      this.$.nameLabel.innerHTML = this.data.name;
+
+      if( this.renderType == 'tree' ) {
         this.renderTree();
-      } else if( this.type == 'compressed' ) {
+        this.$.toggleView.innerHTML = '<i class="fa fa-angle-up"></i>';
+      } else if( this.renderType == 'compressed' ) {
         this.renderCompressed();
+        this.$.toggleView.innerHTML = '<i class="fa fa-angle-double-down"></i>';
       } else {
         this.renderNormal();
+        this.$.toggleView.innerHTML = '<i class="fa fa-angle-down"></i>';
+      }
+    },
+
+    toggleView : function(e) {
+      if( e && e.preventDefault ){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      if( this.renderType == 'tree' ) {
+        this.render('normal');
+      } else if ( this.renderType == 'compressed' ) {
+        this.render('tree');
+      } else {
+        this.render('compressed');
       }
     },
 
     renderNormal : function() {
-      var html = this.data.name+' <a class="btn btn-link"><i class="fa fa-pencil"></i></a>';
-      $(this.$.main)
-        .html(html)
-        .on('click', this.edit.bind(this));
+      this.$.main.innerHTML = '';
     },
 
     renderTree : function() {
+      var list = [];
+      this.getTreeMaterialList(this.data.materials, '', list);
 
+      var html = '<ul class="list-group animated zoomIn" style="padding-top:5px">';
+      for( var i = 0; i < list.length; i++ ) {
+        html += '<li class="list-group-item">' +
+            '<i>'+list[i].path + '</i> <b>' +list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;' +
+            (list[i].type == 'complex' ?
+              '<span class="badge"><i class="fa fa-cubes"></i></span>'  :
+              '<span class="badge">$'+list[i].price+'/'+list[i].units+'</span>') +
+          '</li>';
+      }
+
+      this.$.main.innerHTML = html+'</ul>';
     },
 
     renderCompressed : function() {
+      var list = [];
+      this.getCompressedMaterialList(this.data.materials, list);
 
+      var html = '<ul class="list-group animated zoomIn" style="padding-top:5px">';
+      for( var i = 0; i < list.length; i++ ) {
+        html += '<li class="list-group-item">' +
+            list[i].count+'x <b>' + list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;' +
+            (list[i].type == 'complex' ?
+              '<span class="badge"><i class="fa fa-cubes"></i></span>'  :
+              '<span class="badge">$'+list[i].price+'/'+list[i].units+'</span>') +
+          '</li>';
+      }
+
+      this.$.main.innerHTML = html+'</ul>';
+    },
+
+    getCompressedMaterialList : function(materials, list) {
+      for( var i = 0; i < materials.length; i++ ) {
+        var m = FB.materialController.get(materials[i]);
+        if( m.error ) continue;
+
+        var index = this.listMaterialIndex(list, m.name);
+        if( index == -1 ) {
+          var item = $.extend(true, {}, m);
+          item.count = 1;
+          list.push(item);
+        } else {
+          list[index].count++;
+        }
+
+        if( m.type === 'complex' && m.materials) {
+          this.getCompressedMaterialList(m.materials, list);
+        }
+      }
+    },
+
+    getTreeMaterialList : function(materials, path, list) {
+      for( var i = 0; i < materials.length; i++ ) {
+        var m = FB.materialController.get(materials[i]);
+        if( m.error ) continue;
+
+        var item = $.extend(true, {}, m);
+        item.path = path;
+        list.push(item);
+
+        if( m.type === 'complex' &&  m.materials) {
+          var p = path+m.name+' - ';
+          this.getTreeMaterialList(m.materials, p, list);
+        }
+      }
+    },
+
+    listMaterialIndex : function(list, name) {
+      for( var i = 0; i < list.length; i++ ) {
+        if( list[i].name == name ) return i;
+      }
+      return -1;
     },
 
     search : function() {
-      var results = FB.materialController.find(this.$.materialSearchInput.value, this.data.name);
+      var results = FB.materialController.find(this.$.materialSearchInput.value);
+
+      if( this.listMaterialIndex(results, this.data.name) > -1 ) {
+        results.splice(this.listMaterialIndex(results, this.data.name), 1);
+      }
+      for( var i = this.data.materials.length-1; i >= 0; i-- ) {
+        var index = this.listMaterialIndex(results, this.data.materials[i]);
+        if( index > -1 ) {
+          results.splice(index, 1);
+        }
+      }
 
       if( results.length > 0 ) {
         var html = '';
 
         for( var i = 0; i < results.length; i++ ) {
-          html += '<div>'+results[i].name+'</div>';
+          html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
+                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+'</div>';
         }
-        this.$.resultsPopup.innerHTML = html;
+        $(this.$.resultsPopup)
+          .html(html)
+          .find('a')
+          .on('click', function(e){
+            this.addItemFromSearch(e, results);
+          }.bind(this));
 
         this.$.resultsPopup.style.display = 'block';
       } else {
@@ -110,40 +269,102 @@
       }
     },
 
-    edit : function() {
+    addItemFromSearch : function(e, results) {
+      var ele = $(e.currentTarget);
+      ele.parent().remove();
+      var index = parseInt(ele.attr('index'));
+      this.data.materials.push(results[index].name);
+      this.renderEditList();
+      this.$.resultsPopup.style.display = 'none';
+      this.$.materialSearchInput.value = '';
+    },
+
+    edit : function(e) {
+      if( e && e.preventDefault ){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      this.changesString = JSON.stringify(this.data);
+      this.$.nameInput.value = this.data.name;
       this.popup.setBody(this.$.edit);
       this.popup.show(this.onEditComplete.bind(this));
+      this.renderEditList();
+    },
+
+    renderEditList : function() {
+      var html = '';
+      for( var i = 0; i < this.data.materials.length; i++ ) {
+        var m = FB.materialController.get(this.data.materials[i]);
+
+        if( m.error ) {
+          html += '<div lass="text-danger">Error, unknown material: '+this.data.materials[i]+'</div>';
+        } else if( m.type == 'complex' ) {
+          html += '<div><budget-macro material="'+m.name+'"></budget-macro> <a class="btn btn-link edit-trash" style="vertical-align:top" index="' +
+                  i+'"><i class="fa fa-trash"></i></a></div>';
+        } else {
+          html += '<div>'+m.name+' <a class="btn btn-link edit-trash" index="'+i+'"><i class="fa fa-trash"></i></a></div>'
+        }
+      }
+
+      $(this.$['edit-items'])
+        .html(html)
+        .find('a.edit-trash')
+        .on('click', function(e){
+          var ele = $(e.currentTarget);
+          var index = parseInt(ele.attr('index'));
+
+          ele.parent().remove();
+          this.data.materials.splice(index, 1);
+        }.bind(this));
     },
 
     onEditComplete : function() {
       var newName = this.$.nameInput.value;
+      var oldName = this.data.name;
+      this.data.name = newName;
 
-      if( newName !== this.data.name ) {
-        FB.materialController.remove(this.data.name);
-        this.data.name = newName;
-        FB.materialController.update(this.data);
+      // detect changes
+      if( this.changesString == JSON.stringify(this.data) ) {
+        return;
       }
 
-      this.render();
+      var options = {replace: true};
+      if( newName != oldName ) options.rename = oldName;
+
+      FB.materialController.add(this.data, options);
+
+      this.render(this.renderType);
     },
 
     // fired whenever any material is updated
     onUpdate : function(e) {
+      // renaming something in our list?
+      if( e.replaced && this.data.materials.indexOf(e.replaced) > -1) {
+        var index = this.data.materials.indexOf(e.replaced);
+        this.data.materials[index] = e.material.name;
+
       // if the material name is not in our chain, we can quit
-      if( !this.has(e.detail.name) ) return;
+      }
+
+      if( !this.has(e.material.name) ) {
+        return;
+      }
+
       // rerender
       this.render(this.renderType);
     },
 
     has : function(material) {
+      if( material == this.data.name ) return true;
       return this._has(material, this.data.materials);
     },
 
-    _has : function(material, scope) {
-      if( !scope ) scope = this;
+    _has : function(material, materials) {
+      //if( !scope ) scope = this;
 
-      for( var i = 0; i < scope.materials.length; i++ ) {
-        var m = FB.materialController.get(this.materials[i]);
+      for( var i = 0; i < materials.length; i++ ) {
+        var m = FB.materialController.get(materials[i]);
         if( m.error ) continue;
 
         if( m.name === material ) return true;
