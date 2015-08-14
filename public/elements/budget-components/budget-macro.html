@@ -337,14 +337,14 @@
         } else {
           html +=
             '<div class="layout horizontal">'+
-              '<div class="flex"><b>'+m.name+'</b> ($'+m.price+'/<budget-unit-selector units="'+m.units+'" material="'+material+'"></budget-unit-selector>)</div>'+
+              '<div class="flex"><b>'+m.name+'</b> ($<span id="'+material+'-price-label">'+this.data.materials[material].price.toFixed(2)+'</span>/<budget-unit-selector units="'+m.units+'" material="'+material+'"></budget-unit-selector>)</div>'+
               '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount +
                   '" style="width:50px;display:inline-block" class="form-control"><span id="'+material+'-units-label">'+m.units+'</span>/'+this.data.units+'</div>'+
               '<div><a class="btn btn-link edit-trash" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
             '</div>';
         }
       }
-      html += '<h4 class="page-header">Price</h4><div id="current-price">$'+this.data.price.toFixed(2)+'</div>';
+      html += '<h4>Price <small id="current-price">$'+this.data.price.toFixed(2)+'/'+this.data.units+'</small></h4>';
 
       var ele = $(this.$['edit-items']).html(html);
       ele.find('a.edit-trash')
@@ -375,6 +375,8 @@
 
           FB.materialController.recalc();
           ele.find('#'+material+'-units-label').html(e.originalEvent.detail);
+          ele.find('#'+material+'-price-label').html(this.data.materials[material].price.toFixed(2));
+          ele.find('#current-price').html('$'+this.data.price.toFixed(2));
         }.bind(this));
 
 
