@@ -1,0 +1,48 @@
+<dom-module id="budget-unit-selector">
+  <template>
+    <select id="select" on-change="onChange" style="padding-right: 15px"></select>
+  </template>
+</dom-module>
+
+<script>
+  var UNITS = [
+    ['ft', 'ac', 'mi'],
+    ['oz', 'lb', 'ton']
+  ];
+
+  Polymer({
+    is : 'budget-unit-selector',
+
+    properties : {
+      units : {
+        type : String
+      }
+    },
+
+    attached : function() {
+      this.updateSelector();
+    },
+
+    updateSelector : function() {
+      var list = [];
+      for( var i = 0; i < UNITS.length; i++ ) {
+        if( UNITS[i].indexOf(this.units) ) {
+          list = UNITS[i];
+          break;
+        }
+      }
+      if( list.length == 0 ) list.push(this.units);
+
+      var html = '';
+      for( var i = 0; i < list.length; i++ ) {
+        html += '<option value="'+list[i]+'" '+(list[i] == this.units ? 'checked' : '')+'>'+list[i]+'</option>';
+      }
+
+      this.$.select.innerHTML = html;
+    },
+
+    onChange : function(){
+      this.fire('units-change', this.$.select.val);
+    }
+  });
+</script>

@@ -1,3 +1,7 @@
+<!--
+  TODO: need to integrate https://github.com/jmandel/ucum.js
+-->
+
 <link rel="import" href="budget-macro-item.html" />
 
 <dom-module id="budget-macro">
@@ -26,10 +30,18 @@
   <template>
     <div id="edit" class="animated fadeIn">
       <div class="form-horizontal">
+
         <div class="form-group">
           <label for="nameInput" class="col-sm-3 control-label">Name</label>
           <div class="col-sm-9">
             <input type="text" id="nameInput" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="unitsInput" class="col-sm-3 control-label">Units</label>
+          <div class="col-sm-9">
+            <input type="text" id="unitsInput" class="form-control" on-keyup="editUnits" />
           </div>
         </div>
 
@@ -62,7 +74,7 @@
           </div>
         </td>
         <td style="padding-left: 5px">
-          <i class="fa fa-cubes"></i> <span style="font-weight:bold" id="nameLabel"></span>
+          <i class="fa fa-cubes"></i> <span id="nameLabel"></span>
         </td>
       </tr>
       <tr>
@@ -84,9 +96,12 @@
     },
 
     ready : function() {
+      this.editUnitsTimer = -1;
       this.data = {
         name : '[Not Set]',
-        materials : []
+        materials : {},
+        price : 0,
+        units : ''
       };
       this.showingBtns = false;
 
@@ -126,7 +141,7 @@
     render : function(type) {
       this.renderType = type;
 
-      this.$.nameLabel.innerHTML = this.data.name;
+      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ($'+this.data.price.toFixed(2)+'/'+this.data.units+')';
 
       if( this.renderType == 'tree' ) {
         this.renderTree();
@@ -166,10 +181,9 @@
       var html = '<ul class="list-group animated zoomIn" style="padding-top:5px">';
       for( var i = 0; i < list.length; i++ ) {
         html += '<li class="list-group-item">' +
-            '<i>'+list[i].path + '</i> <b>' +list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;' +
-            (list[i].type == 'complex' ?
-              '<span class="badge"><i class="fa fa-cubes"></i></span>'  :
-              '<span class="badge">$'+list[i].price+'/'+list[i].units+'</span>') +
+            '<i>'+list[i].path + '</i> <b>' +list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;<span class="badge">' +
+            (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
+              '<span class="badge">$'+list[i].price.toFixed(2)+'/'+list[i].units+' x '+list[i].conversion+list[i].units+'</span>'
           '</li>';
       }
 
@@ -183,10 +197,9 @@
       var html = '<ul class="list-group animated zoomIn" style="padding-top:5px">';
       for( var i = 0; i < list.length; i++ ) {
         html += '<li class="list-group-item">' +
-            list[i].count+'x <b>' + list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;' +
-            (list[i].type == 'complex' ?
-              '<span class="badge"><i class="fa fa-cubes"></i></span>'  :
-              '<span class="badge">$'+list[i].price+'/'+list[i].units+'</span>') +
+            list[i].count+'x <b>' + list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;<span class="badge"> ' +
+            (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
+            ' $'+list[i].price.toFixed(2)+'/'+list[i].units+'</span>'
           '</li>';
       }
 
@@ -194,8 +207,8 @@
     },
 
     getCompressedMaterialList : function(materials, list) {
-      for( var i = 0; i < materials.length; i++ ) {
-        var m = FB.materialController.get(materials[i]);
+      for( var material in materials ) {
+        var m = FB.materialController.get(material);
         if( m.error ) continue;
 
         var index = this.listMaterialIndex(list, m.name);
@@ -214,12 +227,13 @@
     },
 
     getTreeMaterialList : function(materials, path, list) {
-      for( var i = 0; i < materials.length; i++ ) {
-        var m = FB.materialController.get(materials[i]);
+      for( var material in materials ) {
+        var m = FB.materialController.get(material);
         if( m.error ) continue;
 
         var item = $.extend(true, {}, m);
         item.path = path;
+        item.conversion = materials[material].amount;
         list.push(item);
 
         if( m.type === 'complex' &&  m.materials) {
@@ -242,8 +256,8 @@
       if( this.listMaterialIndex(results, this.data.name) > -1 ) {
         results.splice(this.listMaterialIndex(results, this.data.name), 1);
       }
-      for( var i = this.data.materials.length-1; i >= 0; i-- ) {
-        var index = this.listMaterialIndex(results, this.data.materials[i]);
+      for( var material in this.data.materials ) {
+        var index = this.listMaterialIndex(results, material);
         if( index > -1 ) {
           results.splice(index, 1);
         }
@@ -273,7 +287,7 @@
       var ele = $(e.currentTarget);
       ele.parent().remove();
       var index = parseInt(ele.attr('index'));
-      this.data.materials.push(results[index].name);
+      this.data.materials[results[index].name] = 1, // TODO: get real conversion value
       this.renderEditList();
       this.$.resultsPopup.style.display = 'none';
       this.$.materialSearchInput.value = '';
@@ -287,42 +301,76 @@
 
       this.changesString = JSON.stringify(this.data);
       this.$.nameInput.value = this.data.name;
+      this.$.unitsInput.value = this.data.units;
       this.popup.setBody(this.$.edit);
       this.popup.show(this.onEditComplete.bind(this));
       this.renderEditList();
     },
 
+    editUnits : function() {
+      if( this.editUnitsTimer != -1 ) clearTimeout(this.editUnitsTimer);
+      this.editUnitsTimer = setTimeout(function(){
+        this.editUnitsTimer = -1;
+        this._editUnits();
+      }.bind(this), 200);
+    },
+
+    _editUnits : function() {
+      this.data.units = this.$.unitsInput.value;
+      this.renderEditList();
+    },
+
     renderEditList : function() {
       var html = '';
-      for( var i = 0; i < this.data.materials.length; i++ ) {
-        var m = FB.materialController.get(this.data.materials[i]);
+      for( var material in this.data.materials ) {
+        var m = FB.materialController.get(material);
 
         if( m.error ) {
-          html += '<div lass="text-danger">Error, unknown material: '+this.data.materials[i]+'</div>';
+          html += '<div lass="text-danger">Error, unknown material: '+material+'</div>';
         } else if( m.type == 'complex' ) {
-          html += '<div><budget-macro material="'+m.name+'"></budget-macro> <a class="btn btn-link edit-trash" style="vertical-align:top" index="' +
-                  i+'"><i class="fa fa-trash"></i></a></div>';
+          html +=
+            '<div class="layout horizontal">'+
+              '<div class="flex"><budget-macro material="'+m.name+'"></budget-macro></div>'+
+              '<div>at <input type="number" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />/'+this.data.units+'</div>'+
+              '<div><a class="btn btn-link edit-trash" style="vertical-align:top" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
+          '</div>';
         } else {
-          html += '<div>'+m.name+' <a class="btn btn-link edit-trash" index="'+i+'"><i class="fa fa-trash"></i></a></div>'
+          html +=
+            '<div class="layout horizontal">'+
+              '<div class="flex">'+m.name+' ('+m.price+'/<budget-unit-selector units="'+m.units+'"></budget-unit-selector>)</div>'+
+              '<div>at <input type="number" material="'+material+'" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control">/'+this.data.units+'</div>'+
+              '<div><a class="btn btn-link edit-trash" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
+            '</div>';
         }
       }
+      html += '<h4 class="page-header">Price</h4><div id="current-price">$'+this.data.price.toFixed(2)+'</div>';
 
-      $(this.$['edit-items'])
-        .html(html)
-        .find('a.edit-trash')
+      var ele = $(this.$['edit-items']).html(html);
+      ele.find('a.edit-trash')
         .on('click', function(e){
           var ele = $(e.currentTarget);
-          var index = parseInt(ele.attr('index'));
+          var material = ele.attr('index');
 
-          ele.parent().remove();
-          this.data.materials.splice(index, 1);
+          ele.parent().parent().remove();
+          delete this.data.materials[material];
         }.bind(this));
+
+        ele.find('input[type="number"]')
+          .on('change', function(e){
+            var target = $(e.currentTarget);
+            var material = target.attr('material');
+            this.data.materials[material].amount = parseInt(target.val());
+
+            FB.materialController.recalc();
+            ele.find('#current-price').html('$'+this.data.price.toFixed(2));
+          }.bind(this));
     },
 
     onEditComplete : function() {
       var newName = this.$.nameInput.value;
       var oldName = this.data.name;
       this.data.name = newName;
+      this.data.units = this.$.unitsInput.value;
 
       // detect changes
       if( this.changesString == JSON.stringify(this.data) ) {
@@ -340,13 +388,12 @@
     // fired whenever any material is updated
     onUpdate : function(e) {
       // renaming something in our list?
-      if( e.replaced && this.data.materials.indexOf(e.replaced) > -1) {
-        var index = this.data.materials.indexOf(e.replaced);
-        this.data.materials[index] = e.material.name;
-
-      // if the material name is not in our chain, we can quit
+      if( e.replaced && this.data.materials[e.replaced] !== undefined ) {
+        this.data.materials[e.material.name] = this.data.materials[e.replaced];
+        delete this.data.materials[e.replaced];
       }
 
+      // if the material name is not in our chain, we can quit
       if( !this.has(e.material.name) ) {
         return;
       }
@@ -354,6 +401,7 @@
       // rerender
       this.render(this.renderType);
     },
+
 
     has : function(material) {
       if( material == this.data.name ) return true;
@@ -363,8 +411,8 @@
     _has : function(material, materials) {
       //if( !scope ) scope = this;
 
-      for( var i = 0; i < materials.length; i++ ) {
-        var m = FB.materialController.get(materials[i]);
+      for( var material in materials ) {
+        var m = FB.materialController.get(material);
         if( m.error ) continue;
 
         if( m.name === material ) return true;

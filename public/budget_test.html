@@ -34,8 +34,10 @@
   <!-- endbuild-->
 
   <link rel="import" href="bower_components/polymer/polymer.html">
+  <link rel="import" href="elements/layout.html">
   <link rel="import" href="elements/budget-components/budget-macro.html">
   <link rel="import" href="elements/budget-components/budget-complex-material-popup.html">
+  <link rel="import" href="elements/budget-components/budget-unit-selector.html">
 
 
 </head>
@@ -70,17 +72,48 @@
       {
         name : 'complex1',
         type : 'complex',
-        materials : ['foo', 'bar']
+        units : 'ac',
+        materials : {
+          foo : {
+            amount : 3
+          },
+          bar : {
+            amount : 4
+          }
+        }
       },
       {
         name : 'complex2',
         type : 'complex',
-        materials : ['complex1', 'bar', 'baz']
+        units : 'lb',
+        materials : {
+          complex1 : {
+            amount : 1
+          },
+          bar: {
+            amount : 5.4
+          },
+          baz : {
+            amount : 23
+          }
+       }
       },
       {
         name : 'super cool thing',
         type : 'complex',
-        materials : ['complex2', 'bar', 'seeds']
+        units : 'ac',
+        materials : {
+          complex2 : {
+            amount : 2
+          },
+          bar : {
+            amount : 2.3,
+            units : 'ft' // convert to feet
+          },
+          seeds : {
+            amount : 4
+          }
+        }
       }
     ];
     var options = {
@@ -88,7 +121,7 @@
     }
 
     var root = document.querySelector('#root');
-    
+
     testMaterials.forEach(function(material){
       FB.materialController.add(material, options);
 
