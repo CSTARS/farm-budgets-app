@@ -331,14 +331,15 @@
           html +=
             '<div class="layout horizontal">'+
               '<div class="flex"><budget-macro material="'+m.name+'"></budget-macro></div>'+
-              '<div>at <input type="number" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />/'+this.data.units+'</div>'+
+              '<div>with <input type="number" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />'+m.units+'/'+this.data.units+'</div>'+
               '<div><a class="btn btn-link edit-trash" style="vertical-align:top" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
           '</div>';
         } else {
           html +=
             '<div class="layout horizontal">'+
-              '<div class="flex">'+m.name+' ('+m.price+'/<budget-unit-selector units="'+m.units+'"></budget-unit-selector>)</div>'+
-              '<div>at <input type="number" material="'+material+'" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control">/'+this.data.units+'</div>'+
+              '<div class="flex"><b>'+m.name+'</b> ($'+m.price+'/<budget-unit-selector units="'+m.units+'" material="'+material+'"></budget-unit-selector>)</div>'+
+              '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount +
+                  '" style="width:50px;display:inline-block" class="form-control"><span id="'+material+'-units-label">'+m.units+'</span>/'+this.data.units+'</div>'+
               '<div><a class="btn btn-link edit-trash" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
             '</div>';
         }
@@ -355,15 +356,28 @@
           delete this.data.materials[material];
         }.bind(this));
 
-        ele.find('input[type="number"]')
-          .on('change', function(e){
-            var target = $(e.currentTarget);
-            var material = target.attr('material');
-            this.data.materials[material].amount = parseInt(target.val());
+      ele.find('input[type="number"]')
+        .on('change', function(e){
+          var target = $(e.currentTarget);
+          var material = target.attr('material');
+          this.data.materials[material].amount = parseInt(target.val());
 
-            FB.materialController.recalc();
-            ele.find('#current-price').html('$'+this.data.price.toFixed(2));
-          }.bind(this));
+          FB.materialController.recalc();
+          ele.find('#current-price').html('$'+this.data.price.toFixed(2));
+        }.bind(this));
+
+      ele.find('budget-unit-selector')
+        .on('units-change', function(e){
+          var target = $(e.currentTarget);
+          var material = target.attr('material');
+          console.log(e.originalEvent.detail);
+          this.data.materials[material].units = e.originalEvent.detail;
+
+          FB.materialController.recalc();
+          ele.find('#'+material+'-units-label').html(e.originalEvent.detail);
+        }.bind(this));
+
+
     },
 
     onEditComplete : function() {

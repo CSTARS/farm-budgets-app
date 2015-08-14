@@ -26,7 +26,7 @@
     updateSelector : function() {
       var list = [];
       for( var i = 0; i < UNITS.length; i++ ) {
-        if( UNITS[i].indexOf(this.units) ) {
+        if( UNITS[i].indexOf(this.units) > -1 ) {
           list = UNITS[i];
           break;
         }
@@ -35,14 +35,14 @@
 
       var html = '';
       for( var i = 0; i < list.length; i++ ) {
-        html += '<option value="'+list[i]+'" '+(list[i] == this.units ? 'checked' : '')+'>'+list[i]+'</option>';
+        html += '<option value="'+list[i]+'" '+(list[i] == this.units ? 'selected' : '')+'>'+list[i]+'</option>';
       }
 
       this.$.select.innerHTML = html;
     },
 
     onChange : function(){
-      this.fire('units-change', this.$.select.val);
+      this.fire('units-change', this.$.select.value);
     }
   });
 </script>
