@@ -8,6 +8,9 @@
   <style>
     :host {
       display: inline-block;
+    }
+
+    #expand {
       cursor: pointer;
     }
 
@@ -74,7 +77,8 @@
           </div>
         </td>
         <td style="padding-left: 5px">
-          <i class="fa fa-cubes"></i> <span id="nameLabel"></span>
+          <span id="expand"><i class="fa fa-cubes"></i> <span id="nameLabel"></span></span>
+          <budget-unit-selector id="unitSelector"></budget-unit-selector><span>)</span>
         </td>
       </tr>
       <tr>
@@ -113,7 +117,9 @@
         $(this).find('.nohover').removeClass('nohover');
       },function(){
         $(this).find('.btn-group > .btn').addClass('nohover');
-      }).on('click',function() {
+      });
+
+      $(this.$.expand).on('click',function() {
         if( this.showingBtns ) {
           $(this).find('.btn-group').hide();
           $(this.$.main).hide();
@@ -122,7 +128,7 @@
           $(this.$.main).show();
         }
         this.showingBtns = !this.showingBtns;
-      });
+      }.bind(this));
     },
 
     attached : function() {
@@ -141,7 +147,9 @@
     render : function(type) {
       this.renderType = type;
 
-      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ($'+this.data.price.toFixed(2)+'/'+this.data.units+')';
+      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ($'+this.data.price.toFixed(2)+'/';
+      this.$.unitSelector.units = this.data.units;
+      this.$.unitSelector.updateSelector();
 
       if( this.renderType == 'tree' ) {
         this.renderTree();
