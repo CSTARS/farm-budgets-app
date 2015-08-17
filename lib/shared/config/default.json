@@ -1,0 +1,2446 @@
+{
+  "materials": [
+    [
+      "0-0-60",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "10-34-00",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "11-52-0",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "13-0-45",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "16-16-16",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "16-20-0-14",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "18-0-5-4",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "2,4-D",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "32-0-0",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "33-0-0-12",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "40-0-0-6",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "46-0-0",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "80-0-0",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "80-00-00",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Achieve SC",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Admire",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Admire Pro",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Air Application",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Alcala",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Ammonium Sulfate",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "AMS",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Apogee",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Assail 70WP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Assesment",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Assure II",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Axiom LB",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Axiom OZ",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Bale",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Baling",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Banvel",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Barley Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Bee Hives",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Bravo",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Broadcast Fertilizer",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Brox M",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Canola Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Capture",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Carbine 50WG",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Clarity",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Clean Seed Orchdgr",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Combine",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Combine Wheat",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Commision Assess",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Commission Assess",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Consultant",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Cool and Pack",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Corn Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Cotton Assesment",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Counter 15G L-N-L",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Crop Insurance",
+      "insurance",
+      "",
+      null
+    ],
+    [
+      "Custom Aerial Spray",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Custom Air Spray",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Custom Air Spray - 5G",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Custom Combining",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Custom Fertilize",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Custom Fumigate - Deep",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Custom Sidedress",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Cut/Windrow",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Dacthal",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Defol 5",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Devrinol 50DF",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Dimethoate",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Diomethate",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Discover",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Disyston",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Di-Syston",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Dithane F45 Rainshield",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Diuron",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Dry Nitrogen",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Dry Nitrogen - Preplant",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Dry P2O5",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Dry Phosphate",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Dry Potash",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Dry Sulfur",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Endura (2x)",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Eptam 7EC",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "estimate",
+      "any",
+      "Cost Estimate",
+      null
+    ],
+    [
+      "Excel 90",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Far-GO",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Fees Assesment",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Finish 6 Pro",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Fuel",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Fuel - Diesel",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Fuel - Gas",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Fumigation",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Gen 25WG",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Ginstar",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Glyphosate GAL1",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Goal",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Goal Tender",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Gopher Control",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Ground Application",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Harmony Extra",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Harvest",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Harvest Combine Grain",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Harvest for Grain",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Harvest: Haul Grain",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Haul and Stack",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Haul Local",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Headline",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Injection-Sidedress",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Injection-Sidedress NH3",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Insecticide",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Irrigation",
+      "water",
+      "",
+      null
+    ],
+    [
+      "K20",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "K2O",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Karmex",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Karmex DF",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Kerb",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Labor (Irrigation)",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Labor (Machine)",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Labor (non-machine)",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Labor (other)",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "land-rent-irrigated",
+      "rent",
+      "Irrigated Land Rent",
+      null
+    ],
+    [
+      "land-rent-nonirrigated",
+      "rent",
+      "Non irrigated Land Rent",
+      null
+    ],
+    [
+      "land-rent-pasture",
+      "rent",
+      "Pasture irrigated Land Rent",
+      null
+    ],
+    [
+      "Lannate 90 SP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Lentil Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Leverage",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Leverage 2.7",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "LI 700",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Lime",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Liquid Nitrogen",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Liquid P2O5",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Lorsban 15G",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Lorsban 4E",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Lube",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Lubricants",
+      "material",
+      "",
+      null
+    ],
+    [
+      "M90",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Maintenance",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Maintenance and Repair",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Malathion",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Management",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Maverick",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "MCPA Amine",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Mepex Gin Our",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Metam Sodium",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Micronutrients",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Micro-Tech",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Mulch",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Mustang 1.5 EW",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Nitrogen",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Nitrogen (dry)",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Oberon 25C",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "oes452091",
+      "labor",
+      "[45-2091 Agricultural Equipment Operators](http://www.bls.gov/oes/current/oes452091.htm)",
+      null
+    ],
+    [
+      "oes452092",
+      "labor",
+      "[45-2092 Farmworkers and Laborers, Crop, Nursery, and Greenhouse](http://www.bls.gov/oes/current/oes452092.htm)",
+      null
+    ],
+    [
+      "oes533032",
+      "labor",
+      "[53-3032 Heavy and Tractor-Trailer Truck Drivers](http://www.bls.gov/oes/current/oes533032.htm)",
+      null
+    ],
+    [
+      "Orthene",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Osprey",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Outlook 6EC",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Packing",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Pest Control Consultant",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Phosphorous",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Phosphorous (dry)",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Pick Berries",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Plant",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Planting",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Poncho Beta Seed Treatment",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Postharvest and packaging",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Potato Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Pristine",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Prowl",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Prowl 3.3EC",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Prowl H20",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Puma 1EC",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Purity and Germ",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Pursuit",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Quadris",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Quilt",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Rake",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Rally 40 WSP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Reglone",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Rental Fertilizer Applicator",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Rental Ripper Shooter",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Rental Sprayer",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Repair",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Ridomil Gold EC",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Riper Shooter",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Roadside Bales",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Roadside Hay",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Rodent Control",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Roundup",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Roundup Original Max",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Roundup Ultra Max",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sawdust",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Seed Clean and Bag",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Seed Cleand and Bag",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Seed Test",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Select Max",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sencor",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sencor 4L",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sencor 75DF",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sevin XLR Plus",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Shark EW",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Slug Bait",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sonalan HFP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sorghum Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Spot Spray Roundup",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sprayer",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Staple",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Starane+Salvo",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Starane+Sword",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Storage Operating Costs",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Storage Repairs",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Stratego",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Stuble Shredder",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Success",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Sugarbeet",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Sulfur",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Sulfur (dry)",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Sulfuric Acid",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Surfactant-Induce",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Surflan AS",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Susan Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Swath",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Swathing",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Swath Rake",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Synapse WG",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Tarping",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Telone II",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Tissue Analysis",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Transport",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Transport to PDX",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Treflan 4HFP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Treflan FP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Treflan TR 10",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Triflurex HFP",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "UN32",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "Velpar L",
+      "pesticide",
+      "",
+      null
+    ],
+    [
+      "Water",
+      "water",
+      "",
+      null
+    ],
+    [
+      "Water Assesment",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Weed Control",
+      "labor",
+      "",
+      null
+    ],
+    [
+      "Wheat Assesment",
+      "processing",
+      "",
+      null
+    ],
+    [
+      "Wheat Seed",
+      "seed",
+      "",
+      null
+    ],
+    [
+      "Yukon",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Zephyr",
+      "material",
+      "",
+      null
+    ],
+    [
+      "Zinc",
+      "fertilizer",
+      "",
+      null
+    ],
+    [
+      "3-Wheel Ag Sprayer",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          3.96,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--3-Wheel Ag Sprayer",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Challenger tractor",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          19.36,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Challenger tractor",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Cooler/van",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          0.96,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Cooler/van",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Eliminator",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          19.36,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Eliminator",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "FR 6080 FH",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          13.2,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--FR 6080 FH",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Large tractor",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          13.2,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Large tractor",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Mid-size tractor",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          3.96,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Mid-size tractor",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Semi-tractor trailer",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          6.5,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Semi-tractor trailer",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Small tractor",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          1.98,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Small tractor",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Support Truck",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          1.76,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Support Truck",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Tandem axle truck",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          13.2,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Tandem axle truck",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Tractor and sprayer",
+      "equipment",
+      null,
+      [
+        [
+          "Equipment Fuel",
+          3.96,
+          "[gal_us]/h"
+        ],
+        [
+          "Labor--Tractor and sprayer",
+          1,
+          "h/h"
+        ]
+      ]
+    ],
+    [
+      "Labor--3-Wheel ag sprayer",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Challenger tractor",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Cooler/van",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--FR 6080 FH",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Laborer",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Large tractor",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Mid-size tractor",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Semi-tractor trailer",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Small tractor",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Supervisor",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Support Truck",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Tandem axle truck",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "Labor--Tractor and Sprayer",
+      "labor",
+      null,
+      null
+    ],
+    [
+      "hoeing",
+      "labor",
+      null,
+      [
+        [
+          "Laborer",
+          192,
+          "h/100.[acr_us]"
+        ]
+      ]
+    ],
+    [
+      "herbicide - manual",
+      "labor",
+      null,
+      [
+        [
+          "Glyphosate",
+          200,
+          "[qt_us]/100.[acr_us]"
+        ],
+        [
+          "Laborer",
+          96,
+          "h/100.[acr_us]"
+        ]
+      ]
+    ],
+    [
+      "Equipment Fuel",
+      "fuel",
+      "Off Road Diesel",
+      null
+    ],
+    [
+      "2,4-D",
+      "fertilizer",
+      null,
+      null
+    ],
+    [
+      "Coragen",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Dimilin",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Fusilade",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Glyphosate",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Goal 2XL",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Imidacloprid5",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Oust",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Rozol",
+      "[qt_us]",
+      "rodenticide",
+      null
+    ],
+    [
+      "Sureguard",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Transline",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Trifluralin",
+      "pesticide",
+      null,
+      null
+    ],
+    [
+      "Poplar Cutting",
+      "seed",
+      "Poplar cutting for planting",
+      null
+    ],
+    [
+      "Irrigation",
+      "water",
+      null,
+      null
+    ]
+  ],
+  "farms": [
+    [
+      "clarksburg",
+      "06113",
+      "POPLAR",
+      "100",
+      "[acr_us]",
+      [
+        [
+          "crop care - established",
+          [
+            [
+              "hoeing",
+              150,
+              "[acr_us]",
+              null
+            ],
+            [
+              "herbicide - manual",
+              100,
+              "[acr_us]",
+              null
+            ]
+          ]
+        ],
+        [
+          "planting",
+          [
+            [
+              "Semi-tractor trailer",
+              20,
+              "h",
+              "Transport Nursery to field"
+            ],
+            [
+              "Poplar Cutting",
+              145000,
+              "each",
+              null
+            ],
+            [
+              "Cooler/van",
+              1080,
+              "h",
+              null
+            ],
+            [
+              "Laborer",
+              480,
+              "h",
+              null
+            ]
+          ]
+        ],
+        [
+          "crop care - yr0",
+          [
+            [
+              "herbicide - manual",
+              25,
+              "[acr_us]",
+              null
+            ],
+            [
+              "hoeing",
+              140,
+              "[acr_us]",
+              "2 times over 70 acres each."
+            ]
+          ]
+        ],
+        [
+          "harvest - established",
+          [
+            [
+              "FR 6080 FH",
+              35,
+              "h",
+              null
+            ],
+            [
+              "Tandem axle truck",
+              175,
+              "h",
+              null
+            ],
+            [
+              "Support Truck",
+              35,
+              "h",
+              null
+            ]
+          ]
+        ],
+        [
+          "crop care - yr1",
+          [
+            [
+              "Small Tractor",
+              48,
+              "h",
+              "Tillage"
+            ],
+            [
+              "hoeing",
+              500,
+              "[arc_us]",
+              "5 times"
+            ],
+            [
+              "herbicide - manual",
+              150,
+              "[arc_us]",
+              "3 times, 1/2 field"
+            ],
+            [
+              "Laborer",
+              96,
+              "h",
+              "Interplanting"
+            ]
+          ]
+        ],
+        [
+          "restoration",
+          [
+            [
+              "Large tractor",
+              12,
+              "h",
+              "disking"
+            ],
+            [
+              "Tractor and sprayer",
+              20,
+              "h",
+              "herbicide"
+            ],
+            [
+              "Glyphosate",
+              200,
+              "[qt_us]",
+              "herbicide"
+            ],
+            [
+              "2,4-D",
+              200,
+              "[qt_us]",
+              "herbicide"
+            ]
+          ]
+        ],
+        [
+          "crop care - post harvest",
+          [
+            [
+              "Mid-size tractor",
+              30,
+              "h",
+              "Post harvest clean up"
+            ],
+            [
+              "Tractor and sprayer",
+              8,
+              "h",
+              "Dormant Herbicide"
+            ],
+            [
+              "Glyphosate",
+              200,
+              "[qt_us]",
+              "Dormant Herbicide"
+            ],
+            [
+              "Trifluralin",
+              200,
+              "[qt_us]",
+              "Dormant Herbicide"
+            ],
+            [
+              "herbicide - manual",
+              100,
+              "[acr_us]",
+              "post emergent"
+            ]
+          ]
+        ],
+        [
+          "harvest - yr1",
+          [
+            [
+              "FR 6080 FH",
+              26,
+              "h",
+              ""
+            ],
+            [
+              "Tandom axle truck",
+              104,
+              "h",
+              null
+            ],
+            [
+              "Support truck",
+              26,
+              "h",
+              null
+            ]
+          ]
+        ],
+        [
+          "site prep",
+          [
+            [
+              "Tractor and sprayer",
+              3,
+              "h",
+              "Initial Spraying"
+            ],
+            [
+              "Glyphosate",
+              100,
+              "[qt_us]",
+              "Initial Spraying"
+            ],
+            [
+              "Goal 2XL",
+              125,
+              "[qt_us]",
+              "Initial Spraying"
+            ],
+            [
+              "Large tractor",
+              20,
+              "h",
+              "Initial Tillage"
+            ],
+            [
+              "Large tractor",
+              10,
+              "h",
+              "Ripping"
+            ],
+            [
+              "Large tractor",
+              25,
+              "h",
+              "Row Marking"
+            ],
+            [
+              "Challenger tractor",
+              25,
+              "h",
+              "herbicide - preemergent"
+            ],
+            [
+              "Trifluralin",
+              50,
+              "[qt_us]",
+              "herbicide - preemergent"
+            ]
+          ]
+        ]
+      ],
+      [
+        [
+          "2015-06-01",
+          "3 mons",
+          "site prep",
+          null,
+          null
+        ],
+        [
+          "2015-10-01",
+          "1 mon",
+          "planting",
+          null,
+          null
+        ],
+        [
+          "2015-11-01",
+          "1 year",
+          "crop care - yr0",
+          null,
+          null
+        ],
+        [
+          "2016-11-01",
+          "1 year",
+          "crop care - yr1",
+          null,
+          null
+        ],
+        [
+          "2017-10-01",
+          "1 mon",
+          "harvest - yr2",
+          9,
+          "[ston_us]/[acr_us]"
+        ],
+        [
+          "2017-11-01",
+          "1 year",
+          "crop care - post harvest",
+          null,
+          null
+        ],
+        [
+          "2018-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2019-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2020-10-01",
+          "1 mon",
+          "harvest - established",
+          27.5,
+          "[ston_us]/[acr_us]"
+        ],
+        [
+          "2021-11-01",
+          "1 year",
+          "crop care - post harvest",
+          null,
+          null
+        ],
+        [
+          "2022-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2023-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2023-10-01",
+          "1 mon",
+          "harvest - established",
+          27.5,
+          "[ston_us]/[acr_us]"
+        ],
+        [
+          "2025-11-01",
+          "1 year",
+          "crop care - post harvest",
+          null,
+          null
+        ],
+        [
+          "2026-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2027-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2028-10-01",
+          "1 mon",
+          "harvest - established",
+          27.5,
+          "[ston_us]/[acr_us]"
+        ],
+        [
+          "2029-11-01",
+          "1 year",
+          "crop care - post harvest",
+          null,
+          null
+        ],
+        [
+          "2030-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2031-11-01",
+          "1 year",
+          "crop care - established",
+          null,
+          null
+        ],
+        [
+          "2032-10-01",
+          "1 mon",
+          "harvest - established",
+          27.5,
+          "[ston_us]/[acr_us]"
+        ],
+        [
+          "2032-11-01",
+          "3 mons",
+          "restoration",
+          null,
+          null
+        ]
+      ]
+    ]
+  ],
+  "prices": [
+    [
+      "3-Wheel Ag Sprayer",
+      50,
+      "us$/h"
+    ],
+    [
+      "Challenger tractor",
+      90,
+      "us$/h"
+    ],
+    [
+      "Cooler/van",
+      1.2,
+      "us$/h"
+    ],
+    [
+      "Eliminator",
+      155,
+      "us$/h"
+    ],
+    [
+      "FR 6080 FH",
+      180,
+      "us$/h"
+    ],
+    [
+      "Large tractor",
+      70,
+      "us$/h"
+    ],
+    [
+      "Mid-size tractor",
+      45,
+      "us$/h"
+    ],
+    [
+      "Semi-tractor trailer",
+      55,
+      "us$/h"
+    ],
+    [
+      "Small tractor",
+      30,
+      "us$/h"
+    ],
+    [
+      "Support Truck",
+      25,
+      "us$/h"
+    ],
+    [
+      "Tandem axle truck",
+      25,
+      "us$/h"
+    ],
+    [
+      "Tractor and sprayer",
+      50,
+      "us$/h"
+    ],
+    [
+      "3-Wheel ag sprayer",
+      30,
+      "us$/h"
+    ],
+    [
+      "Challenger tractor",
+      35,
+      "us$/h"
+    ],
+    [
+      "Cooler/van",
+      0.71,
+      "us$/h"
+    ],
+    [
+      "FR 6080 FH",
+      30,
+      "us$/h"
+    ],
+    [
+      "Laborer",
+      17,
+      "us$/h"
+    ],
+    [
+      "Labor--Large tractor",
+      35,
+      "us$/h"
+    ],
+    [
+      "Labor--Mid-size tractor",
+      22,
+      "us$/h"
+    ],
+    [
+      "Labor--Semi-tractor trailer",
+      28,
+      "us$/h"
+    ],
+    [
+      "Labor--Small tractor",
+      22,
+      "us$/h"
+    ],
+    [
+      "Labor--Supervisor",
+      26,
+      "us$/h"
+    ],
+    [
+      "Labor--Support Truck",
+      30,
+      "us$/h"
+    ],
+    [
+      "Labor--Tandem axle truck",
+      26,
+      "us$/h"
+    ],
+    [
+      "Labor--Tractor and Sprayer",
+      30,
+      "us$/h"
+    ],
+    [
+      "Equipment Fuel",
+      2.81,
+      "us$/[gal_us]"
+    ],
+    [
+      "2,4-D",
+      5,
+      "us$/[qt_us]"
+    ],
+    [
+      "Coragen",
+      210,
+      "us$/[qt_us]"
+    ],
+    [
+      "Fusilade",
+      30,
+      "us$/[qt_us]"
+    ],
+    [
+      "Glyphosate",
+      4,
+      "us$/[qt_us]"
+    ],
+    [
+      "Goal 2XL",
+      30,
+      "us$/[qt_us]"
+    ],
+    [
+      "Imidacloprid",
+      56,
+      "us$/[qt_us]"
+    ],
+    [
+      "Oust",
+      64,
+      "us$/[lb_av]"
+    ],
+    [
+      "Rozol",
+      1.85,
+      "us$/[lb_av]"
+    ],
+    [
+      "Sureguard",
+      130,
+      "us$/[lb_av]"
+    ],
+    [
+      "Transline",
+      215,
+      "us$/[gal_us]"
+    ],
+    [
+      "Trifluralin",
+      7.5,
+      "us$/[qt_us]"
+    ],
+    [
+      "Poplar Cutting",
+      0.08,
+      "us$/1"
+    ],
+    [
+      "Irrigation Cost",
+      6,
+      "us$/[acr_us].[in_us]"
+    ]
+  ]
+}

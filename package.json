@@ -9,12 +9,13 @@
     "init-dev": "npm install && bower install",
     "init-prod": "npm install --production",
     "run-dev": "node server --dev",
-    "watch" : "grunt browserify:watch",
+    "watch": "grunt browserify:watch",
     "test": "grunt test",
     "build": "grunt build",
     "all": "npm run build && npm run test"
   },
   "dependencies": {
+    "config": "^1.15.0",
     "construx": "^1.0.0",
     "construx-copier": "^1.0.0",
     "construx-dustjs": "^1.0.0",
@@ -23,7 +24,8 @@
     "makara": "^2.0.1",
     "merge-util": "^0.3.1",
     "mongoose": "^4.0.8",
-    "pg": "^4.4.0"
+    "pg": "^4.4.0",
+    "ucum.js": "0.0.2"
   },
   "devDependencies": {
     "grunt": "*",
