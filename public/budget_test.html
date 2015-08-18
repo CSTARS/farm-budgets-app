@@ -38,6 +38,8 @@
   <link rel="import" href="elements/budget-components/budget-macro.html">
   <link rel="import" href="elements/budget-components/budget-complex-material-popup.html">
   <link rel="import" href="elements/budget-components/budget-unit-selector.html">
+  <link rel="import" href="elements/budget-components/budget-operation.html">
+  <link rel="import" href="elements/budget-components/budget-material.html">
 
 
 </head>
@@ -48,6 +50,27 @@
   <budget-complex-material-popup></budget-complex-material-popup>
 
   <script>
+    var testOperations = [
+      {
+        name : 'Operation 1',
+        interval : {
+          type : '',
+          dates : []
+        },
+        materials : {
+          foo : {
+            amount : 2,
+          },
+          'complex 1' : {
+            amount : 2,
+          },
+          'super cool thing' : {
+            amount : 2,
+          }
+        }
+      }
+    ];
+
     var testMaterials = [
       {
         name : 'foo',
@@ -116,6 +139,7 @@
         }
       }
     ];
+
     var options = {
       noEvent : true
     }
@@ -132,6 +156,16 @@
         div.appendChild(ele);
         root.appendChild(div);
       }
+    });
+
+    testOperations.forEach(function(operation){
+      FB.operationController.add(operation, options);
+
+      var ele = document.createElement('budget-operation');
+      ele.operation = operation;
+      var div = document.createElement('div');
+      div.appendChild(ele);
+      root.appendChild(div);
     });
 
 

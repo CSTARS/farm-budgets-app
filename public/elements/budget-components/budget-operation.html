@@ -1,0 +1,121 @@
+<link rel="import" href="budget-interval-selector.html" />
+
+<dom-module id="budget-operation">
+  <template>
+
+    <h4>
+      <i class="fa fa-toggle-right"></i> <span id="nameLabel"></span>
+      <small><budget-interval-selector></budget-interval-selector></small>
+    </h4>
+
+    <div id="content">
+
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-operation',
+
+    ready : function() {
+      FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
+    },
+
+    attached : function() {
+      if( this.operation ) this.render();
+    },
+
+    onOperationUpdate : function(e) {
+      if( !this.operation ) return;
+      if( e.operation.id != this.operation.id ) return;
+
+      this.render();
+    },
+
+    update : function(operation) {
+      this.operation = operation;
+
+      // TODO: need to listen for changes to materials
+
+      this.render();
+    },
+
+    render : function() {
+      this.$.nameLabel.innerHTML = this.operation.name;
+
+      this.$.content.innerHTML = '';
+      if( !this.operation.materials ) return;
+
+      this.materialsArray = [];
+      var html = '<table class="table"><tr><th>Material</th><th>Amount</th><th>Price</th></tr>';
+
+      // TODO: someone else should be doing this...
+      this.recalc();
+
+      for( var m in this.operation.materials ) {
+        var materialDef = FB.materialController.get(m);
+        if( materialDef.error ) continue;
+
+        var materialImpl = this.operation.materials[m];
+        if( !materialImpl.units ) materialImpl = materialDef.units;
+
+        if( m.type == 'complex' ) {
+          html += '<tr><td><budget-macro material="'+m+'" index="'+this.materialsArray.length+'"></budget-macro></td>';
+        } else {
+          html += '<tr><td><budget-material material="'+m+'"></budget-material></td>';
+        }
+        html += '<td><input type="number" class="form-control op-amount" index="'+this.materialsArray.length+'" style="max-width: 100px" value="'+materialImpl.amount+'" /></td>'+
+                '<td id="price-'+this.materialsArray.length+'">$'+materialImpl.price.toFixed(2)+'</td></tr>';
+
+        this.materialsArray.push(materialImpl);
+      }
+
+      this.$.content.innerHTML = html+'</table>';
+
+      $(this.$.content)
+        .find('input.op-amount')
+        .on('change', function(e){
+          var ele = $(e.currentTarget);
+          var index = parseInt(ele.attr('index'));
+
+          var m = this.operation.materials[this.materialsArray[index].name];
+
+          m.amount = parseInt(ele.val());
+          this.recalc();
+
+          $(this.$.content).find('#price-'+index).html('$'+m.price.toFixed(2));
+        }.bind(this));
+
+      $(this.$.content)
+        .find('budget-macro')
+        .on('units-change', function(e){
+          var ele = $(e.currentTarget);
+          var material = ele.attr('material');
+
+          var m = this.operation.materials[material];
+          m.units = e.originalEvent.detail;
+
+          this.recalc();
+
+          $(this.$.content).find('#price-'+ele.attr('index')).html('$'+m.price.toFixed(2));
+        }.bind(this));
+    },
+
+    recalc : function() {
+      for( var m in this.operation.materials ) {
+        var materialDef = FB.materialController.get(m);
+        if( m.error ) continue;
+
+        var conversion = 1;
+        if( this.operation.materials[m].units && this.operation.materials[m].units != materialDef.units ) {
+          conversion = 2;
+        }
+
+        this.operation.materials[m].price = this.operation.materials[m].amount * m.price * conversion;
+      }
+    }
+
+  });
+</script>

@@ -1,7 +1,7 @@
 <dom-module id="budget-interval-selector">
   <style>
     :host {
-      display: block;
+      display: inline-block;
       position: relative;
     }
     #inputPanel {
@@ -13,38 +13,48 @@
       margin: 5px;
       border: 1px solid #ccc;
       box-shadow: 0 0 5px #888;
+      font-size: 14px;
+      color: #333;
+      z-index: 100;
+      background-color: white;
+    }
+    #title {
+      cursor: pointer;
     }
   </style>
 
   <template>
 
-    <div>
-      Schedule: <span>{{displayText}}</span> <a class="btn btn-link" on-click="toggle"><i class="fa fa-pencil"></i></a>
+    <div on-click="toggle" id="title">
+      Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i>
     </div>
 
     <div id="inputPanel" style="display:none">
-      <div style="text-align:right">
-        <a class="btn btn-link" on-click="toggle" style="color: #888"><i class="fa fa-remove"></i></a>
-      </div>
+      <h5>
+        Schedule
+        <a class="pull-right" on-click="toggle" style="cursor:pointer;color: #888"><i class="fa fa-remove"></i></a>
+      </h5>
+
+      <select class="form-control" id="scheduleInput" on-input="onScheduleInput">
+        <option value="One Time">One Time</option>
+        <option value="Yearly">Yearly</option>
+        <option value="Biannually">Biannually</option>
+        <option value="Quarterly">Quarterly</option>
+        <option value="Custom">Select Dates</option>
+      </select>
 
       <div class="form-horizontal">
         <div class="form-group">
-          <label for="scheduleInput" class="col-sm-2 control-label">Schedule</label>
+          <label for="scheduleInput" class="col-sm-2 control-label"></label>
           <div class="col-sm-10">
-            <select class="form-control" id="scheduleInput" on-input="onScheduleInput">
-              <option value="One Time">One Time</option>
-              <option value="Yearly">Yearly</option>
-              <option value="Biannually">Biannually</option>
-              <option value="Quarterly">Quarterly</option>
-              <option value="Custom">Select Dates</option>
-            </select>
+
           </div>
         </div>
 
         <div class="form-group" id="dates" style="display:none">
           <label for="datesInput" class="col-sm-2 control-label">Dates</label>
           <div class="col-sm-10">
-            <input id="datesInput" />
+            <input id="datesInput" class="form-control"/>
 
             <div id="selectedDates">
               <template is="dom-repeat" items="{{dateArray}}">
@@ -86,6 +96,14 @@
           this.update();
           $(this.$.datesInput).datepicker('hide');
         }.bind(this));
+
+      $(this.$.title)
+        .on('mouseover', function(){
+          this.$.edit.style.display = 'inline';
+        }.bind(this))
+        .on('mouseleave', function(){
+          this.$.edit.style.display = 'none';
+        }.bind(this))
 
       this.update();
     },
@@ -130,8 +148,11 @@
 
     removeDate : function(e) {
       var index = parseInt(e.currentTarget.getAttribute('index'));
+
       this.dateArray.splice(index, 1);
       this.data.dates.splice(index, 1);
+
+      this.update();
     },
 
     toggle : function() {

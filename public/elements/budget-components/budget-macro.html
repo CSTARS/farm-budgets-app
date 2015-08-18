@@ -13,6 +13,9 @@
     #expand {
       cursor: pointer;
     }
+    #expand:hover {
+      color: #2196f3;
+    }
 
     .btn-group > .btn.btn-default {
       transition: all 300ms linear;
@@ -78,7 +81,8 @@
         </td>
         <td style="padding-left: 5px">
           <span id="expand"><i class="fa fa-cubes"></i> <span id="nameLabel"></span></span>
-          <budget-unit-selector id="unitSelector"></budget-unit-selector><span>)</span>
+          <span id="otherLabel"></span>
+          <budget-unit-selector id="unitSelector" on-units-update="onUnitsUpdate"></budget-unit-selector><span>)</span>
         </td>
       </tr>
       <tr>
@@ -143,11 +147,16 @@
       }
     },
 
+    rerender : function() {
+      this.render(this.renderType);
+    },
+
     // render display. type
     render : function(type) {
       this.renderType = type;
 
-      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ($'+this.data.price.toFixed(2)+'/';
+      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ';
+      this.$.otherLabel.innerHTML = '($'+(this.unitsPrice !== undefined ? this.unitsPrice : this.data.price.toFixed(2))+'/';
       this.$.unitSelector.units = this.data.units;
       this.$.unitSelector.updateSelector();
 

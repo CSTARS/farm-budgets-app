@@ -1,0 +1,44 @@
+<dom-module id="budget-material">
+  <style>
+    host : {
+      display: inline-block;
+    }
+  </style>
+
+  <template>
+    <b id="nameLabel"></b>
+    ($<span id="priceLabel"></span>/<budget-unit-selector id="selector"></budget-unit-selector>)
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-material',
+
+    properties : {
+      material : {
+        type : String,
+        observer : 'render'
+      }
+    },
+
+    attached : function() {
+      this.render();
+    },
+
+    render : function(material) {
+      if( material ) this.material = material;
+      if( !this.material ) return;
+
+      var m = FB.materialController.get(this.material);
+      if( m.error ) return;
+
+      this.$.nameLabel.innerHTML = m.name;
+      this.$.priceLabel.innerHTML = m.price;
+      this.$.selector.setAttribute('units', m.units);
+
+
+      //this.data.materials[material].price.toFixed(2)
+    }
+  });
+</script>
