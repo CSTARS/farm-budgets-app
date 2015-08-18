@@ -1,0 +1,43 @@
+<dom-module id="ahb-budget">
+  <template>
+    <div id="root"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'ahb-budget',
+
+    attached : function() {
+      this.demo();
+    },
+
+    demo : function() {
+      var appData = FB.transform(FB.examples.poplar);
+      window.appData = appData;
+
+      var options = {
+        noEvent : true,
+        noRecalc : true
+      }
+
+      appData.materials.forEach(function(material){
+        FB.materialController.add(material, options);
+      });
+      FB.materialController.recalc();
+
+      appData.operations.forEach(function(operation){
+        FB.operationController.add(operation, options);
+
+        var ele = document.createElement('budget-operation');
+        ele.operationid = operation.id;
+
+        var div = document.createElement('div');
+        div.appendChild(ele);
+
+        this.$.root.appendChild(div);
+      }.bind(this));
+    }
+
+  });
+</script>

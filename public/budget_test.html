@@ -35,28 +35,27 @@
 
   <link rel="import" href="bower_components/polymer/polymer.html">
   <link rel="import" href="elements/layout.html">
+  <link rel="import" href="elements/widgets/ahb-dollar-label.html">
   <link rel="import" href="elements/budget-components/budget-macro.html">
   <link rel="import" href="elements/budget-components/budget-complex-material-popup.html">
   <link rel="import" href="elements/budget-components/budget-unit-selector.html">
   <link rel="import" href="elements/budget-components/budget-operation.html">
   <link rel="import" href="elements/budget-components/budget-material.html">
+  <link rel="import" href="elements/budget-components/ahb-budget.html">
 
 
 </head>
 
 <body style="padding:10px">
 
-  <div id="root"></div>
   <budget-complex-material-popup></budget-complex-material-popup>
+  <ahb-budget></ahb-budget>
 
   <script>
-    var testOperations = [
+    /*var testOperations = [
       {
         name : 'Operation 1',
-        interval : {
-          type : '',
-          dates : []
-        },
+        schedule : [],
         materials : {
           foo : {
             amount : 2,
@@ -148,14 +147,6 @@
 
     testMaterials.forEach(function(material){
       FB.materialController.add(material, options);
-
-      /*if( material.type == 'complex' ) {
-        var ele = document.createElement('budget-macro');
-        ele.data = material;
-        var div = document.createElement('div');
-        div.appendChild(ele);
-        root.appendChild(div);
-      }*/
     });
 
     testOperations.forEach(function(operation){
@@ -168,7 +159,8 @@
       root.appendChild(div);
     });
 
-
+    var appData = FB.transform(FB.examples.poplar);
+    console.log(appData); */
   </script>
 </body>
 </html>

@@ -15,8 +15,6 @@
 
     update : function() {
       if( typeof this.value !== 'string' ) this.value = this.value+'';
-
-
       this.innerHTML = '$'+this.value.replace(/\..*/,'').replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
   });

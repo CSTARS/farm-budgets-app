@@ -1,14 +1,43 @@
-<link rel="import" href="budget-interval-selector.html" />
+<link rel="import" href="budget-operation-scheduler.html" />
 
 <dom-module id="budget-operation">
+  <style>
+    :host {
+      display: block;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+
   <template>
 
-    <h4>
-      <i class="fa fa-toggle-right"></i> <span id="nameLabel"></span>
-      <small><budget-interval-selector></budget-interval-selector></small>
-    </h4>
+    <div class="row">
+      <div class="col-sm-8">
+        <h4>
+          <div style="margin-bottom: 5px"><a on-click="toggleContent" style="cursor:pointer"><i class="fa fa-toggle-right" id="icon"></i></a>
+            <span id="nameLabel"></span>
+            <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
+          </div>
+          <small><budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler></small>
+        </h4>
+      </div>
+      <div class="col-sm-4">
+        <table class="padding: 15px">
+          <tr>
+            <td><h4>Subtotal</h4></td>
+            <td style="padding-left: 10px ">
+              <h4 class="text text-success"><ahb-dollar-label id="subtotal"></ahb-dollar-label>
+              <span id="subtotalInfo"></span></h4>
+            </td>
+          </tr>
+          <tr>
+            <td><h4>Total</h4></td>
+            <td style="padding-left: 10px "><h4 class="text text-success" ><ahb-dollar-label id="total"></ahb-dollar-label></h4></td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-    <div id="content"></div>
+    <div id="content" style="display:none" class="animated slideInRight"></div>
 
   </template>
 </dom-module>
@@ -32,6 +61,7 @@
       if( this.operation ) this.render();
     },
 
+    // fired from operation controller
     onOperationUpdate : function(operation) {
       if( !this.operation ) return;
       if( operation.id != this.operation.id ) return;
@@ -39,13 +69,29 @@
       this.render();
     },
 
+    // fire from schedule element
+    onScheduleUpdate : function(e) {
+      if( !this.operation ) return;
+
+      this.operation.schedule = e.detail;
+      FB.operationController.recalc();
+      this.updateTotals();
+    },
+
     update : function() {
       this.operation = FB.operationController.get(this.operationid);
+      this.$.schedule.set(this.operation.schedule);
       this.render();
+    },
+
+    showError : function(show) {
+      if( show ) this.$.errorIcon.style.display = 'inline';
+      else this.$.errorIcon.style.display = 'none';
     },
 
     render : function() {
       this.$.nameLabel.innerHTML = this.operation.name;
+      this.showError(false);
 
       this.$.content.innerHTML = '';
       if( !this.operation.materials ) return;
@@ -58,7 +104,8 @@
         var materialImpl = this.operation.materials[m];
 
         if( materialImpl.error ) {
-          html += '<tr><td colspan="4"><div class="alert alert-danger">'+this.operation.materials[m].error.message+'</div></td>';
+          this.showError(true);
+          html += '<tr><td colspan="4"><div class="text text-danger">'+this.operation.materials[m].error.message+'</div></td>';
           continue;
         }
         if( materialDef.type == 'complex' ) {
@@ -66,14 +113,14 @@
         } else {
           html += '<tr><td><budget-material material="'+m+'"></budget-material></td>';
         }
-        html += '<td><input type="text" class="form-control" value="'+(materialImpl.notes ? materialImpl.replace(/"/g,'\'') : '')+'" /></td>'
+        html += '<td><input type="text" class="form-control" value="'+(materialImpl.note ? materialImpl.note.replace(/"/g,'\'') : '')+'" /></td>'+
                 '<td><input type="number" class="form-control op-amount" material="'+m+'" style="max-width: 100px" value="'+this.operation.materials[m].amount+'" /></td>'+
-                '<td class="price" material="'+m+'">$'+this.operation.materials[m].price.toFixed(2)+'</td></tr>';
+                '<td class="price" material="'+m+'"><ahb-dollar-label value="'+this.operation.materials[m].price.toFixed(2)+'"></ahb-dollar-label></td></tr>';
       }
 
-      this.$.content.innerHTML = html+
-        '<tr><td></td><td><h4>Total</j4></td><td><h4 class="text text-success total">$'+this.operation.price.toFixed(2)+'</h4></td></tr>';
-        '</table>'+
+      this.$.content.innerHTML = html+'</table>';
+
+      this.updateTotals();
 
       $(this.$.content)
         .find('input.op-amount')
@@ -86,8 +133,8 @@
 
           FB.operationController.recalc();
 
-          $(this.$.content).find('.price[material="'+material+'"]').html('$'+m.price.toFixed(2));
-          $(this.$.content).find('.total').html('$'+this.operation.price.toFixed(2));
+          $(this.$.content).find('.price[material="'+material+'"] ahb-dollar-label').attr('value', m.price.toFixed(2));
+        this.updateTotals();
         }.bind(this));
 
       $(this.$.content)
@@ -101,9 +148,26 @@
 
           FB.operationController.recalc();
 
-          $(this.$.content).find('.price[material="'+material+'"]').html('$'+m.price.toFixed(2));
-          $(this.$.content).find('.total').html('$'+this.operation.price.toFixed(2));
+          $(this.$.content).find('.price[material="'+material+'"] ahb-dollar-label').attr('value', m.price.toFixed(2));
+          this.updateTotals();
         }.bind(this));
+    },
+
+    updateTotals : function() {
+      var scheduled = this.operation.schedule ? this.operation.schedule.length : 0;
+      $(this.$.total).attr('value', this.operation.total);
+      $(this.$.subtotal).attr('value', this.operation.subtotal);
+      $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
+    },
+
+    toggleContent : function() {
+      if( this.$.content.style.display == 'block' ) {
+        this.$.content.style.display = 'none'
+        this.$.icon.className = 'fa fa-toggle-right';
+      } else {
+        this.$.content.style.display = 'block'
+        this.$.icon.className = 'fa fa-toggle-down';
+      }
     }
 
   });

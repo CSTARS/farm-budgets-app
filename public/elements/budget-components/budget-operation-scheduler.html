@@ -1,0 +1,162 @@
+<dom-module id="budget-operation-scheduler">
+  <style>
+    :host {
+      display: block;
+      position: relative;
+    }
+    #inputPanel {
+      display: none;
+      font-size: 14px;
+      color: #333;
+    }
+    #title {
+      cursor: pointer;
+    }
+  </style>
+
+  <template>
+
+    <div on-click="toggle" id="title">
+      Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i>
+    </div>
+
+    <div id="inputPanel" class="well animated slideInLeft" style="display:none">
+      <h5>
+        <i class="fa fa-calendar-o"></i> Edit Schedule
+        <a class="pull-right" on-click="toggle" style="cursor:pointer;color: #888"><i class="fa fa-remove"></i></a>
+      </h5>
+
+      <div class="form-horizontal">
+
+        <div class="form-group" id="dates">
+          <label for="datesInput" class="col-sm-2 control-label">Add Dates</label>
+          <div class="col-sm-10">
+            <input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>
+
+            <div id="selectedDates">
+              <template is="dom-repeat" items="{{data}}">
+                <div>
+
+                  <div class="layout horizontal" style="margin-top:15px">
+                    <div><h6 style="padding-right: 20px">{{item.date}}</h6></div>
+
+                    <div>
+                      <input type="number" value="{{item.length}}" class="form-control" style="max-width: 75px; margin-right: 5px" />
+                    </div>
+
+                    <div>
+                      <select value="{{item.units}}" class="form-control">
+                        <option value="day">Day(s)</option>
+                        <option value="month">Month(s)</option>
+                        <option value="year">Year(s)</option>
+                      </select>
+                    </div>
+
+                    <div class="flex">
+                      <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-remove"></i></a>
+                    </div>
+                  </div> <!-- end inline form -->
+
+                </div>
+              </template>
+            </div>
+
+          </div>
+        </div>
+      </div> <!-- end form -->
+
+    </div> <!-- end input panel -->
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-operation-scheduler',
+
+    ready : function() {
+      this.displayText = '';
+
+      this.data = [];
+      this.dates = [];
+
+      $(this.$.datesInput)
+        .datepicker({
+          format: 'mm/dd/yyyy',
+          orientation : 'top auto'
+        })
+        .on('changeDate', function(e){
+          this.dates.push({
+            date : e.date,
+            length : 1,
+            units : 'month'
+          });
+          this.update();
+          $(this.$.datesInput).datepicker('hide');
+        }.bind(this));
+
+      $(this.$.title)
+        .on('mouseover', function(){
+          this.$.edit.style.display = 'inline';
+        }.bind(this))
+        .on('mouseleave', function(){
+          this.$.edit.style.display = 'none';
+        }.bind(this))
+
+      this.update();
+    },
+
+    set : function(data) {
+      this.data = data;
+
+      this.dates = [];
+      for( var i = 0; i < data.length; i++ ) {
+        this.dates.push({
+          length : data[i].length,
+          units : data[i].units,
+          date : new Date(data[i].date)
+        })
+      }
+
+      this.update();
+    },
+
+    update : function() {
+      this.$.dates.style.display = 'block';
+      this.displayText = ' x'+this.dates.length;
+
+      var tmp = [];
+      for( var i = 0; i < this.dates.length; i++ ) {
+        tmp.push(this.toDateString(this.dates[i]));
+      }
+
+      this.data = tmp;
+      this.fire('schedule-update', this.data);
+    },
+
+    toDateString : function(d) {
+      return {
+        length : d.length,
+        units : d.units,
+        date : (d.date.getYear()+1900)+'-'+(d.date.getMonth()+1)+'-'+(d.date.getDate())
+      }
+    },
+
+    removeDate : function(e) {
+      var index = parseInt(e.currentTarget.getAttribute('index'));
+
+      this.data.splice(index, 1);
+      this.dates.splice(index, 1);
+
+      this.update();
+    },
+
+    toggle : function() {
+      if( this.$.inputPanel.style.display == 'none' ) {
+        this.$.inputPanel.style.top = $(this).height()+'px';
+        this.$.inputPanel.style.display = 'block';
+      } else {
+        this.$.inputPanel.style.display = 'none';
+      }
+    }
+  });
+</script>
