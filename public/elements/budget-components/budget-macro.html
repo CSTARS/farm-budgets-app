@@ -2,8 +2,6 @@
   TODO: need to integrate https://github.com/jmandel/ucum.js
 -->
 
-<link rel="import" href="budget-macro-item.html" />
-
 <dom-module id="budget-macro">
   <style>
     :host {
@@ -12,6 +10,9 @@
 
     #expand {
       cursor: pointer;
+    }
+    #expand:hover {
+      color: #2196f3;
     }
 
     .btn-group > .btn.btn-default {
@@ -78,7 +79,8 @@
         </td>
         <td style="padding-left: 5px">
           <span id="expand"><i class="fa fa-cubes"></i> <span id="nameLabel"></span></span>
-          <budget-unit-selector id="unitSelector"></budget-unit-selector><span>)</span>
+          <span id="otherLabel"></span>
+          <budget-unit-selector id="unitSelector" on-units-update="onUnitsUpdate"></budget-unit-selector><span>)</span>
         </td>
       </tr>
       <tr>
@@ -143,11 +145,16 @@
       }
     },
 
+    rerender : function() {
+      this.render(this.renderType);
+    },
+
     // render display. type
     render : function(type) {
       this.renderType = type;
 
-      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ($'+this.data.price.toFixed(2)+'/';
+      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ';
+      this.$.otherLabel.innerHTML = '($'+(this.unitsPrice !== undefined ? this.unitsPrice : this.data.price.toFixed(2))+'/';
       this.$.unitSelector.units = this.data.units;
       this.$.unitSelector.updateSelector();
 
@@ -339,7 +346,7 @@
           html +=
             '<div class="layout horizontal">'+
               '<div class="flex"><budget-macro material="'+m.name+'"></budget-macro></div>'+
-              '<div>with <input type="number" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />'+m.units+'/'+this.data.units+'</div>'+
+              '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />'+m.units+'/'+this.data.units+'</div>'+
               '<div><a class="btn btn-link edit-trash" style="vertical-align:top" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
           '</div>';
         } else {
