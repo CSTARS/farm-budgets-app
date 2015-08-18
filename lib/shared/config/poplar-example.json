@@ -1157,12 +1157,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 3.96,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--3-Wheel Ag Sprayer"
+          "material": "Labor--3-Wheel Ag Sprayer"
         }
       ],
       "class": "equipment",
@@ -1174,12 +1174,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 19.36,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Challenger tractor"
+          "material": "Labor--Challenger tractor"
         }
       ],
       "class": "equipment",
@@ -1191,12 +1191,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 0.96,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Cooler/van"
+          "material": "Labor--Cooler/van"
         }
       ],
       "class": "equipment",
@@ -1208,12 +1208,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 19.36,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Eliminator"
+          "material": "Labor--Eliminator"
         }
       ],
       "class": "equipment",
@@ -1225,12 +1225,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 13.2,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--FR 6080 FH"
+          "material": "Labor--FR 6080 FH"
         }
       ],
       "class": "equipment",
@@ -1242,12 +1242,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 13.2,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Large tractor"
+          "material": "Labor--Large tractor"
         }
       ],
       "class": "equipment",
@@ -1259,12 +1259,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 3.96,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Mid-size tractor"
+          "material": "Labor--Mid-size tractor"
         }
       ],
       "class": "equipment",
@@ -1276,12 +1276,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 6.5,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Semi-tractor trailer"
+          "material": "Labor--Semi-tractor trailer"
         }
       ],
       "class": "equipment",
@@ -1293,12 +1293,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 1.98,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Small tractor"
+          "material": "Labor--Small tractor"
         }
       ],
       "class": "equipment",
@@ -1310,12 +1310,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 1.76,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Support Truck"
+          "material": "Labor--Support Truck"
         }
       ],
       "class": "equipment",
@@ -1327,12 +1327,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 13.2,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Tandem axle truck"
+          "material": "Labor--Tandem axle truck"
         }
       ],
       "class": "equipment",
@@ -1344,12 +1344,12 @@
         {
           "unit": "[gal_us]/h",
           "amount": 3.96,
-          "requires": "Equipment Fuel"
+          "material": "Equipment Fuel"
         },
         {
           "unit": "h/h",
           "amount": 1,
-          "requires": "Labor--Tractor and sprayer"
+          "material": "Labor--Tractor and sprayer"
         }
       ],
       "class": "equipment",
@@ -1424,9 +1424,9 @@
     {
       "requires": [
         {
-          "unit": "h/100.[acr_us]",
+          "unit": "h/(100.[acr_us])",
           "amount": 192,
-          "requires": "Laborer"
+          "material": "Laborer"
         }
       ],
       "class": "labor",
@@ -1436,14 +1436,14 @@
     {
       "requires": [
         {
-          "unit": "[qt_us]/100.[acr_us]",
+          "unit": "[qt_us]/(100.[acr_us])",
           "amount": 200,
-          "requires": "Glyphosate"
+          "material": "Glyphosate"
         },
         {
-          "unit": "h/100.[acr_us]",
+          "unit": "h/(100.[acr_us])",
           "amount": 96,
-          "requires": "Laborer"
+          "material": "Laborer"
         }
       ],
       "class": "labor",
