@@ -61,7 +61,7 @@
           foo : {
             amount : 2,
           },
-          'complex 1' : {
+          'complex1' : {
             amount : 2,
           },
           'super cool thing' : {
@@ -149,13 +149,13 @@
     testMaterials.forEach(function(material){
       FB.materialController.add(material, options);
 
-      if( material.type == 'complex' ) {
+      /*if( material.type == 'complex' ) {
         var ele = document.createElement('budget-macro');
         ele.data = material;
         var div = document.createElement('div');
         div.appendChild(ele);
         root.appendChild(div);
-      }
+      }*/
     });
 
     testOperations.forEach(function(operation){

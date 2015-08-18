@@ -8,9 +8,7 @@
       <small><budget-interval-selector></budget-interval-selector></small>
     </h4>
 
-    <div id="content">
-
-    </div>
+    <div id="content"></div>
 
   </template>
 </dom-module>
@@ -18,6 +16,13 @@
 <script>
   Polymer({
     is : 'budget-operation',
+
+    properties : {
+      operationid : {
+        type : String,
+        observer : 'update'
+      }
+    },
 
     ready : function() {
       FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
@@ -27,18 +32,15 @@
       if( this.operation ) this.render();
     },
 
-    onOperationUpdate : function(e) {
+    onOperationUpdate : function(operation) {
       if( !this.operation ) return;
-      if( e.operation.id != this.operation.id ) return;
+      if( operation.id != this.operation.id ) return;
 
       this.render();
     },
 
-    update : function(operation) {
-      this.operation = operation;
-
-      // TODO: need to listen for changes to materials
-
+    update : function() {
+      this.operation = FB.operationController.get(this.operationid);
       this.render();
     },
 
@@ -49,43 +51,43 @@
       if( !this.operation.materials ) return;
 
       this.materialsArray = [];
-      var html = '<table class="table"><tr><th>Material</th><th>Amount</th><th>Price</th></tr>';
-
-      // TODO: someone else should be doing this...
-      this.recalc();
+      var html = '<table class="table"><tr><th>Material</th><th>Notes</th><th>Amount</th><th>Price</th></tr>';
 
       for( var m in this.operation.materials ) {
         var materialDef = FB.materialController.get(m);
-        if( materialDef.error ) continue;
-
         var materialImpl = this.operation.materials[m];
-        if( !materialImpl.units ) materialImpl = materialDef.units;
 
-        if( m.type == 'complex' ) {
-          html += '<tr><td><budget-macro material="'+m+'" index="'+this.materialsArray.length+'"></budget-macro></td>';
+        if( materialImpl.error ) {
+          html += '<tr><td colspan="4"><div class="alert alert-danger">'+this.operation.materials[m].error.message+'</div></td>';
+          continue;
+        }
+        if( materialDef.type == 'complex' ) {
+          html += '<tr><td><budget-macro material="'+m+'"></budget-macro></td>';
         } else {
           html += '<tr><td><budget-material material="'+m+'"></budget-material></td>';
         }
-        html += '<td><input type="number" class="form-control op-amount" index="'+this.materialsArray.length+'" style="max-width: 100px" value="'+materialImpl.amount+'" /></td>'+
-                '<td id="price-'+this.materialsArray.length+'">$'+materialImpl.price.toFixed(2)+'</td></tr>';
-
-        this.materialsArray.push(materialImpl);
+        html += '<td><input type="text" class="form-control" value="'+(materialImpl.notes ? materialImpl.replace(/"/g,'\'') : '')+'" /></td>'
+                '<td><input type="number" class="form-control op-amount" material="'+m+'" style="max-width: 100px" value="'+this.operation.materials[m].amount+'" /></td>'+
+                '<td class="price" material="'+m+'">$'+this.operation.materials[m].price.toFixed(2)+'</td></tr>';
       }
 
-      this.$.content.innerHTML = html+'</table>';
+      this.$.content.innerHTML = html+
+        '<tr><td></td><td><h4>Total</j4></td><td><h4 class="text text-success total">$'+this.operation.price.toFixed(2)+'</h4></td></tr>';
+        '</table>'+
 
       $(this.$.content)
         .find('input.op-amount')
         .on('change', function(e){
           var ele = $(e.currentTarget);
-          var index = parseInt(ele.attr('index'));
+          var material = ele.attr('material');
 
-          var m = this.operation.materials[this.materialsArray[index].name];
-
+          var m = this.operation.materials[material];
           m.amount = parseInt(ele.val());
-          this.recalc();
 
-          $(this.$.content).find('#price-'+index).html('$'+m.price.toFixed(2));
+          FB.operationController.recalc();
+
+          $(this.$.content).find('.price[material="'+material+'"]').html('$'+m.price.toFixed(2));
+          $(this.$.content).find('.total').html('$'+this.operation.price.toFixed(2));
         }.bind(this));
 
       $(this.$.content)
@@ -97,24 +99,11 @@
           var m = this.operation.materials[material];
           m.units = e.originalEvent.detail;
 
-          this.recalc();
+          FB.operationController.recalc();
 
-          $(this.$.content).find('#price-'+ele.attr('index')).html('$'+m.price.toFixed(2));
+          $(this.$.content).find('.price[material="'+material+'"]').html('$'+m.price.toFixed(2));
+          $(this.$.content).find('.total').html('$'+this.operation.price.toFixed(2));
         }.bind(this));
-    },
-
-    recalc : function() {
-      for( var m in this.operation.materials ) {
-        var materialDef = FB.materialController.get(m);
-        if( m.error ) continue;
-
-        var conversion = 1;
-        if( this.operation.materials[m].units && this.operation.materials[m].units != materialDef.units ) {
-          conversion = 2;
-        }
-
-        this.operation.materials[m].price = this.operation.materials[m].amount * m.price * conversion;
-      }
     }
 
   });

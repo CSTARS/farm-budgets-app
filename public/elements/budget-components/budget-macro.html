@@ -348,7 +348,7 @@
           html +=
             '<div class="layout horizontal">'+
               '<div class="flex"><budget-macro material="'+m.name+'"></budget-macro></div>'+
-              '<div>with <input type="number" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />'+m.units+'/'+this.data.units+'</div>'+
+              '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />'+m.units+'/'+this.data.units+'</div>'+
               '<div><a class="btn btn-link edit-trash" style="vertical-align:top" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
           '</div>';
         } else {
