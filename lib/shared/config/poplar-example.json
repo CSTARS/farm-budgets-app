@@ -1204,6 +1204,11 @@
       "material": "Cooler/van"
     },
     {
+      "class": "labor",
+      "unit": "h",
+      "material": "Laborer"
+    },
+    {
       "requires": [
         {
           "unit": "[gal_us]/h",
@@ -1379,11 +1384,6 @@
     {
       "class": "labor",
       "unit": "h",
-      "material": "Laborer"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
       "material": "Labor--Large tractor"
     },
     {
@@ -1430,7 +1430,7 @@
         }
       ],
       "class": "labor",
-      "unit": "h",
+      "unit": "[acr_us]",
       "material": "hoeing"
     },
     {
@@ -1446,8 +1446,9 @@
           "material": "Laborer"
         }
       ],
-      "class": "labor",
-      "unit": "h",
+      "description": "'Manual Application of herbicide'",
+      "class": "herbicide",
+      "unit": "[acr_us]",
       "material": "herbicide - manual"
     },
     {
