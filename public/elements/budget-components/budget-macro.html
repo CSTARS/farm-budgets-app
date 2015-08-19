@@ -154,7 +154,8 @@
       this.renderType = type;
 
       this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ';
-      this.$.otherLabel.innerHTML = '($'+(this.unitsPrice !== undefined ? this.unitsPrice : this.data.price.toFixed(2))+'/';
+      this.$.otherLabel.innerHTML = '('+(this.unitsPrice !== undefined ? this.unitsPrice : this.data.price.toFixed(2))+' ';
+
       this.$.unitSelector.units = this.data.units;
       this.$.unitSelector.updateSelector();
 
@@ -271,6 +272,7 @@
       if( this.listMaterialIndex(results, this.data.name) > -1 ) {
         results.splice(this.listMaterialIndex(results, this.data.name), 1);
       }
+
       for( var material in this.data.materials ) {
         var index = this.listMaterialIndex(results, material);
         if( index > -1 ) {
@@ -280,10 +282,13 @@
 
       if( results.length > 0 ) {
         var html = '';
+        console.log(results);
 
         for( var i = 0; i < results.length; i++ ) {
           html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
-                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+'</div>';
+                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+
+                  '<div class="help-block">'+(results[i].class || '')+' '+(results[i].price || '')+' '+FB.units.getLabel(results[i].units || '', true)+'</div>'
+                  '</div>';
         }
         $(this.$.resultsPopup)
           .html(html)
@@ -352,9 +357,10 @@
         } else {
           html +=
             '<div class="layout horizontal">'+
-              '<div class="flex"><b>'+m.name+'</b> ($<span id="'+material+'-price-label">'+this.data.materials[material].price.toFixed(2)+'</span>/<budget-unit-selector units="'+m.units+'" material="'+material+'"></budget-unit-selector>)</div>'+
+              '<div class="flex"><b>'+m.name+'</b> ($<span id="'+material+'-price-label">'+this.data.materials[material].price.toFixed(2) +
+                '</span>/<budget-unit-selector units="'+(this.data.materials[material].units || m.units)+'" material="'+material+'"></budget-unit-selector>)</div>'+
               '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount +
-                  '" style="width:50px;display:inline-block" class="form-control"><span id="'+material+'-units-label">'+m.units+'</span>/'+this.data.units+'</div>'+
+                  '" style="width:50px;display:inline-block" class="form-control"> per '+FB.units.getLabel(this.data.units)+'</div>'+
               '<div><a class="btn btn-link edit-trash" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
             '</div>';
         }
@@ -389,7 +395,6 @@
           this.data.materials[material].units = e.originalEvent.detail;
 
           FB.materialController.recalc();
-          ele.find('#'+material+'-units-label').html(e.originalEvent.detail);
           ele.find('#'+material+'-price-label').html(this.data.materials[material].price.toFixed(2));
           ele.find('#current-price').html('$'+this.data.price.toFixed(2));
         }.bind(this));

@@ -8,12 +8,18 @@
   Polymer({
     is : 'ahb-budget',
 
+    properties : {
+      example : {
+        type : String
+      }
+    },
+
     attached : function() {
       this.demo();
     },
 
     demo : function() {
-      var appData = FB.transform(FB.examples.poplar);
+      var appData = FB.transform(FB.examples[this.example]);
       window.appData = appData;
 
       var options = {
