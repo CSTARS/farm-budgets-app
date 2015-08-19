@@ -1430,7 +1430,7 @@
         }
       ],
       "class": "labor",
-      "unit": "h",
+      "unit": "100.[acr_us]",
       "material": "hoeing"
     },
     {
