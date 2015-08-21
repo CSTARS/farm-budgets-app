@@ -1,4 +1,135 @@
 <dom-module id="budget-unit-selector">
+  <style>
+    :host {
+      display: block;
+      width: 100px;
+    }
+    #message {
+      position: absolute;
+      padding: 3px;
+      border: 1px solid #ccc;
+      background-color: white;
+      display: none;
+    }
+    #input {
+      display : block;
+    }
+  </style>
+
+  <template>
+    <input id="input" type="text" class="form-control text" on-input="onChange" on-blur="onBlur" on-focus="onFocus">
+    <div id="message"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-unit-selector',
+
+    properties : {
+      units : {
+        type : String,
+        observer: 'setUnits'
+      },
+      block : {
+        type : Boolean,
+        observer: 'setDisplayBlock',
+        value : false
+      }
+    },
+
+    attached : function() {
+      this.checkError();
+      this.onBlur();
+    },
+
+    setDisplayBlock : function() {
+      if( this.block ) {
+        this.style.display = 'block';
+        this.$.input.style.display = 'block';
+        this.style.width = '100%';
+      } else {
+        this.style.display = 'inline-block';
+        this.$.input.style.display = 'inline-block';
+      }
+    },
+
+    setUnits : function() {
+      this.$.input.value = this.units;
+      this.checkError();
+    },
+
+    getUnits : function() {
+      return this.$.input.value;
+    },
+
+    onChange : function(){
+      if( this.$.input.value == '' ) {
+        this.clearError();
+        return;
+      }
+
+      this.checkError();
+      this.fire('units-change', {
+        value : this.$.input.value,
+        error : this.error
+      });
+    },
+
+    checkError : function() {
+      try {
+        FB.ucum.parse(this.$.input.value);
+      } catch(e) {
+        $(this).addClass('has-error');
+        $(this.$.input).addClass('text-danger');
+        this.error = true;
+        this.$.message.innerHTML = '<div class="text text-danger">Invalid Units</div>'+this.getReminders();
+        return;
+      }
+      this.clearError();
+    },
+
+    clearError : function() {
+      this.error = false;
+      $(this).removeClass('has-error');
+      $(this.$.input).removeClass('text-danger');
+      this.$.message.innerHTML = '<span class="text text-success">Valid</span>';
+    },
+
+    onFocus : function() {
+      this.$.message.style.display = 'block';
+
+      if( this.block ) return;
+      this.style.width = '150px';
+      this.$.input.style.width = '150px';
+    },
+
+    onBlur : function() {
+      this.$.message.style.display = 'none';
+
+      if( this.block ) return;
+      this.style.width = '50px';
+      this.$.input.style.width = '50px';
+    },
+
+    getReminders : function() {
+      var parts = this.$.input.value.replace(/[\]\[\.\/]/g, ' ').replace(/\s+/g,' ').trim().toLowerCase().split(' ');
+
+      var reminders = [];
+      for( var i = 0; i < parts.length; i++ ) {
+        if( FB.units.lookup[parts[i]] && FB.units.lookup[parts[i]].symbol != parts[i]) {
+          reminders.push('<b>'+parts[i]+'</b> = '+FB.units.lookup[parts[i]].symbol);
+        }
+      }
+
+      if( reminders.length == 0 ) return '';
+      return '<div class="well well-sm"><div>Reminders</div><div>'+reminders.join('</div><div>')+'</div></div>';
+    }
+  });
+</script>
+
+<!--
+<dom-module id="budget-unit-selector">
   <template>
     <span id="label"></span><select id="select" on-change="onChange" style="padding-right: 15px"></select>
   </template>
@@ -54,3 +185,4 @@
     }
   });
 </script>
+-->

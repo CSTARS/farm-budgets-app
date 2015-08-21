@@ -7,7 +7,7 @@
 
   <template>
     <b id="nameLabel"></b>
-    (<span id="priceLabel"></span> <budget-unit-selector id="selector"></budget-unit-selector>)
+    <spam id="price">(<span id="priceLabel"></span> <budget-unit-selector id="selector"></budget-unit-selector>)</span>
   </template>
 </dom-module>
 
@@ -19,6 +19,11 @@
       material : {
         type : String,
         observer : 'render'
+      },
+      showPrice : {
+        type : Boolean,
+        observer : 'render',
+        value : true
       }
     },
 

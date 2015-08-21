@@ -1,6 +1,7 @@
 <!--
   TODO: need to integrate https://github.com/jmandel/ucum.js
 -->
+<link rel="import" href="budget-macro-edit-material.html" />
 
 <dom-module id="budget-macro">
   <style>
@@ -42,10 +43,10 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="unitsGroup">
           <label for="unitsInput" class="col-sm-3 control-label">Units</label>
           <div class="col-sm-9">
-            <input type="text" id="unitsInput" class="form-control" on-keyup="editUnits" />
+            <budget-unit-selector id="unitsInput" on-units-change="editUnits" block></budget-unit-selector>
           </div>
         </div>
 
@@ -63,7 +64,12 @@
 
         <div class="form-group">
           <label for="materialSearchInput" class="col-sm-3 control-label">Materials</label>
-          <div class="col-sm-9" style="position: relative" id="edit-items"></div>
+          <div class="col-sm-9" style="position: relative">
+            <div id="edit-items"></div>
+            <div>
+              <h4>Price <small ><span id="current-price"></span> per <span id="current-units"></span></small></h4>
+            </div>
+          </div>
         </div>
 
       </div> <!-- end form -->
@@ -136,13 +142,21 @@
     attached : function() {
       this.popup = document.querySelector('budget-complex-material-popup');
       this.render();
+      this.updateMaterial();
+    },
 
-      if( this.material ) {
-        var m = FB.materialController.get(this.material);
-        if( m.error ) return;
-        this.data = m;
-        this.render(this.renderType);
-      }
+    updateMaterial : function(material) {
+      if( material ) this.material = material;
+
+      if( !this.material ) return;
+
+      var m = FB.materialController.get(this.material);
+
+      // TODO: set error message!!
+      if( m.error ) return;
+
+      this.data = m;
+      this.render(this.renderType);
     },
 
     rerender : function() {
@@ -157,7 +171,7 @@
       this.$.otherLabel.innerHTML = '('+(this.unitsPrice !== undefined ? this.unitsPrice : this.data.price.toFixed(2))+' ';
 
       this.$.unitSelector.units = this.data.units;
-      this.$.unitSelector.updateSelector();
+      //this.$.unitSelector.updateSelector();
 
       if( this.renderType == 'tree' ) {
         this.renderTree();
@@ -282,7 +296,6 @@
 
       if( results.length > 0 ) {
         var html = '';
-        console.log(results);
 
         for( var i = 0; i < results.length; i++ ) {
           html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
@@ -321,92 +334,65 @@
 
       this.changesString = JSON.stringify(this.data);
       this.$.nameInput.value = this.data.name;
-      this.$.unitsInput.value = this.data.units;
+      this.$.unitsInput.units = this.data.units;
       this.popup.setBody(this.$.edit);
       this.popup.show(this.onEditComplete.bind(this));
       this.renderEditList();
     },
 
-    editUnits : function() {
+    editUnits : function(e) {
       if( this.editUnitsTimer != -1 ) clearTimeout(this.editUnitsTimer);
       this.editUnitsTimer = setTimeout(function(){
         this.editUnitsTimer = -1;
-        this._editUnits();
+        this._editUnits(e);
       }.bind(this), 200);
     },
 
-    _editUnits : function() {
-      this.data.units = this.$.unitsInput.value;
+    _editUnits : function(e) {
+      if( e.detail.error ) return;
+
+      this.data.units = e.detail.value;
+      FB.materialController.recalc();
       this.renderEditList();
     },
 
     renderEditList : function() {
       var html = '';
+      this.$['edit-items'].innerHTML = '';
+
       for( var material in this.data.materials ) {
         var m = FB.materialController.get(material);
+        var ele = document.createElement('budget-macro-edit-material');
 
-        if( m.error ) {
-          html += '<div lass="text-danger">Error, unknown material: '+material+'</div>';
-        } else if( m.type == 'complex' ) {
-          html +=
-            '<div class="layout horizontal">'+
-              '<div class="flex"><budget-macro material="'+m.name+'"></budget-macro></div>'+
-              '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount+'" style="width:50px;display:inline-block" class="form-control" />'+m.units+'/'+this.data.units+'</div>'+
-              '<div><a class="btn btn-link edit-trash" style="vertical-align:top" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
-          '</div>';
-        } else {
-          html +=
-            '<div class="layout horizontal">'+
-              '<div class="flex"><b>'+m.name+'</b> ($<span id="'+material+'-price-label">'+this.data.materials[material].price.toFixed(2) +
-                '</span>/<budget-unit-selector units="'+(this.data.materials[material].units || m.units)+'" material="'+material+'"></budget-unit-selector>)</div>'+
-              '<div>with <input type="number" material="'+material+'" value="'+this.data.materials[material].amount +
-                  '" style="width:50px;display:inline-block" class="form-control"> per '+FB.units.getLabel(this.data.units)+'</div>'+
-              '<div><a class="btn btn-link edit-trash" index="'+material+'"><i class="fa fa-trash"></i></a></div>'+
-            '</div>';
-        }
+        ele.init({
+          material : m,
+          complexMaterial : this.data,
+
+          onDelete : function(material) {
+            delete this.data.materials[material.name];
+          }.bind(this),
+
+          onAmountChange : function(material, amount) {
+            this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
+          }.bind(this),
+
+          onUnitsChange : function(material, units) {
+            this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
+          }.bind(this)
+        });
+
+        this.$['edit-items'].appendChild(ele);
       }
-      html += '<h4>Price <small id="current-price">$'+this.data.price.toFixed(2)+'/'+this.data.units+'</small></h4>';
 
-      var ele = $(this.$['edit-items']).html(html);
-      ele.find('a.edit-trash')
-        .on('click', function(e){
-          var ele = $(e.currentTarget);
-          var material = ele.attr('index');
-
-          ele.parent().parent().remove();
-          delete this.data.materials[material];
-        }.bind(this));
-
-      ele.find('input[type="number"]')
-        .on('change', function(e){
-          var target = $(e.currentTarget);
-          var material = target.attr('material');
-          this.data.materials[material].amount = parseInt(target.val());
-
-          FB.materialController.recalc();
-          ele.find('#current-price').html('$'+this.data.price.toFixed(2));
-        }.bind(this));
-
-      ele.find('budget-unit-selector')
-        .on('units-change', function(e){
-          var target = $(e.currentTarget);
-          var material = target.attr('material');
-          console.log(e.originalEvent.detail);
-          this.data.materials[material].units = e.originalEvent.detail;
-
-          FB.materialController.recalc();
-          ele.find('#'+material+'-price-label').html(this.data.materials[material].price.toFixed(2));
-          ele.find('#current-price').html('$'+this.data.price.toFixed(2));
-        }.bind(this));
-
-
+      this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
+      this.$['current-units'].innerHTML = '$'+FB.units.getLabel(this.data.units);
     },
 
     onEditComplete : function() {
       var newName = this.$.nameInput.value;
       var oldName = this.data.name;
       this.data.name = newName;
-      this.data.units = this.$.unitsInput.value;
+      this.data.units = this.$.unitsInput.getUnits();
 
       // detect changes
       if( this.changesString == JSON.stringify(this.data) ) {
@@ -436,6 +422,14 @@
 
       // rerender
       this.render(this.renderType);
+    },
+
+    setUnitsError : function(msg) {
+      if( !msg ) {
+        $(this.$.unitsGroup).removeClass('has-error');
+      } else {
+        $(this.$.unitsGroup).addClass('has-error');
+      }
     },
 
 
