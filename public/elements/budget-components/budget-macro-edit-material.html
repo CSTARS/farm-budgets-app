@@ -21,7 +21,6 @@
       <div class="flex">
         <input type="number" class="form-control" on-input="fireAmountChange" />
         <budget-unit-selector id="complexUnits" on-units-change="fireUnitsChange"></budget-unit-selector>
-        per <span class="macroUnits"></span>
       </div>
       <div class="total"></div>
       <div><a class="btn btn-link edit-trash" on-click="fireDelete"><i class="fa fa-trash"></i></a></div>
@@ -33,7 +32,6 @@
       <div class="flex" style="text-align:center">
         <input type="number" id="simpleInput" class="form-control" on-input="fireAmountChange" />
         <budget-unit-selector id="simpleUnits" on-units-change="fireUnitsChange"></budget-unit-selector>
-        per <span class="macroUnits"></span>
       </div>
       <div class="total"></div>
       <div><a class="btn btn-link edit-trash" on-click="fireDelete"><i class="fa fa-trash"></i></a></div>
@@ -79,7 +77,7 @@
 
         this.$.complex.style.display = 'flex';
         this.$.complexName.setMaterial(this.config.material.name);
-        this.$.complexUnits.units = this.getUnitsLabel();
+        this.$.complexUnits.units = this.getUnits();
         this.$.complexInput.value = amount;
 
       } else {
@@ -87,7 +85,7 @@
         this.$.simple.style.display = 'flex';
         this.$.simpleName.innerHTML = this.config.material.name;
         this.$.simpleInput.value = amount;
-        this.$.simpleUnits.units = this.getUnitsLabel();
+        this.$.simpleUnits.units = this.getUnits();
 
       }
 
@@ -95,11 +93,11 @@
 
       this.setErrorStatus();
 
-      $(this).find('.macroUnits').html(FB.units.getLabel(this.config.complexMaterial.units));
+      //$(this).find('.macroUnits').html(FB.units.getLabel(this.config.complexMaterial.units));
     },
 
     getUnits : function() {
-      return this.config.complexMaterial.materials[this.config.material.name].units || this.config.material.units;
+      return this.config.materialImpl.units;
     },
 
     setErrorStatus : function() {
@@ -111,8 +109,42 @@
       }
     },
 
+    splitUnits : function() {
+      var units = this.getUnits();
+      var parts = units.split('/');
+
+      if( parts.length == 1 ) {
+        return [parts[0], this.config.complexMaterial.units];
+      }
+
+      var denominator = parts.splice(parts.length-1, 1)[0];
+
+      return [parts.join('/'), denominator]
+    },
+
+    updateAmountFromUnits : function(from, to) {
+      try {
+        this.config.materialImpl.amount = FB.ucum.convert(this.config.materialImpl.amount, from, to);
+
+        this.$.complexInput.value = this.config.materialImpl.amount;
+        this.$.simpleInput.value = this.config.materialImpl.amount;
+
+        this.config.materialImpl.error = null;
+      } catch(e) {
+        this.config.materialImpl.error = {
+          error : true,
+          message : 'Unable to convert',
+          math : from+' to '+to
+        }
+      }
+
+      this.setErrorStatus();
+    },
+
+/*
     getUnitsLabel : function() {
       var units = this.getUnits();
+
       var val = FB.ucum.parse('('+FB.units.math.cleanDollars(units)+').('+FB.units.math.cleanDollars(this.config.complexMaterial.units)+')');
       var keys = Object.keys(val.units);
 
@@ -127,7 +159,7 @@
 
       return val;
     },
-
+*/
     fireUnitsChange : function(e) {
       if( this.unitTimer == -1 ) clearTimeout(this.unitTimer);
 
@@ -139,6 +171,7 @@
 
     _fireUnitsChange : function(e) {
       if( e.detail.error ) return;
+
       this.config.materialImpl.units = '('+e.detail.value+')/'+this.config.complexMaterial.units;
 
       FB.materialController.recalc();

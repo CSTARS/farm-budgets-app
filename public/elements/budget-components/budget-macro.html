@@ -351,7 +351,20 @@
     _editUnits : function(e) {
       if( e.detail.error ) return;
 
-      this.data.units = e.detail.value;
+      var oldUnits = this.data.units;
+      var newUnits = e.detail.value;
+
+      var items = this.$.edit.querySelectorAll('budget-macro-edit-material');
+
+      for( var i = 0; i < items.length; i++ ) {
+        var units = items[i].splitUnits();
+        if( units[1] != newUnits ) {
+          items[i].updateAmountFromUnits(units[1], newUnits);
+        }
+      }
+
+      this.data.units = newUnits;
+
       FB.materialController.recalc();
       this.renderEditList();
     },
