@@ -1,7 +1,7 @@
 <dom-module id="budget-macro-edit-material">
   <style>
     input[type="number"] {
-      width : 50px;
+      width : 100px;
       display : inline-block;
     }
     input[type="text"] {
@@ -150,25 +150,6 @@
       this.setErrorStatus();
     },
 
-/*
-    getUnitsLabel : function() {
-      var units = this.getUnits();
-
-      var val = FB.ucum.parse('('+FB.units.math.cleanDollars(units)+').('+FB.units.math.cleanDollars(this.config.complexMaterial.units)+')');
-      var keys = Object.keys(val.units);
-
-      var n = [], d = [];
-      for( var key in val.units ) {
-        if( val.units[key] == 1) n.push(key);
-        else d.push(key);
-      }
-
-      val = n.join('.');
-      if( d.length > 0 ) val += '/'+d.join('.');
-
-      return val;
-    },
-*/
     fireUnitsChange : function(e) {
       if( this.unitTimer == -1 ) clearTimeout(this.unitTimer);
 

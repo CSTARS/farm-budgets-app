@@ -37,7 +37,9 @@
       </div>
     </div>
 
-    <div id="content" style="display:none" class="animated slideInRight"></div>
+    <div id="content" style="display:none" class="animated slideInRight">
+      <budget-materials-table id="materialTable"></budget-materials-table>
+    </div>
 
   </template>
 </dom-module>
@@ -90,11 +92,17 @@
     },
 
     render : function() {
+      if( !this.$.materialTable.setMaterials ) return;
+
       this.$.nameLabel.innerHTML = this.operation.name;
       this.showError(false);
 
-      this.$.content.innerHTML = '';
       if( !this.operation.materials ) return;
+
+      this.$.materialTable.setMaterials(this.operation);
+
+      /*this.$.content.innerHTML = '';
+
 
       this.materialsArray = [];
       var html = '<table class="table"><tr><th>Material</th><th>Notes</th><th>Amount</th><th>Price</th></tr>';
@@ -108,6 +116,7 @@
           html += '<tr><td colspan="4"><div class="text text-danger">'+this.operation.materials[m].error.message+'</div></td>';
           continue;
         }
+
         if( materialDef.type == 'complex' ) {
           html += '<tr><td><budget-macro material="'+m+'"></budget-macro></td>';
         } else {
@@ -118,11 +127,11 @@
                 '<td class="price" material="'+m+'"><ahb-dollar-label value="'+this.operation.materials[m].price.toFixed(2)+'"></ahb-dollar-label></td></tr>';
       }
 
-      this.$.content.innerHTML = html+'</table>';
+      this.$.content.innerHTML = html+'</table>';*/
 
       this.updateTotals();
 
-      $(this.$.content)
+      /*$(this.$.content)
         .find('input.op-amount')
         .on('change', function(e){
           var ele = $(e.currentTarget);
@@ -150,7 +159,7 @@
 
           $(this.$.content).find('.price[material="'+material+'"] ahb-dollar-label').attr('value', m.price.toFixed(2));
           this.updateTotals();
-        }.bind(this));
+        }.bind(this));*/
     },
 
     updateTotals : function() {

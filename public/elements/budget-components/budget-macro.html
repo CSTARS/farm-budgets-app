@@ -8,6 +8,11 @@
     :host {
       display: inline-block;
     }
+    :host.open {
+      background-color: #f8f8f8;
+      border-radius: 4px;
+      padding: 5px
+    }
 
     #expand {
       cursor: pointer;
@@ -62,6 +67,7 @@
         </div>
 
 
+      <!--
         <div class="form-group">
           <label for="materialSearchInput" class="col-sm-3 control-label">Materials</label>
           <div class="col-sm-9" style="position: relative">
@@ -71,26 +77,33 @@
             </div>
           </div>
         </div>
-
+      -->
       </div> <!-- end form -->
+
+      <h4>Materials</h4>
+      <budget-materials-table id="materialTable" on-price-change="onPriceChange"></budget-materials-table>
+
+      <h4>Price <small ><span id="current-price"></span> per <span id="current-units"></span></small></h4>
+
     </div>
+
 
     <table>
       <tr>
         <td>
-          <div class="btn-group animated fadeIn" role="group" style="display:none">
-            <a class="btn btn-default nohover" on-click="edit"><i class="fa fa-pencil"></i></a>
-            <a class="btn btn-default nohover" on-click="toggleView" id="toggleView"><i class="fa fa-angle-down"></i></a>
-          </div>
-        </td>
-        <td style="padding-left: 5px">
           <span id="expand"><i class="fa fa-cubes"></i> <span id="nameLabel"></span></span>
-          <span id="otherLabel"></span>
-          <budget-unit-selector id="unitSelector" on-units-update="onUnitsUpdate"></budget-unit-selector><span>)</span>
+        </td>
+        <td>
+          <div style="width: 102px;display:none;" id="btns">
+            <div class="btn-group" role="group" style="padding-left: 15px">
+              <a class="btn btn-default nohover" on-click="edit"><i class="fa fa-pencil"></i></a>
+              <a class="btn btn-default nohover" on-click="toggleView" id="toggleView"><i class="fa fa-angle-down"></i></a>
+            </div>
+          </div>
         </td>
       </tr>
       <tr>
-        <td id="main" colspan="2"></td>
+        <td colspan="2"><div id="main" style="display:none"></div></td>
       </tr>
     </table>
 
@@ -103,7 +116,8 @@
 
     properties : {
       material : {
-        type : String
+        type : String,
+        observer : 'updateMaterial'
       }
     },
 
@@ -115,7 +129,6 @@
         price : 0,
         units : ''
       };
-      this.showingBtns = false;
 
       this.removeChild(this.$.edit);
 
@@ -128,14 +141,9 @@
       });
 
       $(this.$.expand).on('click',function() {
-        if( this.showingBtns ) {
-          $(this).find('.btn-group').hide();
-          $(this.$.main).hide();
-        } else {
-          $(this).find('.btn-group').show();
-          $(this.$.main).show();
-        }
-        this.showingBtns = !this.showingBtns;
+        $(this.$.main).toggle();
+        $(this.$.btns).toggle();
+        $(this).toggleClass('open');
       }.bind(this));
     },
 
@@ -166,22 +174,14 @@
     // render display. type
     render : function(type) {
       this.renderType = type;
-
       this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ';
-      this.$.otherLabel.innerHTML = '('+(this.unitsPrice !== undefined ? this.unitsPrice : this.data.price.toFixed(2))+' ';
-
-      this.$.unitSelector.units = this.data.units;
-      //this.$.unitSelector.updateSelector();
 
       if( this.renderType == 'tree' ) {
         this.renderTree();
-        this.$.toggleView.innerHTML = '<i class="fa fa-angle-up"></i>';
-      } else if( this.renderType == 'compressed' ) {
+        this.$.toggleView.innerHTML = '<i class="fa fa-angle-down"></i>';
+      } else {
         this.renderCompressed();
         this.$.toggleView.innerHTML = '<i class="fa fa-angle-double-down"></i>';
-      } else {
-        this.renderNormal();
-        this.$.toggleView.innerHTML = '<i class="fa fa-angle-down"></i>';
       }
     },
 
@@ -192,48 +192,49 @@
       }
 
       if( this.renderType == 'tree' ) {
-        this.render('normal');
-      } else if ( this.renderType == 'compressed' ) {
-        this.render('tree');
-      } else {
         this.render('compressed');
+      } else {
+        this.render('tree');
       }
-    },
-
-    renderNormal : function() {
-      this.$.main.innerHTML = '';
     },
 
     renderTree : function() {
       var list = [];
       this.getTreeMaterialList(this.data.materials, '', list);
 
-      var html = '<ul class="list-group animated zoomIn" style="padding-top:5px">';
+      var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
-        html += '<li class="list-group-item">' +
-            '<i>'+list[i].path + '</i> <b>' +list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;<span class="badge">' +
+        html += '<tr><td>' +
+            '<i>'+list[i].path + '</i> <b>' +list[i].name + '</b></td><td>' +
             (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
-              '<span class="badge">$'+list[i].price.toFixed(2)+'/'+list[i].units+' x '+list[i].conversion+list[i].units+'</span>'
-          '</li>';
+              list[i].amount+' '+FB.units.getLabel(list[i].units,true)+' = $'+
+              list[i].price.toFixed(2)+' </span>'
+          '</td></tr>';
       }
 
-      this.$.main.innerHTML = html+'</ul>';
+      this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+    },
+
+    getPriceLabel : function() {
+      return '<div class="text text-success" style="text-align:center;padding-top:5px">$' +
+            (this.data.price ? this.data.price.toFixed(2) : '0')  +
+            ' per '+FB.units.getLabel(this.data.units)+'</div>';
     },
 
     renderCompressed : function() {
       var list = [];
       this.getCompressedMaterialList(this.data.materials, list);
 
-      var html = '<ul class="list-group animated zoomIn" style="padding-top:5px">';
+      var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
-        html += '<li class="list-group-item">' +
-            list[i].count+'x <b>' + list[i].name + '</b>&nbsp;&nbsp;&nbsp;&nbsp;<span class="badge"> ' +
+        html += '<tr><td>' +
+            list[i].count+'x <b>' + list[i].name + '</b></td><td> ' +
             (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
-            ' $'+list[i].price.toFixed(2)+'/'+list[i].units+'</span>'
-          '</li>';
+            ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+FB.units.getLabel(list[i].units, true)+'</span>'
+          '</td></tr>';
       }
 
-      this.$.main.innerHTML = html+'</ul>';
+      this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
     },
 
     getCompressedMaterialList : function(materials, list) {
@@ -263,7 +264,9 @@
 
         var item = $.extend(true, {}, m);
         item.path = path;
-        item.conversion = materials[material].amount;
+        item.amount = materials[material].amount;
+        item.units = materials[material].units;
+        item.price = materials[material].price;
         list.push(item);
 
         if( m.type === 'complex' &&  m.materials) {
@@ -370,8 +373,10 @@
 
     renderEditList : function() {
       var html = '';
-      this.$['edit-items'].innerHTML = '';
+      //this.$['edit-items'].innerHTML = '';
 
+      this.$.materialTable.setMaterials(this.data, {noNotes: true});
+      /*
       for( var material in this.data.materials ) {
         var m = FB.materialController.get(material);
         var ele = document.createElement('budget-macro-edit-material');
@@ -395,9 +400,14 @@
 
         this.$['edit-items'].appendChild(ele);
       }
+      */
 
       this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
       this.$['current-units'].innerHTML = FB.units.getLabel(this.data.units);
+    },
+
+    onPriceChange : function() {
+      this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
     },
 
     onEditComplete : function() {

@@ -23,7 +23,7 @@
       showPrice : {
         type : Boolean,
         observer : 'render',
-        value : true
+        value : false
       }
     },
 
@@ -32,6 +32,9 @@
     },
 
     render : function(material) {
+      if( this.showPrice ) this.$.price.style.display = 'block';
+      else this.$.price.style.display = 'none';
+
       if( material ) this.material = material;
       if( !this.material ) return;
 
