@@ -104,7 +104,8 @@
       if( !this.config.materialImpl.error ) {
         this.$.error.style.display = 'none';
       } else {
-        this.$.error.innerHTML = this.config.materialImpl.error.message+': '+this.config.materialImpl.error.math;
+        this.$.error.innerHTML = this.config.materialImpl.error.message+': '+this.config.materialImpl.error.math+
+          (this.config.materialImpl.error.debug ? '<br />'+this.config.materialImpl.error.debug : '');
         this.$.error.style.display = 'block';
       }
     },
@@ -122,9 +123,17 @@
       return [parts.join('/'), denominator]
     },
 
-    updateAmountFromUnits : function(from, to) {
+    updateAmountFromUnits : function(to) {
       try {
-        this.config.materialImpl.amount = FB.ucum.convert(this.config.materialImpl.amount, from, to);
+        //this.config.materialImpl.amount = FB.ucum.convert(this.config.materialImpl.amount, from, to);
+
+        var str = '('+FB.units.math.cleanDollars(this.config.materialImpl.units)+').('+
+                  FB.units.math.cleanDollars(to) + ').(' +
+                  FB.units.math.cleanDollars(this.config.material.units)+')';
+
+        var value = FB.ucum.canonicalize(str);
+        this.config.materialImpl.amount = value.value * this.config.materialImpl.originalAmount;
+        console.log(' convert: '+str);
 
         this.$.complexInput.value = this.config.materialImpl.amount;
         this.$.simpleInput.value = this.config.materialImpl.amount;
@@ -134,7 +143,7 @@
         this.config.materialImpl.error = {
           error : true,
           message : 'Unable to convert',
-          math : from+' to '+to
+          math : str
         }
       }
 
@@ -172,7 +181,7 @@
     _fireUnitsChange : function(e) {
       if( e.detail.error ) return;
 
-      this.config.materialImpl.units = '('+e.detail.value+')/'+this.config.complexMaterial.units;
+      this.config.materialImpl.units = e.detail.value;
 
       FB.materialController.recalc();
       $(this).find('.total').html('= $'+this.config.materialImpl.price.toFixed());
@@ -191,6 +200,8 @@
 
     _fireAmountChange : function(e) {
       this.config.materialImpl.amount = parseInt(e.target.value);
+      this.config.materialImpl.originalAmount = this.config.materialImpl.amount;
+
       FB.materialController.recalc();
       $(this).find('.total').html('= $'+this.config.materialImpl.price.toFixed());
       this.setErrorStatus();

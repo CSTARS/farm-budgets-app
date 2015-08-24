@@ -357,10 +357,9 @@
       var items = this.$.edit.querySelectorAll('budget-macro-edit-material');
 
       for( var i = 0; i < items.length; i++ ) {
-        var units = items[i].splitUnits();
-        if( units[1] != newUnits ) {
-          items[i].updateAmountFromUnits(units[1], newUnits);
-        }
+        //if( units[1] != newUnits ) {
+          items[i].updateAmountFromUnits(newUnits);
+        //}
       }
 
       this.data.units = newUnits;
@@ -398,7 +397,7 @@
       }
 
       this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
-      this.$['current-units'].innerHTML = '$'+FB.units.getLabel(this.data.units);
+      this.$['current-units'].innerHTML = FB.units.getLabel(this.data.units);
     },
 
     onEditComplete : function() {
