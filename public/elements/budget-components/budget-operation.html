@@ -4,19 +4,23 @@
   <style>
     :host {
       display: block;
-      border-bottom: 1px solid #ccc;
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
     }
   </style>
 
   <template>
 
+    <h4 class="page-header" style="margin-top: 5px">
+      <div style="margin-bottom: 5px"><a on-click="toggleContent" style="cursor:pointer"><i class="fa fa-toggle-right" id="icon"></i></a>
+      <span id="nameLabel"></span>
+      <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
+    </h4>
+
     <div class="row">
       <div class="col-sm-8">
         <h4>
-          <div style="margin-bottom: 5px"><a on-click="toggleContent" style="cursor:pointer"><i class="fa fa-toggle-right" id="icon"></i></a>
-            <span id="nameLabel"></span>
-            <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
-          </div>
           <small><budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler></small>
         </h4>
       </div>
@@ -37,7 +41,9 @@
       </div>
     </div>
 
-    <div id="content" style="display:none" class="animated slideInRight">
+
+
+    <div id="content" style="display:none" class="animated zoomIn">
       <budget-materials-table id="materialTable"></budget-materials-table>
     </div>
 
