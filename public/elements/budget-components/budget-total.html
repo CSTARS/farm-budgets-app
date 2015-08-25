@@ -1,0 +1,21 @@
+<dom-module id="budget-total">
+  <template>
+    <h4 style="text-align:right">Duration: <span>{{durationText}}</span></h4>
+    <h4 style="text-align:right">Crop Total: <ahb-dollar-label id="totalLabel"></ahb-dollar-label></h4>
+    <h4 style="text-align:right">Average Monthly Cost: <span class="text text-success">{{average}}</span></h4>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-total',
+
+    attached : function() {
+      FB.operationController.on('total-update', this.onTotalUpdate.bind(this));
+    },
+
+    onTotalUpdate : function(e) {
+      this.$.totalLabel.value = e;
+    }
+  })
+</script>

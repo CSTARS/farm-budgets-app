@@ -3,6 +3,12 @@
     :host {
       display: block;
       position: relative;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    :host:hover {
+      background-color: #f8f8f8;
+      color: #2196f3;
     }
     #inputPanel {
       font-size: 14px;
@@ -20,7 +26,8 @@
   <template>
 
     <div on-click="toggle" id="title">
-      <i class="fa fa-calendar-o"></i> Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i>
+      <div><i class="fa fa-calendar-o"></i> Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i></div>
+      <div><small id="dateRangeText"></small></div>
     </div>
 
     <div id="inputPanel">
@@ -76,6 +83,7 @@
 
     ready : function() {
       this.displayText = '';
+      this.dateRangeText = '';
 
       this.data = [];
       this.dates = [];
@@ -123,12 +131,18 @@
         })
       }
 
-      this.update();
+      this.update(true);
     },
 
-    update : function() {
+    update : function(noEvent) {
       this.$.dates.style.display = 'block';
       this.displayText = ' x'+this.dates.length;
+
+      this.dates.sort(function(a, b){
+        if( a.date.getTime() > b.date.getTime() ) return 1;
+        else if( a.date.getTime() < b.date.getTime() ) return -1;
+        return 0;
+      });
 
       var tmp = [];
       for( var i = 0; i < this.dates.length; i++ ) {
@@ -136,7 +150,18 @@
       }
 
       this.data = tmp;
-      this.fire('schedule-update', this.data);
+
+      if( this.dates.length > 1 ) {
+        this.dateRangeText = this.toDateString(this.dates[0]).date + ' <i class="fa fa-long-arrow-right"></i> ' +
+                            this.toDateString(this.dates[this.dates.length-1]).date;
+      } else if( this.dates.length == 1 ) {
+        this.dateRangeText = this.toDateString(this.dates[0]).date;
+      } else {
+        this.dateRangeText = '';
+      }
+      this.$.dateRangeText.innerHTML = this.dateRangeText;
+
+      if( !noEvent ) this.fire('schedule-update', this.data);
     },
 
     toDateString : function(d) {

@@ -1,13 +1,17 @@
 <dom-module id="budget-material">
   <style>
-    host : {
+    :host {
       display: inline-block;
+    }
+    #label:hover {
+      color: #2196f3;
     }
   </style>
 
   <template>
-    <b id="nameLabel"></b>
-    <spam id="price">(<span id="priceLabel"></span> <budget-unit-selector id="selector"></budget-unit-selector>)</span>
+    <div id="label" style="cursor:pointer" on-click="toggle"><b id="nameLabel"></b></div>
+    <div id="error" class="text text-danger"></div>
+    <div id="price" class="text text-success"><span id="priceLabel"></span> <span id="unitLabel"></span></div>
   </template>
 </dom-module>
 
@@ -32,21 +36,47 @@
     },
 
     render : function(material) {
-      if( this.showPrice ) this.$.price.style.display = 'block';
-      else this.$.price.style.display = 'none';
+      this.updatePrice();
 
-      if( material ) this.material = material;
+      this.showError();
+
+      if( typeof material == 'string' ) this.material = material;
       if( !this.material ) return;
 
+      this.$.nameLabel.innerHTML = this.material;
+
       var m = FB.materialController.get(this.material);
-      if( m.error ) return;
+      if( m.error ) return this.showError(m);
 
-      this.$.nameLabel.innerHTML = m.name;
+      // TODO: don't think this is the best place for this error checkError
+      // but at least we are getting it on screen
+      if( m.price === undefined ) {
+        return this.showError({message: 'No price set for this material'});
+      }
+
       this.$.priceLabel.innerHTML = m.price;
-      this.$.selector.setAttribute('units', m.units);
-
-
+      this.$.unitLabel.innerHTML = FB.units.getLabel(m.units, true);
       //this.data.materials[material].price.toFixed(2)
+    },
+
+    showError : function(err) {
+      if( !err ) {
+        this.$.error.style.display = 'none';
+        return;
+      }
+
+      this.$.error.style.display = 'block';
+      this.$.error.innerHTML = err.message;
+    },
+
+    toggle : function() {
+      this.showPrice = !this.showPrice;
+      this.updatePrice();
+    },
+
+    updatePrice : function() {
+      if( this.showPrice ) this.$.price.style.display = 'block';
+      else this.$.price.style.display = 'none';
     }
   });
 </script>

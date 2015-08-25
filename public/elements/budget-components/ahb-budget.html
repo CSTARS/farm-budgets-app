@@ -1,6 +1,7 @@
 <dom-module id="ahb-budget">
   <template>
     <div id="root"></div>
+    <budget-total></budget-total>
   </template>
 </dom-module>
 
@@ -30,11 +31,16 @@
       appData.materials.forEach(function(material){
         FB.materialController.add(material, options);
       });
+
       FB.materialController.recalc();
 
       appData.operations.forEach(function(operation){
         FB.operationController.add(operation, options);
+      });
 
+      FB.operationController.recalc();
+
+      appData.operations.forEach(function(operation){
         var ele = document.createElement('budget-operation');
         ele.operationid = operation.id;
 
@@ -43,6 +49,7 @@
 
         this.$.root.appendChild(div);
       }.bind(this));
+
     }
 
   });

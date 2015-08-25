@@ -66,18 +66,6 @@
           </div>
         </div>
 
-
-      <!--
-        <div class="form-group">
-          <label for="materialSearchInput" class="col-sm-3 control-label">Materials</label>
-          <div class="col-sm-9" style="position: relative">
-            <div id="edit-items"></div>
-            <div>
-              <h4>Price <small ><span id="current-price"></span> per <span id="current-units"></span></small></h4>
-            </div>
-          </div>
-        </div>
-      -->
       </div> <!-- end form -->
 
       <h4>Materials</h4>
@@ -161,9 +149,19 @@
       var m = FB.materialController.get(this.material);
 
       // TODO: set error message!!
-      if( m.error ) return;
+      if( m.error ) {
+        return alert(JSON.stringify(m));
+      }
 
       this.data = m;
+
+      // first time check for bad units
+      try {
+        FB.ucum.parse(m.units);
+      } catch(e) {
+        this.$.unitsInput.error = true;
+      }
+
       this.render(this.renderType);
     },
 
@@ -188,14 +186,23 @@
     },
 
     checkError : function() {
+      if( this.$.unitsInput.error ) {
+        this.$.icon.className = 'fa fa-warning';
+        this.$.icon.style.color = 'red';
+        this.error = true;
+        return;
+      }
+
       for( var key in this.data.materials ) {
         if( this.data.materials[key].error ) {
           this.$.icon.className = 'fa fa-warning';
           this.$.icon.style.color = 'red';
+          this.error = true;
           return;
         }
       }
 
+      this.error = false;
       this.$.icon.className = 'fa fa-cubes';
       this.$.icon.style.color = '';
     },
@@ -220,8 +227,10 @@
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
         html += '<tr><td>' +
-            '<i>'+list[i].path + '</i> <b>' +list[i].name + '</b></td><td>' +
+            '<i>'+list[i].path + '</i> '+
+            (list[i].type == 'complex' ? '<b>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
             (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
+
               list[i].amount+' '+FB.units.getLabel(list[i].units, true)+' = $'+
               list[i].price.toFixed(2)+' </span>'
           '</td></tr>';
