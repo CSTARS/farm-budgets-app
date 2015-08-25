@@ -1,0 +1,56 @@
+<dom-module id="budget-timeline">
+  <style>
+    :host {
+      display : block;
+    }
+  </style>
+  <template>
+    <h4>Timeline</div>
+    <div style="padding:10px">
+      <div id="chart" style="height: 450px"></div>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-timeline',
+
+    attached : function() {
+      FB.operationController.on('total-update', this.drawChart.bind(this));
+    },
+
+    drawChart : function(e) {
+      var data = e.range.all;
+      this.$.chart.innerHTML = '';
+
+      var container = this.$.chart;
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+      dataTable.addColumn({ type: 'string', id: 'Operation' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+
+      var arr = [];
+      data.forEach(function(d){
+        var end = new Date(d.date.getTime()+this.getIntervalTime(d));
+        arr.push([d.name, d.date, end]);
+      }.bind(this));
+
+      dataTable.addRows(arr);
+      chart.draw(dataTable);
+    },
+
+    getIntervalTime : function(date) {
+      var l = parseInt(date.length);
+      if( date.units == 'year' ) {
+        return l * 86400000 * 365;
+      } else {
+        return l * 86400000 * 30;
+      }
+    }
+
+
+  })
+</script>
