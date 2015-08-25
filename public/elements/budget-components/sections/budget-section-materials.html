@@ -102,6 +102,7 @@
       var html =
         '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
           '<h5 class="material-name">'+material.name+'</h5>'+
+          '<div>'+(material.description || '')+'</div>'+
           '<table class="table">' +
             '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
             '<tr>' +
@@ -139,7 +140,7 @@
         name : ele.find('.material-name').html(),
         price : parseInt(ele.find('.material-price').val()),
         'class' : ele.find('.material-class').html(),
-        units : ele.find('budget-unit-selector')[0].units
+        units : ele.find('budget-unit-selector')[0].getUnits()
       };
 
       FB.materialController.add(item, {replace: true});

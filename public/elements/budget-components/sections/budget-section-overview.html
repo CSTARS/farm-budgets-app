@@ -21,7 +21,7 @@
             <tbody id="tbody">
               <tr>
                 <td>Farm Size</td>
-                <td><input type="number" class="form-control" id="sizeInput" /></td>
+                <td><input type="number" class="form-control" id="sizeInput" on-input="onFarmSizeChange"/></td>
               </tr>
             </tbody>
           </table>
@@ -42,12 +42,21 @@
       <h4>Timeline</h4>
       <budget-timeline id="timeline"></budget-timeline>
     </div>
+
+    <div class="card">
+      <h4>JSON (debug)</h4>
+      <textarea id="json" class="form-control" style="height: 400px"></textarea>
+    </div>
   </template>
 </dom-module>
 
 <script>
   Polymer({
     is : 'budget-section-overview',
+
+    ready : function() {
+      FB.operationController.on('total-update', this.setJsonDump.bind(this));
+    },
 
     setData : function(data) {
       if( !data.farm ) return;
@@ -64,8 +73,28 @@
       }
     },
 
+    onFarmSizeChange : function() {
+      this.$.total.farm.size = this.$.sizeInput.value;
+      this.$.total.onTotalUpdate();
+    },
+
     onShow : function() {
       this.$.timeline.onShow();
+    },
+
+    setJsonDump : function() {
+      // get latest data
+      var arr = [];
+
+      var materials = FB.materialController.get();
+
+      for( var key in materials.materials ) arr.push(materials.materials[key]);
+      for( var key in materials.complex ) arr.push(materials.complex[key]);
+
+      appData.materials = arr;
+      appData.operations = FB.operationController.get();
+
+      this.$.json.innerHTML = JSON.stringify(appData, '', '  ');
     }
   });
 </script>
