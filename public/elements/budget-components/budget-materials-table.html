@@ -3,7 +3,7 @@
     is : 'budget-materials-table',
 
     ready : function() {
-      this.defaultCols = ['Material', 'Units', 'Notes', 'Amount', 'Price', 'Remove'];
+      this.defaultCols = ['Material', 'Notes', 'Amount', 'Units', 'Price', 'Remove'];
       this.cols = [];
       this.style.display = 'block';
       this.controllers = [];
@@ -129,7 +129,7 @@
       setPrice();
 
       if( cols.Notes ) {
-        notesInput.val(config.materialImpl.notes);
+        notesInput.val(config.materialImpl.note);
       }
 
       setErrorStatus();
