@@ -1,0 +1,45 @@
+<!-- reusable popup for operation schedule -->
+
+<dom-module id="budget-schedule-popup">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" on-click="hide"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-calendar-o"></i> Edit Schedule</h4>
+          </div>
+          <div class="modal-body" id="body"></div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  </template>
+</dom-modle>
+
+<script>
+  Polymer({
+    is : 'budget-schedule-popup',
+
+    ready : function() {
+      this.popup = $(this.$.popup).modal({show: false});
+      this.body = $(this.$.body);
+    },
+
+    show : function(closeCallback) {
+      this.closeCallback = closeCallback;
+      this.popup.modal('show');
+    },
+
+    hide : function() {
+      if( this.closeCallback ) {
+        this.closeCallback();
+        this.closeCallback = null;
+      }
+      this.popup.modal('hide');
+    },
+
+    setBody : function(ele) {
+      this.body.html('').append(ele);
+    }
+  })
+</script>

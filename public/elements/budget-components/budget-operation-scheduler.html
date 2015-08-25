@@ -5,41 +5,42 @@
       position: relative;
     }
     #inputPanel {
-      display: none;
       font-size: 14px;
       color: #333;
     }
     #title {
       cursor: pointer;
     }
+    .length-label {
+      padding: 10px;
+      color: #666;
+    }
   </style>
 
   <template>
 
     <div on-click="toggle" id="title">
-      Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i>
+      <i class="fa fa-calendar-o"></i> Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i>
     </div>
 
-    <div id="inputPanel" class="well animated zoomIn" style="display:none">
-      <h5>
-        <i class="fa fa-calendar-o"></i> Edit Schedule
-        <a class="pull-right" on-click="toggle" style="cursor:pointer;color: #888"><i class="fa fa-remove"></i></a>
-      </h5>
-
+    <div id="inputPanel">
       <div class="form-horizontal">
 
         <div class="form-group" id="dates">
-          <label for="datesInput" class="col-sm-2 control-label">Add Dates</label>
-          <div class="col-sm-10">
+          <label for="datesInput" class="col-sm-3 control-label"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
+          <div class="col-sm-9">
             <input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>
 
             <div id="selectedDates">
+
+
               <template is="dom-repeat" items="{{data}}">
                 <div>
 
                   <div class="layout horizontal" style="margin-top:15px">
-                    <div><h6 style="padding-right: 20px">{{item.date}}</h6></div>
+                    <div class="flex"><h6 style="padding-right: 20px">{{item.date}}</h6></div>
 
+                    <div class="length-label">Length:</div>
                     <div>
                       <input type="number" value="{{item.length}}" class="form-control" style="max-width: 75px; margin-right: 5px" />
                     </div>
@@ -53,7 +54,7 @@
                     </div>
 
                     <div class="flex">
-                      <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-remove"></i></a>
+                      <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
                     </div>
                   </div> <!-- end inline form -->
 
@@ -105,6 +106,11 @@
       this.update();
     },
 
+    attached : function() {
+      this.popup = document.querySelector('budget-schedule-popup');
+      this.removeChild(this.$.inputPanel);
+    },
+
     set : function(data) {
       this.data = data;
 
@@ -151,12 +157,8 @@
     },
 
     toggle : function() {
-      if( this.$.inputPanel.style.display == 'none' ) {
-        this.$.inputPanel.style.top = $(this).height()+'px';
-        this.$.inputPanel.style.display = 'block';
-      } else {
-        this.$.inputPanel.style.display = 'none';
-      }
+      this.popup.setBody(this.$.inputPanel);
+      this.popup.show();
     }
   });
 </script>

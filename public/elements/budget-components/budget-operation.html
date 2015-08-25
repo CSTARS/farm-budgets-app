@@ -13,16 +13,16 @@
   <template>
 
     <h4 class="page-header" style="margin-top: 5px">
-      <div style="margin-bottom: 5px"><a on-click="toggleContent" style="cursor:pointer"><i class="fa fa-toggle-right" id="icon"></i></a>
+      <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
       <span id="nameLabel"></span>
       <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
     </h4>
 
     <div class="row">
       <div class="col-sm-8">
-        <h4>
-          <small><budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler></small>
-        </h4>
+        <h5>
+          <budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler>
+        </h5>
       </div>
       <div class="col-sm-4">
         <table class="padding: 15px">
@@ -97,16 +97,26 @@
       else this.$.errorIcon.style.display = 'none';
     },
 
+    checkError : function() {
+      for( var material in this.operation.materials ) {
+        if( this.operation.materials[material].error ) {
+          this.showError(true);
+          return;
+        }
+      }
+      this.showError(false);
+    },
+
     render : function() {
       if( !this.$.materialTable.setMaterials ) return;
 
       this.$.nameLabel.innerHTML = this.operation.name;
-      this.showError(false);
 
       if( !this.operation.materials ) return;
 
       this.$.materialTable.setMaterials(this.operation, {});
       this.updateTotals();
+      this.checkError();
     },
 
     updateTotals : function() {
