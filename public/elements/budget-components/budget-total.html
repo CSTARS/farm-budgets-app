@@ -1,9 +1,16 @@
 <dom-module id="budget-total">
   <template>
     <h4 style="text-align:right">Duration: <span class="text text-primary" id="durationText"></span></h4>
-    <h4 style="text-align:right">Crop Lifetime Total: <ahb-dollar-label id="totalLabel"></ahb-dollar-label></h4>
-    <h4 style="text-align:right">Average Monthly Cost: <ahb-dollar-label id="average"></ahb-dollar-label></h4>
-    <h4 style="text-align:right">Average Yearly Cost: <ahb-dollar-label id="averageYear"></ahb-dollar-label></h4>
+    <h4 style="text-align:right">
+      Crop Lifetime Total:
+      <ahb-dollar-label id="totalLabel"></ahb-dollar-label> <small>Per Acre</small>
+    </h4>
+    <h4 style="text-align:right">
+      Crop Lifetime Total:
+      <ahb-dollar-label id="completeTotalLabel"></ahb-dollar-label> <small>Total</small>
+    </h4>
+    <h4 style="text-align:right">Average Monthly Cost: <ahb-dollar-label id="average"></ahb-dollar-label> <small>Per Acre</small></h4>
+    <h4 style="text-align:right">Average Yearly Cost: <ahb-dollar-label id="averageYear"></ahb-dollar-label> <small>Per Acre</small></h4>
   </template>
 </dom-module>
 
@@ -15,17 +22,27 @@
       FB.operationController.on('total-update', this.onTotalUpdate.bind(this));
     },
 
-    onTotalUpdate : function(e) {
-      this.$.totalLabel.value = e.total;
+    setData : function(farm) {
+      this.farm = farm;
+      this.onTotalUpdate();
+    },
 
-      if( e.range.start !== null && e.range.stop !== null ) {
-        var diff = e.range.stop.getTime() - e.range.start.getTime();
+    onTotalUpdate : function(e) {
+      if( e ) this.data = e;
+      if( !this.data ) return;
+
+      this.$.totalLabel.value = this.data.total;
+
+      this.$.completeTotalLabel.value = this.data.total * ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+
+      if( this.data.range.start !== null && this.data.range.stop !== null ) {
+        var diff =  this.data.range.stop.getTime() - this.data.range.start.getTime();
         var days = diff / 86400000;
         var months = Math.ceil(days / 30);
-        this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(e.range.start)+' - '+this.toDateString(e.range.stop)+')</small>';
+        this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
 
-        this.$.average.value = e.total / months;
-        this.$.averageYear.value = (e.total / months) * 12;
+        this.$.average.value = this.data.total / months;
+        this.$.averageYear.value = (this.data.total / months) * 12;
       } else {
         this.$.durationText.innerHTML = 'Unknown';
       }

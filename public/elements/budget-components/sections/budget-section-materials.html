@@ -9,16 +9,22 @@
 
   <template>
 
-    <div class="form-horizontal">
-      <div class="form-group">
-        <label for="filterInput" class="col-sm-2 control-label">Filter</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+
+        <div class="form-horizontal" style="margin: 25px 0">
+          <div class="form-group">
+            <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+            </div>
+          </div>
         </div>
+
+        <div id="root"></div>
+
       </div>
     </div>
-
-    <div id="root"></div>
   </template>
 </dom-module>
 
@@ -28,6 +34,7 @@
 
     ready : function() {
       this.filterTimer = -1;
+      this.updateTimer = -1;
     },
 
     setData : function(data) {
@@ -94,12 +101,12 @@
     createTable : function(material) {
       var html =
         '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
-          '<h5>'+material.name+'</h5>'+
+          '<h5 class="material-name">'+material.name+'</h5>'+
           '<table class="table">' +
             '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
             '<tr>' +
-              '<td>'+material.class+'</td>' +
-              '<td><input type="number" class="form-control price-input" value="'+(material.price || '')+'" /></td>' +
+              '<td class="material-class">'+material.class+'</td>' +
+              '<td><input type="number" class="form-control material-price" value="'+(material.price || '')+'" /></td>' +
               '<td><budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector></td>' +
             '</tr>' +
           '</table>' +
@@ -107,18 +114,36 @@
 
       var row = $(html);
 
-      row.find('.price-input').on('input', function(){
-        console.log('need to update material');
-      });
+      row.find('.material-price').on('input', function(){
+        this.updateFromEvent(row);
+      }.bind(this));
       row.find('budget-unit-selector').on('units-change', function(){
-        console.log('need to update material');
-      });
+        this.updateFromEvent(row);
+      }.bind(this));
 
       return row[0];
     },
 
     updateFromEvent : function(ele) {
+      if( this.updateTimer != -1 ) clearTimeout(this.updateTimer);
 
+      this.updateTimer = setTimeout(function(){
+        this.updateTimer = -1;
+        this._updateFromEvent(ele);
+      }.bind(this), 300);
+    },
+
+    _updateFromEvent : function(ele) {
+      console.log('updating');
+      var item = {
+        name : ele.find('.material-name').html(),
+        price : parseInt(ele.find('.material-price').val()),
+        'class' : ele.find('.material-class').html(),
+        units : ele.find('budget-unit-selector')[0].units
+      };
+
+      FB.materialController.add(item, {replace: true});
+      FB.operationController.recalc();
     }
   });
 </script>

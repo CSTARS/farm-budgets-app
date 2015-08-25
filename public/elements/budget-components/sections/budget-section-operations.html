@@ -1,16 +1,20 @@
 <dom-module id="budget-section-operations">
   <template>
 
-    <div class="form-horizontal">
-      <div class="form-group">
-        <label for="filterInput" class="col-sm-2 control-label">Filter</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <div class="form-horizontal" style="margin: 25px 0">
+          <div class="form-group">
+            <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+            </div>
+          </div>
         </div>
+
+        <div id="root"></div>
       </div>
     </div>
-
-    <div id="root"></div>
   </template>
 </dom-module>
 
@@ -34,6 +38,8 @@
 
         this.$.root.appendChild(div);
       }.bind(this));
+
+      this._filter();
     },
 
     onShow : function(params) {
