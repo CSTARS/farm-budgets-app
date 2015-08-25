@@ -44,7 +44,7 @@
 
 
     <div id="content" style="display:none" class="animated zoomIn">
-      <budget-materials-table id="materialTable"></budget-materials-table>
+      <budget-materials-table id="materialTable" on-price-change="updateTotals"></budget-materials-table>
     </div>
 
   </template>
@@ -105,67 +105,8 @@
 
       if( !this.operation.materials ) return;
 
-      this.$.materialTable.setMaterials(this.operation);
-
-      /*this.$.content.innerHTML = '';
-
-
-      this.materialsArray = [];
-      var html = '<table class="table"><tr><th>Material</th><th>Notes</th><th>Amount</th><th>Price</th></tr>';
-
-      for( var m in this.operation.materials ) {
-        var materialDef = FB.materialController.get(m);
-        var materialImpl = this.operation.materials[m];
-
-        if( materialImpl.error ) {
-          this.showError(true);
-          html += '<tr><td colspan="4"><div class="text text-danger">'+this.operation.materials[m].error.message+'</div></td>';
-          continue;
-        }
-
-        if( materialDef.type == 'complex' ) {
-          html += '<tr><td><budget-macro material="'+m+'"></budget-macro></td>';
-        } else {
-          html += '<tr><td><budget-material material="'+m+'"></budget-material></td>';
-        }
-        html += '<td><input type="text" class="form-control" value="'+(materialImpl.note ? materialImpl.note.replace(/"/g,'\'') : '')+'" /></td>'+
-                '<td><input type="number" class="form-control op-amount" material="'+m+'" style="max-width: 100px" value="'+this.operation.materials[m].amount+'" /></td>'+
-                '<td class="price" material="'+m+'"><ahb-dollar-label value="'+this.operation.materials[m].price.toFixed(2)+'"></ahb-dollar-label></td></tr>';
-      }
-
-      this.$.content.innerHTML = html+'</table>';*/
-
+      this.$.materialTable.setMaterials(this.operation, {});
       this.updateTotals();
-
-      /*$(this.$.content)
-        .find('input.op-amount')
-        .on('change', function(e){
-          var ele = $(e.currentTarget);
-          var material = ele.attr('material');
-
-          var m = this.operation.materials[material];
-          m.amount = parseInt(ele.val());
-
-          FB.operationController.recalc();
-
-          $(this.$.content).find('.price[material="'+material+'"] ahb-dollar-label').attr('value', m.price.toFixed(2));
-        this.updateTotals();
-        }.bind(this));
-
-      $(this.$.content)
-        .find('budget-macro')
-        .on('units-change', function(e){
-          var ele = $(e.currentTarget);
-          var material = ele.attr('material');
-
-          var m = this.operation.materials[material];
-          m.units = e.originalEvent.detail;
-
-          FB.operationController.recalc();
-
-          $(this.$.content).find('.price[material="'+material+'"] ahb-dollar-label').attr('value', m.price.toFixed(2));
-          this.updateTotals();
-        }.bind(this));*/
     },
 
     updateTotals : function() {

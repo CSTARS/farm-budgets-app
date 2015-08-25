@@ -81,7 +81,7 @@
 
   // controller for the material table row
   FB.MaterialTableRow = function(ele, config){
-    var $ele = $(ele), amountTimer = -1, unitsTimer = -1, cols = {};
+    var $ele = $(ele), amountTimer = -1, unitTimer = -1, cols = {};
 
     config.materialImpl = config.complexMaterial.materials[config.material.name];
 
@@ -118,7 +118,7 @@
     function render() {
       if( config.material.error ) {
         errorLabel.show();
-        errorLabel.html('Unknown material');
+        errorLabel.html('Unknown material: '+config.material.name);
         return;
       }
 
@@ -139,6 +139,7 @@
       if( !config.materialImpl.error ) {
         errorLabel.hide();
       } else {
+        if( typeof config.materialImpl.error.math == 'object' ) debugger;
         errorLabel.html(config.materialImpl.error.message+': '+config.materialImpl.error.math+
           (config.materialImpl.error.debug ? '<br />'+config.materialImpl.error.debug : ''));
         errorLabel.show();
@@ -179,16 +180,17 @@
     }
 
     function _fireUnitsChange(e) {
-      if( e.detail.error ) return;
+      if( e.originalEvent.detail.error ) return;
 
-      config.materialImpl.units = e.detail.value;
+      config.materialImpl.units = e.originalEvent.detail.value;
 
       FB.materialController.recalc();
+      FB.operationController.recalc();
 
       setPrice();
 
       setErrorStatus();
-      config.onUnitsChange(this.config.materialImpl, e.detail.value);
+      config.onUnitsChange(config.materialImpl, e.originalEvent.detail.value);
     }
 
     function fireAmountChange(e) {
@@ -201,15 +203,16 @@
     }
 
     function _fireAmountChange(e) {
-      config.materialImpl.amount = parseInt(e.target.value);
+      config.materialImpl.amount = parseInt(e.originalEvent.target.value);
       config.materialImpl.originalAmount = config.materialImpl.amount;
 
       FB.materialController.recalc();
+      FB.operationController.recalc();
 
       setPrice();
 
       setErrorStatus();
-      config.onAmountChange(config.materialImpl, parseInt(e.target.value));
+      config.onAmountChange(config.materialImpl, parseInt(e.originalEvent.target.value));
     }
 
     function fireDelete() {

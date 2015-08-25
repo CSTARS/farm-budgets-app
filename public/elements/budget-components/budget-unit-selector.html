@@ -3,6 +3,7 @@
     :host {
       display: block;
       width: 100px;
+      position: relative;
     }
     #message {
       position: absolute;
@@ -15,10 +16,15 @@
     #input {
       display : block;
     }
+    #icon {
+      position : absolute;
+      bottom : 3px;
+      right: 0px;
+    }
   </style>
 
   <template>
-    <input id="input" type="text" class="form-control text" on-input="onChange" on-blur="onBlur" on-focus="onFocus">
+    <i id="icon" class="text text-danger fa fa-warning"></i><input id="input" type="text" class="form-control text" on-input="onChange" on-blur="onBlur" on-focus="onFocus">
     <div id="message"></div>
   </template>
 </dom-module>
@@ -84,6 +90,9 @@
         $(this).addClass('has-error');
         $(this.$.input).addClass('text-danger');
         this.error = true;
+
+        this.$.icon.style.display = 'inline';
+
         this.$.message.innerHTML = '<div class="text text-danger">Invalid Units</div>'+this.getReminders();
         return;
       }
@@ -95,6 +104,8 @@
       $(this).removeClass('has-error');
       $(this.$.input).removeClass('text-danger');
       this.$.message.innerHTML = '<span class="text text-success">Valid</span>';
+
+      this.$.icon.style.display = 'none';
     },
 
     onFocus : function() {
