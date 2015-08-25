@@ -1,0 +1,124 @@
+<dom-module id="budget-section-materials">
+  <style>
+    .card {
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
+    }
+  </style>
+
+  <template>
+
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+        </div>
+      </div>
+    </div>
+
+    <div id="root"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-materials',
+
+    ready : function() {
+      this.filterTimer = -1;
+    },
+
+    setData : function(data) {
+      this.data = data;
+
+      this.data.materials.forEach(function(material){
+        if( material.type == 'complex' ) return;
+
+        var div = this.createTable(material);
+        this.$.root.appendChild(div);
+      }.bind(this));
+
+      this._filter();
+    },
+
+    onShow : function(params) {
+      if( params.length > 0 ) {
+        this.$.filterInput.value = params[0];
+      } else {
+        this.$.filterInput.value = '';
+      }
+
+      this._filter();
+    },
+
+    filter : function() {
+      if( this.filterTimer != -1 ) clearTimeout(this.filterTimer);
+      this.filterTimer = setTimeout(function(){
+        this.filterTimer = -1;
+        this._filter();
+      }.bind(this));
+    },
+
+    _filter : function() {
+      var txt = this.$.filterInput.value;
+
+      var matched = [], showAll = false;
+      if( txt == '' ) {
+        showAll = true;
+      } else {
+        matched = this.toNameArray(FB.materialController.find(txt));
+      }
+
+      var opEles = this.querySelectorAll('[material]');
+      for( var i = 0; i < opEles.length; i++ ) {
+        var ele = opEles[i];
+        if( showAll || matched.indexOf(ele.getAttribute('material')) > -1 ) {
+          ele.style.display = 'block';
+        } else {
+          ele.style.display = 'none';
+        }
+      };
+    },
+
+    toNameArray : function(ops) {
+      var arr = [];
+      ops.forEach(function(op){
+        if( op.type == 'complex' ) return;
+        arr.push(op.name);
+      });
+      return arr;
+    },
+
+    createTable : function(material) {
+      var html =
+        '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
+          '<h5>'+material.name+'</h5>'+
+          '<table class="table">' +
+            '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
+            '<tr>' +
+              '<td>'+material.class+'</td>' +
+              '<td><input type="number" class="form-control price-input" value="'+(material.price || '')+'" /></td>' +
+              '<td><budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector></td>' +
+            '</tr>' +
+          '</table>' +
+        '</div>';
+
+      var row = $(html);
+
+      row.find('.price-input').on('input', function(){
+        console.log('need to update material');
+      });
+      row.find('budget-unit-selector').on('units-change', function(){
+        console.log('need to update material');
+      });
+
+      return row[0];
+    },
+
+    updateFromEvent : function(ele) {
+
+    }
+  });
+</script>

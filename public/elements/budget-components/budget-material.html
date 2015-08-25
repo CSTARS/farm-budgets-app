@@ -11,7 +11,11 @@
   <template>
     <div id="label" style="cursor:pointer" on-click="toggle"><b id="nameLabel"></b></div>
     <div id="error" class="text text-danger"></div>
-    <div id="price" class="text text-success"><span id="priceLabel"></span> <span id="unitLabel"></span></div>
+    <div id="price" class="text text-success">
+      <span id="priceLabel"></span>
+      <span id="unitLabel"></span>
+      <a class="btn btn-default" id="edit"><i class="fa fa-edit"></i></a>
+    </div>
   </template>
 </dom-module>
 
@@ -43,6 +47,7 @@
       if( typeof material == 'string' ) this.material = material;
       if( !this.material ) return;
 
+      this.$.edit.href = '#budget/materials/'+this.material;
       this.$.nameLabel.innerHTML = this.material;
 
       var m = FB.materialController.get(this.material);

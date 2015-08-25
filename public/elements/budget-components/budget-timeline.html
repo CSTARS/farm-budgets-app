@@ -5,10 +5,7 @@
     }
   </style>
   <template>
-    <h4>Timeline</div>
-    <div style="padding:10px">
-      <div id="chart" style="height: 450px"></div>
-    </div>
+    <div id="chart" style="height: 450px"></div>
   </template>
 </dom-module>
 
@@ -17,11 +14,27 @@
     is : 'budget-timeline',
 
     attached : function() {
+      $(window).on('resize', this.drawChart.bind(this));
+
+      this.handlerSet = false;
       FB.operationController.on('total-update', this.drawChart.bind(this));
     },
 
+    onShow : function() {
+      this.drawChart();
+    },
+
     drawChart : function(e) {
-      var data = e.range.all;
+      if( e && e.range ) this.data = e.range.all;
+
+      if( !window.google && !this.handlerSet ) {
+        googleChartLoadHandlers.push(this.drawChart.bind(this));
+        this.handlerSet = true;
+        return;
+      }
+
+      if( !this.data ) return;
+
       this.$.chart.innerHTML = '';
 
       var container = this.$.chart;
@@ -33,13 +46,21 @@
       dataTable.addColumn({ type: 'date', id: 'End' });
 
       var arr = [];
-      data.forEach(function(d){
+      this.data.forEach(function(d){
         var end = new Date(d.date.getTime()+this.getIntervalTime(d));
         arr.push([d.name, d.date, end]);
       }.bind(this));
 
       dataTable.addRows(arr);
       chart.draw(dataTable);
+
+      google.visualization.events.addListener(chart, 'select', function(){
+        try {
+          window.location = '#budget/operations/'+arr[chart.getSelection()[0].row][0];
+        } catch(e) {
+          console.log(e);
+        }
+      });
     },
 
     getIntervalTime : function(date) {

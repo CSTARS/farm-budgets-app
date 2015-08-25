@@ -1,0 +1,85 @@
+<dom-module id="budget-section-operations">
+  <template>
+
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+        </div>
+      </div>
+    </div>
+
+    <div id="root"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-operations',
+
+    ready : function() {
+      this.filterTimer = -1;
+    },
+
+    setData : function(data) {
+      this.data = data;
+
+      this.data.operations.forEach(function(operation){
+        var ele = document.createElement('budget-operation');
+        ele.operationid = operation.id;
+
+        var div = document.createElement('div');
+        div.appendChild(ele);
+
+        this.$.root.appendChild(div);
+      }.bind(this));
+    },
+
+    onShow : function(params) {
+      if( params.length > 0 ) {
+        this.$.filterInput.value = params[0];
+      } else {
+        this.$.filterInput.value = '';
+      }
+      this._filter();
+    },
+
+    filter : function() {
+      if( this.filterTimer != -1 ) clearTimeout(this.filterTimer);
+      this.filterTimer = setTimeout(function(){
+        this.filterTimer = -1;
+        this._filter();
+      }.bind(this));
+    },
+
+    _filter : function() {
+      var txt = this.$.filterInput.value;
+
+      var matched = [], showAll = false;
+      if( txt == '' ) {
+        showAll = true;
+      } else {
+        matched = this.toIdArray(FB.operationController.find(txt));
+      }
+
+      var opEles = this.querySelectorAll('budget-operation');
+      for( var i = 0; i < opEles.length; i++ ) {
+        var ele = opEles[i];
+        if( showAll || matched.indexOf(ele.operationid) > -1 ) {
+          ele.style.display = 'block';
+        } else {
+          ele.style.display = 'none';
+        }
+      };
+    },
+
+    toIdArray : function(ops) {
+      var arr = [];
+      ops.forEach(function(op){
+        arr.push(op.id);
+      });
+      return arr;
+    }
+  });
+</script>

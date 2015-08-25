@@ -1,8 +1,6 @@
 <dom-module id="ahb-budget">
   <template>
-    <budget-timeline></budget-timeline>
-    <div id="root"></div>
-    <budget-total></budget-total>
+    <budget-sections id="sections"></budget-sections>
   </template>
 </dom-module>
 
@@ -41,16 +39,7 @@
 
       FB.operationController.recalc();
 
-      appData.operations.forEach(function(operation){
-        var ele = document.createElement('budget-operation');
-        ele.operationid = operation.id;
-
-        var div = document.createElement('div');
-        div.appendChild(ele);
-
-        this.$.root.appendChild(div);
-      }.bind(this));
-
+      this.$.sections.setData(appData);
     }
 
   });

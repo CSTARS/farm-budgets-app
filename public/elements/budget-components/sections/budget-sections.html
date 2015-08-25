@@ -1,0 +1,67 @@
+<link rel="import" href="budget-section-overview.html" />
+<link rel="import" href="budget-section-operations.html" />
+<link rel="import" href="budget-section-materials.html" />
+
+<dom-module id="budget-sections">
+  <style>
+    .section {
+      display : none;
+    }
+  </style>
+
+  <template>
+    <ul class="nav nav-pills nav-justified" id="tabs">
+      <li role="presentation" class="active" id="btn-overview"><a href="#budget/overview">Overview</a></li>
+      <li role="presentation" id="btn-operations"><a href="#budget/operations">Operations</a></li>
+      <li role="presentation" id="btn-materials"><a href="#budget/materials">Materials</a></li>
+    </ul>
+
+    <budget-section-overview id="overview" class="section"></budget-section-overview>
+    <budget-section-operations id="operations" class="section"></budget-section-operations>
+    <budget-section-materials id="materials" class="section"></budget-section-materials>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-sections',
+
+    ready : function() {
+      $(window).on('hashchange', this.setSection.bind(this));
+      this.setSection();
+    },
+
+    setSection : function() {
+      var parts = window.location.hash.replace(/#/,'').split('/');
+
+      // TODO: remove later
+      if( parts.length == 1 && parts[0] == '' ) {
+        window.location = '#budget/overview';
+      }
+
+      if( parts[0] != 'budget' ) return;
+
+      $(this).find('.section').hide();
+      $(this.$.tabs).find('li').removeClass('active');
+
+      var section;
+      if( this.$[parts[1]] ) {
+        section = this.$[parts[1]];
+        $(this.$.tabs).find('#btn-'+parts[1]).addClass('active');
+      } else {
+        section = this.$.overview;
+        $(this.$.tabs).find('#btn-overview').addClass('active');
+      }
+
+      section.style.display = 'block';
+      if( section.onShow ) section.onShow(parts.splice(2, parts.length-1));
+    },
+
+    setData : function(data) {
+      var sections = this.querySelectorAll('.section');
+      for( var i = 0; i < sections.length; i++ ) {
+        if( sections[i].setData ) sections[i].setData(data);
+      }
+    }
+  });
+</script>

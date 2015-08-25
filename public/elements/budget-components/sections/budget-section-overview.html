@@ -1,0 +1,55 @@
+<dom-module id="budget-section-overview">
+  <style>
+    .card {
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
+    }
+  </style>
+  <template>
+    <div class="card">
+      <h4>Farm Information</h4>
+      <table class="table">
+        <tbody id="tbody">
+          <tr>
+            <td>Farm Size</td>
+            <td><input type="number" class="form-control" id="sizeInput" /></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h4 class="page-header">Total</h4>
+      <budget-total></budget-total>
+    </div>
+
+    <div class="card">
+      <h4>Timeline</h4>
+      <budget-timeline id="timeline"></budget-timeline>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-overview',
+
+    setData : function(data) {
+      if( !data.farm ) return;
+
+      for( var key in data.farm ) {
+        if( key == 'size' ) {
+          this.$.sizeInput.value = data.farm[key];
+        } else {
+          var row = $('<tr><td>'+key+'</td><td>'+data.farm[key]+'</td></tr>')[0];
+          this.$.tbody.appendChild(row);
+        }
+      }
+    },
+
+    onShow : function() {
+      this.$.timeline.onShow();
+    }
+  });
+</script>

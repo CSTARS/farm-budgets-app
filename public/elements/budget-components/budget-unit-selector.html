@@ -85,7 +85,7 @@
 
     checkError : function() {
       try {
-        FB.ucum.parse(this.$.input.value);
+        FB.ucum.parse(FB.units.math.cleanDollars(this.$.input.value));
       } catch(e) {
         $(this).addClass('has-error');
         $(this.$.input).addClass('text-danger');
@@ -139,62 +139,3 @@
     }
   });
 </script>
-
-<!--
-<dom-module id="budget-unit-selector">
-  <template>
-    <span id="label"></span><select id="select" on-change="onChange" style="padding-right: 15px"></select>
-  </template>
-</dom-module>
-
-<script>
-  Polymer({
-    is : 'budget-unit-selector',
-
-    properties : {
-      units : {
-        type : String,
-        observer: 'updateSelector'
-      }
-    },
-
-    attached : function() {
-      this.updateSelector();
-    },
-
-    updateSelector : function() {
-      if( !this.units ) return;
-
-      var list = [];
-      var unit = '';
-
-      if( this.units.indexOf('/') > -1 ) {
-        var label = this.units.split('/');
-        this.$.label.innerHTML = FB.units.getLabel(label[0], true)+'/';
-        unit = label[1];
-      } else {
-        unit = this.units;
-      }
-
-      var likeUnits = FB.units.getLikeUnits(unit);
-      var html = '';
-
-      if( likeUnits.length == 0 ) {
-        html += '<option value="'+unit+'">'+unit+'</option>';
-      } else {
-        unit = FB.units.getLabel(unit);
-        for( var i = 0; i < likeUnits.length; i++ ) {
-          html += '<option value="'+likeUnits[i].symbol+'" '+(likeUnits[i].name == unit ? 'selected' : '')+'>' +
-                  likeUnits[i].name+'</option>';
-        }
-      }
-
-      this.$.select.innerHTML = html;
-    },
-
-    onChange : function(){
-      this.fire('units-change', this.$.select.value);
-    }
-  });
-</script>
--->

@@ -86,11 +86,11 @@
 
       // on init this event will fire, but we don't
       // need to recalc budgets
-      if( this.firstScheduleEvent ) {
-        this.firstScheduleEvent = false;
-      } else {
+      //if( this.firstScheduleEvent ) {
+      //  this.firstScheduleEvent = false;
+      //} else {
         FB.operationController.recalc();
-      }
+      //}
 
 
       this.updateTotals();

@@ -11,7 +11,14 @@
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
       // Load the Visualization API and the piechart package.
+      var googleChartLoadHandlers = [];
+      function onGoogleChartsLoad() {
+        googleChartLoadHandlers.forEach(function(handler){
+            handler();
+        });
+      }
       google.load('visualization', '1.0', {'packages':['corechart', 'timeline']});
+      google.setOnLoadCallback(onGoogleChartsLoad);
   </script>
 
   <!-- build:css styles/main.css -->
@@ -42,10 +49,12 @@
   <link rel="import" href="elements/budget-components/budget-unit-selector.html">
   <link rel="import" href="elements/budget-components/budget-operation.html">
   <link rel="import" href="elements/budget-components/budget-material.html">
+  <link rel="import" href="elements/budget-components/sections/budget-sections.html">
   <link rel="import" href="elements/budget-components/ahb-budget.html">
   <link rel="import" href="elements/budget-components/budget-materials-table.html">
   <link rel="import" href="elements/budget-components/budget-total.html">
   <link rel="import" href="elements/budget-components/budget-timeline.html">
+
 
 
 </head>
