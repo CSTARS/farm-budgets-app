@@ -1,0 +1,138 @@
+{
+  "prices": [
+    {
+      "unit": "us$/us$",
+      "price": 1,
+      "material": "estimate"
+    },
+    {
+      "unit": "us$/[gal_us]",
+      "price": 2.68,
+      "material": "fuel"
+    },
+    {
+      "unit": "us$/([in_us].[acr_us])",
+      "price": 112.86,
+      "material": "irrigation"
+    },
+    {
+      "unit": "us$/h",
+      "price": 9.42,
+      "material": "Labor-machine"
+    },
+    {
+      "unit": "us$/h",
+      "price": 7.25,
+      "material": "Labor-manual"
+    }
+  ],
+  "materials": [
+    {
+      "description": "Manual Labor (minimum wage)",
+      "class": "labor",
+      "unit": "h",
+      "material": "Labor-machine"
+    },
+    {
+      "description": "Machine Labor (%130 of minimum)",
+      "class": "labor",
+      "unit": "h",
+      "material": "Labor-manual"
+    },
+    {
+      "description": "Dollar estimate",
+      "class": "custom",
+      "unit": "us$",
+      "material": "estimate"
+    },
+    {
+      "description": "Irrigation in AcIn per Ac",
+      "class": "custom",
+      "unit": "[in_us].[acr_us]",
+      "material": "irrigation"
+    },
+    {
+      "description": "Fuel for Equipment",
+      "class": "fuel",
+      "unit": "[gal_us]",
+      "material": "fuel"
+    }
+  ],
+  "farm": [
+    {
+      "schedule": [
+        {
+          "operation": "Annual Estimate",
+          "duration": "1 year",
+          "start": "2015-01-01"
+        }
+      ],
+      "operations": [
+        {
+          "materials": [
+            {
+              "note": "repair&lube",
+              "unit": "us$",
+              "amount": 1,
+              "material": "estimate"
+            },
+            {
+              "note": "fertilizer",
+              "unit": "us$",
+              "amount": 32.75,
+              "material": "estimate"
+            },
+            {
+              "note": "pesticides",
+              "unit": "us$",
+              "amount": 97.09,
+              "material": "estimate"
+            },
+            {
+              "note": "other",
+              "unit": "us$",
+              "amount": 133,
+              "material": "estimate"
+            },
+            {
+              "note": "custom",
+              "unit": "us$",
+              "amount": 380.54,
+              "material": "estimate"
+            },
+            {
+              "note": "",
+              "unit": "[gal_us]",
+              "amount": 1.15,
+              "material": "fuel"
+            },
+            {
+              "note": "",
+              "unit": "[in_us].[acr_us]",
+              "amount": 4.5,
+              "material": "irrigation"
+            },
+            {
+              "note": "",
+              "unit": "h",
+              "amount": 0.58,
+              "material": "Labor-machine"
+            },
+            {
+              "note": "",
+              "unit": "h",
+              "amount": 1.82,
+              "material": "Labor-manual"
+            }
+          ],
+          "operation": "Annual Estimate"
+        }
+      ],
+      "unit": "[acr_us]",
+      "size": "1",
+      "commodity": "ALFALFA",
+      "location": "06",
+      "farm": "06/ALFALFA"
+    }
+  ]
+}
