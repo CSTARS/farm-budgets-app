@@ -31,6 +31,8 @@
     </div>
 
     <div id="inputPanel">
+      <h5 class="page-header" style="text-align:center; margin-top: 0px" >{{operationName}}</h5>
+
       <div class="form-horizontal">
 
         <div class="form-group" id="dates">
@@ -41,11 +43,11 @@
             <div id="selectedDates">
 
 
-              <template is="dom-repeat" items="{{data}}">
+              <template is="dom-repeat" items="{{dates}}">
                 <div>
 
                   <div class="layout horizontal" style="margin-top:15px">
-                    <div class="flex"><h6 style="padding-right: 20px">{{item.date}}</h6></div>
+                    <div class="flex"><h6 style="padding-right: 20px">{{item.dateFormatted}}</h6></div>
 
                     <div class="length-label">Length:</div>
                     <div>
@@ -60,7 +62,7 @@
                       </select>
                     </div>
 
-                    <div class="flex">
+                    <div>
                       <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
                     </div>
                   </div> <!-- end inline form -->
@@ -72,6 +74,8 @@
           </div>
         </div>
       </div> <!-- end form -->
+
+      <div id="chart" style="height:100px"></div>
 
     </div> <!-- end input panel -->
   </template>
@@ -112,26 +116,43 @@
         }.bind(this))
 
       this.update();
+      $(window).on('resize', this.updateChart.bind(this));
     },
 
     attached : function() {
       this.popup = document.querySelector('budget-schedule-popup');
+      this.popup.on('hidden.bs.modal', function (e) {
+        this.editing = false;
+      }.bind(this));
+
       this.removeChild(this.$.inputPanel);
     },
 
-    set : function(data) {
+    set : function(data, name) {
       this.data = data;
+      this.operationName = name;
 
-      this.dates = [];
-      for( var i = 0; i < data.length; i++ ) {
-        this.dates.push({
-          length : data[i].length,
-          units : data[i].units,
-          date : new Date(data[i].date)
+      this.copyDataArray();
+
+      this.update(true);
+    },
+
+    // Polymer hack and keeping UI code out of data
+    copyDataArray : function() {
+      var tmp = [];
+
+      for( var i = 0; i < this.data.length; i++ ) {
+        var date = this.toDate(this.data[i].date);
+
+        tmp.push({
+          length : this.data[i].length,
+          units : this.data[i].units,
+          date : date,
+          dateFormatted : date.toDateString()
         })
       }
 
-      this.update(true);
+      this.dates = tmp;
     },
 
     update : function(noEvent) {
@@ -150,6 +171,7 @@
       }
 
       this.data = tmp;
+      this.copyDataArray();
 
       if( this.dates.length > 1 ) {
         this.dateRangeText = this.toDateString(this.dates[0]).date + ' <i class="fa fa-long-arrow-right"></i> ' +
@@ -162,6 +184,47 @@
       this.$.dateRangeText.innerHTML = this.dateRangeText;
 
       if( !noEvent ) this.fire('schedule-update', this.data);
+
+      this.updateChart();
+    },
+
+    updateChart : function() {
+      if( !this.editing ) return;
+
+      var container = this.$.chart;
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+      dataTable.addColumn({ type: 'string', id: 'Operation' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+
+      var arr = [];
+      this.dates.forEach(function(d){
+        var end = new Date(d.date.getTime()+this.getIntervalTime(d));
+        arr.push([this.operationName, d.date, end]);
+      }.bind(this));
+
+      dataTable.addRows(arr);
+      chart.draw(dataTable);
+    },
+
+    getIntervalTime : function(date) {
+      var l = parseInt(date.length);
+      if( date.units == 'year' ) {
+        return l * 86400000 * 365;
+      } else {
+        return l * 86400000 * 30;
+      }
+    },
+
+    toDate : function(dateStr) {
+      try {
+        var parts = dateStr.split('-');
+        return new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+      } catch(e) {
+        return new Date();
+      }
     },
 
     toDateString : function(d) {
@@ -182,8 +245,10 @@
     },
 
     toggle : function() {
+      this.editing = true;
       this.popup.setBody(this.$.inputPanel);
       this.popup.show();
+      setTimeout(this.updateChart.bind(this), 500);
     }
   });
 </script>
