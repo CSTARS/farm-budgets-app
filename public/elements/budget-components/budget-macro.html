@@ -224,8 +224,7 @@
       for( var i = 0; i < list.length; i++ ) {
         html += '<tr><td>' +
             '<i>'+list[i].path + '</i> '+
-            (list[i].type == 'complex' ? '<b>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
-            (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
+            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
 
               list[i].amount+' '+FB.units.getLabel(list[i].units, true)+' = $'+
               list[i].price.toFixed(2)+' </span>'
@@ -248,8 +247,8 @@
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
         html += '<tr><td>' +
-            list[i].count+'x <b>' + list[i].name + '</b></td><td> ' +
-            (list[i].type == 'complex' ? '<i class="fa fa-cubes"></i>' : '') +
+            list[i].count+'x ' +
+            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
             ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+FB.units.getLabel(list[i].units, true)+'</span>'
           '</td></tr>';
       }

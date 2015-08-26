@@ -12,6 +12,7 @@
     <div id="label" style="cursor:pointer" on-click="toggle"><b id="nameLabel"></b></div>
     <div id="error" class="text text-danger"></div>
     <div id="price" style="white-space: nowrap">
+      <div id="forLabel"></div>
       <span id="priceLabel"></span>
       <span id="unitLabel"></span>
       <a class="btn btn-link" id="edit"><i class="fa fa-edit"></i></a>
@@ -48,7 +49,13 @@
       if( !this.material ) return;
 
       this.$.edit.href = '#budget/materials/'+this.material;
-      this.$.nameLabel.innerHTML = this.material;
+      this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
+
+      if( this.material.indexOf('--') > -1 ) {
+        this.$.forLabel.innerHTML = '(for '+this.material.split('--')[0]+')';
+      } else {
+        this.$.forLabel.innerHTML = '';
+      }
 
       var m = FB.materialController.get(this.material);
       if( m.error ) return this.showError(m);

@@ -22,34 +22,37 @@
       this.initTable(Object.keys(this.data.materials).length);
 
       var c = 2;
+
       for( var material in this.data.materials ) {
         var m = FB.materialController.get(material);
-
-        var row = new FB.MaterialTableRow(
-          this.querySelector('tr:nth-child('+c+')'),
-          {
-            cols : this.cols,
-            material : m,
-            complexMaterial : this.data,
-            isOperation : this.options.isOperation,
-
-            onDelete : function(material) {
-              delete this.data.materials[material.name];
-            }.bind(this),
-
-            onAmountChange : function(material, amount) {
-              this.fire('price-change', this.data.price);
-            }.bind(this),
-
-            onUnitsChange : function(material, units) {
-              this.fire('price-change', this.data.price);
-            }.bind(this)
-          }
-        );
-
+        var row = this.initRow(c, m);
         this.controllers.push(row);
         c++;
       }
+    },
+
+    initRow : function(row, material) {
+      return new FB.MaterialTableRow(
+        this.querySelector('table[main] > tbody > tr:nth-child('+row+')'),
+        {
+          cols : this.cols,
+          material : material,
+          complexMaterial : this.data,
+          isOperation : this.options.isOperation,
+
+          onDelete : function(material) {
+            delete this.data.materials[material.name];
+          }.bind(this),
+
+          onAmountChange : function(material, amount) {
+            this.fire('price-change', this.data.price);
+          }.bind(this),
+
+          onUnitsChange : function(material, units) {
+            this.fire('price-change', this.data.price);
+          }.bind(this)
+        }
+      );
     },
 
     updateAmountFromUnits : function(from, to) {
@@ -59,7 +62,7 @@
     },
 
     initTable : function(rows) {
-      var table = '<table class="table">', cell;
+      var table = '<table class="table" main>', cell;
       if( !this.options ) this.options = {};
 
       this.cols = $.extend(true, [], this.defaultCols);
@@ -90,7 +93,12 @@
       cols[config.cols[i]] = $ele.find('[type="'+config.cols[i]+'"]');
     }
 
-    var nameLabel = $(config.material.type == 'complex' ? '<budget-macro></budget-macro>' : '<budget-material></budget-material>');
+    var nameLabel;
+    if( config.material.type == 'complex' ) {
+      nameLabel = $('<budget-macro></budget-macro>');
+    } else {
+      nameLabel = $('<budget-material></budget-material>');
+    }
     cols.Material.append(nameLabel);
 
     var errorLabel = $('<div style="display:none" class="text text-danger"></div>');

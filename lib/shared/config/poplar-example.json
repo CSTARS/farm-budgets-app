@@ -12,8 +12,48 @@
     },
     {
       "unit": "us$/h",
+      "price": 90,
+      "material": "Semi-Tractor trailer--Capitol Cost"
+    },
+    {
+      "unit": "us$/h",
+      "price": 90,
+      "material": "FR 6080 FH--Capitol Cost"
+    },
+    {
+      "unit": "us$/h",
+      "price": 90,
+      "material": "Tandem Axle Truck--Capitol Cost"
+    },
+    {
+      "unit": "us$/h",
+      "price": 15,
+      "material": "Cooler/van--Capitol Cost"
+    },
+    {
+      "unit": "us$/h",
       "price": 35,
       "material": "Challenger Tractor--Labor"
+    },
+    {
+      "unit": "us$/h",
+      "price": 35,
+      "material": "FR 6080 FH--Labor"
+    },
+    {
+      "unit": "us$/h",
+      "price": 35,
+      "material": "Tandem Axle Truck--Labor"
+    },
+    {
+      "unit": "us$/h",
+      "price": 35,
+      "material": "Semi-Tractor trailer--Labor"
+    },
+    {
+      "unit": "us$/h",
+      "price": 10,
+      "material": "Cooler/van--Labor"
     },
     {
       "unit": "us$/h",
@@ -166,9 +206,9 @@
           "material": "Laborer"
         }
       ],
-      "description": "'Manual Application of herbicide'",
+      "description": "Manual Application of herbicide",
       "class": "herbicide",
-      "unit": "[acr_us]",
+      "unit": "100.[acr_us]",
       "material": "herbicide - manual"
     },
     {
@@ -180,7 +220,7 @@
         }
       ],
       "class": "labor",
-      "unit": "[acr_us]",
+      "unit": "100.[acr_us]",
       "material": "hoeing"
     },
     {
@@ -204,11 +244,6 @@
           "unit": "h",
           "amount": 1,
           "material": "Large Tractor--Labor"
-        },
-        {
-          "unit": "h",
-          "amount": 1,
-          "material": "Large Tractor--Capitol Cost"
         }
       ],
       "class": "equipment",
@@ -231,11 +266,6 @@
           "unit": "[gal_us]",
           "amount": 3.96,
           "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h",
-          "amount": 1,
-          "material": "Mid-size Tractor--Capitol Cost"
         }
       ],
       "class": "equipment",
@@ -250,11 +280,6 @@
     },
     {
       "requires": [
-        {
-          "unit": "h",
-          "amount": 1,
-          "material": "Semi-Tractor trailer--Capitol Cost"
-        },
         {
           "unit": "h",
           "amount": 1,
@@ -291,11 +316,6 @@
           "unit": "h",
           "amount": 1,
           "material": "Small Tractor--Capitol Cost"
-        },
-        {
-          "unit": "h",
-          "amount": 1,
-          "material": "Small Tractor--Capitol Cost"
         }
       ],
       "class": "equipment",
@@ -304,11 +324,6 @@
     },
     {
       "requires": [
-        {
-          "unit": "h",
-          "amount": 1,
-          "material": "Support Truck--Capitol Cost"
-        },
         {
           "unit": "h",
           "amount": 1,
@@ -331,11 +346,6 @@
     },
     {
       "requires": [
-        {
-          "unit": "h",
-          "amount": 1,
-          "material": "Tandem Axle Truck--Capitol Cost"
-        },
         {
           "unit": "h",
           "amount": 1,
@@ -528,7 +538,7 @@
               "material": "Semi-Tractor trailer"
             },
             {
-              "unit": "each",
+              "unit": "1",
               "amount": 145000,
               "material": "Poplar Cutting"
             },
@@ -591,13 +601,13 @@
             },
             {
               "note": "5 times",
-              "unit": "[arc_us]",
+              "unit": "[acr_us]",
               "amount": 500,
               "material": "hoeing"
             },
             {
               "note": "3 times, 1/2 field",
-              "unit": "[arc_us]",
+              "unit": "[acr_us]",
               "amount": 150,
               "material": "herbicide - manual"
             },
