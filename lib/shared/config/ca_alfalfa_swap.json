@@ -1,0 +1,182 @@
+{
+  "prices": [
+    {
+      "unit": "us$/us$",
+      "price": 1,
+      "material": "custom"
+    },
+    {
+      "unit": "us$/us$",
+      "price": 1,
+      "material": "fertilizer"
+    },
+    {
+      "unit": "us$/[gal_us]",
+      "price": 2.68,
+      "material": "fuel"
+    },
+    {
+      "unit": "us$/([in_us].[acr_us])",
+      "price": 112.86,
+      "material": "irrigation"
+    },
+    {
+      "unit": "us$/h",
+      "price": 9.42,
+      "material": "Labor-machine"
+    },
+    {
+      "unit": "us$/h",
+      "price": 7.25,
+      "material": "Labor-manual"
+    },
+    {
+      "unit": "us$/us$",
+      "price": 1,
+      "material": "other"
+    },
+    {
+      "unit": "us$/us$",
+      "price": 1,
+      "material": "pesticides"
+    },
+    {
+      "unit": "us$/us$",
+      "price": 1,
+      "material": "repair&lube"
+    }
+  ],
+  "materials": [
+    {
+      "description": "'Manual Labor (minimum wage)'",
+      "class": "labor",
+      "unit": "h",
+      "material": "Labor-machine"
+    },
+    {
+      "description": "'Machine Labor (%130 of minimum)'",
+      "class": "labor",
+      "unit": "h",
+      "material": "Labor-manual"
+    },
+    {
+      "description": "'Dollar estimate of repairs'",
+      "class": "custom",
+      "unit": "us$",
+      "material": "repair&lube"
+    },
+    {
+      "description": "'Dollar estimate of pesticide use'",
+      "class": "custom",
+      "unit": "us$",
+      "material": "pesticides"
+    },
+    {
+      "description": "'Dollar estimate of fertilizer'",
+      "class": "custom",
+      "unit": "us$",
+      "material": "fertilizer"
+    },
+    {
+      "description": "'Dollar estimate of other costs'",
+      "class": "custom",
+      "unit": "us$",
+      "material": "other"
+    },
+    {
+      "description": "'Dollar estimate of consulting'",
+      "class": "custom",
+      "unit": "us$",
+      "material": "custom"
+    },
+    {
+      "description": "'Dollar fuel cost estimates'",
+      "class": "custom",
+      "unit": "us$",
+      "material": "fuel"
+    },
+    {
+      "description": "'Irrigation in AcIn per Ac'",
+      "class": "custom",
+      "unit": "[in_us].[acr_us]",
+      "material": "irrigation"
+    }
+  ],
+  "farm": [
+    {
+      "schedule": [
+        {
+          "operation": "Annual Estimate",
+          "duration": "1 year",
+          "start": "2015-01-01"
+        }
+      ],
+      "operations": [
+        {
+          "materials": [
+            {
+              "note": "",
+              "unit": "us$",
+              "amount": 32.75,
+              "material": "fertilizer"
+            },
+            {
+              "note": "",
+              "unit": "us$",
+              "amount": 97.09,
+              "material": "pesticides"
+            },
+            {
+              "note": "",
+              "unit": "us$",
+              "amount": 1,
+              "material": "repair&lube"
+            },
+            {
+              "note": "",
+              "unit": "us$",
+              "amount": 380.54,
+              "material": "custom"
+            },
+            {
+              "note": "",
+              "unit": "us$",
+              "amount": 133,
+              "material": "other"
+            },
+            {
+              "note": "",
+              "unit": "h",
+              "amount": 0.58,
+              "material": "Labor-machine"
+            },
+            {
+              "note": "",
+              "unit": "h",
+              "amount": 1.82,
+              "material": "Labor-manual"
+            },
+            {
+              "note": "",
+              "unit": "[in_us].[acr_us]",
+              "amount": 4.5,
+              "material": "irrigation"
+            },
+            {
+              "note": "",
+              "unit": "[gal_us]",
+              "amount": 1.15,
+              "material": "fuel"
+            }
+          ],
+          "operation": "Annual Estimate"
+        }
+      ],
+      "unit": "[acr_us]",
+      "size": "1",
+      "commodity": "ALFALFA",
+      "location": "06",
+      "farm": "06/ALFALFA"
+    }
+  ]
+}
