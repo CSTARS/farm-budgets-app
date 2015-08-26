@@ -178,8 +178,8 @@
       this.copyDataArray();
 
       if( this.dates.length > 1 ) {
-        this.dateRangeText = this.toDateString(this.dates[0]).date + ' <i class="fa fa-long-arrow-right"></i> ' +
-                            this.toDateString(this.dates[this.dates.length-1]).date;
+        this.dateRangeText = this.dates[0].date.toDateString() + ' <i class="fa fa-long-arrow-right"></i> ' +
+                            this.dates[this.dates.length-1].date.toDateString();
       } else if( this.dates.length == 1 ) {
         this.dateRangeText = this.toDateString(this.dates[0]).date;
       } else {

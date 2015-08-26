@@ -11,9 +11,15 @@
 
   <template>
     <ul class="nav nav-pills nav-justified" id="tabs">
-      <li role="presentation" class="active" id="btn-overview"><a href="#budget/overview">Overview</a></li>
-      <li role="presentation" id="btn-operations"><a href="#budget/operations">Operations</a></li>
-      <li role="presentation" id="btn-materials"><a href="#budget/materials">Materials</a></li>
+      <li role="presentation" class="active" id="btn-overview">
+        <a href="#budget/overview"><i class="fa fa-dashboard"></i> Overview</a>
+      </li>
+      <li role="presentation" id="btn-operations">
+        <a href="#budget/operations"><i class="fa fa-cogs"></i> Operations</a>
+      </li>
+      <li role="presentation" id="btn-materials">
+        <a href="#budget/materials"><i class="fa fa-cube"></i> Materials</a>
+      </li>
     </ul>
 
     <budget-section-overview id="overview" class="section"></budget-section-overview>
