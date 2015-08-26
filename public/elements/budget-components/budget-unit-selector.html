@@ -94,6 +94,13 @@
         this.$.icon.style.display = 'inline';
 
         this.$.message.innerHTML = '<div class="text text-danger">Invalid Units</div>'+this.getReminders();
+
+        $(this.$.message)
+          .find('a')
+          .on('click', function(e){
+            this.$.input.value = e.currentTarget.innerHTML;
+            this.onChange();
+          }.bind(this));
         return;
       }
       this.clearError();
@@ -117,11 +124,14 @@
     },
 
     onBlur : function() {
-      this.$.message.style.display = 'none';
+      setTimeout(function(){
+        this.$.message.style.display = 'none';
+        if( this.block ) return;
+        this.style.width = '100px';
+        this.$.input.style.width = '100px';
+      }.bind(this), 100);
 
-      if( this.block ) return;
-      this.style.width = '100px';
-      this.$.input.style.width = '100px';
+
     },
 
     getReminders : function() {
@@ -135,14 +145,15 @@
         var re = new RegExp('.*'+parts[i].trim()+'.*','i');
 
         for( var key in FB.units.lookup ) {
-          if( key.match(re) && used.indexOf(key) == -1 ) {
+          if( key.match(re) && used.indexOf(key) == -1 && used.indexOf(FB.units.lookup[key].symbol) == -1 ) {
             if( FB.units.lookup[key].symbol != key ) {
-              reminders.push('<b>'+key+'</b> = '+FB.units.lookup[key].symbol);
+              reminders.push('<b>'+key+'</b> = <a style="cursor:pointer">'+FB.units.lookup[key].symbol+'</a>');
             } else {
-              reminders.push(FB.units.lookup[key].symbol);
+              reminders.push('<a style="cursor:pointer">'+FB.units.lookup[key].symbol+'</a>');
             }
 
             used.push(key);
+            used.push(FB.units.lookup[key].symbol);
           }
         }
       }

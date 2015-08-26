@@ -51,11 +51,11 @@
 
                     <div class="length-label">Length:</div>
                     <div>
-                      <input type="number" value="{{item.length}}" class="form-control" style="max-width: 75px; margin-right: 5px" />
+                      <input type="number" value="{{item.length::input}}" class="form-control" on-input="onLengthUpdate" style="max-width: 75px; margin-right: 5px" />
                     </div>
 
                     <div>
-                      <select value="{{item.units}}" class="form-control">
+                      <select value="{{item.units::input}}" class="form-control" on-change="onLengthUpdate">
                         <option value="day">Day(s)</option>
                         <option value="month">Month(s)</option>
                         <option value="year">Year(s)</option>
@@ -153,6 +153,10 @@
       }
 
       this.dates = tmp;
+    },
+
+    onLengthUpdate : function() {
+      this.update();
     },
 
     update : function(noEvent) {

@@ -57,8 +57,6 @@
     onShow : function(params) {
       if( params.length > 0 ) {
         this.$.filterInput.value = params[0];
-      } else {
-        this.$.filterInput.value = '';
       }
 
       this._filter();

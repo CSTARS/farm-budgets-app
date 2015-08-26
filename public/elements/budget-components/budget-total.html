@@ -37,6 +37,8 @@
 
       if( this.data.range.start !== null && this.data.range.stop !== null ) {
         var diff =  this.data.range.stop.getTime() - this.data.range.start.getTime();
+        if( diff < 86400000 * 30 ) diff = 86400000 * 30;
+
         var days = diff / 86400000;
         var months = Math.ceil(days / 30);
         this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
