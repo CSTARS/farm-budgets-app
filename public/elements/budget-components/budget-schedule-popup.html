@@ -40,6 +40,10 @@
 
     setBody : function(ele) {
       this.body.html('').append(ele);
+    },
+
+    on : function(e, fn) {
+      this.popup.on(e, fn);
     }
   })
 </script>

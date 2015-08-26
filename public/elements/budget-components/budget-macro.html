@@ -1,7 +1,3 @@
-<!--
-  TODO: need to integrate https://github.com/jmandel/ucum.js
--->
-<link rel="import" href="budget-macro-edit-material.html" />
 
 <dom-module id="budget-macro">
   <style>
@@ -381,13 +377,14 @@
       var oldUnits = this.data.units;
       var newUnits = e.detail.value;
 
-      var items = this.$.edit.querySelectorAll('budget-macro-edit-material');
+      this.$.materialTable.updateAmountFromUnits(oldUnits, newUnits);
+      // var items = this.$.edit.querySelectorAll('budget-macro-edit-material');
 
-      for( var i = 0; i < items.length; i++ ) {
-        //if( units[1] != newUnits ) {
-          items[i].updateAmountFromUnits(newUnits);
-        //}
-      }
+      //for( var i = 0; i < items.length; i++ ) {
+      //  if( units[1] != newUnits ) {
+      //    items[i].updateAmountFromUnits(newUnits);
+      //  }
+      //}
 
       this.data.units = newUnits;
 

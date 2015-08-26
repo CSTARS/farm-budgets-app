@@ -23,6 +23,8 @@
     ready : function() {
       this.popup = $(this.$.popup).modal({show: false});
       this.body = $(this.$.body);
+
+      $(window).on('hashchange', this.hide.bind(this));
     },
 
     show : function(closeCallback) {

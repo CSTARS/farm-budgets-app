@@ -125,12 +125,25 @@
     },
 
     getReminders : function() {
-      var parts = this.$.input.value.replace(/[\]\[\.\/]/g, ' ').replace(/\s+/g,' ').trim().toLowerCase().split(' ');
+      var parts = this.$.input.value.replace(/[\]\[\.\/]/g, ' ').replace(/\s+/g,' ').split(' ');
 
       var reminders = [];
+      var used = [];
+
       for( var i = 0; i < parts.length; i++ ) {
-        if( FB.units.lookup[parts[i]] && FB.units.lookup[parts[i]].symbol != parts[i]) {
-          reminders.push('<b>'+parts[i]+'</b> = '+FB.units.lookup[parts[i]].symbol);
+        if( parts[i] == '' ) continue;
+        var re = new RegExp('.*'+parts[i].trim()+'.*','i');
+
+        for( var key in FB.units.lookup ) {
+          if( key.match(re) && used.indexOf(key) == -1 ) {
+            if( FB.units.lookup[key].symbol != key ) {
+              reminders.push('<b>'+key+'</b> = '+FB.units.lookup[key].symbol);
+            } else {
+              reminders.push(FB.units.lookup[key].symbol);
+            }
+
+            used.push(key);
+          }
         }
       }
 

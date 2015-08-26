@@ -17,6 +17,12 @@
             <label for="filterInput" class="col-sm-2 control-label">Filter</label>
             <div class="col-sm-10">
               <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="thisBudgetInput" checked on-click="_filter"> Only materials used in this budget.
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -41,8 +47,6 @@
       this.data = data;
 
       this.data.materials.forEach(function(material){
-        if( material.type == 'complex' ) return;
-
         var div = this.createTable(material);
         this.$.root.appendChild(div);
       }.bind(this));
@@ -72,7 +76,7 @@
       var txt = this.$.filterInput.value;
 
       var matched = [], showAll = false;
-      if( txt == '' ) {
+      if( txt == '' && !$(this.$.thisBudgetInput).is(':checked') ) {
         showAll = true;
       } else {
         matched = this.toNameArray(FB.materialController.find(txt));
@@ -89,11 +93,23 @@
       };
     },
 
-    toNameArray : function(ops) {
-      var arr = [];
-      ops.forEach(function(op){
-        if( op.type == 'complex' ) return;
-        arr.push(op.name);
+    toNameArray : function(materials) {
+      var arr = [], include;
+      var thisBudget = $(this.$.thisBudgetInput).is(':checked');
+
+      if( thisBudget ) {
+        include = FB.utils.getActiveMaterials();
+      }
+
+      materials.forEach(function(material){
+        if( thisBudget ) {
+          if( include.indexOf(material.name) > -1 ) {
+            arr.push(material.name);
+          }
+        } else {
+          arr.push(material.name);
+        }
+
       });
       return arr;
     },
@@ -101,13 +117,16 @@
     createTable : function(material) {
       var html =
         '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
-          '<h5 class="material-name">'+material.name+'</h5>'+
+          '<h5 class="material-name">'+(material.type == 'complex' ? '<i class="fa fa-cubes"></i> ' : '')+material.name+'</h5>'+
           '<div>'+(material.description || '')+'</div>'+
           '<table class="table">' +
             '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
             '<tr>' +
-              '<td class="material-class">'+material.class+'</td>' +
-              '<td><input type="number" class="form-control material-price" value="'+(material.price || '')+'" /></td>' +
+              '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class)+'</td>' +
+              (material.type == 'complex' ?
+                '<td class="material-price">'+(material.price || '')+'</td>' :
+                '<td><input type="number" class="form-control material-price" value="'+(material.price || '')+'" /></td>'
+              ) +
               '<td><budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector></td>' +
             '</tr>' +
           '</table>' +
@@ -138,7 +157,7 @@
       console.log('updating');
       var item = {
         name : ele.find('.material-name').html(),
-        price : parseInt(ele.find('.material-price').val()),
+        price : parseFloat(ele.find('.material-price').val()),
         'class' : ele.find('.material-class').html(),
         units : ele.find('budget-unit-selector')[0].getUnits()
       };

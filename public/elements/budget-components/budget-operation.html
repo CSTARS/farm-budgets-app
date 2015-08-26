@@ -83,22 +83,13 @@
       if( !this.operation ) return;
 
       this.operation.schedule = e.detail;
-
-      // on init this event will fire, but we don't
-      // need to recalc budgets
-      //if( this.firstScheduleEvent ) {
-      //  this.firstScheduleEvent = false;
-      //} else {
-        FB.operationController.recalc();
-      //}
-
-
+      FB.operationController.recalc();
       this.updateTotals();
     },
 
     update : function() {
       this.operation = FB.operationController.get(this.operationid);
-      this.$.schedule.set(this.operation.schedule);
+      this.$.schedule.set(this.operation.schedule, this.operation.name);
       this.render();
     },
 
@@ -124,7 +115,7 @@
 
       if( !this.operation.materials ) return;
 
-      this.$.materialTable.setMaterials(this.operation, {});
+      this.$.materialTable.setMaterials(this.operation, {isOperation : true});
       this.updateTotals();
       this.checkError();
     },
