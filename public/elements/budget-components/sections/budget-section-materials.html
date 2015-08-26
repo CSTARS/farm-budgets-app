@@ -157,7 +157,7 @@
       console.log('updating');
       var item = {
         name : ele.find('.material-name').html(),
-        price : parseInt(ele.find('.material-price').val()),
+        price : parseFloat(ele.find('.material-price').val()),
         'class' : ele.find('.material-class').html(),
         units : ele.find('budget-unit-selector')[0].getUnits()
       };

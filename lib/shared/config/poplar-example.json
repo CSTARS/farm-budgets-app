@@ -1394,7 +1394,7 @@
     {
       "class": "labor",
       "unit": "h",
-      "material": "Driver [Semi-tractor trailer]"
+      "material": "Labor--Semi-tractor trailer"
     },
     {
       "class": "labor",
@@ -1424,13 +1424,13 @@
     {
       "requires": [
         {
-          "unit": "h/(100.[acr_us])",
+          "unit": "h",
           "amount": 192,
           "material": "Laborer"
         }
       ],
       "class": "labor",
-      "unit": "[acr_us]",
+      "unit": "100.[acr_us]",
       "material": "hoeing"
     },
     {
