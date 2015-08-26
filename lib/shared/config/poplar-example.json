@@ -1,14 +1,19 @@
 {
   "prices": [
     {
-      "unit": "us$/h",
-      "price": 50,
-      "material": "3-Wheel Ag Sprayer"
+      "unit": "us$/[qt_us]",
+      "price": 5,
+      "material": "2,4-D"
     },
     {
       "unit": "us$/h",
       "price": 90,
-      "material": "Challenger tractor"
+      "material": "Challenger Tractor--Capitol Cost"
+    },
+    {
+      "unit": "us$/h",
+      "price": 35,
+      "material": "Challenger Tractor--Labor"
     },
     {
       "unit": "us$/h",
@@ -16,134 +21,14 @@
       "material": "Cooler/van"
     },
     {
-      "unit": "us$/h",
-      "price": 155,
-      "material": "Eliminator"
-    },
-    {
-      "unit": "us$/h",
-      "price": 180,
-      "material": "FR 6080 FH"
-    },
-    {
-      "unit": "us$/h",
-      "price": 70,
-      "material": "Large tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 45,
-      "material": "Mid-size tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 55,
-      "material": "Semi-tractor trailer"
-    },
-    {
-      "unit": "us$/h",
-      "price": 30,
-      "material": "Small tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 25,
-      "material": "Support Truck"
-    },
-    {
-      "unit": "us$/h",
-      "price": 25,
-      "material": "Tandem axle truck"
-    },
-    {
-      "unit": "us$/h",
-      "price": 50,
-      "material": "Tractor and sprayer"
-    },
-    {
-      "unit": "us$/h",
-      "price": 30,
-      "material": "3-Wheel ag sprayer"
-    },
-    {
-      "unit": "us$/h",
-      "price": 35,
-      "material": "Challenger tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 0.71,
-      "material": "Cooler/van"
-    },
-    {
-      "unit": "us$/h",
-      "price": 30,
-      "material": "FR 6080 FH"
-    },
-    {
-      "unit": "us$/h",
-      "price": 17,
-      "material": "Laborer"
-    },
-    {
-      "unit": "us$/h",
-      "price": 35,
-      "material": "Labor--Large tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 22,
-      "material": "Labor--Mid-size tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 28,
-      "material": "Labor--Semi-tractor trailer"
-    },
-    {
-      "unit": "us$/h",
-      "price": 22,
-      "material": "Labor--Small tractor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 26,
-      "material": "Labor--Supervisor"
-    },
-    {
-      "unit": "us$/h",
-      "price": 30,
-      "material": "Labor--Support Truck"
-    },
-    {
-      "unit": "us$/h",
-      "price": 26,
-      "material": "Labor--Tandem axle truck"
-    },
-    {
-      "unit": "us$/h",
-      "price": 30,
-      "material": "Labor--Tractor and Sprayer"
-    },
-    {
       "unit": "us$/[gal_us]",
       "price": 2.81,
       "material": "Equipment Fuel"
     },
     {
-      "unit": "us$/[qt_us]",
-      "price": 5,
-      "material": "2,4-D"
-    },
-    {
-      "unit": "us$/[qt_us]",
-      "price": 210,
-      "material": "Coragen"
-    },
-    {
-      "unit": "us$/[qt_us]",
+      "unit": "us$/h",
       "price": 30,
-      "material": "Fusilade"
+      "material": "FR 6080 FH"
     },
     {
       "unit": "us$/[qt_us]",
@@ -156,34 +41,9 @@
       "material": "Goal 2XL"
     },
     {
-      "unit": "us$/[qt_us]",
-      "price": 56,
-      "material": "Imidacloprid"
-    },
-    {
-      "unit": "us$/[lb_av]",
-      "price": 64,
-      "material": "Oust"
-    },
-    {
-      "unit": "us$/[lb_av]",
-      "price": 1.85,
-      "material": "Rozol"
-    },
-    {
-      "unit": "us$/[lb_av]",
-      "price": 130,
-      "material": "Sureguard"
-    },
-    {
-      "unit": "us$/[gal_us]",
-      "price": 215,
-      "material": "Transline"
-    },
-    {
-      "unit": "us$/[qt_us]",
-      "price": 7.5,
-      "material": "Trifluralin"
+      "unit": "us$/h",
+      "price": 17,
+      "material": "Laborer"
     },
     {
       "unit": "us$/1",
@@ -191,1012 +51,70 @@
       "material": "Poplar Cutting"
     },
     {
-      "unit": "us$/[acr_us].[in_us]",
-      "price": 6,
-      "material": "Irrigation Cost"
+      "unit": "us$/h",
+      "price": 25,
+      "material": "Support Truck--Capitol Cost"
+    },
+    {
+      "unit": "us$/h",
+      "price": 30,
+      "material": "Support Truck--Labor"
+    },
+    {
+      "unit": "us$/h",
+      "price": 50,
+      "material": "Tractor and sprayer"
+    },
+    {
+      "unit": "us$/[qt_us]",
+      "price": 7.5,
+      "material": "Trifluralin"
     }
   ],
   "materials": [
     {
       "class": "fertilizer",
-      "material": "0-0-60"
-    },
-    {
-      "class": "fertilizer",
-      "material": "10-34-00"
-    },
-    {
-      "class": "fertilizer",
-      "material": "11-52-0"
-    },
-    {
-      "class": "fertilizer",
-      "material": "13-0-45"
-    },
-    {
-      "class": "fertilizer",
-      "material": "16-16-16"
-    },
-    {
-      "class": "fertilizer",
-      "material": "16-20-0-14"
-    },
-    {
-      "class": "fertilizer",
-      "material": "18-0-5-4"
-    },
-    {
-      "class": "fertilizer",
+      "unit": "[qt_us]",
       "material": "2,4-D"
     },
     {
-      "class": "fertilizer",
-      "material": "32-0-0"
-    },
-    {
-      "class": "fertilizer",
-      "material": "33-0-0-12"
-    },
-    {
-      "class": "fertilizer",
-      "material": "40-0-0-6"
-    },
-    {
-      "class": "fertilizer",
-      "material": "46-0-0"
-    },
-    {
-      "class": "fertilizer",
-      "material": "80-0-0"
-    },
-    {
-      "class": "fertilizer",
-      "material": "80-00-00"
-    },
-    {
-      "class": "pesticide",
-      "material": "Achieve SC"
-    },
-    {
-      "class": "pesticide",
-      "material": "Admire"
-    },
-    {
-      "class": "pesticide",
-      "material": "Admire Pro"
-    },
-    {
-      "class": "pesticide",
-      "material": "Air Application"
-    },
-    {
-      "class": "pesticide",
-      "material": "Alcala"
-    },
-    {
-      "class": "pesticide",
-      "material": "Ammonium Sulfate"
-    },
-    {
-      "class": "pesticide",
-      "material": "AMS"
-    },
-    {
-      "class": "pesticide",
-      "material": "Apogee"
-    },
-    {
-      "class": "pesticide",
-      "material": "Assail 70WP"
-    },
-    {
-      "class": "pesticide",
-      "material": "Assesment"
-    },
-    {
-      "class": "pesticide",
-      "material": "Assure II"
-    },
-    {
-      "class": "pesticide",
-      "material": "Axiom LB"
-    },
-    {
-      "class": "pesticide",
-      "material": "Axiom OZ"
-    },
-    {
-      "class": "pesticide",
-      "material": "Bale"
-    },
-    {
-      "class": "pesticide",
-      "material": "Baling"
-    },
-    {
-      "class": "pesticide",
-      "material": "Banvel"
-    },
-    {
-      "class": "seed",
-      "material": "Barley Seed"
-    },
-    {
-      "class": "pesticide",
-      "material": "Bee Hives"
-    },
-    {
-      "class": "pesticide",
-      "material": "Bravo"
-    },
-    {
-      "class": "pesticide",
-      "material": "Broadcast Fertilizer"
-    },
-    {
-      "class": "pesticide",
-      "material": "Brox M"
-    },
-    {
-      "class": "seed",
-      "material": "Canola Seed"
-    },
-    {
-      "class": "processing",
-      "material": "Capture"
-    },
-    {
-      "class": "pesticide",
-      "material": "Carbine 50WG"
-    },
-    {
-      "class": "pesticide",
-      "material": "Clarity"
-    },
-    {
-      "class": "processing",
-      "material": "Clean Seed Orchdgr"
-    },
-    {
-      "class": "labor",
-      "material": "Combine"
-    },
-    {
-      "class": "labor",
-      "material": "Combine Wheat"
-    },
-    {
-      "class": "processing",
-      "material": "Commision Assess"
-    },
-    {
-      "class": "processing",
-      "material": "Commission Assess"
-    },
-    {
-      "class": "processing",
-      "material": "Consultant"
-    },
-    {
-      "class": "labor",
-      "material": "Cool and Pack"
-    },
-    {
-      "class": "seed",
-      "material": "Corn Seed"
-    },
-    {
-      "class": "processing",
-      "material": "Cotton Assesment"
-    },
-    {
-      "class": "pesticide",
-      "material": "Counter 15G L-N-L"
-    },
-    {
-      "class": "insurance",
-      "material": "Crop Insurance"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Aerial Spray"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Air Spray"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Air Spray - 5G"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Combining"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Fertilize"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Fumigate - Deep"
-    },
-    {
-      "class": "processing",
-      "material": "Custom Sidedress"
-    },
-    {
-      "class": "processing",
-      "material": "Cut/Windrow"
-    },
-    {
-      "class": "pesticide",
-      "material": "Dacthal"
-    },
-    {
-      "class": "pesticide",
-      "material": "Defol 5"
-    },
-    {
-      "class": "pesticide",
-      "material": "Devrinol 50DF"
-    },
-    {
-      "class": "pesticide",
-      "material": "Dimethoate"
-    },
-    {
-      "class": "pesticide",
-      "material": "Diomethate"
-    },
-    {
-      "class": "pesticide",
-      "material": "Discover"
-    },
-    {
-      "class": "pesticide",
-      "material": "Disyston"
-    },
-    {
-      "class": "pesticide",
-      "material": "Di-Syston"
-    },
-    {
-      "class": "pesticide",
-      "material": "Dithane F45 Rainshield"
-    },
-    {
-      "class": "pesticide",
-      "material": "Diuron"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Dry Nitrogen"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Dry Nitrogen - Preplant"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Dry P2O5"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Dry Phosphate"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Dry Potash"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Dry Sulfur"
-    },
-    {
-      "class": "pesticide",
-      "material": "Endura (2x)"
-    },
-    {
-      "class": "pesticide",
-      "material": "Eptam 7EC"
-    },
-    {
-      "description": "Cost Estimate",
-      "class": "any",
-      "material": "estimate"
-    },
-    {
-      "class": "pesticide",
-      "material": "Excel 90"
-    },
-    {
-      "class": "pesticide",
-      "material": "Far-GO"
-    },
-    {
-      "class": "processing",
-      "material": "Fees Assesment"
-    },
-    {
-      "class": "pesticide",
-      "material": "Finish 6 Pro"
-    },
-    {
-      "class": "material",
-      "material": "Fuel"
-    },
-    {
-      "class": "material",
-      "material": "Fuel - Diesel"
-    },
-    {
-      "class": "material",
-      "material": "Fuel - Gas"
-    },
-    {
-      "class": "processing",
-      "material": "Fumigation"
-    },
-    {
-      "class": "pesticide",
-      "material": "Gen 25WG"
-    },
-    {
-      "class": "pesticide",
-      "material": "Ginstar"
-    },
-    {
-      "class": "pesticide",
-      "material": "Glyphosate GAL1"
-    },
-    {
-      "class": "pesticide",
-      "material": "Goal"
-    },
-    {
-      "class": "pesticide",
-      "material": "Goal Tender"
-    },
-    {
-      "class": "labor",
-      "material": "Gopher Control"
-    },
-    {
-      "class": "processing",
-      "material": "Ground Application"
-    },
-    {
-      "class": "pesticide",
-      "material": "Harmony Extra"
-    },
-    {
-      "class": "processing",
-      "material": "Harvest"
-    },
-    {
-      "class": "processing",
-      "material": "Harvest Combine Grain"
-    },
-    {
-      "class": "processing",
-      "material": "Harvest for Grain"
-    },
-    {
-      "class": "processing",
-      "material": "Harvest: Haul Grain"
-    },
-    {
-      "class": "processing",
-      "material": "Haul and Stack"
-    },
-    {
-      "class": "processing",
-      "material": "Haul Local"
-    },
-    {
-      "class": "pesticide",
-      "material": "Headline"
-    },
-    {
-      "class": "processing",
-      "material": "Injection-Sidedress"
-    },
-    {
-      "class": "processing",
-      "material": "Injection-Sidedress NH3"
-    },
-    {
-      "class": "processing",
-      "material": "Insecticide"
-    },
-    {
-      "class": "water",
-      "material": "Irrigation"
-    },
-    {
-      "class": "fertilizer",
-      "material": "K20"
-    },
-    {
-      "class": "fertilizer",
-      "material": "K2O"
-    },
-    {
-      "class": "pesticide",
-      "material": "Karmex"
-    },
-    {
-      "class": "pesticide",
-      "material": "Karmex DF"
-    },
-    {
-      "class": "pesticide",
-      "material": "Kerb"
-    },
-    {
-      "class": "labor",
-      "material": "Labor (Irrigation)"
-    },
-    {
-      "class": "labor",
-      "material": "Labor (Machine)"
-    },
-    {
-      "class": "labor",
-      "material": "Labor (non-machine)"
-    },
-    {
-      "class": "labor",
-      "material": "Labor (other)"
-    },
-    {
-      "description": "Irrigated Land Rent",
-      "class": "rent",
-      "material": "land-rent-irrigated"
-    },
-    {
-      "description": "Non irrigated Land Rent",
-      "class": "rent",
-      "material": "land-rent-nonirrigated"
-    },
-    {
-      "description": "Pasture irrigated Land Rent",
-      "class": "rent",
-      "material": "land-rent-pasture"
-    },
-    {
-      "class": "pesticide",
-      "material": "Lannate 90 SP"
-    },
-    {
-      "class": "seed",
-      "material": "Lentil Seed"
-    },
-    {
-      "class": "pesticide",
-      "material": "Leverage"
-    },
-    {
-      "class": "pesticide",
-      "material": "Leverage 2.7"
-    },
-    {
-      "class": "pesticide",
-      "material": "LI 700"
-    },
-    {
-      "class": "material",
-      "material": "Lime"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Liquid Nitrogen"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Liquid P2O5"
-    },
-    {
-      "class": "pesticide",
-      "material": "Lorsban 15G"
-    },
-    {
-      "class": "pesticide",
-      "material": "Lorsban 4E"
-    },
-    {
-      "class": "material",
-      "material": "Lube"
-    },
-    {
-      "class": "material",
-      "material": "Lubricants"
-    },
-    {
-      "class": "pesticide",
-      "material": "M90"
-    },
-    {
-      "class": "labor",
-      "material": "Maintenance"
-    },
-    {
-      "class": "labor",
-      "material": "Maintenance and Repair"
-    },
-    {
-      "class": "pesticide",
-      "material": "Malathion"
-    },
-    {
-      "class": "processing",
-      "material": "Management"
-    },
-    {
-      "class": "pesticide",
-      "material": "Maverick"
-    },
-    {
-      "class": "pesticide",
-      "material": "MCPA Amine"
-    },
-    {
-      "class": "pesticide",
-      "material": "Mepex Gin Our"
-    },
-    {
-      "class": "pesticide",
-      "material": "Metam Sodium"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Micronutrients"
-    },
-    {
-      "class": "pesticide",
-      "material": "Micro-Tech"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Mulch"
-    },
-    {
-      "class": "pesticide",
-      "material": "Mustang 1.5 EW"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Nitrogen"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Nitrogen (dry)"
-    },
-    {
-      "class": "pesticide",
-      "material": "Oberon 25C"
-    },
-    {
-      "description": "[45-2091 Agricultural Equipment Operators](http://www.bls.gov/oes/current/oes452091.htm)",
-      "class": "labor",
-      "material": "oes452091"
-    },
-    {
-      "description": "[45-2092 Farmworkers and Laborers, Crop, Nursery, and Greenhouse](http://www.bls.gov/oes/current/oes452092.htm)",
-      "class": "labor",
-      "material": "oes452092"
-    },
-    {
-      "description": "[53-3032 Heavy and Tractor-Trailer Truck Drivers](http://www.bls.gov/oes/current/oes533032.htm)",
-      "class": "labor",
-      "material": "oes533032"
-    },
-    {
-      "class": "pesticide",
-      "material": "Orthene"
-    },
-    {
-      "class": "pesticide",
-      "material": "Osprey"
-    },
-    {
-      "class": "pesticide",
-      "material": "Outlook 6EC"
-    },
-    {
-      "class": "material",
-      "material": "Packing"
-    },
-    {
-      "class": "processing",
-      "material": "Pest Control Consultant"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Phosphorous"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Phosphorous (dry)"
-    },
-    {
-      "class": "labor",
-      "material": "Pick Berries"
-    },
-    {
-      "class": "labor",
-      "material": "Plant"
-    },
-    {
-      "class": "labor",
-      "material": "Planting"
-    },
-    {
-      "class": "processing",
-      "material": "Poncho Beta Seed Treatment"
-    },
-    {
-      "class": "labor",
-      "material": "Postharvest and packaging"
-    },
-    {
-      "class": "seed",
-      "material": "Potato Seed"
-    },
-    {
-      "class": "pesticide",
-      "material": "Pristine"
-    },
-    {
-      "class": "pesticide",
-      "material": "Prowl"
-    },
-    {
-      "class": "pesticide",
-      "material": "Prowl 3.3EC"
-    },
-    {
-      "class": "pesticide",
-      "material": "Prowl H20"
-    },
-    {
-      "class": "pesticide",
-      "material": "Puma 1EC"
-    },
-    {
-      "class": "material",
-      "material": "Purity and Germ"
-    },
-    {
-      "class": "pesticide",
-      "material": "Pursuit"
-    },
-    {
-      "class": "pesticide",
-      "material": "Quadris"
-    },
-    {
-      "class": "pesticide",
-      "material": "Quilt"
-    },
-    {
-      "class": "material",
-      "material": "Rake"
-    },
-    {
-      "class": "pesticide",
-      "material": "Rally 40 WSP"
-    },
-    {
-      "class": "pesticide",
-      "material": "Reglone"
-    },
-    {
-      "class": "processing",
-      "material": "Rental Fertilizer Applicator"
-    },
-    {
-      "class": "processing",
-      "material": "Rental Ripper Shooter"
-    },
-    {
-      "class": "processing",
-      "material": "Rental Sprayer"
-    },
-    {
-      "class": "processing",
-      "material": "Repair"
-    },
-    {
-      "class": "pesticide",
-      "material": "Ridomil Gold EC"
-    },
-    {
-      "class": "processing",
-      "material": "Riper Shooter"
-    },
-    {
-      "class": "processing",
-      "material": "Roadside Bales"
-    },
-    {
-      "class": "processing",
-      "material": "Roadside Hay"
-    },
-    {
-      "class": "labor",
-      "material": "Rodent Control"
-    },
-    {
-      "class": "pesticide",
-      "material": "Roundup"
-    },
-    {
-      "class": "pesticide",
-      "material": "Roundup Original Max"
-    },
-    {
-      "class": "pesticide",
-      "material": "Roundup Ultra Max"
-    },
-    {
-      "class": "material",
-      "material": "Sawdust"
-    },
-    {
-      "class": "processing",
-      "material": "Seed Clean and Bag"
-    },
-    {
-      "class": "processing",
-      "material": "Seed Cleand and Bag"
-    },
-    {
-      "class": "processing",
-      "material": "Seed Test"
-    },
-    {
-      "class": "pesticide",
-      "material": "Select Max"
-    },
-    {
-      "class": "pesticide",
-      "material": "Sencor"
-    },
-    {
-      "class": "pesticide",
-      "material": "Sencor 4L"
-    },
-    {
-      "class": "pesticide",
-      "material": "Sencor 75DF"
-    },
-    {
-      "class": "pesticide",
-      "material": "Sevin XLR Plus"
-    },
-    {
-      "class": "pesticide",
-      "material": "Shark EW"
-    },
-    {
-      "class": "pesticide",
-      "material": "Slug Bait"
-    },
-    {
-      "class": "pesticide",
-      "material": "Sonalan HFP"
-    },
-    {
-      "class": "seed",
-      "material": "Sorghum Seed"
-    },
-    {
-      "class": "pesticide",
-      "material": "Spot Spray Roundup"
-    },
-    {
-      "class": "labor",
-      "material": "Sprayer"
-    },
-    {
-      "class": "pesticide",
-      "material": "Staple"
-    },
-    {
-      "class": "pesticide",
-      "material": "Starane+Salvo"
-    },
-    {
-      "class": "pesticide",
-      "material": "Starane+Sword"
-    },
-    {
-      "class": "processing",
-      "material": "Storage Operating Costs"
-    },
-    {
-      "class": "processing",
-      "material": "Storage Repairs"
-    },
-    {
-      "class": "pesticide",
-      "material": "Stratego"
-    },
-    {
-      "class": "labor",
-      "material": "Stuble Shredder"
-    },
-    {
-      "class": "pesticide",
-      "material": "Success"
-    },
-    {
-      "class": "processing",
-      "material": "Sugarbeet"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Sulfur"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Sulfur (dry)"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Sulfuric Acid"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Surfactant-Induce"
-    },
-    {
-      "class": "pesticide",
-      "material": "Surflan AS"
-    },
-    {
-      "class": "seed",
-      "material": "Susan Seed"
-    },
-    {
-      "class": "processing",
-      "material": "Swath"
-    },
-    {
-      "class": "processing",
-      "material": "Swathing"
-    },
-    {
-      "class": "labor",
-      "material": "Swath Rake"
-    },
-    {
-      "class": "pesticide",
-      "material": "Synapse WG"
-    },
-    {
-      "class": "processing",
-      "material": "Tarping"
-    },
-    {
-      "class": "pesticide",
-      "material": "Telone II"
-    },
-    {
-      "class": "processing",
-      "material": "Tissue Analysis"
-    },
-    {
-      "class": "processing",
-      "material": "Transport"
-    },
-    {
-      "class": "processing",
-      "material": "Transport to PDX"
-    },
-    {
-      "class": "pesticide",
-      "material": "Treflan 4HFP"
-    },
-    {
-      "class": "pesticide",
-      "material": "Treflan FP"
-    },
-    {
-      "class": "pesticide",
-      "material": "Treflan TR 10"
-    },
-    {
-      "class": "pesticide",
-      "material": "Triflurex HFP"
-    },
-    {
-      "class": "fertilizer",
-      "material": "UN32"
-    },
-    {
-      "class": "pesticide",
-      "material": "Velpar L"
-    },
-    {
-      "class": "water",
-      "material": "Water"
-    },
-    {
-      "class": "processing",
-      "material": "Water Assesment"
-    },
-    {
-      "class": "labor",
-      "material": "Weed Control"
-    },
-    {
-      "class": "processing",
-      "material": "Wheat Assesment"
-    },
-    {
-      "class": "seed",
-      "material": "Wheat Seed"
-    },
-    {
-      "class": "material",
-      "material": "Yukon"
-    },
-    {
-      "class": "material",
-      "material": "Zephyr"
-    },
-    {
-      "class": "fertilizer",
-      "material": "Zinc"
-    },
-    {
       "requires": [
         {
-          "unit": "[gal_us]/h",
-          "amount": 3.96,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--3-Wheel Ag Sprayer"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "3-Wheel Ag Sprayer"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
+          "unit": "[gal_us]",
           "amount": 19.36,
           "material": "Equipment Fuel"
         },
         {
-          "unit": "h/h",
+          "unit": "h",
           "amount": 1,
-          "material": "Labor--Challenger tractor"
+          "material": "Challenger Tractor--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Challenger Tractor--Labor"
         }
       ],
       "class": "equipment",
       "unit": "h",
-      "material": "Challenger tractor"
+      "material": "Challenger Tractor"
     },
     {
       "requires": [
         {
-          "unit": "[gal_us]/h",
-          "amount": 0.96,
-          "material": "Equipment Fuel"
+          "unit": "h",
+          "amount": 1,
+          "material": "Cooler/van--Labor"
         },
         {
-          "unit": "h/h",
+          "unit": "h",
           "amount": 1,
-          "material": "Labor--Cooler/van"
+          "material": "Cooler/van--Capitol Cost"
+        },
+        {
+          "unit": "[gal_us]",
+          "amount": 0.96,
+          "material": "Equipment Fuel"
         }
       ],
       "class": "equipment",
@@ -1204,278 +122,26 @@
       "material": "Cooler/van"
     },
     {
-      "class": "labor",
-      "unit": "h",
-      "material": "Laborer"
-    },
-    {
       "requires": [
         {
-          "unit": "[gal_us]/h",
-          "amount": 19.36,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Eliminator"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Eliminator"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
+          "unit": "[gal_us]",
           "amount": 13.2,
           "material": "Equipment Fuel"
         },
         {
-          "unit": "h/h",
+          "unit": "h",
           "amount": 1,
-          "material": "Labor--FR 6080 FH"
+          "material": "FR 6080 FH--Labor"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "FR 6080 FH--Capitol Cost"
         }
       ],
       "class": "equipment",
       "unit": "h",
       "material": "FR 6080 FH"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 13.2,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Large tractor"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Large tractor"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 3.96,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Mid-size tractor"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Mid-size tractor"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 6.5,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Semi-tractor trailer"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Semi-tractor trailer"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 1.98,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Small tractor"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Small tractor"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 1.76,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Support Truck"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Support Truck"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 13.2,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Tandem axle truck"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Tandem axle truck"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[gal_us]/h",
-          "amount": 3.96,
-          "material": "Equipment Fuel"
-        },
-        {
-          "unit": "h/h",
-          "amount": 1,
-          "material": "Labor--Tractor and sprayer"
-        }
-      ],
-      "class": "equipment",
-      "unit": "h",
-      "material": "Tractor and sprayer"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--3-Wheel ag sprayer"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Challenger tractor"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Cooler/van"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--FR 6080 FH"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Large tractor"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Mid-size tractor"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Semi-tractor trailer"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Small tractor"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Supervisor"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Support Truck"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Tandem axle truck"
-    },
-    {
-      "class": "labor",
-      "unit": "h",
-      "material": "Labor--Tractor and Sprayer"
-    },
-    {
-      "requires": [
-        {
-          "unit": "h/(100.[acr_us])",
-          "amount": 192,
-          "material": "Laborer"
-        }
-      ],
-      "class": "labor",
-      "unit": "[acr_us]",
-      "material": "hoeing"
-    },
-    {
-      "requires": [
-        {
-          "unit": "[qt_us]/(100.[acr_us])",
-          "amount": 200,
-          "material": "Glyphosate"
-        },
-        {
-          "unit": "h/(100.[acr_us])",
-          "amount": 96,
-          "material": "Laborer"
-        }
-      ],
-      "description": "'Manual Application of herbicide'",
-      "class": "herbicide",
-      "unit": "[acr_us]",
-      "material": "herbicide - manual"
-    },
-    {
-      "description": "Off Road Diesel",
-      "class": "fuel",
-      "unit": "gal",
-      "material": "Equipment Fuel"
-    },
-    {
-      "class": "fertilizer",
-      "unit": "[qt_us]",
-      "material": "2,4-D"
-    },
-    {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Coragen"
-    },
-    {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Dimilin"
-    },
-    {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Fusilade"
     },
     {
       "class": "pesticide",
@@ -1488,35 +154,93 @@
       "material": "Goal 2XL"
     },
     {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Imidacloprid5"
+      "requires": [
+        {
+          "unit": "[qt_us]",
+          "amount": 200,
+          "material": "Glyphosate"
+        },
+        {
+          "unit": "h",
+          "amount": 96,
+          "material": "Laborer"
+        }
+      ],
+      "description": "'Manual Application of herbicide'",
+      "class": "herbicide",
+      "unit": "[acr_us]",
+      "material": "herbicide - manual"
     },
     {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Oust"
+      "requires": [
+        {
+          "unit": "h",
+          "amount": 192,
+          "material": "Laborer"
+        }
+      ],
+      "class": "labor",
+      "unit": "[acr_us]",
+      "material": "hoeing"
     },
     {
-      "description": "rodenticide",
-      "class": "[qt_us]",
-      "unit": "pesticide",
-      "material": "Rozol"
+      "class": "labor",
+      "unit": "h",
+      "material": "Laborer"
     },
     {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Sureguard"
+      "requires": [
+        {
+          "unit": "[gal_us]",
+          "amount": 13.2,
+          "material": "Equipment Fuel"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Large Tractor--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Large Tractor--Labor"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Large Tractor--Capitol Cost"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Large Tractor"
     },
     {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Transline"
-    },
-    {
-      "class": "pesticide",
-      "unit": "[qt_us]",
-      "material": "Trifluralin"
+      "requires": [
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Mid-size Tractor--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Mid-size Tractor--Labor"
+        },
+        {
+          "unit": "[gal_us]",
+          "amount": 3.96,
+          "material": "Equipment Fuel"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Mid-size Tractor--Capitol Cost"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Mid-size Tractor"
     },
     {
       "description": "Poplar cutting for planting",
@@ -1525,9 +249,134 @@
       "material": "Poplar Cutting"
     },
     {
-      "class": "water",
-      "unit": "acr_us].[in_us]",
-      "material": "Irrigation"
+      "requires": [
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Semi-Tractor trailer--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Semi-Tractor trailer--Capitol Cost"
+        },
+        {
+          "unit": "[gal_us]",
+          "amount": 6.5,
+          "material": "Equipment Fuel"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Semi-Tractor trailer--Labor"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Semi-Tractor trailer"
+    },
+    {
+      "requires": [
+        {
+          "unit": "[gal_us]",
+          "amount": 1.98,
+          "material": "Equipment Fuel"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Small Tractor--Labor"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Small Tractor--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Small Tractor--Capitol Cost"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Small Tractor"
+    },
+    {
+      "requires": [
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Support Truck--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Support Truck--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Support Truck--Labor"
+        },
+        {
+          "unit": "[gal_us]",
+          "amount": 1.76,
+          "material": "Equipment Fuel"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Support Truck"
+    },
+    {
+      "requires": [
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Tandem Axle Truck--Capitol Cost"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Tandem Axle Truck--Capitol Cost"
+        },
+        {
+          "unit": "[gal_us]",
+          "amount": 13.2,
+          "material": "Equipment Fuel"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Tandem Axle Truck--Labor"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Tandem Axle Truck"
+    },
+    {
+      "requires": [
+        {
+          "unit": "[gal_us]",
+          "amount": 3.96,
+          "material": "Equipment Fuel"
+        },
+        {
+          "unit": "h",
+          "amount": 1,
+          "material": "Tractor and sprayer--Labor"
+        }
+      ],
+      "class": "equipment",
+      "unit": "h",
+      "material": "Tractor and sprayer"
+    },
+    {
+      "class": "pesticide",
+      "unit": "[qt_us]",
+      "material": "Trifluralin"
     }
   ],
   "farm": [
@@ -1676,7 +525,7 @@
               "note": "Transport Nursery to field",
               "unit": "h",
               "amount": 20,
-              "material": "Semi-tractor trailer"
+              "material": "Semi-Tractor trailer"
             },
             {
               "unit": "each",
@@ -1722,7 +571,7 @@
             {
               "unit": "h",
               "amount": 175,
-              "material": "Tandem axle truck"
+              "material": "Tandem Axle Truck"
             },
             {
               "unit": "h",
@@ -1767,7 +616,7 @@
               "note": "disking",
               "unit": "h",
               "amount": 12,
-              "material": "Large tractor"
+              "material": "Large Tractor"
             },
             {
               "note": "herbicide",
@@ -1796,7 +645,7 @@
               "note": "Post harvest clean up",
               "unit": "h",
               "amount": 30,
-              "material": "Mid-size tractor"
+              "material": "Mid-size Tractor"
             },
             {
               "note": "Dormant Herbicide",
@@ -1836,12 +685,12 @@
             {
               "unit": "h",
               "amount": 104,
-              "material": "Tandom axle truck"
+              "material": "Tandem Axle Truck"
             },
             {
               "unit": "h",
               "amount": 26,
-              "material": "Support truck"
+              "material": "Support Truck"
             }
           ],
           "operation": "harvest - yr1"
@@ -1870,25 +719,25 @@
               "note": "Initial Tillage",
               "unit": "h",
               "amount": 20,
-              "material": "Large tractor"
+              "material": "Large Tractor"
             },
             {
               "note": "Ripping",
               "unit": "h",
               "amount": 10,
-              "material": "Large tractor"
+              "material": "Large Tractor"
             },
             {
               "note": "Row Marking",
               "unit": "h",
               "amount": 25,
-              "material": "Large tractor"
+              "material": "Large Tractor"
             },
             {
               "note": "herbicide - preemergent",
               "unit": "h",
               "amount": 25,
-              "material": "Challenger tractor"
+              "material": "Challenger Tractor"
             },
             {
               "note": "herbicide - preemergent",
