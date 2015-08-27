@@ -27,7 +27,7 @@
     drawChart : function(e) {
       if( e && e.spendingByMonth ) {
         var operations = FB.operationController.get();
-        var header = ['Month', 'Total'];
+        var header = ['Month'];
         for( var i = 0; i < operations.length; i++ ) {
           header.push(operations[i].name);
         }
@@ -35,21 +35,19 @@
         this.data = [header];
 
         for( var i = 0; i < e.spendingByMonth.length; i++ ) {
-          var arr = [e.spendingByMonth[i].month, parseFloat(e.spendingByMonth[i].total.toFixed(2))];
+          var arr = [e.spendingByMonth[i].month];
 
           for( var j = 0; j < operations.length; j++ ) {
             if( e.spendingByMonth[i][operations[j].name] ) {
               arr.push(parseFloat(e.spendingByMonth[i][operations[j].name].toFixed(2)));
             } else {
-              arr.push(0);
+              arr.push(1);
             }
           }
 
           this.data.push(arr);
         }
       }
-
-console.log(this.data);
 
       if( !window.google && !this.handlerSet ) {
         googleChartLoadHandlers.push(this.drawChart.bind(this));
@@ -65,7 +63,11 @@ console.log(this.data);
       var chart = new google.visualization.LineChart(container);
       var dataTable = google.visualization.arrayToDataTable(this.data);
 
-      chart.draw(dataTable);
+      chart.draw(dataTable, {
+        vAxis : {
+          logScale : true
+        }
+      });
     }
 
   })
