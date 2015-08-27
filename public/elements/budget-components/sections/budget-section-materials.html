@@ -9,6 +9,10 @@
 
   <template>
 
+    <div style="text-align: center; padding: 25px 0 15px 0">
+      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create New Material</a>
+    </div>
+
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
 
@@ -41,11 +45,33 @@
     ready : function() {
       this.filterTimer = -1;
       this.updateTimer = -1;
+      FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
+    },
+
+    attached : function() {
+      this.popup = document.querySelector('budget-material-popup');
+    },
+
+    onMaterialsUpdated : function(e) {
+      if( e.isNew || e.replaced ) {
+        this.data.materials = [];
+        var materials = FB.materialController.get();
+
+        for( var key in materials.materials ) {
+          this.data.materials.push(materials.materials[key]);
+        }
+        for( var key in materials.complex ) {
+          this.data.materials.push(materials.complex[key]);
+        }
+
+        this.setData(this.data);
+      }
     },
 
     setData : function(data) {
       this.data = data;
 
+      this.$.root.innerHTML = '';
       this.data.materials.forEach(function(material){
         var div = this.createTable(material);
         this.$.root.appendChild(div);
@@ -60,6 +86,10 @@
       }
 
       this._filter();
+    },
+
+    showCreate : function() {
+      this.popup.create();
     },
 
     filter : function() {

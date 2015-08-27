@@ -38,7 +38,7 @@
                 <label for="priceInput" class="col-sm-3 control-label" id="priceLabel">Price</label>
                 <div class="col-sm-9">
                   <input type="number" id="priceInput" class="form-control" on-input="onPriceInput"/>
-                  <div class="text text-warning animated slideInRight" id="priceMessage" style="display:none">*A base price is not required for complex materials.</div>
+                  <div class="help-block animated slideInRight" id="priceMessage" style="display:none">*A base price is not required for complex materials.</div>
                 </div>
               </div>
 
@@ -169,7 +169,13 @@
         price : 0
       };
       this.action = 'create';
+
       this.$.title.innerHTML = '<i class="fa fa-cube"></i> Create Material';
+      this.$.nameInput.value = '';
+      this.$.unitsInput.setUnits('');
+      this.$.priceInput.value = '';
+      this.setComplex(false);
+
       this.onSaveCallback = callback;
       this.show();
     },
@@ -180,11 +186,6 @@
         this.closeCallback = null;
       }
       this.popup.modal('hide');
-    },
-
-    setName : function() {
-      this.$.nameInput.value = this.data.name;
-      this.$.nameLabel.innerHTML = this.data.name;
     },
 
     onMaterialSelect : function(e) {
@@ -213,6 +214,8 @@
         this.$.complexPanel.style.display = 'block';
         this.$.priceMessage.style.display = 'block';
         this.$.priceLabel.innerHTML = 'Base Price';
+        this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
+        this.updatePriceLabel();
       } else {
         this.$.isComplexInput.removeAttribute('checked');
         this.$.isComplexInput.checked = false;
@@ -224,6 +227,22 @@
 
     getBasePriceName : function() {
       return this.data.name+'--Base Price';
+    },
+
+    save : function() {
+      if( this.data.name == '' ) {
+        this.$.nameInputMessage.innerHTML = 'A material name is required';
+        return;
+      }
+      this.$.nameInputMessage.innerHTML = '';
+
+      var result = FB.materialController.add(this.data);
+
+      if( result.error ) {
+        return alert(result.message);
+      }
+
+      this.hide();
     },
 
     /**
@@ -252,10 +271,9 @@
     /**
      * Start main input control Fn's
      */
-
     onNameInput : function() {
       var name = this.$.nameInput.value;
-      if( this.data.name == name ) return;
+      if( this.data.name == name || name == '' ) return;
 
       var m = FB.materialController.get(name);
       if( !m.error ) {
@@ -264,7 +282,7 @@
       }
       this.$.nameInputMessage.innerHTML = '';
 
-
+      this.$.nameLabel.innerHTML = name;
       this.data.name = name;
 
       if( this.data.materials ) {
@@ -400,7 +418,6 @@
 
 
         this.setComplex(true);
-        this.updatePriceLabel();
       }
     },
 
@@ -434,7 +451,6 @@
 
       this.recalc();
     },
-
     /**
      * End main input control Fn's
      */
@@ -507,7 +523,6 @@
     toggleUnique : function() {
       $(this.$.createUniquePanel).toggle();
     },
-
     /**
      * End Create Unique Fn's
      */

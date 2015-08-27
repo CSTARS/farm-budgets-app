@@ -36,7 +36,8 @@
     properties : {
       units : {
         type : String,
-        observer: 'setUnits'
+        observer: 'unitsObserver',
+        value : ''
       },
       block : {
         type : Boolean,
@@ -71,7 +72,12 @@
       else this.$.input.removeAttribute('disabled');
     },
 
-    setUnits : function() {
+    unitsObserver : function() {
+      this.setUnits();
+    },
+
+    setUnits : function(units) {
+      if( units ) this.units = units;
       this.$.input.value = this.units;
       this.checkError();
     },
