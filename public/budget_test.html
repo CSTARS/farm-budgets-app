@@ -56,6 +56,9 @@
   <link rel="import" href="elements/budget-components/budget-timeline.html">
   <link rel="import" href="elements/budget-components/budget-spending-timeline.html">
 
+  <link rel="import" href="elements/budget-components/budget-material-popup.html">
+  <link rel="import" href="elements/budget-components/budget-material-search.html">
+
 
 
 </head>
@@ -65,6 +68,13 @@
   <budget-complex-material-popup></budget-complex-material-popup>
   <budget-schedule-popup></budget-schedule-popup>
   <ahb-budget example="poplar bad"></ahb-budget>
+  <budget-material-popup></budget-material-popup>
+
+  <script>
+    $(document).on('ready', function(){
+    //  $('budget-material-popup')[0].create();
+    });
+  </script>
 
 </body>
 </html>

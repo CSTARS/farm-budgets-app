@@ -42,6 +42,11 @@
         type : Boolean,
         observer: 'setDisplayBlock',
         value : false
+      },
+      disabled : {
+        type : Boolean,
+        observer: 'setDisabled',
+        value : false
       }
     },
 
@@ -59,6 +64,11 @@
         this.style.display = 'inline-block';
         this.$.input.style.display = 'inline-block';
       }
+    },
+
+    setDisabled : function() {
+      if( this.disabled ) this.$.input.setAttribute('disabled', 'disabled');
+      else this.$.input.removeAttribute('disabled');
     },
 
     setUnits : function() {

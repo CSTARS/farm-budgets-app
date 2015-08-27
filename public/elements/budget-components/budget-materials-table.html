@@ -19,6 +19,8 @@
 
       this.controllers = []
       this.data = data;
+
+
       this.initTable(Object.keys(this.data.materials).length);
 
       var c = 2;
@@ -41,14 +43,20 @@
           isOperation : this.options.isOperation,
 
           onDelete : function(material) {
-            delete this.data.materials[material.name];
+            FB.materialController.materialRecalc(this.data);
+            if( Object.keys(this.data.materials).length == 0 ) {
+              this.innerHTML = ''; // remove table
+            }
+            this.fire('delete', material);
           }.bind(this),
 
           onAmountChange : function(material, amount) {
+            FB.materialController.materialRecalc(this.data);
             this.fire('price-change', this.data.price);
           }.bind(this),
 
           onUnitsChange : function(material, units) {
+            FB.materialController.materialRecalc(this.data);
             this.fire('price-change', this.data.price);
           }.bind(this)
         }
@@ -62,6 +70,11 @@
     },
 
     initTable : function(rows) {
+      if( rows == 0 ) {
+        this.innerHTML = '';
+        return;
+      }
+
       var table = '<table class="table" main>', cell;
       if( !this.options ) this.options = {};
 
@@ -89,6 +102,11 @@
 
     config.materialImpl = config.complexMaterial.materials[config.material.name];
 
+    var isBasePrice = false;
+    if( config.material.name == config.complexMaterial.name+'--Base Price' ) {
+      isBasePrice = true;
+    }
+
     for( var i = 0; i < config.cols.length; i++ ) {
       cols[config.cols[i]] = $ele.find('[type="'+config.cols[i]+'"]');
     }
@@ -104,11 +122,11 @@
     var errorLabel = $('<div style="display:none" class="text text-danger"></div>');
     cols.Material.append(errorLabel);
 
-    var unitsInput = $('<budget-unit-selector></budget-unit-selector>');
+    var unitsInput = $('<budget-unit-selector '+(isBasePrice ? 'disabled' : '')+'></budget-unit-selector>');
     unitsInput.on('units-change', fireUnitsChange);
     cols.Units.append(unitsInput);
 
-    var amountInput = $('<input type="number" class="form-control" />');
+    var amountInput = $('<input type="number" class="form-control" '+(isBasePrice ? 'disabled' : '')+' />');
     amountInput.on('input', fireAmountChange);
     cols.Amount.append(amountInput);
 
@@ -126,6 +144,7 @@
     var removeBtn;
     if( cols.Remove ) {
       removeBtn = $('<a class="btn btn-link"><i class="fa fa-trash"></i></a>');
+      removeBtn.on('click', fireDelete);
       cols.Remove.append(removeBtn);
     }
 
@@ -176,7 +195,6 @@
 
         var value = FB.ucum.canonicalize(str);
         config.materialImpl.amount = value.value * config.materialImpl.amount;
-        console.log(' convert: '+str);
 
         amountInput.val(config.materialImpl.amount);
 
@@ -206,13 +224,16 @@
 
       config.materialImpl.units = e.originalEvent.detail.value;
 
-      FB.materialController.recalc();
-      FB.operationController.recalc();
-
-      setPrice();
-
       setErrorStatus();
       config.onUnitsChange(config.materialImpl, e.originalEvent.detail.value);
+      setPrice();
+    }
+
+    function fireDelete(e) {
+      delete config.complexMaterial.materials[config.material.name];
+      $ele.remove();
+
+      config.onDelete(config.materialImpl);
     }
 
     function fireAmountChange(e) {
@@ -228,18 +249,9 @@
       config.materialImpl.amount = parseInt(e.originalEvent.target.value);
       config.materialImpl.originalAmount = config.materialImpl.amount;
 
-      FB.materialController.recalc();
-      FB.operationController.recalc();
-
-      setPrice();
-
       setErrorStatus();
       config.onAmountChange(config.materialImpl, parseInt(e.originalEvent.target.value));
-    }
-
-    function fireDelete() {
-      config.onDelete(config.material);
-      $ele.remove();
+      setPrice();
     }
 
     function setPrice() {
