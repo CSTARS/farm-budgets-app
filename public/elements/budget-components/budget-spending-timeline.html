@@ -1,0 +1,72 @@
+<dom-module id="budget-spending-timeline">
+  <style>
+    :host {
+      display : block;
+    }
+  </style>
+  <template>
+    <div id="chart" style="height: 450px"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-spending-timeline',
+
+    attached : function() {
+      $(window).on('resize', this.drawChart.bind(this));
+
+      this.handlerSet = false;
+      FB.operationController.on('total-update', this.drawChart.bind(this));
+    },
+
+    onShow : function() {
+      this.drawChart();
+    },
+
+    drawChart : function(e) {
+      if( e && e.spendingByMonth ) {
+        var operations = FB.operationController.get();
+        var header = ['Month', 'Total'];
+        for( var i = 0; i < operations.length; i++ ) {
+          header.push(operations[i].name);
+        }
+
+        this.data = [header];
+
+        for( var i = 0; i < e.spendingByMonth.length; i++ ) {
+          var arr = [e.spendingByMonth[i].month, parseFloat(e.spendingByMonth[i].total.toFixed(2))];
+
+          for( var j = 0; j < operations.length; j++ ) {
+            if( e.spendingByMonth[i][operations[j].name] ) {
+              arr.push(parseFloat(e.spendingByMonth[i][operations[j].name].toFixed(2)));
+            } else {
+              arr.push(0);
+            }
+          }
+
+          this.data.push(arr);
+        }
+      }
+
+console.log(this.data);
+
+      if( !window.google && !this.handlerSet ) {
+        googleChartLoadHandlers.push(this.drawChart.bind(this));
+        this.handlerSet = true;
+        return;
+      }
+
+      if( !this.data ) return;
+
+      this.$.chart.innerHTML = '';
+
+      var container = this.$.chart;
+      var chart = new google.visualization.LineChart(container);
+      var dataTable = google.visualization.arrayToDataTable(this.data);
+
+      chart.draw(dataTable);
+    }
+
+  })
+</script>
