@@ -6,6 +6,16 @@
   </style>
   <template>
     <div id="chart" style="height: 450px"></div>
+
+    <div class="horizontal layout">
+      <div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary" id="opBtn" on-click="byOperation">By Operation</button>
+          <button type="button" class="btn btn-default" id="totalBtn" on-click="byTotal">Total</button>
+        </div>
+      </div>
+      <div class="flex" id="selected" style="padding: 5px"></div>
+    </div>
   </template>
 </dom-module>
 
@@ -14,39 +24,74 @@
     is : 'budget-spending-timeline',
 
     attached : function() {
+      this.type = 'all';
+
       $(window).on('resize', this.drawChart.bind(this));
 
       this.handlerSet = false;
       FB.operationController.on('total-update', this.drawChart.bind(this));
     },
 
+    byOperation : function() {
+      if( this.type == 'all' ) return;
+      this.type = 'all';
+      this.$.opBtn.className = 'btn btn-primary';
+      this.$.totalBtn.className = 'btn btn-default';
+      this.updateData();
+      this.drawChart();
+    },
+
+    byTotal : function() {
+      if( this.type == 'total' ) return;
+      this.type = 'total';
+      this.$.opBtn.className = 'btn btn-default';
+      this.$.totalBtn.className = 'btn btn-primary';
+      this.updateData();
+      this.drawChart();
+    },
+
     onShow : function() {
       this.drawChart();
     },
 
-    drawChart : function(e) {
-      if( e && e.spendingByMonth ) {
-        var operations = FB.operationController.get();
-        var header = ['Month'];
+    updateData  : function() {
+      this.$.selected.innerHTML = '';
+
+      var operations = FB.operationController.get();
+      var header = ['Month'];
+
+      if( this.type == 'all' ) {
         for( var i = 0; i < operations.length; i++ ) {
           header.push(operations[i].name);
         }
+      } else {
+        header.push('total');
+      }
+      this.data = [header];
 
-        this.data = [header];
+      for( var i = 0; i < this.months.length; i++ ) {
+        var arr = [this.months[i].month];
 
-        for( var i = 0; i < e.spendingByMonth.length; i++ ) {
-          var arr = [e.spendingByMonth[i].month];
-
+        if( this.type == 'all' ) {
           for( var j = 0; j < operations.length; j++ ) {
-            if( e.spendingByMonth[i][operations[j].name] ) {
-              arr.push(parseFloat(e.spendingByMonth[i][operations[j].name].toFixed(2)));
+            if( this.months[i][operations[j].name] ) {
+              arr.push(parseFloat(this.months[i][operations[j].name].toFixed(2)));
             } else {
               arr.push(1);
             }
           }
-
-          this.data.push(arr);
+        } else {
+          arr.push(parseFloat(this.months[i].total.toFixed(2)) || 1);
         }
+
+        this.data.push(arr);
+      }
+    },
+
+    drawChart : function(e) {
+      if( e && e.spendingByMonth ) {
+        this.months = e.spendingByMonth;
+        this.updateData();
       }
 
       if( !window.google && !this.handlerSet ) {
@@ -68,6 +113,27 @@
           logScale : true
         }
       });
+
+      google.visualization.events.addListener(chart, 'select', function(){
+        var selection = chart.getSelection()[0];
+        this.show(selection.row);
+      }.bind(this));
+    },
+
+    show : function(row) {
+      var info = this.months[row];
+      var html = '<div class="well"><h5>'+info.month+'</h5>';
+
+      for( var key in info ) {
+        if( key == 'month' ) continue;
+        if( key == 'total' ) {
+          html += '<div><b>'+key+': </b><ahb-dollar-label value="'+info[key]+'"></ahb-dollar-label></div>';
+        } else {
+          html += '<div><a href="#budget/operations/'+key+'">'+key+':</a> <ahb-dollar-label value="'+info[key]+'"></ahb-dollar-label></div>';
+        }
+      }
+
+      this.$.selected.innerHTML = html+'</div>';
     }
 
   })
