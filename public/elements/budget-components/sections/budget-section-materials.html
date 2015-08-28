@@ -24,9 +24,10 @@
 
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" id="thisBudgetInput" checked on-click="_filter"> Only materials used in this budget.
+                  <input type="checkbox" id="thisBudgetInput" on-click="_filter"> Only materials used in this budget.
                 </label>
               </div>
+
             </div>
           </div>
         </div>
@@ -53,19 +54,31 @@
     },
 
     onMaterialsUpdated : function(e) {
-      if( e.isNew || e.replaced ) {
-        this.data.materials = [];
-        var materials = FB.materialController.get();
+      if( e.isNew ) {
 
-        for( var key in materials.materials ) {
-          this.data.materials.push(materials.materials[key]);
-        }
-        for( var key in materials.complex ) {
-          this.data.materials.push(materials.complex[key]);
-        }
+        var div = this.createTable(e.material);
+        this.$.root.appendChild(div);
 
-        this.setData(this.data);
+      } else if( e.replaced ) {
+
+        var current = $(this.$.root).find('[material="'+e.replaced +'"]');
+        var div = $(this.createTable(e.material));
+        div.insertAfter(current);
+        current.remove();
+
+      } else {
+
+        var current = $(this.$.root).find('[material="'+e.material.name+'"]');
+        var div = $(this.createTable(e.material));
+        if( current.length == 0 ) {
+          $(this.$.root).append(div);
+        } else {
+          div.insertAfter(current);
+          current.remove();
+        }
       }
+
+      this.filter();
     },
 
     setData : function(data) {
@@ -82,7 +95,7 @@
 
     onShow : function(params) {
       if( params.length > 0 ) {
-        this.$.filterInput.value = params[0];
+        this.$.filterInput.value = params.join('/');
       }
 
       this._filter();
@@ -145,12 +158,23 @@
     createTable : function(material) {
       var html =
         '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
-          '<h5 class="material-name">'+(material.type == 'complex' ? '<i class="fa fa-cubes"></i> ' : '<i class="fa fa-cube"></i> ')+material.name+'</h5>'+
+          '<h5 class="material-name">' +
+            '<div class="layout horizontal center">'+
+              '<div class="flex">'+
+                (material.type == 'complex' ?
+                  '<i class="fa fa-cubes"></i> ' :
+                  '<i class="fa fa-cube"></i> '
+                )+material.name+
+              '</div>'+
+              '<div>'+
+                ' <a class="btn btn-default btn-lg pull-right"><i class="fa fa-pencil"></i></a>'+
+            '</div></div>'+
+          '</h5>'+
           '<div>'+(material.description || '')+'</div>'+
           '<table class="table">' +
             '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
             '<tr>' +
-              '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class)+'</td>' +
+              '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
               (material.type == 'complex' ?
                 '<td class="material-price">'+(material.price || '')+'</td>' :
                 '<td><input type="number" class="form-control material-price" value="'+(material.price || '')+'" /></td>'
@@ -168,6 +192,9 @@
       row.find('budget-unit-selector').on('units-change', function(){
         this.updateFromEvent(row);
       }.bind(this));
+      row.find('.btn-lg').on('click', function(){
+        document.querySelector('budget-material-popup').edit(material);
+      });
 
       return row[0];
     },

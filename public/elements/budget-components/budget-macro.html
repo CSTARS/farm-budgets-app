@@ -34,43 +34,6 @@
   </style>
 
   <template>
-    <div id="edit" class="animated fadeIn">
-      <div class="form-horizontal">
-
-        <div class="form-group">
-          <label for="nameInput" class="col-sm-3 control-label">Name</label>
-          <div class="col-sm-9">
-            <input type="text" id="nameInput" class="form-control" />
-          </div>
-        </div>
-
-        <div class="form-group" id="unitsGroup">
-          <label for="unitsInput" class="col-sm-3 control-label">Units</label>
-          <div class="col-sm-9">
-            <budget-unit-selector id="unitsInput" on-units-change="editUnits" block></budget-unit-selector>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
-          <div class="col-sm-9" style="position: relative">
-            <input type="text" id="materialSearchInput" placeholder="Search by item name" class="form-control" on-keyup="search"/>
-            <div id="resultsPopup" style="display:none;z-index:1000;position:absolute;background-color:white;padding:10px;border: 1px solid #ccc"></div>
-
-            <div class="help-block">Use search box to find materials by name.  Complex materials can include
-            other complex materials. Or <a style="cursor:pointer"><i class="fa fa-plus"></i> create new material</a></div>
-          </div>
-        </div>
-
-      </div> <!-- end form -->
-
-      <h4>Materials</h4>
-      <budget-materials-table id="materialTable" on-price-change="onPriceChange"></budget-materials-table>
-
-      <h4>Price <small ><span id="current-price"></span> per <span id="current-units"></span></small></h4>
-
-    </div>
-
 
     <table>
       <tr>
@@ -80,7 +43,7 @@
         <td>
           <div style="width: 102px;display:none;" id="btns">
             <div class="btn-group" role="group" style="padding-left: 15px">
-              <a class="btn btn-default nohover" on-click="edit"><i class="fa fa-pencil"></i></a>
+              <a class="btn btn-default nohover" id="editBtn"><i class="fa fa-pencil"></i></a>
               <a class="btn btn-default nohover" on-click="toggleView" id="toggleView"><i class="fa fa-angle-down"></i></a>
             </div>
           </div>
@@ -107,14 +70,13 @@
 
     ready : function() {
       this.editUnitsTimer = -1;
+
       this.data = {
         name : '[Not Set]',
         materials : {},
         price : 0,
         units : ''
       };
-
-      this.removeChild(this.$.edit);
 
       FB.materialController.on('material-update', this.onUpdate.bind(this));
 
@@ -139,7 +101,6 @@
 
     updateMaterial : function(material) {
       if( material ) this.material = material;
-
       if( !this.material ) return;
 
       var m = FB.materialController.get(this.material);
@@ -148,6 +109,8 @@
       if( m.error ) {
         return alert(JSON.stringify(m));
       }
+
+      this.$.editBtn.setAttribute('href','#budget/materials/'+m.name);
 
       this.data = m;
 
@@ -182,13 +145,6 @@
     },
 
     checkError : function() {
-      if( this.$.unitsInput.error ) {
-        this.$.icon.className = 'fa fa-warning';
-        this.$.icon.style.color = 'red';
-        this.error = true;
-        return;
-      }
-
       for( var key in this.data.materials ) {
         if( this.data.materials[key].error ) {
           this.$.icon.className = 'fa fa-warning';
@@ -302,153 +258,6 @@
       return -1;
     },
 
-    search : function() {
-      var results = FB.materialController.find(this.$.materialSearchInput.value);
-
-      if( this.listMaterialIndex(results, this.data.name) > -1 ) {
-        results.splice(this.listMaterialIndex(results, this.data.name), 1);
-      }
-
-      for( var material in this.data.materials ) {
-        var index = this.listMaterialIndex(results, material);
-        if( index > -1 ) {
-          results.splice(index, 1);
-        }
-      }
-
-      if( results.length > 0 ) {
-        var html = '';
-
-        for( var i = 0; i < results.length; i++ ) {
-          html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
-                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+
-                  '<div class="help-block">'+(results[i].class || '')+' '+(results[i].price || '')+' '+FB.units.getLabel(results[i].units || '', true)+'</div>'
-                  '</div>';
-        }
-        $(this.$.resultsPopup)
-          .html(html)
-          .find('a')
-          .on('click', function(e){
-            this.addItemFromSearch(e, results);
-          }.bind(this));
-
-        this.$.resultsPopup.style.display = 'block';
-      } else {
-        this.$.resultsPopup.style.display = 'none';
-      }
-    },
-
-    addItemFromSearch : function(e, results) {
-      var ele = $(e.currentTarget);
-      ele.parent().remove();
-      var index = parseInt(ele.attr('index'));
-      this.data.materials[results[index].name] = 1, // TODO: get real conversion value
-      this.renderEditList();
-      this.$.resultsPopup.style.display = 'none';
-      this.$.materialSearchInput.value = '';
-    },
-
-    edit : function(e) {
-      if( e && e.preventDefault ){
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
-      this.changesString = JSON.stringify(this.data);
-      this.$.nameInput.value = this.data.name;
-      this.$.unitsInput.units = this.data.units;
-      this.popup.setBody(this.$.edit);
-      this.popup.show(this.onEditComplete.bind(this));
-      this.renderEditList();
-    },
-
-    editUnits : function(e) {
-      if( this.editUnitsTimer != -1 ) clearTimeout(this.editUnitsTimer);
-      this.editUnitsTimer = setTimeout(function(){
-        this.editUnitsTimer = -1;
-        this._editUnits(e);
-      }.bind(this), 200);
-    },
-
-    _editUnits : function(e) {
-      if( e.detail.error ) return;
-
-      var oldUnits = this.data.units;
-      var newUnits = e.detail.value;
-
-      this.$.materialTable.updateAmountFromUnits(oldUnits, newUnits);
-      // var items = this.$.edit.querySelectorAll('budget-macro-edit-material');
-
-      //for( var i = 0; i < items.length; i++ ) {
-      //  if( units[1] != newUnits ) {
-      //    items[i].updateAmountFromUnits(newUnits);
-      //  }
-      //}
-
-      this.data.units = newUnits;
-
-      FB.materialController.recalc();
-      this.renderEditList();
-    },
-
-    renderEditList : function() {
-      var html = '';
-      //this.$['edit-items'].innerHTML = '';
-
-      this.$.materialTable.setMaterials(this.data, {noNotes: true});
-      /*
-      for( var material in this.data.materials ) {
-        var m = FB.materialController.get(material);
-        var ele = document.createElement('budget-macro-edit-material');
-
-        ele.init({
-          material : m,
-          complexMaterial : this.data,
-
-          onDelete : function(material) {
-            delete this.data.materials[material.name];
-          }.bind(this),
-
-          onAmountChange : function(material, amount) {
-            this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
-          }.bind(this),
-
-          onUnitsChange : function(material, units) {
-            this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
-          }.bind(this)
-        });
-
-        this.$['edit-items'].appendChild(ele);
-      }
-      */
-
-      this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
-      this.$['current-units'].innerHTML = FB.units.getLabel(this.data.units);
-    },
-
-    onPriceChange : function() {
-      this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
-    },
-
-    onEditComplete : function() {
-      var newName = this.$.nameInput.value;
-      var oldName = this.data.name;
-      this.data.name = newName;
-      this.data.units = this.$.unitsInput.getUnits();
-
-      // detect changes
-      if( this.changesString == JSON.stringify(this.data) ) {
-        return;
-      }
-
-      var options = {replace: true};
-      if( newName != oldName ) options.rename = oldName;
-
-      FB.materialController.add(this.data, options);
-
-      this.render(this.renderType);
-    },
-
     // fired whenever any material is updated
     onUpdate : function(e) {
       // renaming something in our list?
@@ -464,14 +273,6 @@
 
       // rerender
       this.render(this.renderType);
-    },
-
-    setUnitsError : function(msg) {
-      if( !msg ) {
-        $(this.$.unitsGroup).removeClass('has-error');
-      } else {
-        $(this.$.unitsGroup).addClass('has-error');
-      }
     },
 
 

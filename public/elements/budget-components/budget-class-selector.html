@@ -1,0 +1,64 @@
+<dom-module id="budget-class-selector">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <template>
+    <select id="input" class="form-control">
+      <option value="other">Other</option>
+      <option value="equipment">Equipment</option>
+      <option value="fertilizer">Fertilizer</option>
+      <option value="herbicide">Herbicide</option>
+      <option value="insurance">Insurance</option>
+      <option value="labor">Labor</option>
+      <option value="pesticide">Pesticide</option>
+      <option value="processing">Processing</option>
+      <option value="seed">Seed</option>
+      <option value="water">Water</option>
+    </select>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-class-selector',
+
+    properties : {
+      value : {
+        type : 'String',
+        observer : 'valueObserver',
+        value : 'other'
+      }
+    },
+
+    ready : function() {
+      this.list = [];
+      var options = this.querySelectorAll('option');
+      for( var i = 0; i < options.length; i++ ) {
+        this.list.push(options[i].getAttribute('value'));
+      }
+    },
+
+    isClass : function(txt) {
+      if( this.list.indexOf(txt.toLowerCase()) > -1 ) {
+        return true;
+      }
+      return false;
+    },
+
+    valueObserver : function() {
+      this.setValue();
+    },
+
+    setValue : function(value) {
+      if( value ) this.value = value;
+      this.$.input.value = this.value;
+    },
+
+    getValue : function() {
+      return this.$.input.value;
+    }
+
+  })
+</script>

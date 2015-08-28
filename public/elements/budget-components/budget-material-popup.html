@@ -6,7 +6,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" aria-label="Close" on-click="hide"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close" aria-label="Close" on-click="cancel"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="title"></h4>
           </div>
           <div class="modal-body">
@@ -14,11 +14,19 @@
 
             <div class="form-horizontal">
 
+              <div id="parentMaterial"></div>
               <div class="form-group">
                 <label for="nameInput" class="col-sm-3 control-label">Name</label>
                 <div class="col-sm-9">
                   <input type="text" id="nameInput" class="form-control" on-input="onNameInput" />
                   <div class="text text-danger" id="nameInputMessage"></div>
+                </div>
+              </div>
+
+              <div class="form-group" id="classGroup">
+                <label for="optionInput" class="col-sm-3 control-label">Class</label>
+                <div class="col-sm-9">
+                  <budget-class-selector  id="classInput"></budget-class-selector>
                 </div>
               </div>
 
@@ -42,7 +50,7 @@
                 </div>
               </div>
 
-              <div class="form-group" id="unitsGroup">
+              <div class="form-group" id="complexGroup">
                 <label class="col-sm-3 control-label"><i class="fa fa-cubes"></i></label>
                 <div class="col-sm-9">
                   <div class="checkbox">
@@ -73,6 +81,13 @@
                         <span id="nameLabel"></span> material.</div>
 
                       <div class="form-horizontal" >
+
+                        <div class="form-group">
+                          <label for="optionInput" class="col-sm-2 control-label">Class</label>
+                          <div class="col-sm-10">
+                            <budget-class-selector id="uniqueClassInput" on-change="onUniqueClassChange"></budget-class-selector>
+                          </div>
+                        </div>
 
                         <div class="form-group">
                           <label for="uniqueNameInput" class="col-sm-2 control-label">Name</label>
@@ -124,7 +139,7 @@
 
             <div style="text-align:right">
               <a class="btn btn-primary" on-click="save">Save</a>
-              <a class="btn btn-cancel" on-click="hide">Cancel</a>
+              <a class="btn btn-cancel" on-click="cancel">Cancel</a>
             </div>
 
 
@@ -140,24 +155,124 @@
     is : 'budget-material-popup',
 
     ready : function() {
-      this.popup = $(this.$.popup).modal({show: false});
+      this.popup = $(this.$.popup).modal({show: false, backdrop: 'static'});
 
       this.materialTableOptions = {
         noNotes: true
       };
 
-      $(window).on('hashchange', this.hide.bind(this));
+      $(window).on('hashchange', function(){
+        if( !this.showing ) return;
+
+        // when we manually hit the back button bellow this event will be
+        // triped again.  you can ignore it.
+        if( this.ignoreNextHashEvent ) {
+          this.ignoreNextHashEvent = false;
+          return;
+        }
+
+        if( confirm('Do you want to save and close?') ) {
+          this.save();
+        } else {
+          this.ignoreNextHashEvent = true;
+          window.history.back();
+        }
+      }.bind(this));
     },
 
-    show : function(closeCallback) {
-
+    show : function() {
+      this.showing = true;
       this.popup.modal('show');
     },
 
-    edit : function(materialImpl, callback) {
+    hide : function() {
+      this.showing = false;
+      this.popup.modal('hide');
+    },
+
+    cancel : function() {
+      // remove any unique materials as they were added to the material
+      // controller so things didn't break
+      if( this.data.type == 'complex' ) {
+        for( var key in this.data.materials ) {
+          if( key.match(/--/) ) {
+            FB.materialController.remove(key);
+          }
+        }
+      }
+
+      // if we were creating
+      if( this.action == 'create' ) {
+        // not sure we need to do anything right now...
+
+      // cancel an edit
+      } else {
+
+        // reset any original unique materials
+        for( var i = 0; i < this.originalUniqueMaterials.length; i++ ) {
+          FB.materialController.add(this.originalUniqueMaterials[i], {replace: true});
+        }
+
+        FB.materialController.add(this.originalData, {replace: true});
+      }
+
+      this.hide();
+    },
+
+    edit : function(material) {
       this.action = 'edit';
       this.$.title.innerHTML = '<i class="fa fa-pencil"></i> Edit Material';
-      this.onSaveCallback = callback;
+
+      this.data = material;
+
+      // make a copy for if we cancel
+      this.originalData = $.extend(true, {}, this.data);
+      this.originalUniqueMaterials = [];
+
+      if( this.data.name.match(/--/) ) {
+        var parts = this.data.name.split('--');
+        this.parentMaterial = parts[0];
+        this.$.parentMaterial.innerHTML = '<h5 style="border-bottom: 1px solid #ccc; text-align:center">Parent: '+parts[0]+'</h5>';
+        this.$.nameInput.value = parts[1];
+
+        this.$.complexGroup.style.display = 'none';
+      } else {
+        this.$.complexGroup.style.display = 'block';
+        this.$.parentMaterial.innerHTML = '';
+        this.$.nameInput.value = this.data.name;
+      }
+
+
+
+      if( this.data.type == 'complex' ) {
+        this.setComplex(true);
+        this.$.unitsInput.setUnits(this.data.units);
+
+        if( this.data.materials[this.getBasePriceName()] ) {
+          this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
+        } else {
+          this.$.priceInput.value = '';
+        }
+
+        // snapshot all definitions of unique materials
+        for( var key in this.data.materials ) {
+          if( key.match(/--/) ) {
+            this.originalUniqueMaterials.push($.extend(true, {}, FB.materialController.get(key)));
+          }
+        }
+
+      } else {
+        this.$.unitsInput.setUnits(FB.units.invert(this.data.units));
+        this.$.priceInput.value = this.data.price;
+        this.setComplex(false);
+
+        if( this.$.classInput.isClass(this.data.class || '') ) {
+          this.$.classInput.setValue(this.data.class.toLowerCase());
+        }
+      }
+
+      this.recalc();
+
       this.show();
     },
 
@@ -171,21 +286,18 @@
       this.action = 'create';
 
       this.$.title.innerHTML = '<i class="fa fa-cube"></i> Create Material';
+      this.$.complexGroup.style.display = 'block';
+
       this.$.nameInput.value = '';
       this.$.unitsInput.setUnits('');
       this.$.priceInput.value = '';
       this.setComplex(false);
 
+      this.parentMaterial = null;
+      this.$.parentMaterial.innerHTML = '';
+
       this.onSaveCallback = callback;
       this.show();
-    },
-
-    hide : function() {
-      if( this.closeCallback ) {
-        this.closeCallback();
-        this.closeCallback = null;
-      }
-      this.popup.modal('hide');
     },
 
     onMaterialSelect : function(e) {
@@ -213,6 +325,7 @@
         this.$.isComplexInput.checked = true;
         this.$.complexPanel.style.display = 'block';
         this.$.priceMessage.style.display = 'block';
+        this.$.classGroup.style.display = 'none';
         this.$.priceLabel.innerHTML = 'Base Price';
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
         this.updatePriceLabel();
@@ -221,6 +334,7 @@
         this.$.isComplexInput.checked = false;
         this.$.complexPanel.style.display = 'none';
         this.$.priceMessage.style.display = 'none';
+        this.$.classGroup.style.display = 'Block';
         this.$.priceLabel.innerHTML = 'Price';
       }
     },
@@ -233,13 +347,41 @@
       if( this.data.name == '' ) {
         this.$.nameInputMessage.innerHTML = 'A material name is required';
         return;
+      } else if( this.data.name.indexOf('--') > -1 ) {
+        this.$.nameInputMessage.innerHTML = '"--" is reserved and not allowed in the material name.';
+        return;
       }
       this.$.nameInputMessage.innerHTML = '';
 
-      var result = FB.materialController.add(this.data);
+      if( this.data.type == 'simple' ) {
+        this.data.class = this.$.classInput.getValue();
+      }
+
+      var options = {};
+      if( this.action == 'edit' ) {
+        options.replace = true;
+
+        // if the name has changed, make sure we preform a rename
+        if( this.originalData.name != this.data.name ) {
+          options.rename = this.originalData.name;
+        }
+      }
+
+      console.log(this.data);
+      var result = FB.materialController.add(this.data, options);
 
       if( result.error ) {
         return alert(result.message);
+      }
+
+      // now re-save all required materials, this time we will fire events
+      if( this.data.type == 'complex' ) {
+        for( var key in this.data.materials ) {
+          var m = FB.materialController.get(key);
+          if( !m.error ) {
+            FB.materialController.add(m, {replace: true});
+          }
+        }
       }
 
       this.hide();
@@ -272,33 +414,53 @@
      * Start main input control Fn's
      */
     onNameInput : function() {
-      var name = this.$.nameInput.value;
-      if( this.data.name == name || name == '' ) return;
+      var newName = this.$.nameInput.value;
 
-      var m = FB.materialController.get(name);
+      if( this.parentMaterial ) {
+        newName = this.parentMaterial+'--'+newName;
+      }
+
+      if( this.data.name == newName || newName == '' ) return;
+
+      var m = FB.materialController.get(newName);
       if( !m.error ) {
         this.$.nameInputMessage.innerHTML = 'A material with this name already exists';
         return;
       }
       this.$.nameInputMessage.innerHTML = '';
 
-      this.$.nameLabel.innerHTML = name;
-      this.data.name = name;
+      this.$.nameLabel.innerHTML = newName;
+      this.data.name = newName;
 
-      if( this.data.materials ) {
+      // if complex, we need to update the name of all unique materials
+      if( this.data.type == 'complex' ) {
         var updated = [];
 
         for( var key in this.data.materials ) {
+
+          // only want to update unique stuff
           if( key.indexOf('--') > -1 ) {
+            // first lets update impl
             var m = this.data.materials[key];
             delete this.data.materials[key];
-            m.name = this.data.name+'--'+m.name.replace(/.*--/, '');
+            var newName = this.data.name+'--'+m.name.replace(/.*--/, '');
+            m.name = newName;
+            updated.push(m);
+
+            // now update def
+            m = FB.materialController.get(key);
+            if( m.error ) {
+              console.log('BADNESS!');
+              continue;
+            }
+            m.name = newName;
+
             FB.materialController.add(m, {
               rename: key,
               noRecalc : true,
               noEvent : true
             });
-            updated.push(m);
+
           }
         }
 
@@ -378,6 +540,7 @@
 
         if( keys === 0 || (keys === 1 && hasBase) ){
           delete this.data.materials;
+          delete this.data.class;
           this.data.type = 'simple';
           this.setComplex(false);
 
@@ -385,6 +548,7 @@
               'materials will be removed') ) {
 
           delete this.data.materials;
+          delete this.data.class;
           this.data.type = 'simple';
           this.setComplex(false);
         } else {
@@ -432,21 +596,27 @@
     _editUnits : function(e) {
       if( e.detail.error ) return;
 
-      var oldUnits = this.data.units;
-      var newUnits = e.detail.value;
 
-      this.$.materialTable.updateAmountFromUnits(oldUnits, newUnits);
 
-      this.data.units = newUnits;
       if( this.data.type == 'complex' ) {
+        var oldUnits = this.data.units;
+        var newUnits = e.detail.value;
+
+        this.$.materialTable.updateAmountFromUnits(oldUnits, newUnits);
+
+        this.data.units = newUnits;
+
         var m = FB.materialController.get(this.getBasePriceName());
         m.units = FB.units.invert(this.data.units);
 
         var name = this.getBasePriceName();
+
         if( this.data.materials[name] ) {
           this.data.materials[name].units = this.data.units;
           this.data.materials[name].amount = 1; // verify
         }
+      } else {
+        this.data.units = FB.units.invert(e.detail.value);
       }
 
       this.recalc();
@@ -461,6 +631,7 @@
      */
     createUnique : function() {
       var data = {
+        class : this.$.uniqueClassInput.getValue(),
         name : this.$.uniqueNameInput.value,
         units : this.$.uniqueUnitsInput.getUnits(),
         price : parseFloat(this.$.uniquePriceInput.value)
@@ -509,6 +680,12 @@
 
       // this just resets and hides
       this.cancelCreateUnique();
+    },
+
+    onUniqueClassChange : function() {
+      if( this.$.uniqueNameInput.value == '' || this.$.uniqueClassInput.isClass(this.$.uniqueNameInput.value) ) {
+        this.$.uniqueNameInput.value = this.$.uniqueClassInput.getValue();
+      }
     },
 
     cancelCreateUnique : function() {

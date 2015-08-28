@@ -151,8 +151,10 @@
     function render() {
       if( config.material.error ) {
         errorLabel.show();
-        errorLabel.html('Unknown material: '+config.material.name);
-        return;
+        errorLabel.html(config.material.error.message);
+        //return;
+      } else {
+        setErrorStatus();
       }
 
       nameLabel[0].material = config.material.name;
@@ -171,7 +173,6 @@
         notesInput.val(config.materialImpl.note);
       }
 
-      setErrorStatus();
     }
 
     function setErrorStatus() {
