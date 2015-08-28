@@ -162,7 +162,7 @@
       amountInput.val(config.materialImpl.amount);
 
       cols.Price.html(
-        config.material.price.toFixed(2) +
+        (config.material.price ? config.material.price.toFixed(2) : '')+
         (config.material.type === 'complex' ? ' $/' : ' ') +
         FB.units.getLabel(config.material.units, true)
       );

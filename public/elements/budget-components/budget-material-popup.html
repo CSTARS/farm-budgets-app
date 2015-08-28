@@ -377,14 +377,16 @@
       }
 
       // now re-save all required materials, this time we will fire events
+      var materials = [];
       if( this.data.type == 'complex' ) {
         for( var key in this.data.materials ) {
           var m = FB.materialController.get(key);
           if( !m.error ) {
-            FB.materialController.add(m, {replace: true});
+            materials.push(m);
           }
         }
       }
+      FB.materialController.bulkAdd(materials, {replace: true});
 
       this.hide();
     },
