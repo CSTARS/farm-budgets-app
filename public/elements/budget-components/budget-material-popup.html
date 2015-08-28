@@ -207,13 +207,15 @@
 
       // cancel an edit
       } else {
+        var materials = []
 
         // reset any original unique materials
         for( var i = 0; i < this.originalUniqueMaterials.length; i++ ) {
-          FB.materialController.add(this.originalUniqueMaterials[i], {replace: true});
+          materials.push(this.originalUniqueMaterials[i]);
         }
+        materials.push(this.originalData);
 
-        FB.materialController.add(this.originalData, {replace: true});
+        FB.materialController.bulkAdd(materials, {replace: true});
       }
 
       this.hide();
@@ -276,7 +278,7 @@
       this.show();
     },
 
-    create : function(callback) {
+    create : function() {
       this.data = {
         type : 'simple',
         name : '',
@@ -291,12 +293,12 @@
       this.$.nameInput.value = '';
       this.$.unitsInput.setUnits('');
       this.$.priceInput.value = '';
+      this.$.classInput.setValue('other');
       this.setComplex(false);
 
       this.parentMaterial = null;
       this.$.parentMaterial.innerHTML = '';
 
-      this.onSaveCallback = callback;
       this.show();
     },
 

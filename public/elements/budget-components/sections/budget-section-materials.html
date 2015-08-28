@@ -47,6 +47,10 @@
       this.filterTimer = -1;
       this.updateTimer = -1;
       FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
+      FB.materialController.on('material-removed', function(e){
+        console.log('Material removed and event not handled');
+        console.log(e);
+      });
     },
 
     attached : function() {
@@ -54,12 +58,8 @@
     },
 
     onMaterialsUpdated : function(e) {
-      if( e.isNew ) {
 
-        var div = this.createTable(e.material);
-        this.$.root.appendChild(div);
-
-      } else if( e.replaced ) {
+      if( e.replaced ) {
 
         var current = $(this.$.root).find('[material="'+e.replaced +'"]');
         var div = $(this.createTable(e.material));
@@ -85,6 +85,7 @@
       this.data = data;
 
       this.$.root.innerHTML = '';
+      
       this.data.materials.forEach(function(material){
         var div = this.createTable(material);
         this.$.root.appendChild(div);

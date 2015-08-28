@@ -77,7 +77,7 @@
     },
 
     setUnits : function(units) {
-      if( units ) this.units = units;
+      if( units !== undefined ) this.units = units;
       this.$.input.value = this.units;
       this.checkError();
     },
