@@ -102,10 +102,11 @@
 
     config.materialImpl = config.complexMaterial.materials[config.material.name];
 
+    /* BASEPRICE
     var isBasePrice = false;
     if( config.material.name == config.complexMaterial.name+'--Base Price' ) {
       isBasePrice = true;
-    }
+    } */
 
     for( var i = 0; i < config.cols.length; i++ ) {
       cols[config.cols[i]] = $ele.find('[type="'+config.cols[i]+'"]');
@@ -122,11 +123,15 @@
     var errorLabel = $('<div style="display:none" class="text text-danger"></div>');
     cols.Material.append(errorLabel);
 
-    var unitsInput = $('<budget-unit-selector '+(isBasePrice ? 'disabled' : '')+'></budget-unit-selector>');
+    // BASEPRICE
+    // var unitsInput = $('<budget-unit-selector '+(isBasePrice ? 'disabled' : '')+'></budget-unit-selector>');
+    var unitsInput = $('<budget-unit-selector '+(config.material.fixed ? 'disabled' : '')+'></budget-unit-selector>');
     unitsInput.on('units-change', fireUnitsChange);
     cols.Units.append(unitsInput);
 
-    var amountInput = $('<input type="number" class="form-control" '+(isBasePrice ? 'disabled' : '')+' />');
+    // BASEPRICE
+    //var amountInput = $('<input type="number" class="form-control" '+(isBasePrice ? 'disabled' : '')+' />');
+    var amountInput = $('<input type="number" class="form-control" />');
     amountInput.on('input', fireAmountChange);
     cols.Amount.append(amountInput);
 

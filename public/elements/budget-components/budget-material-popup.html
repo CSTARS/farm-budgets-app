@@ -42,11 +42,13 @@
                 </div>
               </div>
 
-              <div class="form-group" id="unitsGroup">
+              <div class="form-group" id="priceGroup">
                 <label for="priceInput" class="col-sm-3 control-label" id="priceLabel">Price</label>
                 <div class="col-sm-9">
                   <input type="number" id="priceInput" class="form-control" on-input="onPriceInput"/>
-                  <div class="help-block animated slideInRight" id="priceMessage" style="display:none">*A base price is not required for complex materials.</div>
+                  <!--
+                    <div class="help-block animated slideInRight" id="priceMessage" style="display:none">*A base price is not required for complex materials.</div>
+                  -->
                 </div>
               </div>
 
@@ -250,11 +252,12 @@
         this.setComplex(true);
         this.$.unitsInput.setUnits(this.data.units);
 
-        if( this.data.materials[this.getBasePriceName()] ) {
-          this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
-        } else {
-          this.$.priceInput.value = '';
-        }
+        // JM - BASEPRICE
+        //if( this.data.materials[this.getBasePriceName()] ) {
+        //  this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
+        //} else {
+        this.$.priceInput.value = '';
+        //}
 
         // snapshot all definitions of unique materials
         for( var key in this.data.materials ) {
@@ -326,24 +329,34 @@
         this.$.isComplexInput.setAttribute('checked', 'checked');
         this.$.isComplexInput.checked = true;
         this.$.complexPanel.style.display = 'block';
-        this.$.priceMessage.style.display = 'block';
+
         this.$.classGroup.style.display = 'none';
-        this.$.priceLabel.innerHTML = 'Base Price';
+
+        // BASEPRICE
+        //this.$.priceLabel.innerHTML = 'Base Price';
+        //this.$.priceMessage.style.display = 'block';
+        this.$.priceGroup.style.display = 'none';
+
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
         this.updatePriceLabel();
       } else {
         this.$.isComplexInput.removeAttribute('checked');
         this.$.isComplexInput.checked = false;
         this.$.complexPanel.style.display = 'none';
-        this.$.priceMessage.style.display = 'none';
+
+        // BASEPRICE
+        //this.$.priceMessage.style.display = 'none';
+        //this.$.priceLabel.innerHTML = 'Price';
+        this.$.priceGroup.style.display = 'block';
+
         this.$.classGroup.style.display = 'Block';
-        this.$.priceLabel.innerHTML = 'Price';
       }
     },
 
-    getBasePriceName : function() {
-      return this.data.name+'--Base Price';
-    },
+    // BASEPRICE
+    //getBasePriceName : function() {
+    //  return this.data.name+'--Base Price';
+    //},
 
     save : function() {
       if( this.data.name == '' ) {
@@ -396,18 +409,24 @@
      */
     onPriceChange : function() {
       FB.materialController.materialRecalc(this.data);
+
       // make sure the price is set
-      if( this.data.materials[this.getBasePriceName()] ) {
-        this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
-      }
+      // BASEPRICE
+      //if( this.data.materials[this.getBasePriceName()] ) {
+      //  this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
+      //}
+
       // do not call recalc, will update material table
       this.updatePriceLabel();
     },
 
     onMaterialDelete : function(e) {
-      if( e.detail.name == this.getBasePriceName() ) {
-        this.$.priceInput.value = '';
-      }
+
+      // BASEPRICE
+      //if( e.detail.name == this.getBasePriceName() ) {
+      //  this.$.priceInput.value = '';
+      //}
+
       this.updatePriceLabel();
     },
     /**
@@ -493,16 +512,18 @@
     onPriceInput : function() {
       var val = this.$.priceInput.value;
 
+      /* BASEPRICE
       if( val == '' && this.data.type == 'complex' ) {
         FB.materialController.remove(this.getBasePriceName());
         delete this.data.materials[this.getBasePriceName()];
         this.recalc();
         return;
-      }
+      } */
 
       var val = parseFloat(val);
       if( isNaN(val) ) return;
 
+      /* BASEPRICE
       if( this.data.type == 'complex' ) {
         var material = FB.materialController.get(this.getBasePriceName());
 
@@ -528,9 +549,10 @@
           }
         }
 
-      } else {
-        this.data.price = val;
-      }
+      } else { */
+      this.data.price = val;
+      //}
+
 
       this.recalc();
     },
@@ -540,9 +562,11 @@
 
       if( this.data.materials ) {
         var keys = Object.keys(this.data.materials).length;
-        var hasBase = this.data.materials[this.getBasePriceName()];
 
-        if( keys === 0 || (keys === 1 && hasBase) ){
+        // BASEPRICE
+        // var hasBase = this.data.materials[this.getBasePriceName()];
+        // if( keys === 0 || (keys === 1 && hasBase) ){
+        if( keys === 0 ){
           delete this.data.materials;
           delete this.data.class;
           this.data.type = 'simple';
@@ -567,7 +591,7 @@
           var price = parseFloat(this.$.priceInput.value);
 
           if( !isNaN(price) ) {
-            var name = this.getBasePriceName();
+            /* var name = this.getBasePriceName();
 
             this.data.materials[name] = {
               amount : 1,
@@ -579,7 +603,13 @@
               units : FB.units.invert(this.data.units),
               name : name,
               price : price
-            });
+            });*/
+
+            this.data.materials.Estimate = {
+              amount : price,
+              units : 'us$'
+            }
+
             this.recalc();
           }
         }
@@ -610,6 +640,7 @@
 
         this.data.units = newUnits;
 
+        /* BASEPRICE
         var m = FB.materialController.get(this.getBasePriceName());
         m.units = FB.units.invert(this.data.units);
 
@@ -618,7 +649,7 @@
         if( this.data.materials[name] ) {
           this.data.materials[name].units = this.data.units;
           this.data.materials[name].amount = 1; // verify
-        }
+        }*/
       } else {
         this.data.units = FB.units.invert(e.detail.value);
       }

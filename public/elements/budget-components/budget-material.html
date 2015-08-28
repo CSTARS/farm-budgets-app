@@ -48,7 +48,6 @@
       if( typeof material == 'string' ) this.material = material;
       if( !this.material ) return;
 
-      this.$.edit.href = '#budget/materials/'+this.material;
       this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
 
       if( this.material.indexOf('--') > -1 ) {
@@ -59,6 +58,14 @@
 
       var m = FB.materialController.get(this.material);
       if( m.error ) return this.showError(m);
+
+      if( m.fixed ) {
+        this.$.edit.style.display = 'none';
+      } else {
+        this.$.edit.style.display = 'inline-block';
+        this.$.edit.href = '#budget/materials/'+this.material;
+      }
+
 
       // TODO: don't think this is the best place for this error checkError
       // but at least we are getting it on screen
