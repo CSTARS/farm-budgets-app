@@ -43,24 +43,36 @@
           isOperation : this.options.isOperation,
 
           onDelete : function(material) {
-            FB.materialController.materialRecalc(this.data);
+            this.recalc();
+            
             if( Object.keys(this.data.materials).length == 0 ) {
               this.innerHTML = ''; // remove table
             }
+
             this.fire('delete', material);
           }.bind(this),
 
           onAmountChange : function(material, amount) {
-            FB.materialController.materialRecalc(this.data);
+            this.recalc();
             this.fire('price-change', this.data.price);
+
           }.bind(this),
 
           onUnitsChange : function(material, units) {
-            FB.materialController.materialRecalc(this.data);
+            this.recalc();
             this.fire('price-change', this.data.price);
           }.bind(this)
         }
       );
+    },
+
+    recalc : function() {
+      // sniff out material or operation
+      if( this.data.schedule ) {
+        FB.operationController.operationRecalc(this.data);
+      } else {
+        FB.materialController.materialRecalc(this.data);
+      }
     },
 
     updateAmountFromUnits : function(from, to) {

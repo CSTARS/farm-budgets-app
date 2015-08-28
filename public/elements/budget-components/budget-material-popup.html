@@ -443,7 +443,7 @@
       // remove from all operations
       for( var i = 0; i < usedBy.operations.length; i++ ) {
         delete usedBy.operations[i].materials[this.data.name];
-        FB.operationController.add(usedBy.operations[i], {replace: true});
+        FB.operationController.update(usedBy.operations[i]);
       }
 
       // remove from all materials

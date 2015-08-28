@@ -9,7 +9,7 @@
   </style>
 
   <template>
-    <div id="label" style="cursor:pointer" on-click="toggle"><b><i class="fa fa-cube"></i> <span id="nameLabel"></span></b></div>
+    <div id="label" style="cursor:pointer" on-click="toggle"><b><i class="fa fa-cube" id="icon"></i> <span id="nameLabel"></span></b></div>
     <div id="error" class="text text-danger"></div>
     <div id="price" style="white-space: nowrap">
       <div id="forLabel"></div>
@@ -48,7 +48,7 @@
       if( typeof material == 'string' ) this.material = material;
       if( !this.material ) return;
 
-      this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
+
 
       if( this.material.indexOf('--') > -1 ) {
         this.$.forLabel.innerHTML = '(for '+this.material.split('--')[0]+')';
@@ -61,9 +61,11 @@
 
       if( m.fixed ) {
         this.$.edit.style.display = 'none';
+        this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '')+' <span class="label label-warning">Fixed</span>';
       } else {
         this.$.edit.style.display = 'inline-block';
         this.$.edit.href = '#budget/materials/'+this.material;
+        this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
       }
 
 

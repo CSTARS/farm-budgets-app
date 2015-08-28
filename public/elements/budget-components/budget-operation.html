@@ -14,7 +14,12 @@
 
     <h4 class="page-header" style="margin-top: 5px; text-transform: capitalize">
       <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
-      <span id="nameLabel"></span>
+
+      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="saveNewName" />
+      <span id="nameLabel" style="cursor:pointer" on-mouseenter="onMouseEnterName" on-mouseleave="onMouseLeaveName" on-click="editName" ></span>
+      <span id="nameMsg" class="text text-danger" style="font-size: 14px"></span>
+      <i class="fa fa-pencil" style="display:none" id="renameIcon"></i>
+
       <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
     </h4>
 
@@ -44,7 +49,16 @@
 
 
     <div id="content" style="display:none" class="animated zoomIn">
-      <budget-materials-table id="materialTable" on-price-change="updateTotals"></budget-materials-table>
+      <div class="form-horizontal" style="margin: 25px 0 ">
+        <div class="form-group">
+          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
+          <div class="col-sm-9">
+            <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
+          </div>
+        </div>
+      </div>
+
+      <budget-materials-table id="materialTable" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
     </div>
 
   </template>
@@ -55,7 +69,7 @@
     is : 'budget-operation',
 
     properties : {
-      operationid : {
+      operationname : {
         type : String,
         observer : 'update'
       }
@@ -73,7 +87,7 @@
     // fired from operation controller
     onOperationUpdate : function(operation) {
       if( !this.operation ) return;
-      if( operation.id != this.operation.id ) return;
+      if( operation.name != this.operation.name ) return;
 
       this.render();
     },
@@ -88,7 +102,7 @@
     },
 
     update : function() {
-      this.operation = FB.operationController.get(this.operationid);
+      this.operation = FB.operationController.get(this.operationname);
       this.$.schedule.set(this.operation.schedule, this.operation.name);
       this.render();
     },
@@ -127,6 +141,23 @@
       $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
     },
 
+    onMaterialDelete : function(e) {
+      FB.operationController.update(this.operation);
+      this.updateTotals();
+    },
+
+    onMaterialSelect : function(e) {
+      var material = e.detail;
+      this.operation.materials[material.name] = {
+        name : material.name,
+        amount : 1,
+        units : material.units
+      }
+
+      FB.operationController.update(this.operation);
+      this.render();
+    },
+
     toggleContent : function() {
       if( this.$.content.style.display == 'block' ) {
         this.$.content.style.display = 'none'
@@ -135,6 +166,45 @@
         this.$.content.style.display = 'block'
         this.$.icon.className = 'fa fa-toggle-down';
       }
+    },
+
+    onMouseEnterName : function() {
+      this.$.renameIcon.style.display = 'inline-block';
+    },
+
+    onMouseLeaveName : function() {
+      this.$.renameIcon.style.display = 'none';
+    },
+
+    editName : function() {
+      this.$.nameLabel.style.display = 'none';
+      this.$.nameInput.style.display = 'inline-block';
+      this.$.nameInput.value = this.operation.name;
+      this.$.nameInput.focus();
+    },
+
+    onNameInputKeyUp : function(e) {
+      if( e.which == 13 ) this.$.nameInput.blur();
+    },
+
+    saveNewName : function() {
+      if( this.$.nameInput.value.replace(/\s/g, '') == '' ) {
+        this.$.nameMsg.innerHTML = 'Invalid Name.';
+        return;
+      }
+
+      var op = FB.operationController.get(this.$.nameInput.value);
+      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
+        this.$.nameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
+        return;
+      }
+
+      this.$.nameMsg.innerHTML = '';
+      this.operation.name = this.$.nameInput.value;
+      this.$.nameLabel.innerHTML = this.operation.name;
+      this.$.nameLabel.style.display = 'inline-block';
+      this.$.nameInput.style.display = 'none';
+      FB.operationController.update(this.operation, {noRecalc: true, noEvents: true});
     }
 
   });
