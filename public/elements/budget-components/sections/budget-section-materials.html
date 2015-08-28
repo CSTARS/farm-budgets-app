@@ -48,9 +48,9 @@
       this.updateTimer = -1;
       FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
       FB.materialController.on('material-removed', function(e){
-        console.log('Material removed and event not handled');
-        console.log(e);
-      });
+        $(this.$.root).find('[material="'+e.material.name+'"]').remove();
+        this.filter();
+      }.bind(this));
     },
 
     attached : function() {
@@ -177,8 +177,8 @@
             '<tr>' +
               '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
               (material.type == 'complex' || material.fixed ?
-                '<td class="material-price">'+(material.price || '')+' </td>' :
-                '<td><input type="number" class="form-control material-price" value="'+(material.price || '')+'" /></td>'
+                '<td class="material-price">'+(material.price || '0')+' </td>' :
+                '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
               ) +
               '<td>'+
                 (material.fixed ?
