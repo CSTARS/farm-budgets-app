@@ -1,6 +1,39 @@
 <dom-module id="budget-section-operations">
   <template>
 
+    <div class="modal fade" id="createPopup" tabindex="-1" role="dialog" aria-labelledby="createPopupLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="createPopupLabel">Create New Operation</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="filterInput" class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="newNameInput" placeholder="New Operation Name" on-keyup="onNewNameKeyUp">
+                  <div id="newNameMsg"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer" style="text-align: right">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" on-click="createNew">Create</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: 25px 0 15px 0">
+      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cogs"></i> Create New Operation</a>
+    </div>
+
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
         <div class="form-horizontal" style="margin: 25px 0">
@@ -24,6 +57,39 @@
 
     ready : function() {
       this.filterTimer = -1;
+
+      this.popup = $(this.$.createPopup).remove();
+      $('body').append(this.popup);
+      this.popup.modal({show: false});
+
+      FB.materialController.on('operation-update', this.onOperationsUpdated.bind(this));
+      FB.materialController.on('operation-removed', function(e){
+        $(this.$.root).find('[material="'+e.material.name+'"]').remove();
+        this.filter();
+      }.bind(this));
+    },
+
+    onOperationsUpdated : function(e) {
+      if( e.replaced ) {
+
+        var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
+        var div = $(this.createTable(e.material));
+        div.insertAfter(current);
+        current.remove();
+
+      } else {
+
+        var current = $(this.$.root).find('[operation="'+e.material.name+'"]');
+        var div = $(this.createTable(e.material));
+        if( current.length == 0 ) {
+          $(this.$.root).append(div);
+        } else {
+          div.insertAfter(current);
+          current.remove();
+        }
+      }
+
+      this.filter();
     },
 
     setData : function(data) {
@@ -31,6 +97,7 @@
 
       this.data.operations.forEach(function(operation){
         var ele = document.createElement('budget-operation');
+        ele.setAttribute('operation', operation.name);
         ele.operationname = operation.name;
 
         var div = document.createElement('div');
@@ -42,12 +109,46 @@
       this._filter();
     },
 
+    showCreate : function() {
+      this.$.newNameInput.value = '';
+      this.$.newNameMsg.innerHTML = '';
+      this.popup.modal('show');
+    },
+
     onShow : function(params) {
       if( params.length > 0 ) {
         this.$.filterInput.value = params[0];
       }
 
       this._filter();
+    },
+
+    onNewNameKeyUp : function(e) {
+      if( e.which == 13 ) this.createNew();
+    },
+
+    createNew : function() {
+      var name = this.$.newNameInput.value;
+
+      if( name.replace(/\s/g, '') == '' ) {
+        this.$.newNameMsg.innerHTML = 'Invalid Name.';
+        return;
+      }
+
+      var op = FB.operationController.get(name);
+      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
+        this.$.newNameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
+        return;
+      }
+      this.$.newNameMsg.innerHTML = '';
+
+      var op = {
+        name : name,
+        materials : {},
+        schedule : [],
+        units : '[acr_us]'
+      }
+      FB.operationController.add(op);
     },
 
     filter : function() {

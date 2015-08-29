@@ -46,8 +46,6 @@
       </div>
     </div>
 
-
-
     <div id="content" style="display:none" class="animated zoomIn">
       <div class="form-horizontal" style="margin: 25px 0 ">
         <div class="form-group">
@@ -113,8 +111,8 @@
     },
 
     checkError : function() {
-      for( var material in this.operation.materials ) {
-        if( this.operation.materials[material].error ) {
+      for( var i = 0; i < this.operation.materials.length; i++ ) {
+        if( this.operation.materials[i].error ) {
           this.showError(true);
           return;
         }
@@ -142,19 +140,23 @@
     },
 
     onMaterialDelete : function(e) {
-      FB.operationController.update(this.operation);
+      FB.operationController.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
     onMaterialSelect : function(e) {
       var material = e.detail;
-      this.operation.materials[material.name] = {
-        name : material.name,
-        amount : 1,
-        units : material.units
-      }
 
-      FB.operationController.update(this.operation);
+      FB.operationController.addUpdateMaterial(
+        this.operation,
+        {
+          name : material.name,
+          amount : 1,
+          units : material.units
+        }
+      );
+
+      FB.operationController.add(this.operation, {replace: true});
       this.render();
     },
 
@@ -200,11 +202,19 @@
       }
 
       this.$.nameMsg.innerHTML = '';
+      var oldName = this.operation.name;
       this.operation.name = this.$.nameInput.value;
       this.$.nameLabel.innerHTML = this.operation.name;
       this.$.nameLabel.style.display = 'inline-block';
       this.$.nameInput.style.display = 'none';
-      FB.operationController.update(this.operation, {noRecalc: true, noEvents: true});
+
+      FB.operationController.add(this.operation,
+          {
+            noRecalc: true,
+            noEvents: true,
+            rename : oldName
+          }
+      );
     }
 
   });

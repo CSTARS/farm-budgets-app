@@ -3,7 +3,7 @@
 <dom-module id="budget-material-popup">
   <template>
     <div class="modal fade" id="popup">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" aria-label="Close" on-click="cancel"><span aria-hidden="true">&times;</span></button>
@@ -441,13 +441,14 @@
       }
 
       // remove from all operations
+      var updates = usedBy.operations;
       for( var i = 0; i < usedBy.operations.length; i++ ) {
         delete usedBy.operations[i].materials[this.data.name];
-        FB.operationController.update(usedBy.operations[i]);
       }
+      FB.operationController.bulkAdd(updates, {replace: true});
 
       // remove from all materials
-      var updates = usedBy.materials;
+      updates = usedBy.materials;
       for( var i = 0; i < usedBy.materials.length; i++ ) {
         delete usedBy.materials[i].materials[this.data.name];
       }

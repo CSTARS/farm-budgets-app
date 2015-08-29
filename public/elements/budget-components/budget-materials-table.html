@@ -20,20 +20,29 @@
       this.controllers = []
       this.data = data;
 
+      if( Array.isArray(this.data.materials) ) {
+        this.initTable(this.data.materials.length);
 
-      this.initTable(Object.keys(this.data.materials).length);
+        for( var i = 0; i < this.data.materials.length; i++ ) {
+          var m = FB.materialController.get(this.data.materials[i].name);
+          var row = this.initRow(i+2, m, this.data.materials[i]);
+          this.controllers.push(row);
+        }
 
-      var c = 2;
-
-      for( var material in this.data.materials ) {
-        var m = FB.materialController.get(material);
-        var row = this.initRow(c, m);
-        this.controllers.push(row);
-        c++;
+      } else {
+        this.initTable(Object.keys(this.data.materials).length);
+        var c = 2;
+        for( var material in this.data.materials ) {
+          var m = FB.materialController.get(material);
+          var row = this.initRow(c, m, material);
+          this.controllers.push(row);
+          c++;
+        }
       }
+
     },
 
-    initRow : function(row, material) {
+    initRow : function(row, material, materialImpl) {
       return new FB.MaterialTableRow(
         this.querySelector('table[main] > tbody > tr:nth-child('+row+')'),
         {
@@ -41,11 +50,14 @@
           material : material,
           complexMaterial : this.data,
           isOperation : this.options.isOperation,
+          materialImpl : materialImpl,
 
           onDelete : function(material) {
             this.recalc();
-            
-            if( Object.keys(this.data.materials).length == 0 ) {
+
+            if( Array.isArray(this.data.materials) && this.data.materials.length == 0 ) {
+              this.innerHTML = ''; // remove table
+            } else if( Object.keys(this.data.materials).length == 0 ) {
               this.innerHTML = ''; // remove table
             }
 
@@ -111,8 +123,6 @@
   // controller for the material table row
   FB.MaterialTableRow = function(ele, config){
     var $ele = $(ele), amountTimer = -1, unitTimer = -1, cols = {};
-
-    config.materialImpl = config.complexMaterial.materials[config.material.name];
 
     /* BASEPRICE
     var isBasePrice = false;
@@ -248,7 +258,17 @@
     }
 
     function fireDelete(e) {
-      delete config.complexMaterial.materials[config.material.name];
+      if( Array.isArray(config.complexMaterial.materials) ) {
+        for( var i = 0; i < config.complexMaterial.materials.length; i++ ) {
+          if( config.complexMaterial.materials[i].id == config.materials.id ) {
+            config.complexMaterial.materials.splice(i, 1);
+            break;
+          }
+        }
+      } else {
+        delete config.complexMaterial.materials[config.material.name];
+      }
+
       $ele.remove();
 
       config.onDelete(config.materialImpl);
