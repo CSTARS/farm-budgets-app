@@ -38,8 +38,7 @@
         <div class="form-group" id="dates">
           <label for="datesInput" class="col-sm-3 control-label"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
           <div class="col-sm-9">
-            <input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>
-
+            <div id="inputRoot"></div>
             <div id="selectedDates">
 
 
@@ -91,21 +90,6 @@
 
       this.data = [];
       this.dates = [];
-
-      $(this.$.datesInput)
-        .datepicker({
-          format: 'mm/dd/yyyy',
-          orientation : 'top auto'
-        })
-        .on('changeDate', function(e){
-          this.dates.push({
-            date : e.date,
-            length : 1,
-            units : 'month'
-          });
-          this.update();
-          $(this.$.datesInput).datepicker('hide');
-        }.bind(this));
 
       $(this.$.title)
         .on('mouseover', function(){
@@ -248,10 +232,35 @@
       this.update();
     },
 
+    recreateInput : function() {
+      var input = $('<input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>');
+      $(this.$.inputRoot).html('').append(input);
+
+      input
+        .datepicker({
+          format: 'mm/dd/yyyy',
+          orientation : 'top auto'
+        })
+        .on('changeDate', function(e){
+          this.dates.push({
+            date : e.date,
+            length : 1,
+            units : 'month'
+          });
+          this.update();
+          $(this.$.datesInput).datepicker('hide');
+        }.bind(this));
+    },
+
     toggle : function() {
       this.editing = true;
+
       this.popup.setBody(this.$.inputPanel);
       this.popup.show();
+
+      this.recreateInput();
+
+
       setTimeout(this.updateChart.bind(this), 500);
     }
   });

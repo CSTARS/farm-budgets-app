@@ -34,7 +34,7 @@
         var c = 2;
         for( var material in this.data.materials ) {
           var m = FB.materialController.get(material);
-          var row = this.initRow(c, m, material);
+          var row = this.initRow(c, m, this.data.materials[material]);
           this.controllers.push(row);
           c++;
         }
@@ -81,9 +81,9 @@
     recalc : function() {
       // sniff out material or operation
       if( this.data.schedule ) {
-        FB.operationController.operationRecalc(this.data);
+        FB.operationController.recalc();
       } else {
-        FB.materialController.materialRecalc(this.data);
+        FB.materialController.recalc();
       }
     },
 
@@ -260,7 +260,7 @@
     function fireDelete(e) {
       if( Array.isArray(config.complexMaterial.materials) ) {
         for( var i = 0; i < config.complexMaterial.materials.length; i++ ) {
-          if( config.complexMaterial.materials[i].id == config.materials.id ) {
+          if( config.complexMaterial.materials[i].id == config.materialImpl.id ) {
             config.complexMaterial.materials.splice(i, 1);
             break;
           }

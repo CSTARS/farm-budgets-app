@@ -45,6 +45,7 @@
           </div>
         </div>
 
+        <div id="searchMsg"></div>
         <div id="root"></div>
       </div>
     </div>
@@ -62,9 +63,9 @@
       $('body').append(this.popup);
       this.popup.modal({show: false});
 
-      FB.materialController.on('operation-update', this.onOperationsUpdated.bind(this));
-      FB.materialController.on('operation-removed', function(e){
-        $(this.$.root).find('[material="'+e.material.name+'"]').remove();
+      FB.operationController.on('operation-update', this.onOperationsUpdated.bind(this));
+      FB.operationController.on('operation-removed', function(e){
+        $(this.$.root).find('[operation="'+e.operation.name+'"]').remove();
         this.filter();
       }.bind(this));
     },
@@ -73,19 +74,17 @@
       if( e.replaced ) {
 
         var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
-        var div = $(this.createTable(e.material));
+        current.attr('operation', operation.name);
+        /*var div = $(this.createPanel(e.operation));
         div.insertAfter(current);
-        current.remove();
+        current.remove();*/
 
       } else {
 
-        var current = $(this.$.root).find('[operation="'+e.material.name+'"]');
-        var div = $(this.createTable(e.material));
+        var current = $(this.$.root).find('[operation="'+e.operation.name+'"]');
         if( current.length == 0 ) {
+          var div = $(this.createPanel(e.operation, e.isNew));
           $(this.$.root).append(div);
-        } else {
-          div.insertAfter(current);
-          current.remove();
         }
       }
 
@@ -96,23 +95,28 @@
       this.data = data;
 
       this.data.operations.forEach(function(operation){
-        var ele = document.createElement('budget-operation');
-        ele.setAttribute('operation', operation.name);
-        ele.operationname = operation.name;
-
-        var div = document.createElement('div');
-        div.appendChild(ele);
-
-        this.$.root.appendChild(div);
+        var ele = this.createPanel(operation);
+        this.$.root.appendChild(ele);
       }.bind(this));
 
       this._filter();
+    },
+
+    createPanel : function(operation, open) {
+      var ele = document.createElement('budget-operation');
+      ele.setAttribute('operation', operation.name);
+      ele.operationname = operation.name;
+      if( open ) ele.toggleContent();
+      return ele;
     },
 
     showCreate : function() {
       this.$.newNameInput.value = '';
       this.$.newNameMsg.innerHTML = '';
       this.popup.modal('show');
+      setTimeout(function(){
+        this.$.newNameInput.focus();
+      }.bind(this), 500);
     },
 
     onShow : function(params) {
@@ -144,11 +148,14 @@
 
       var op = {
         name : name,
-        materials : {},
+        materials : [],
         schedule : [],
         units : '[acr_us]'
-      }
+      };
+
       FB.operationController.add(op);
+      this.$.filterInput.value = name;
+      this.popup.modal('hide');
     },
 
     filter : function() {
@@ -166,24 +173,39 @@
       if( txt == '' ) {
         showAll = true;
       } else {
-        matched = this.toIdArray(FB.operationController.find(txt));
+        matched = this.toNameArray(FB.operationController.find(txt));
       }
 
       var opEles = this.querySelectorAll('budget-operation');
       for( var i = 0; i < opEles.length; i++ ) {
         var ele = opEles[i];
-        if( showAll || matched.indexOf(ele.operationid) > -1 ) {
+        if( showAll || matched.indexOf(ele.operationname) > -1 ) {
           ele.style.display = 'block';
         } else {
           ele.style.display = 'none';
         }
-      };
+      }
+
+      if( matched.length == 0 && !showAll ) {
+        this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
+        '. <a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
+
+        $(this.$.searchMsg)
+          .find('a')
+          .on('click', function() {
+            this.showCreate();
+            this.$.newNameInput.value = txt;
+          }.bind(this));
+      } else {
+        this.$.searchMsg.innerHTML = '';
+      }
+
     },
 
-    toIdArray : function(ops) {
+    toNameArray : function(ops) {
       var arr = [];
       ops.forEach(function(op){
-        arr.push(op.id);
+        arr.push(op.name);
       });
       return arr;
     }

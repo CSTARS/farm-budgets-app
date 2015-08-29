@@ -56,6 +56,8 @@
         this.$.forLabel.innerHTML = '';
       }
 
+      this.$.edit.href = '#budget/materials/'+this.material;
+
       var m = FB.materialController.get(this.material);
       if( m.error ) return this.showError(m);
 
@@ -64,9 +66,9 @@
         this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '')+' <span class="label label-warning">Fixed</span>';
       } else {
         this.$.edit.style.display = 'inline-block';
-        this.$.edit.href = '#budget/materials/'+this.material;
         this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
       }
+
 
 
       // TODO: don't think this is the best place for this error checkError

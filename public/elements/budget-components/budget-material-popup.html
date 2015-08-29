@@ -286,10 +286,10 @@
       this.show();
     },
 
-    create : function() {
+    create : function(name) {
       this.data = {
         type : 'simple',
-        name : '',
+        name : name || '',
         units : '',
         price : 0
       };
@@ -298,7 +298,7 @@
       this.$.title.innerHTML = '<i class="fa fa-cube"></i> Create Material';
       this.$.complexGroup.style.display = 'block';
 
-      this.$.nameInput.value = '';
+      this.$.nameInput.value = name || '';
       this.$.unitsInput.setUnits('');
       this.$.priceInput.value = '';
       this.$.classInput.setValue('other');

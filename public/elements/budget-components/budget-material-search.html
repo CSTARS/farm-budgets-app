@@ -73,10 +73,15 @@
       var index = parseInt($(e.currentTarget).attr('index'));
       var material = results[index];
 
+      setTimeout(function(){
+        $(this.$.input).val('').blur();
+      }.bind(this), 400);
+
       this.fire('material-select', material);
     },
 
     showResults : function() {
+      this.search();
       this.$.results.style.display = 'block';
     },
 

@@ -32,6 +32,7 @@
           </div>
         </div>
 
+        <div id="searchMsg"></div>
         <div id="root"></div>
 
       </div>
@@ -133,6 +134,20 @@
           ele.style.display = 'none';
         }
       };
+
+      if( matched.length == 0 && !showAll ) {
+        this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
+        '. <a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
+
+        $(this.$.searchMsg)
+          .find('a')
+          .on('click', function() {
+            document.querySelector('budget-material-popup').create(txt);
+          });
+      } else {
+        this.$.searchMsg.innerHTML = '';
+      }
+
     },
 
     toNameArray : function(materials) {

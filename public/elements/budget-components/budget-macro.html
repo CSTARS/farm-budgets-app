@@ -105,12 +105,12 @@
 
       var m = FB.materialController.get(this.material);
 
+      this.$.editBtn.setAttribute('href','#budget/materials/'+this.material);
+
       // TODO: set error message!!
       if( m.error ) {
         return alert(JSON.stringify(m));
       }
-
-      this.$.editBtn.setAttribute('href','#budget/materials/'+m.name);
 
       this.data = m;
 
