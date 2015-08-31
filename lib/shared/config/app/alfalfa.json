@@ -288,6 +288,70 @@
     },
     {
       "class": "equipment",
+      "name": "ATV Sprayer System--Lube & Repairs",
+      "units": "us$/h",
+      "price": 2.61,
+      "type": "simple"
+    },
+    {
+      "class": "equipment",
+      "name": "ATV Sprayer System--Taxes",
+      "units": "us$/h",
+      "price": 0.23,
+      "type": "simple"
+    },
+    {
+      "class": "insurance",
+      "name": "ATV Sprayer System--insurance",
+      "units": "us$/h",
+      "price": 0.02,
+      "type": "simple"
+    },
+    {
+      "class": "other",
+      "name": "ATV Sprayer System--Capital Recovery",
+      "units": "us$/h",
+      "price": 4.41,
+      "type": "simple"
+    },
+    {
+      "type": "simple",
+      "name": "Equipment Operator Labor",
+      "units": "us$/h",
+      "description": "",
+      "price": 17,
+      "class": "labor"
+    },
+    {
+      "class": "other",
+      "name": "205HP Crawler--Capital Recovery",
+      "units": "us$/h",
+      "price": 9.12,
+      "type": "simple"
+    },
+    {
+      "class": "insurance",
+      "name": "205HP Crawler--insurance",
+      "units": "us$/h",
+      "price": 0.05,
+      "type": "simple"
+    },
+    {
+      "class": "other",
+      "name": "205HP Crawler--Taxes",
+      "units": "us$/h",
+      "price": 0.57,
+      "type": "simple"
+    },
+    {
+      "class": "equipment",
+      "name": "205HP Crawler--Lube & Repairs",
+      "units": "us$/h",
+      "price": 13.13,
+      "type": "simple"
+    },
+    {
+      "class": "equipment",
       "name": "Challenger Tractor",
       "units": "h",
       "type": "complex",
@@ -633,7 +697,7 @@
     {
       "type": "complex",
       "name": "ATV",
-      "units": "us$/h",
+      "units": "h",
       "description": "",
       "price": 6.9799999999999995,
       "materials": {
@@ -642,35 +706,122 @@
           "amount": 1,
           "units": "[gal_us]",
           "error": null,
-          "price": 3.79
+          "price": 3.79,
+          "originalAmount": 1
         },
         "ATV--Capital Recovery": {
           "name": "ATV--Capital Recovery",
           "amount": 1,
           "units": "h",
           "error": null,
-          "price": 1.89
+          "price": 1.89,
+          "originalAmount": 1
         },
         "ATV--insurance": {
           "name": "ATV--insurance",
           "amount": 1,
           "units": "h",
           "error": null,
-          "price": 0.01
+          "price": 0.01,
+          "originalAmount": 1
         },
         "ATV--Taxes": {
           "name": "ATV--Taxes",
           "amount": 1,
           "units": "h",
           "error": null,
-          "price": 0.09
+          "price": 0.09,
+          "originalAmount": 1
         },
         "ATV--Lube & Repairs": {
           "name": "ATV--Lube & Repairs",
           "amount": 1,
           "units": "h",
           "error": null,
-          "price": 1.2
+          "price": 1.2,
+          "originalAmount": 1
+        }
+      }
+    },
+    {
+      "type": "complex",
+      "name": "ATV Sprayer System",
+      "units": "h",
+      "description": "",
+      "price": 7.27,
+      "materials": {
+        "ATV Sprayer System--Lube & Repairs": {
+          "name": "ATV Sprayer System--Lube & Repairs",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 2.61
+        },
+        "ATV Sprayer System--Taxes": {
+          "name": "ATV Sprayer System--Taxes",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 0.23
+        },
+        "ATV Sprayer System--insurance": {
+          "name": "ATV Sprayer System--insurance",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 0.02
+        },
+        "ATV Sprayer System--Capital Recovery": {
+          "name": "ATV Sprayer System--Capital Recovery",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 4.41
+        }
+      }
+    },
+    {
+      "type": "complex",
+      "name": "205HP Crawler",
+      "units": "h",
+      "description": "",
+      "price": 69.0322,
+      "materials": {
+        "205HP Crawler--Capital Recovery": {
+          "name": "205HP Crawler--Capital Recovery",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 9.12
+        },
+        "205HP Crawler--insurance": {
+          "name": "205HP Crawler--insurance",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 0.05
+        },
+        "205HP Crawler--Taxes": {
+          "name": "205HP Crawler--Taxes",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 0.57
+        },
+        "205HP Crawler--Lube & Repairs": {
+          "name": "205HP Crawler--Lube & Repairs",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 13.13
+        },
+        "Gas": {
+          "name": "Gas",
+          "amount": 12.18,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 46.1622,
+          "originalAmount": 12.18
         }
       }
     }
@@ -681,40 +832,141 @@
       "materials": [
         {
           "name": "ATV",
-          "amount": 0,
-          "units": "us$/h",
-          "id": "c2b6880a-a297-4cb8-8ab8-8d3223a66d79",
+          "amount": 0.06,
+          "units": "h",
+          "id": "b6aeb9d5-3662-416f-b40a-fa373bdb2288",
           "error": null,
-          "price": 0,
-          "originalAmount": 0
+          "price": 0.41879999999999995,
+          "originalAmount": 0.06
         },
         {
           "name": "Roundup PowerMax",
+          "amount": 0.06,
+          "units": "[pt_us]",
+          "id": "3c2102da-47dd-4f5e-9ec4-ec5be01b5a21",
+          "error": null,
+          "price": 0.16499999999999998,
+          "originalAmount": 0.06
+        },
+        {
+          "name": "Equipment Operator Labor",
+          "amount": 0.06,
+          "units": "h",
+          "id": "eeddf609-57f6-4194-9f76-6b816dbcef06",
+          "error": null,
+          "price": 1.02,
+          "originalAmount": 0.06
+        },
+        {
+          "name": "Velpar L",
           "amount": 2,
           "units": "[pt_us]",
-          "id": "743cbe08-4c69-4cd7-8612-8fb11c1a9ba0",
+          "id": "c3db4d78-453d-4ec0-856d-3c82ddc3e092",
           "error": null,
-          "price": 5.5,
+          "price": 28.82,
+          "originalAmount": 2
+        },
+        {
+          "name": "ATV Sprayer System",
+          "amount": 2,
+          "units": "h",
+          "id": "48e31480-0427-40a9-9ac0-3cc16ccf469e",
+          "error": null,
+          "price": 14.54,
           "originalAmount": 2
         }
       ],
       "schedule": [
         {
           "length": 1,
-          "units": "month",
+          "units": "day",
           "date": "2015-12-1"
         }
       ],
       "units": "[acr_us]",
-      "subtotal": 5.5,
-      "total": 5.5
+      "subtotal": 44.9638,
+      "total": 44.9638
+    },
+    {
+      "name": "Fertilizer 11-52-0",
+      "materials": [
+        {
+          "name": "11-52-0",
+          "amount": 200,
+          "units": "[lb_av]",
+          "id": "15403d5b-9f8d-410d-9daa-08c808803827",
+          "error": null,
+          "price": 74,
+          "originalAmount": 200
+        },
+        {
+          "name": "Ground Application",
+          "amount": 1,
+          "units": "[acr_us]",
+          "id": "62631861-6b2b-4a53-b336-e2eb2952f83d",
+          "error": null,
+          "price": 10.5
+        }
+      ],
+      "schedule": [
+        {
+          "length": 1,
+          "units": "day",
+          "date": "2016-1-13"
+        }
+      ],
+      "units": "[acr_us]",
+      "subtotal": 84.5,
+      "total": 84.5
+    },
+    {
+      "name": "Insects-Aphids/Weevil",
+      "materials": [
+        {
+          "name": "ATV",
+          "amount": 0.06,
+          "units": "h",
+          "id": "d0e175b1-a8cc-424f-89f0-0eb26311d66b",
+          "error": null,
+          "price": 0.41879999999999995,
+          "originalAmount": 0.06
+        },
+        {
+          "name": "Equipment Operator Labor",
+          "amount": 0.06,
+          "units": "h",
+          "id": "2759f00a-ce8a-4b70-8800-3cfc5520cfe8",
+          "error": null,
+          "price": 1.02,
+          "originalAmount": 0.06
+        },
+        {
+          "name": "Warrior II",
+          "amount": 1,
+          "units": "[foz_us]",
+          "id": "4e1356e8-3bdd-4099-96f8-ebfdd19d1187",
+          "error": null,
+          "price": 5.25,
+          "originalAmount": 1
+        }
+      ],
+      "schedule": [
+        {
+          "length": "3",
+          "units": "day",
+          "date": "2016-3-16"
+        }
+      ],
+      "units": "[acr_us]",
+      "subtotal": 6.6888000000000005,
+      "total": 6.6888000000000005
     }
   ],
   "farm": {
     "unit": "[acr_us]",
     "size": "100",
-    "commodity": "POPLAR",
-    "location": "06113",
-    "farm": "clarksburg"
+    "commodity": "Alfalfa",
+    "location": "Northern California",
+    "farm": "generic"
   }
 }

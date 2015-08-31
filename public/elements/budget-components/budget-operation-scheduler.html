@@ -201,6 +201,8 @@
       var l = parseInt(date.length);
       if( date.units == 'year' ) {
         return l * 86400000 * 365;
+      } else if( date.units == 'day' ){
+        return l * 86400000;
       } else {
         return l * 86400000 * 30;
       }
@@ -209,7 +211,7 @@
     toDate : function(dateStr) {
       try {
         var parts = dateStr.split('-');
-        return new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+        return new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
       } catch(e) {
         return new Date();
       }
@@ -242,6 +244,7 @@
           orientation : 'top auto'
         })
         .on('changeDate', function(e){
+          console.log(e);
           this.dates.push({
             date : e.date,
             length : 1,
