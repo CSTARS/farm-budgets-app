@@ -46,7 +46,7 @@
       <budget-spending-timeline id="spendingTimeline"></budget-spending-timeline>
     </div>
 
-    <div class="card">
+    <div class="card" id="debug" style="display:none">
       <h4>JSON (debug)</h4>
       <textarea id="json" class="form-control" style="height: 400px"></textarea>
     </div>
@@ -81,9 +81,15 @@
       this.$.total.onTotalUpdate();
     },
 
-    onShow : function() {
+    onShow : function(params) {
       this.$.timeline.onShow();
       this.$.spendingTimeline.onShow();
+
+      if( params.length > 0 && params[0] === 'debug' ) {
+        this.$.debug.style.display = 'block';
+      } else {
+        this.$.debug.style.display = 'none';
+      }
     },
 
     setJsonDump : function() {
