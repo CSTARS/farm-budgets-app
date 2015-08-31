@@ -6223,577 +6223,6 @@ this._insertChildren();
 this.fire('dom-change');
 }
 });</script>
-
-
-
-
-<script>
-(function() {
-  "use strict";
-  /**
-    `Polymer.IronJsonpLibraryBehavior` loads a jsonp library.
-    Multiple components can request same library, only one copy will load.
-
-    Some libraries require a specific global function be defined.
-    If this is the case, specify the `callbackName` property.
-
-    You should use an HTML Import to load library dependencies
-    when possible instead of using this element.
-
-    @hero hero.svg
-    @demo demo/index.html
-    @polymerBehavior
-   */
-  Polymer.IronJsonpLibraryBehavior = {
-
-    properties: {
-      /**
-       * True if library has been successfully loaded
-       */
-      libraryLoaded: {
-        type: Boolean,
-        value: false,
-        notify: true,
-        readOnly: true
-      },
-      /**
-       * Not null if library has failed to load
-       */
-      libraryErrorMessage: {
-        type: String,
-        value: null,
-        notify: true,
-        readOnly: true
-      }
-      // Following properties are to be set by behavior users
-      /**
-       * Library url. Must contain string `%%callback_name%%`.
-       *
-       * `%%callback_name%%` is a placeholder for jsonp wrapper function name
-       *
-       * Ex: https://maps.googleapis.com/maps/api/js?callback=%%callback%%
-       * @property libraryUrl
-       */
-      /**
-       * Set if library requires specific callback name.
-       * Name will be automatically generated if not set.
-       * @property callbackName
-       */
-      /**
-       * name of event to be emitted when library loads. Standard is `api-load`
-       * @property notifyEvent
-       */
-      /**
-       * event with name specified in `notifyEvent` attribute
-       * will fire upon successful load2
-       * @event `notifyEvent`
-       */
-    },
-
-    observers: [
-      '_libraryUrlChanged(libraryUrl)'
-    ],
-
-    _libraryUrlChanged: function(libraryUrl) {
-      // can't load before ready because notifyEvent might not be set
-      if (this._isReady && this.libraryUrl)
-        this._loadLibrary();
-    },
-
-    _libraryLoadCallback: function(err, result) {
-      if (err) {
-        console.warn("Library load failed:", err.message);
-        this._setLibraryErrorMessage(err.message);
-      }
-      else {
-        this._setLibraryErrorMessage(null);
-        this._setLibraryLoaded(true);
-        if (this.notifyEvent)
-          this.fire(this.notifyEvent, result);
-      }
-    },
-
-    /** loads the library, and fires this.notifyEvent upon completion */
-    _loadLibrary: function() {
-      LoaderMap.require(
-        this.libraryUrl,
-        this._libraryLoadCallback.bind(this),
-        this.callbackName
-      );
-    },
-
-    ready: function() {
-      this._isReady = true;
-      if (this.libraryUrl)
-        this._loadLibrary();
-    }
-  };
-
-  /**
-   * LoaderMap keeps track of all Loaders
-   */
-  var LoaderMap = {
-    apiMap: {}, // { hash -> Loader }
-
-    /**
-     * @param {Function} notifyCallback loaded callback fn(result)
-     * @param {string} jsonpCallbackName name of jsonpcallback. If API does not provide it, leave empty. Optional.
-     */
-    require: function(url, notifyCallback, jsonpCallbackName) {
-
-      // make hashable string form url
-      var name = this.nameFromUrl(url);
-
-      // create a loader as needed
-      if (!this.apiMap[name])
-        this.apiMap[name] = new Loader(name, url, jsonpCallbackName);
-
-      // ask for notification
-      this.apiMap[name].requestNotify(notifyCallback);
-    },
-
-    nameFromUrl: function(url) {
-      return url.replace(/[\:\/\%\?\&\.\=\-\,]/g, '_') + '_api';
-    }
-  };
-
-  /** @constructor */
-  var Loader = function(name, url, callbackName) {
-    this.notifiers = [];  // array of notifyFn [ notifyFn* ]
-
-    // callback is specified either as callback name
-    // or computed dynamically if url has callbackMacro in it
-    if (!callbackName) {
-      if (url.indexOf(this.callbackMacro) >= 0) {
-        callbackName = name + '_loaded';
-        url = url.replace(this.callbackMacro, callbackName);
-      } else {
-        this.error = new Error('IronJsonpLibraryBehavior a %%callback_name%% parameter is required in libraryUrl');
-        // TODO(sjmiles): we should probably fallback to listening to script.load
-        return;
-      }
-    }
-    this.callbackName = callbackName;
-    window[this.callbackName] = this.success.bind(this);
-    this.addScript(url);
-  };
-
-  Loader.prototype = {
-
-    callbackMacro: '%%callback%%',
-    loaded: false,
-
-    addScript: function(src) {
-      var script = document.createElement('script');
-      script.src = src;
-      script.onerror = this.handleError.bind(this);
-      var s = document.querySelector('script') || document.body;
-      s.parentNode.insertBefore(script, s);
-      this.script = script;
-    },
-
-    removeScript: function() {
-      if (this.script.parentNode) {
-        this.script.parentNode.removeChild(this.script);
-      }
-      this.script = null;
-    },
-
-    handleError: function(ev) {
-      this.error = new Error("Library failed to load");
-      this.notifyAll();
-      this.cleanup();
-    },
-
-    success: function() {
-      this.loaded = true;
-      this.result = Array.prototype.slice.call(arguments);
-      this.notifyAll();
-      this.cleanup();
-    },
-
-    cleanup: function() {
-      delete window[this.callbackName];
-    },
-
-    notifyAll: function() {
-      this.notifiers.forEach( function(notifyCallback) {
-        notifyCallback(this.error, this.result);
-      }.bind(this));
-      this.notifiers = [];
-    },
-
-    requestNotify: function(notifyCallback) {
-      if (this.loaded || this.error) {
-        notifyCallback( this.error, this.result);
-      } else {
-        this.notifiers.push(notifyCallback);
-      }
-    }
-  };
-})();
-</script>
-
-
-<script>
-  Polymer({
-
-    is: 'iron-jsonp-library',
-
-    behaviors: [ Polymer.IronJsonpLibraryBehavior ],
-
-    properties: {
-      /**
-       * Library url. Must contain string `%%callback_name%%`.
-       *
-       * `%%callback_name%%` is a placeholder for jsonp wrapper function name
-       *
-       * Ex: https://maps.googleapis.com/maps/api/js?callback=%%callback%%
-       */
-      libraryUrl: String,
-      /**
-       * Set if library requires specific callback name.
-       * Name will be automatically generated if not set.
-       */
-      callbackName: String,
-      /**
-       * event with name specified in 'notifyEvent' attribute
-       * will fire upon successful load
-       */
-      notifyEvent: String
-      /**
-       * event with name specified in 'notifyEvent' attribute
-       * will fire upon successful load
-       * @event `notifyEvent`
-       */
-
-    }
-  });
-
-</script>
-<script>
-/**
-Dynamically loads the Google Maps JavaScript API, firing the `api-load` event when ready.
-
-#### Example
-
-    <google-maps-api apiKey="abc123" version="3.exp"></google-maps-api>
-    <script>
-      var mapsAPI = document.querySelector('google-maps-api');
-      mapsAPI.addEventListener('api-load', function(e) {
-        // this.api === google.maps
-      });
-    <script>
-
-Any number of components can use `<google-maps-api>` elements, and the library will only be loaded once.
-
-@blurb Element wrapper around Google Maps API.
-
- */
-  Polymer({
-
-    is: 'google-maps-api',
-
-    behaviors: [
-      Polymer.IronJsonpLibraryBehavior
-    ],
-
-    properties: {
-
-      /** @private */
-      mapsUrl: {
-        type: String,
-        value: 'https://maps.googleapis.com/maps/api/js?callback=%%callback%%'
-      },
-
-      /**
-       * A Maps API key. To obtain an API key, see developers.google.com/maps/documentation/javascript/tutorial#api_key.
-       */
-      apiKey: {
-        type: String,
-        value: ''
-      },
-
-      /**
-       * A Maps API for Business Client ID. To obtain a Maps API for Business Client ID, see developers.google.com/maps/documentation/business/.
-       * If set, a Client ID will take precedence over an API Key.
-       */
-      clientId: {
-        type: String,
-        value: ''
-      },
-
-      /**
-       * The libraries to load with this map. Defaults to "places". For more information
-       * see https://developers.google.com/maps/documentation/javascript/libraries.
-       */
-      libraries: {
-        type: String,
-        value: 'places'
-      },
-
-      /**
-       * Version of the Maps API to use.
-       */
-      version: {
-        type: String,
-        value: '3.exp'
-      },
-
-      /**
-       * The localized language to load the Maps API with. For more information
-       * see https://developers.google.com/maps/documentation/javascript/basics#Language
-       *
-       * Note: the Maps API defaults to the preffered language setting of the browser.
-       * Use this parameter to override that behavior.
-       */
-      language: {
-        type: String,
-        value: ''
-      },
-      /**
-       * If true, sign-in is enabled.
-       * See https://developers.google.com/maps/documentation/javascript/signedin#enable_sign_in
-       */
-      signedIn: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Fired when the Maps API library is loaded and ready.
-       * @event api-load
-       */
-      /**
-       * Name of event fired when library is loaded and available.
-       */
-      notifyEvent: {
-        type: String,
-        value: 'api-load'
-      },
-
-      /** @private */
-      libraryUrl: {
-        type: String,
-        computed: '_computeUrl(mapsUrl, version, libraries, apiKey, clientId, language, signedIn)'
-      }
-    },
-
-    _computeUrl: function(mapsUrl, version, libraries, apiKey, clientId, language, signedIn) {
-      var url = mapsUrl + '&v=' + version;
-      url += "&libraries=" + libraries;
-
-      if (apiKey && !clientId) {
-        url += '&key=' + apiKey;
-      }
-
-      if (clientId) {
-        url += '&client=' + clientId;
-      }
-
-      if (language) {
-        url += '&language=' + language;
-      }
-
-      if (signedIn) {
-        url += '&signed_in=' + signedIn;
-      }
-      return url;
-    },
-
-    /**
-     * Provides the google.maps JS API namespace.
-     */
-    get api() {
-      return google.maps;
-    }
-  });
-</script>
-
-
-<script>
-  /**
-   * `IronResizableBehavior` is a behavior that can be used in Polymer elements to
-   * coordinate the flow of resize events between "resizers" (elements that control the
-   * size or hidden state of their children) and "resizables" (elements that need to be
-   * notified when they are resized or un-hidden by their parents in order to take
-   * action on their new measurements).
-   * Elements that perform measurement should add the `IronResizableBehavior` behavior to
-   * their element definition and listen for the `iron-resize` event on themselves.
-   * This event will be fired when they become showing after having been hidden,
-   * when they are resized explicitly by another resizable, or when the window has been
-   * resized.
-   * Note, the `iron-resize` event is non-bubbling.
-   *
-   * @polymerBehavior Polymer.IronResizableBehavior
-   * @demo demo/index.html
-   **/
-  Polymer.IronResizableBehavior = {
-    properties: {
-      /**
-       * The closest ancestor element that implements `IronResizableBehavior`.
-       */
-      _parentResizable: {
-        type: Object,
-        observer: '_parentResizableChanged'
-      },
-
-      /**
-       * True if this element is currently notifying its descedant elements of
-       * resize.
-       */
-      _notifyingDescendant: {
-        type: Boolean,
-        value: false
-      }
-    },
-
-    listeners: {
-      'iron-request-resize-notifications': '_onIronRequestResizeNotifications'
-    },
-
-    created: function() {
-      // We don't really need property effects on these, and also we want them
-      // to be created before the `_parentResizable` observer fires:
-      this._interestedResizables = [];
-      this._boundNotifyResize = this.notifyResize.bind(this);
-    },
-
-    attached: function() {
-      this.fire('iron-request-resize-notifications', null, {
-        node: this,
-        bubbles: true,
-        cancelable: true
-      });
-
-      if (!this._parentResizable) {
-        window.addEventListener('resize', this._boundNotifyResize);
-        this.notifyResize();
-      }
-    },
-
-    detached: function() {
-      if (this._parentResizable) {
-        this._parentResizable.stopResizeNotificationsFor(this);
-      } else {
-        window.removeEventListener('resize', this._boundNotifyResize);
-      }
-
-      this._parentResizable = null;
-    },
-
-    /**
-     * Can be called to manually notify a resizable and its descendant
-     * resizables of a resize change.
-     */
-    notifyResize: function() {
-      if (!this.isAttached) {
-        return;
-      }
-
-      this._interestedResizables.forEach(function(resizable) {
-        if (this.resizerShouldNotify(resizable)) {
-          this._notifyDescendant(resizable);
-        }
-      }, this);
-
-      this._fireResize();
-    },
-
-    /**
-     * Used to assign the closest resizable ancestor to this resizable
-     * if the ancestor detects a request for notifications.
-     */
-    assignParentResizable: function(parentResizable) {
-      this._parentResizable = parentResizable;
-    },
-
-    /**
-     * Used to remove a resizable descendant from the list of descendants
-     * that should be notified of a resize change.
-     */
-    stopResizeNotificationsFor: function(target) {
-      var index = this._interestedResizables.indexOf(target);
-
-      if (index > -1) {
-        this._interestedResizables.splice(index, 1);
-        this.unlisten(target, 'iron-resize', '_onDescendantIronResize');
-      }
-    },
-
-    /**
-     * This method can be overridden to filter nested elements that should or
-     * should not be notified by the current element. Return true if an element
-     * should be notified, or false if it should not be notified.
-     *
-     * @param {HTMLElement} element A candidate descendant element that
-     * implements `IronResizableBehavior`.
-     * @return {boolean} True if the `element` should be notified of resize.
-     */
-    resizerShouldNotify: function(element) { return true; },
-
-    _onDescendantIronResize: function(event) {
-      if (this._notifyingDescendant) {
-        event.stopPropagation();
-        return;
-      }
-
-      // NOTE(cdata): In ShadowDOM, event retargetting makes echoing of the
-      // otherwise non-bubbling event "just work." We do it manually here for
-      // the case where Polymer is not using shadow roots for whatever reason:
-      if (!Polymer.Settings.useShadow) {
-        this._fireResize();
-      }
-    },
-
-    _fireResize: function() {
-      this.fire('iron-resize', null, {
-        node: this,
-        bubbles: false
-      });
-    },
-
-    _onIronRequestResizeNotifications: function(event) {
-      var target = event.path ? event.path[0] : event.target;
-
-      if (target === this) {
-        return;
-      }
-
-      if (this._interestedResizables.indexOf(target) === -1) {
-        this._interestedResizables.push(target);
-        this.listen(target, 'iron-resize', '_onDescendantIronResize');
-      }
-
-      target.assignParentResizable(this);
-      this._notifyDescendant(target);
-
-      event.stopPropagation();
-    },
-
-    _parentResizableChanged: function(parentResizable) {
-      if (parentResizable) {
-        window.removeEventListener('resize', this._boundNotifyResize);
-      }
-    },
-
-    _notifyDescendant: function(descendant) {
-      // NOTE(cdata): In IE10, attached is fired on children first, so it's
-      // important not to notify them if the parent is not attached yet (or
-      // else they will get redundantly notified when the parent attaches).
-      if (!this.isAttached) {
-        return;
-      }
-
-      this._notifyingDescendant = true;
-      descendant.notifyResize();
-      this._notifyingDescendant = false;
-    }
-  };
-</script>
-
-
-
 <style>
   /*******************************
             Flex Layout
@@ -7036,6 +6465,34 @@ Any number of components can use `<google-maps-api>` elements, and the library w
     left: 0;
   }
 </style>
+<script>
+  Polymer({
+    is: 'ahb-dollar-label',
+
+    properties : {
+      value : {
+        type : String,
+        observer : 'update',
+        value : '0'
+      },
+      decimal : {
+        type : Boolean,
+        observer : 'update',
+        value : false
+      }
+    },
+
+    ready : function() {
+      this.style.color = '#5cb85c';
+    },
+
+    update : function() {
+      //if( typeof this.value !== 'string' ) this.value = this.value+'';
+      var val = ''+parseFloat(this.value).toFixed(this.decimal ? 2 : 0);
+      this.innerHTML = '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+    }
+  });
+</script>
 <script>
   Polymer({
     is : 'budget-materials-table',
@@ -7342,2637 +6799,3157 @@ Any number of components can use `<google-maps-api>` elements, and the library w
 
   };
 </script>
+</head><body><div hidden="" by-vulcanize=""><dom-module id="budget-macro" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display: inline-block;
+    }
+    :host.open {
+      background-color: #f8f8f8;
+      border-radius: 4px;
+      padding: 5px
+    }
+
+    #expand {
+      cursor: pointer;
+    }
+    #expand:hover {
+      color: #2196f3;
+    }
+
+    .btn-group > .btn.btn-default {
+      transition: all 300ms linear;
+      -moz-transition: all 300ms linear;
+      -ms-transition: all 300ms linear;
+    }
+
+    .btn-group > .btn.btn-default.nohover {
+      border-top: 1px solid transparent !important;
+      border-left: 1px solid transparent !important;
+      box-shadow: none !important;
+      -moz-box-shadow: none !important;
+      -ms-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+    }
+  </style>
+
+  <template>
+
+    <table>
+      <tbody><tr>
+        <td>
+          <span id="expand"><i class="fa fa-cubes" id="icon"></i> <span id="nameLabel"></span></span>
+        </td>
+        <td>
+          <div style="width: 102px;display:none;" id="btns">
+            <div class="btn-group" role="group" style="padding-left: 15px">
+              <a class="btn btn-default nohover" id="editBtn"><i class="fa fa-pencil"></i></a>
+              <a class="btn btn-default nohover" on-click="toggleView" id="toggleView"><i class="fa fa-angle-down"></i></a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"><div id="main" style="display:none"></div></td>
+      </tr>
+    </tbody></table>
+
+  </template>
+</dom-module>
+
 <script>
   Polymer({
-    is: 'ahb-dollar-label',
+    is : 'budget-macro',
 
     properties : {
-      value : {
+      material : {
         type : String,
-        observer : 'update',
-        value : '0'
+        observer : 'updateMaterial'
+      }
+    },
+
+    ready : function() {
+      this.editUnitsTimer = -1;
+
+      this.data = {
+        name : '[Not Set]',
+        materials : {},
+        price : 0,
+        units : ''
+      };
+
+      FB.materialController.on('material-update', this.onUpdate.bind(this));
+
+      $(this).hover(function(){
+        $(this).find('.nohover').removeClass('nohover');
+      },function(){
+        $(this).find('.btn-group > .btn').addClass('nohover');
+      });
+
+      $(this.$.expand).on('click',function() {
+        $(this.$.main).toggle();
+        $(this.$.btns).toggle();
+        $(this).toggleClass('open');
+      }.bind(this));
+    },
+
+    attached : function() {
+      this.popup = document.querySelector('budget-complex-material-popup');
+      this.render();
+      this.updateMaterial();
+    },
+
+    updateMaterial : function(material) {
+      if( material ) this.material = material;
+      if( !this.material ) return;
+
+      var m = FB.materialController.get(this.material);
+
+      this.$.editBtn.setAttribute('href','#budget/materials/'+this.material);
+
+      // TODO: set error message!!
+      if( m.error ) {
+        return alert(JSON.stringify(m));
+      }
+
+      this.data = m;
+
+      // first time check for bad units
+      try {
+        FB.ucum.parse(m.units);
+      } catch(e) {
+        console.log('BAD UNITS. nothing done :(');
+        console.log(e);
+      //  this.$.unitsInput.error = true;
+
+      }
+
+      this.render(this.renderType);
+    },
+
+    rerender : function() {
+      this.render(this.renderType);
+    },
+
+    // render display. type
+    render : function(type) {
+      this.renderType = type;
+      this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ';
+
+      if( this.renderType == 'tree' ) {
+        this.renderTree();
+        this.$.toggleView.innerHTML = '<i class="fa fa-angle-down"></i>';
+      } else {
+        this.renderCompressed();
+        this.$.toggleView.innerHTML = '<i class="fa fa-angle-double-down"></i>';
+      }
+
+      this.checkError();
+    },
+
+    checkError : function() {
+      for( var key in this.data.materials ) {
+        if( this.data.materials[key].error ) {
+          this.$.icon.className = 'fa fa-warning';
+          this.$.icon.style.color = 'red';
+          this.error = true;
+          return;
+        }
+      }
+
+      this.error = false;
+      this.$.icon.className = 'fa fa-cubes';
+      this.$.icon.style.color = '';
+    },
+
+    toggleView : function(e) {
+      if( e && e.preventDefault ){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      if( this.renderType == 'tree' ) {
+        this.render('compressed');
+      } else {
+        this.render('tree');
+      }
+    },
+
+    renderTree : function() {
+      var list = [];
+      this.getTreeMaterialList(this.data.materials, '', list);
+
+      var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
+      for( var i = 0; i < list.length; i++ ) {
+        html += '<tr><td>' +
+            '<i>'+list[i].path + '</i> '+
+            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
+
+              list[i].amount+' '+FB.units.getLabel(list[i].units, true)+' = $'+
+              list[i].price.toFixed(2)+' </span>'
+          '</td></tr>';
+      }
+
+      this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+    },
+
+    getPriceLabel : function() {
+      return '<div class="text text-success" style="text-align:center;padding-top:5px">$' +
+            (this.data.price ? this.data.price.toFixed(2) : '0')  +
+            ' per '+FB.units.getLabel(this.data.units, true)+'</div>';
+    },
+
+    renderCompressed : function() {
+      var list = [];
+      this.getCompressedMaterialList(this.data.materials, list);
+
+      var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
+      for( var i = 0; i < list.length; i++ ) {
+        html += '<tr><td>' +
+            list[i].count+'x ' +
+            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
+            ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+FB.units.getLabel(list[i].units, true)+'</span>'
+          '</td></tr>';
+      }
+
+      this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+    },
+
+    getCompressedMaterialList : function(materials, list) {
+      for( var material in materials ) {
+        var m = FB.materialController.get(material);
+        if( m.error ) continue;
+
+        var index = this.listMaterialIndex(list, m.name);
+        if( index == -1 ) {
+          var item = $.extend(true, {}, m);
+          item.count = 1;
+          list.push(item);
+        } else {
+          list[index].count++;
+        }
+
+        if( m.type === 'complex' && m.materials) {
+          this.getCompressedMaterialList(m.materials, list);
+        }
+      }
+    },
+
+    getTreeMaterialList : function(materials, path, list) {
+      for( var material in materials ) {
+        var m = FB.materialController.get(material);
+        if( m.error ) continue;
+
+        var item = $.extend(true, {}, m);
+        item.path = path;
+        item.amount = materials[material].amount;
+        item.units = materials[material].units;
+        item.price = materials[material].price;
+        list.push(item);
+
+        if( m.type === 'complex' &&  m.materials) {
+          var p = path+m.name+' - ';
+          this.getTreeMaterialList(m.materials, p, list);
+        }
+      }
+    },
+
+    listMaterialIndex : function(list, name) {
+      for( var i = 0; i < list.length; i++ ) {
+        if( list[i].name == name ) return i;
+      }
+      return -1;
+    },
+
+    // fired whenever any material is updated
+    onUpdate : function(e) {
+      // renaming something in our list?
+      if( e.replaced && this.data.materials[e.replaced] !== undefined ) {
+        this.data.materials[e.material.name] = this.data.materials[e.replaced];
+        delete this.data.materials[e.replaced];
+      }
+
+      // if the material name is not in our chain, we can quit
+      if( !this.has(e.material.name) ) {
+        return;
+      }
+
+      // rerender
+      this.render(this.renderType);
+    },
+
+
+    has : function(material) {
+      if( material == this.data.name ) return true;
+      return this._has(material, this.data.materials);
+    },
+
+    _has : function(material, materials) {
+      //if( !scope ) scope = this;
+
+      for( var material in materials ) {
+        var m = FB.materialController.get(material);
+        if( m.error ) continue;
+
+        if( m.name === material ) return true;
+        if( m.type === 'complex' && m.materials ) {
+          return this._has(material, m.materials);
+        }
+      }
+      return false;
+    }
+  });
+</script>
+<dom-module id="budget-complex-material-popup" assetpath="/public/elements/budget-components/">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" on-click="hide"><span aria-hidden="true">×</span></button>
+            <h4 class="modal-title"><i class="fa fa-pencil"></i> Edit Complex Material</h4>
+          </div>
+          <div class="modal-body" id="body"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+<script>
+  Polymer({
+    is : 'budget-complex-material-popup',
+
+    ready : function() {
+      this.popup = $(this.$.popup).modal({show: false});
+      this.body = $(this.$.body);
+
+      $(window).on('hashchange', this.hide.bind(this));
+    },
+
+    show : function(closeCallback) {
+      this.closeCallback = closeCallback;
+      this.popup.modal('show');
+    },
+
+    hide : function() {
+      if( this.closeCallback ) {
+        this.closeCallback();
+        this.closeCallback = null;
+      }
+      this.popup.modal('hide');
+    },
+
+    setBody : function(ele) {
+      this.body.html('').append(ele);
+    }
+  })
+</script>
+</dom-module><dom-module id="budget-schedule-popup" assetpath="/public/elements/budget-components/">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" on-click="hide"><span aria-hidden="true">×</span></button>
+            <h4 class="modal-title"><i class="fa fa-calendar-o"></i> Edit Schedule</h4>
+          </div>
+          <div class="modal-body" id="body"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+<script>
+  Polymer({
+    is : 'budget-schedule-popup',
+
+    ready : function() {
+      this.popup = $(this.$.popup).modal({show: false});
+      this.body = $(this.$.body);
+    },
+
+    show : function(closeCallback) {
+      this.closeCallback = closeCallback;
+      this.popup.modal('show');
+    },
+
+    hide : function() {
+      if( this.closeCallback ) {
+        this.closeCallback();
+        this.closeCallback = null;
+      }
+      this.popup.modal('hide');
+    },
+
+    setBody : function(ele) {
+      this.body.html('').append(ele);
+    },
+
+    on : function(e, fn) {
+      this.popup.on(e, fn);
+    }
+  })
+</script>
+</dom-module><dom-module id="budget-unit-selector" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display: block;
+      width: 100px;
+      position: relative;
+    }
+    #message {
+      position: absolute;
+      padding: 3px;
+      border: 1px solid #ccc;
+      background-color: white;
+      display: none;
+      z-index: 100;
+    }
+    #input {
+      display : block;
+    }
+    #icon {
+      position : absolute;
+      bottom : 3px;
+      right: 0px;
+    }
+  </style>
+
+  <template>
+    <i id="icon" class="text text-danger fa fa-warning"></i><input id="input" type="text" class="form-control text" on-input="onChange" on-blur="onBlur" on-focus="onFocus">
+    <div id="message"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-unit-selector',
+
+    properties : {
+      units : {
+        type : String,
+        observer: 'unitsObserver',
+        value : ''
       },
-      decimal : {
+      block : {
         type : Boolean,
-        observer : 'update',
+        observer: 'setDisplayBlock',
+        value : false
+      },
+      disabled : {
+        type : Boolean,
+        observer: 'setDisabled',
         value : false
       }
     },
 
-    ready : function() {
-      this.style.color = '#5cb85c';
+    attached : function() {
+      this.checkError();
+      this.onBlur();
     },
 
-    update : function() {
-      //if( typeof this.value !== 'string' ) this.value = this.value+'';
-      var val = ''+parseFloat(this.value).toFixed(this.decimal ? 2 : 0);
-      this.innerHTML = '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-    }
-  });
-</script>
-</head><body><div hidden="" by-vulcanize=""><dom-module id="iron-collapse" assetpath="/public/bower_components/iron-collapse/">
-
-  <style>
-
-    :host {
-      display: block;
-      transition-duration: 300ms;
-    }
-
-    :host(.iron-collapse-closed) {
-      display: none;
-    }
-
-    :host(:not(.iron-collapse-opened)) {
-      overflow: hidden;
-    }
-
-  </style>
-
-  <template>
-
-    <content></content>
-
-  </template>
-
-</dom-module>
-
-<script>
-
-  Polymer({
-
-    is: 'iron-collapse',
-
-    properties: {
-
-      /**
-       * If true, the orientation is horizontal; otherwise is vertical.
-       *
-       * @attribute horizontal
-       */
-      horizontal: {
-        type: Boolean,
-        value: false,
-        observer: '_horizontalChanged'
-      },
-
-      /**
-       * Set opened to true to show the collapse element and to false to hide it.
-       *
-       * @attribute opened
-       */
-      opened: {
-        type: Boolean,
-        value: false,
-        notify: true,
-        observer: '_openedChanged'
-      }
-
-    },
-
-    hostAttributes: {
-      role: 'group',
-      'aria-expanded': 'false',
-      tabindex: 0
-    },
-
-    listeners: {
-      transitionend: '_transitionEnd'
-    },
-
-    ready: function() {
-      // Avoid transition at the beginning e.g. page loads and enable
-      // transitions only after the element is rendered and ready.
-      this._enableTransition = true;
-    },
-
-    /**
-     * Toggle the opened state.
-     *
-     * @method toggle
-     */
-    toggle: function() {
-      this.opened = !this.opened;
-    },
-
-    show: function() {
-      this.toggleClass('iron-collapse-closed', false);
-      this.updateSize('auto', false);
-      var s = this._calcSize();
-      this.updateSize('0px', false);
-      // force layout to ensure transition will go
-      this.offsetHeight;
-      this.updateSize(s, true);
-    },
-
-    hide: function() {
-      this.toggleClass('iron-collapse-opened', false);
-      this.updateSize(this._calcSize(), false);
-      // force layout to ensure transition will go
-      this.offsetHeight;
-      this.updateSize('0px', true);
-    },
-
-    updateSize: function(size, animated) {
-      this.enableTransition(animated);
-      var s = this.style;
-      var nochange = s[this.dimension] === size;
-      s[this.dimension] = size;
-      if (animated && nochange) {
-        this._transitionEnd();
-      }
-    },
-
-    enableTransition: function(enabled) {
-      this.style.transitionDuration = (enabled && this._enableTransition) ? '' : '0s';
-    },
-
-    _horizontalChanged: function() {
-      this.dimension = this.horizontal ? 'width' : 'height';
-      this.style.transitionProperty = this.dimension;
-    },
-
-    _openedChanged: function() {
-      this[this.opened ? 'show' : 'hide']();
-      this.setAttribute('aria-expanded', this.opened ? 'true' : 'false');
-
-    },
-
-    _transitionEnd: function() {
-      if (this.opened) {
-        this.updateSize('auto', false);
-      }
-      this.toggleClass('iron-collapse-closed', !this.opened);
-      this.toggleClass('iron-collapse-opened', this.opened);
-      this.enableTransition(false);
-    },
-
-    _calcSize: function() {
-      return this.getBoundingClientRect()[this.dimension] + 'px';
-    },
-
-
-  });
-
-</script>
-<dom-module id="google-map-marker" assetpath="/public/bower_components/google-map/">
-  <style>
-    :host {
-      display: none;
-    }
-  </style>
-  <template><content></content></template>
-</dom-module>
-
-<script>
-
-(function() {
-  Polymer({
-
-    is: 'google-map-marker',
-
-    /**
-     * Fired when the marker icon was clicked. Requires the clickEvents attribute to be true.
-     * @param {google.maps.MouseEvent} event The mouse event.
-     * @event google-map-marker-click
-     */
-    /**
-     * Fired when the marker icon was double clicked. Requires the clickEvents attribute to be true.
-     * @param {google.maps.MouseEvent} event The mouse event.
-     * @event google-map-marker-dblclick
-     */
-    /**
-     * Fired for a mousedown on the marker. Requires the mouseEvents attribute to be true.
-     * @event google-map-marker-mousedown
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the DOM `mousemove` event is fired on the marker. Requires the mouseEvents
-     * attribute to be true.
-     * @event google-map-marker-mousemove
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the mouse leaves the area of the marker icon. Requires the mouseEvents attribute to be
-     * true.
-     * @event google-map-marker-mouseout
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the mouse enters the area of the marker icon. Requires the mouseEvents attribute to be
-     * true.
-     * @event google-map-marker-mouseover
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired for a mouseup on the marker. Requires the mouseEvents attribute to be true.
-     *
-     * @event google-map-marker-mouseup
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired for a rightclick on the marker. Requires the clickEvents attribute to be true.
-     * @event google-map-marker-rightclick
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    properties: {
-      /**
-       * A Google Maps marker object.
-       * @type google.maps.Marker
-       */
-      marker: Object,
-
-      /**
-       * The Google map object.
-       * @type google.maps.Map
-       */
-      map: {
-        type: Object,
-        observer: '_mapChanged'
-      },
-
-      /**
-       * A Google Map Infowindow object.
-       */
-      info: {
-        type: Object,
-        value: null
-      },
-
-      /**
-       * When true, marker *click events are automatically registered.
-       */
-      clickEvents: {
-        type: Boolean,
-        value: false,
-        observer: '_clickEventsChanged'
-      },
-
-      /**
-       * Image URL for the marker icon.
-       * @type string|google.maps.Icon|google.maps.Symbol
-       */
-      icon: {
-        type: Object,
-        value: null,
-        observer: '_iconChanged'
-      },
-
-      /**
-       * When true, marker mouse* events are automatically registered.
-       */
-      mouseEvents: {
-        type: Boolean,
-        value: false,
-        observer: '_mouseEventsChanged'
-      },
-
-      /**
-       * Z-index for the marker icon.
-       */
-      zIndex: {
-        type: Number,
-        value: 0,
-        observer: '_zIndexChanged'
-      },
-
-      /**
-       * The marker's longitude coordinate.
-       */
-      longitude: {
-        type: Number,
-        value: null,
-        reflectToAttribute: true
-      },
-      /**
-       * The marker's latitude coordinate.
-       */
-      latitude: {
-        type: Number,
-        value: null,
-        reflectToAttribute: true
-      }
-    },
-
-    observers: [
-      '_updatePosition(latitude, longitude)'
-    ],
-
-    detached: function() {
-      if (this.marker) {
-        this.marker.setMap(null);
-      }
-      if (this._contentObserver)
-        this._contentObserver.disconnect();
-    },
-
-    attached: function() {
-      // If element is added back to DOM, put it back on the map.
-      if (this.marker) {
-        this.marker.setMap(this.map);
-      }
-    },
-
-    _updatePosition: function() {
-      if (this.marker && this.latitude != null && this.longitude != null) {
-        this.marker.setPosition({
-          lat: parseFloat(this.latitude),
-          lng: parseFloat(this.longitude)
-        });
-      }
-    },
-
-    _clickEventsChanged: function() {
-      if (this.map) {
-        if (this.clickEvents) {
-          this._forwardEvent('click');
-          this._forwardEvent('dblclick');
-          this._forwardEvent('rightclick');
-        } else {
-          this._clearListener('click');
-          this._clearListener('dblclick');
-          this._clearListener('rightclick');
-        }
-      }
-    },
-
-    _mouseEventsChanged: function() {
-      if (this.map) {
-        if (this.mouseEvents) {
-          this._forwardEvent('mousedown');
-          this._forwardEvent('mousemove');
-          this._forwardEvent('mouseout');
-          this._forwardEvent('mouseover');
-          this._forwardEvent('mouseup');
-        } else {
-          this._clearListener('mousedown');
-          this._clearListener('mousemove');
-          this._clearListener('mouseout');
-          this._clearListener('mouseover');
-          this._clearListener('mouseup');
-        }
-      }
-    },
-
-    _iconChanged: function() {
-      if (this.marker) {
-        this.marker.setIcon(this.icon);
-      }
-    },
-
-    _zIndexChanged: function() {
-      if (this.marker) {
-        this.marker.setZIndex(this.zIndex);
-      }
-    },
-
-    _mapChanged: function() {
-      // Marker will be rebuilt, so disconnect existing one from old map and listeners.
-      if (this.marker) {
-        this.marker.setMap(null);
-        google.maps.event.clearInstanceListeners(this.marker);
-      }
-
-      if (this.map && this.map instanceof google.maps.Map) {
-        this._mapReady();
-      }
-    },
-
-    _contentChanged: function() {
-      if (this._contentObserver)
-        this._contentObserver.disconnect();
-      // Watch for future updates.
-      this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
-      this._contentObserver.observe( this, {
-        childList: true,
-        subtree: true
-      });
-
-      var content = this.innerHTML.trim();
-      if (content) {
-        if (!this.info) {
-          // Create a new infowindow
-          this.info = new google.maps.InfoWindow();
-          this.infoHandler_ = google.maps.event.addListener(this.marker, 'click', function() {
-            this.info.open(this.map, this.marker);
-          }.bind(this));
-        }
-        this.info.setContent(content);
+    setDisplayBlock : function() {
+      if( this.block ) {
+        this.style.display = 'block';
+        this.$.input.style.display = 'block';
+        this.style.width = '100%';
       } else {
-        if (this.info) {
-          // Destroy the existing infowindow.  It doesn't make sense to have an empty one.
-          google.maps.event.removeListener(this.infoHandler_);
-          this.info = null;
-        }
+        this.style.display = 'inline-block';
+        this.$.input.style.display = 'inline-block';
       }
     },
 
-    _mapReady: function() {
-      this._listeners = {};
-      this.marker = new google.maps.Marker({
-        map: this.map,
-        position: new google.maps.LatLng(this.latitude, this.longitude),
-        title: this.title,
-        draggable: this.draggable,
-        visible: !this.hidden,
-        icon: this.icon,
-        zIndex: this.zIndex
-      });
-      this._contentChanged();
-      this._clickEventsChanged();
-      this._contentChanged();
-      this._mouseEventsChanged();
-      setupDragHandler_.bind(this)();
+    setDisabled : function() {
+      if( this.disabled ) this.$.input.setAttribute('disabled', 'disabled');
+      else this.$.input.removeAttribute('disabled');
     },
 
-    _clearListener: function(name) {
-      if (this._listeners[name]) {
-        google.maps.event.removeListener(this._listeners[name]);
-        this._listeners[name] = null;
-      }
+    unitsObserver : function() {
+      this.setUnits();
     },
 
-    _forwardEvent: function(name) {
-      this._listeners[name] = google.maps.event.addListener(this.marker, name, function(event) {
-        this.fire('google-map-marker-' + name, event);
-      }.bind(this));
+    setUnits : function(units) {
+      if( units !== undefined ) this.units = units;
+      this.$.input.value = this.units;
+      this.checkError();
     },
 
-    attributeChanged: function(attrName, oldVal, newVal) {
-      if (!this.marker) {
+    getUnits : function() {
+      return this.$.input.value;
+    },
+
+    onChange : function(){
+      if( this.$.input.value == '' ) {
+        this.clearError();
         return;
       }
 
-      // Cannot use *Changed watchers for native properties.
-      switch (attrName) {
-        case 'hidden':
-          this.marker.setVisible(!this.hidden);
-          break;
-        case 'draggable':
-          this.marker.setDraggable(this.draggable);
-          setupDragHandler_.bind(this)();
-          break;
-        case 'title':
-          this.marker.setTitle(this.title);
-          break;
-      }
-    }
-  });
-
-  function setupDragHandler_() {
-    if (this.draggable) {
-      this.dragHandler_ = google.maps.event.addListener(
-          this.marker, 'dragend', onDragEnd_.bind(this));
-    } else {
-      google.maps.event.removeListener(this.dragHandler_);
-      this.dragHandler_ = null;
-    }
-  }
-
-  function onDragEnd_(e, details, sender) {
-    this.latitude = e.latLng.lat();
-    this.longitude = e.latLng.lng();
-  }
-})();
-</script>
-<dom-module id="google-map" assetpath="/public/bower_components/google-map/">
-
-  <style>
-    :host {
-      position: relative;
-      display: block;
-      height: 100%;
-    }
-
-    #map {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    }
-
-  </style>
-  <template>
-    <google-maps-api api-key="[[apiKey]]" client-id="[[clientId]]" version="[[version]]" libraries="[[libraries]]" signed-in="[[signedIn]]" language="[[language]]" on-api-load="_mapApiLoaded"></google-maps-api>
-
-    <div id="map"></div>
-
-    <content id="markers" select="google-map-marker"></content>
-
-  </template>
-</dom-module>
-
-<script>
-
-  Polymer({
-
-    is: 'google-map',
-
-
-    /**
-     * Fired when the Maps API has fully loaded.
-     * @event google-map-ready
-     */
-    /**
-     * Fired when the when the user clicks on the map (but not when they click on a marker, infowindow, or
-     * other object). Requires the clickEvents attribute to be true.
-     * @event google-map-click
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the user double-clicks on the map. Note that the google-map-click event will also fire,
-     * right before this one. Requires the clickEvents attribute to be true.
-     * @event google-map-dblclick
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired repeatedly while the user drags the map. Requires the dragEvents attribute to be true.
-     * @event google-map-drag
-     */
-    /**
-     * Fired when the user stops dragging the map. Requires the dragEvents attribute to be true.
-     * @event google-map-dragend
-     */
-    /**
-     * Fired when the user starts dragging the map. Requires the dragEvents attribute to be true.
-     * @event google-map-dragstart
-     */
-    /**
-     * Fired whenever the user's mouse moves over the map container. Requires the mouseEvents attribute to
-     * be true.
-     * @event google-map-mousemove
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the user's mouse exits the map container. Requires the mouseEvents attribute to be true.
-     * @event google-map-mouseout
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the user's mouse enters the map container. Requires the mouseEvents attribute to be true.
-     * @event google-map-mouseover
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    /**
-     * Fired when the DOM `contextmenu` event is fired on the map container. Requires the clickEvents
-     * attribute to be true.
-     * @event google-map-rightclick
-     * @param {google.maps.MouseEvent} event The mouse event.
-     */
-    properties: {
-      /**
-       * A Maps API key. To obtain an API key, see developers.google.com/maps/documentation/javascript/tutorial#api_key.
-       */
-      apiKey: String,
-
-      /**
-       * A Maps API for Business Client ID. To obtain a Maps API for Business Client ID, see developers.google.com/maps/documentation/business/.
-       * If set, a Client ID will take precedence over an API Key.
-       */
-      clientId: String,
-
-      /**
-       * A latitude to center the map on.
-       */
-      latitude: {
-        type: Number,
-        value: 37.77493,
-        notify: true,
-        reflectToAttribute: true
-      },
-
-      /**
-       * A Maps API object.
-       */
-      map: {
-        type: Object,
-        notify: true,
-        value: null
-      },
-
-      /**
-       * A comma separated list (e.g. "places,geometry") of libraries to load
-       * with this map. Defaults to "places". For more information see
-       * https://developers.google.com/maps/documentation/javascript/libraries.
-       */
-      libraries: {
-        type: String,
-        value: 'places'
-      },
-
-      /**
-       * A longitude to center the map on.
-       */
-      longitude: {
-        type: Number,
-        value: -122.41942,
-        notify: true,
-        reflectToAttribute: true
-      },
-
-      /**
-       * A zoom level to set the map to.
-       */
-      zoom: {
-        type: Number,
-        value: 10,
-        observer: '_zoomChanged'
-      },
-
-      /**
-       * When set, prevents the map from tilting (when the zoom level and viewport supports it).
-       */
-      noAutoTilt: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Map type to display. One of 'roadmap', 'satellite', 'hybrid', 'terrain'.
-       */
-      mapType: {
-        type: String,
-        value: 'roadmap', // roadmap, satellite, hybrid, terrain,
-        observer: '_mapTypeChanged'
-      },
-
-      /**
-       * Version of the Google Maps API to use.
-       */
-      version: {
-        type: String,
-        value: '3.exp'
-      },
-
-      /**
-       * If set, removes the map's default UI controls.
-       */
-      disableDefaultUi: {
-        type: Boolean,
-        value: false,
-        observer: '_disableDefaultUiChanged'
-      },
-
-      /**
-       * If set, the zoom level is set such that all markers (google-map-marker children) are brought into view.
-       */
-      fitToMarkers: {
-        type: Boolean,
-        value: false,
-        observer: '_fitToMarkersChanged'
-      },
-
-      /**
-       * If true, prevent the user from zooming the map interactively.
-       */
-      disableZoom: {
-        type: Boolean,
-        value: false,
-        observer: '_disableZoomChanged'
-      },
-
-      /**
-       * If set, custom styles can be applied to the map.
-       * For style documentation see developers.google.com/maps/documentation/javascript/reference#MapTypeStyle
-       */
-      styles: {
-        type: Object,
-        value: function() { return {}; }
-      },
-
-      /**
-       * A maximum zoom level which will be displayed on the map.
-       */
-      maxZoom: {
-        type: Number,
-        observer: '_maxZoomChanged'
-      },
-
-      /**
-       * A minimum zoom level which will be displayed on the map.
-       */
-      minZoom: {
-        type: Number,
-        observer: '_minZoomChanged'
-      },
-
-      /**
-       * If true, sign-in is enabled.
-       * See https://developers.google.com/maps/documentation/javascript/signedin#enable_sign_in
-       */
-      signedIn: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * The localized language to load the Maps API with. For more information
-       * see https://developers.google.com/maps/documentation/javascript/basics#Language
-       *
-       * Note: the Maps API defaults to the preffered language setting of the browser.
-       * Use this parameter to override that behavior.
-       */
-      language: {
-        type: String
-      },
-
-      /**
-       * When true, map *click events are automatically registered.
-       */
-      clickEvents: {
-        type: Boolean,
-        value: false,
-        observer: '_clickEventsChanged'
-      },
-
-      /**
-       * When true, map drag* events are automatically registered.
-       */
-      dragEvents: {
-        type: Boolean,
-        value: false,
-        observer: '_dragEventsChanged'
-      },
-
-      /**
-       * When true, map mouse* events are automatically registered.
-       */
-      mouseEvents: {
-        type: Boolean,
-        value: false,
-        observer: '_mouseEventsChanged'
-      },
-
-      /**
-       * Additional map options for google.maps.Map constructor.
-       * Use to specify additional options we do not expose as
-       * properties.
-       * Ex: `<google-map additional-map-options='{"mapTypeId":"satellite"}'>`
-       */
-      additionalMapOptions: {
-        type: Object,
-        value: function() { return {}; }
-      }
-
-    },
-
-    behaviors: [
-      Polymer.IronResizableBehavior
-    ],
-
-    listeners: {
-      'iron-resize': 'resize'
-    },
-
-    observers: [
-      '_debounceUpdateCenter(latitude, longitude)'
-    ],
-
-    created: function() {
-      this.markers = [];
-    },
-
-    attached: function() {
-      this._initGMap();
-    },
-
-    detached: function() {
-      if (this._mutationObserver) {
-        this._mutationObserver.disconnect();
-        this._mutationObserver = null;
-      }
-    },
-
-    _initGMap: function() {
-      if (this.map) {
-        return; // already initialized
-      }
-      if (!(window.google && window.google.maps)) {
-        return; // api not loaded
-      }
-      if (!this.isAttached) {
-        return; // not attached
-      }
-
-      this.map = new google.maps.Map(this.$.map, this._getMapOptions());
-      this._listeners = {};
-      this._updateCenter();
-      this._updateMarkers();
-      this._addMapListeners();
-      this.fire('google-map-ready');
-    },
-
-    _mapApiLoaded: function() {
-      this._initGMap();
-    },
-
-    _getMapOptions: function() {
-      var mapOptions = {
-        zoom: this.zoom,
-        tilt: this.noAutoTilt ? 0 : 45,
-        mapTypeId: this.mapType,
-        disableDefaultUI: this.disableDefaultUi,
-        disableDoubleClickZoom: this.disableZoom,
-        scrollwheel: !this.disableZoom,
-        styles: this.styles,
-        maxZoom: Number(this.maxZoom),
-        minZoom: Number(this.minZoom)
-      };
-
-      // Only override the default if set.
-      // We use getAttribute here because the default value of this.draggable = false even when not set.
-      if (this.getAttribute('draggable') != null) {
-        mapOptions.draggable = this.draggable
-      }
-      for (var p in this.additionalMapOptions)
-        mapOptions[p] = this.additionalMapOptions[p];
-
-      return mapOptions;
-    },
-
-    // watch for future updates
-    _observeMarkers: function() {
-      // Watch for future updates.
-      if (this._mutationObserver) {
-        return;
-      }
-      this._mutationObserver = new MutationObserver( this._updateMarkers.bind(this));
-      this._mutationObserver.observe(this, {
-        childList: true
+      this.checkError();
+      this.fire('units-change', {
+        value : this.$.input.value,
+        error : this.error
       });
     },
 
-    _updateMarkers: function() {
-      var newMarkers = Array.prototype.slice.call(
-          Polymer.dom(this.$.markers).getDistributedNodes());
-
-      // do not recompute if markers have not been added or removed
-      if (newMarkers.length === this.markers.length) {
-        var added = newMarkers.filter(function(m) {
-          return this.markers && this.markers.indexOf(m) === -1;
-        }.bind(this));
-        if (added.length === 0) {
-          // set up observer first time around
-          if (!this._mutationObserver) {
-            this._observeMarkers();
-          }
-          return;
-        }
-      }
-
-      this._observeMarkers();
-
-      this.markers = newMarkers;
-
-      // Set the map on each marker and zoom viewport to ensure they're in view.
-      if (this.markers.length && this.map) {
-        for (var i = 0, m; m = this.markers[i]; ++i) {
-          m.map = this.map;
-        }
-      }
-      if (this.fitToMarkers) {
-        this._fitToMarkersChanged();
-      }
-    },
-
-    /**
-     * Clears all markers from the map.
-     *
-     * @method clear
-     */
-    clear: function() {
-      for (var i = 0, m; m = this.markers[i]; ++i) {
-        m.marker.setMap(null);
-      }
-    },
-
-    /**
-     * Explicitly resizes the map, updating its center. This is useful if the
-     * map does not show after you have unhidden it.
-     *
-     * @method resize
-     */
-    resize: function() {
-      if (this.map) {
-
-        // saves and restores latitude/longitude because resize can move the center
-        var oldLatitude = this.latitude;
-        var oldLongitude = this.longitude;
-        google.maps.event.trigger(this.map, 'resize');
-        this.latitude = oldLatitude;  // restore because resize can move our center
-        this.longitude = oldLongitude;
-
-        if (this.fitToMarkers) { // we might not have a center if we are doing fit-to-markers
-          this._fitToMarkersChanged();
-        }
-      }
-    },
-
-    _debounceUpdateCenter: function() {
-      this.debounce('updateCenter', this._updateCenter);
-    },
-
-    _updateCenter: function() {
-      this.cancelDebouncer('updateCenter');
-
-      if (this.map && this.latitude !== undefined && this.longitude !== undefined) {
-        // allow for latitude and longitude to be String-typed, but still Number valued
-        var lati = Number(this.latitude);
-        if (isNaN(lati)) {
-          throw new TypeError('latitude must be a number');
-        }
-        var longi = Number(this.longitude);
-        if (isNaN(longi)) {
-          throw new TypeError('longitude must be a number');
-        }
-
-        var newCenter = new google.maps.LatLng(lati, longi);
-        var oldCenter = this.map.getCenter();
-
-        if (!oldCenter) {
-          // If the map does not have a center, set it right away.
-          this.map.setCenter(newCenter);
-        } else {
-          // Using google.maps.LatLng returns corrected lat/lngs.
-          oldCenter = new google.maps.LatLng(oldCenter.lat(), oldCenter.lng());
-
-          // If the map currently has a center, slowly pan to the new one.
-          if (!oldCenter.equals(newCenter)) {
-            this.map.panTo(newCenter);
-          }
-        }
-      }
-    },
-
-    _zoomChanged: function() {
-      if (this.map) {
-        this.map.setZoom(Number(this.zoom));
-      }
-    },
-
-    _clickEventsChanged: function() {
-      if (this.map) {
-        if (this.clickEvents) {
-          this._forwardEvent('click');
-          this._forwardEvent('dblclick');
-          this._forwardEvent('rightclick');
-        } else {
-          this._clearListener('click');
-          this._clearListener('dblclick');
-          this._clearListener('rightclick');
-        }
-      }
-    },
-
-    _dragEventsChanged: function() {
-      if (this.map) {
-        if (this.dragEvents) {
-          this._forwardEvent('drag');
-          this._forwardEvent('dragend');
-          this._forwardEvent('dragstart');
-        } else {
-          this._clearListener('drag');
-          this._clearListener('dragend');
-          this._clearListener('dragstart');
-        }
-      }
-    },
-
-    _mouseEventsChanged: function() {
-      if (this.map) {
-        if (this.mouseEvents) {
-          this._forwardEvent('mousemove');
-          this._forwardEvent('mouseout');
-          this._forwardEvent('mouseover');
-        } else {
-          this._clearListener('mousemove');
-          this._clearListener('mouseout');
-          this._clearListener('mouseover');
-        }
-      }
-    },
-
-    _maxZoomChanged: function() {
-      if (this.map) {
-        this.map.setOptions({maxZoom: Number(this.maxZoom)});
-      }
-    },
-
-    _minZoomChanged: function() {
-      if (this.map) {
-        this.map.setOptions({minZoom: Number(this.minZoom)});
-      }
-    },
-
-    _mapTypeChanged: function() {
-      if (this.map) {
-        this.map.setMapTypeId(this.mapType);
-      }
-    },
-
-    _disableDefaultUiChanged: function() {
-      if (!this.map) {
-        return;
-      }
-      this.map.setOptions({disableDefaultUI: this.disableDefaultUi});
-    },
-
-    _disableZoomChanged: function() {
-      if (!this.map) {
-        return;
-      }
-      this.map.setOptions({
-        disableDoubleClickZoom: this.disableZoom,
-        scrollwheel: !this.disableZoom
-      });
-    },
-
-    attributeChanged: function(attrName, oldVal, newVal) {
-      if (!this.map) {
-        return;
-      }
-      // Cannot use *Changed watchers for native properties.
-      switch (attrName) {
-        case 'draggable':
-          this.map.setOptions({draggable: this.draggable});
-          break;
-      }
-    },
-
-    _fitToMarkersChanged: function() {
-      // TODO(ericbidelman): respect user's zoom level.
-
-      if (this.map && this.fitToMarkers) {
-        var latLngBounds = new google.maps.LatLngBounds();
-        for (var i = 0, m; m = this.markers[i]; ++i) {
-          latLngBounds.extend(
-              new google.maps.LatLng(m.latitude, m.longitude));
-        }
-
-        // For one marker, don't alter zoom, just center it.
-        if (this.markers.length > 1) {
-          this.map.fitBounds(latLngBounds);
-        }
-
-        this.map.setCenter(latLngBounds.getCenter());
-      }
-    },
-
-    _addMapListeners: function() {
-      google.maps.event.addListener(this.map, 'center_changed', function() {
-        var center = this.map.getCenter();
-        this.latitude = center.lat();
-        this.longitude = center.lng();
-      }.bind(this));
-
-      google.maps.event.addListener(this.map, 'zoom_changed', function() {
-        this.zoom = this.map.getZoom();
-      }.bind(this));
-
-      this._clickEventsChanged();
-      this._dragEventsChanged();
-      this._mouseEventsChanged();
-    },
-
-    _clearListener: function(name) {
-      if (this._listeners[name]) {
-        google.maps.event.removeListener(this._listeners[name]);
-        this._listeners[name] = null;
-      }
-    },
-
-    _forwardEvent: function(name) {
-      this._listeners[name] = google.maps.event.addListener(this.map, name, function(event) {
-        this.fire('google-map-' + name, event);
-      }.bind(this));
-    }
-
-  });
-
-</script>
-<dom-module id="ahb-page-location" assetpath="/public/elements/">
-  <style>
-      :host {
-          display: block;
-          height: 100%;
-      }
-
-      google-map {
-          display: block;
-          height: 100%;
-      }
-
-      .location {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width:100%;
-          background-color: rgba(255,255,255, .7);
-          padding: 5px;
-          border-bottom: 1px solid white;
-      }
-
-      .phoneBreak {
-          display: none;
-      }
-      @media(max-width: 768px) {
-          .phoneBreak {
-              display: block;
-          }
-      }
-  </style>
-
-  <template>
-
-
-      <google-map id="map" latitude="37.77493" longitude="-122.41942" on-google-map-ready="initMap"></google-map>
-
-      <div class="location">
-          <div id="searching" style="display:none">
-              <div class="layout horizontal">
-                  <div class="flex">
-                      <input type="text" class="form-control" id="textBox" on-keypress="setSearchTimer">
-                  </div>
-                  <div style="padding: 10px">
-                      <i class="fa fa-circle-o-notch fa-spin" id="loadingIcon" style="display:none"></i>
-                  </div>
-                  <div>
-                      <a class="btn btn-default" on-click="stopSearch"><i class="fa fa-remove"></i></a>
-                  </div>
-              </div>
-
-              <div id="resultsPanel"></div>
-          </div>
-
-          <div id="emptySearch">
-              <div class="layout horizontal">
-                  <div class="flex self-center">
-                      <a class="btn btn-default" on-click="startSearch"><i class="fa fa-search"></i> Search</a>
-                  </div>
-                  <div class="self-center" style="text-align:right; padding-top:4px">
-                      Click map to select Location
-                  </div>
-              </div>
-          </div>
-
-          <div id="completedSearch" style="display:none">
-              <div class="layout horizontal">
-                  <div class="flex self-center">
-                      <a class="btn btn-default" on-click="startSearch"><i class="fa fa-search"></i> Search</a>
-                  </div>
-
-                  <div style="text-align:right; padding-top:4px;" class="self-center" id="currentLocation"></div>
-              </div>
-          </div>
-      </div>
-  </template>
-</dom-module>
-
-<script>
-  Polymer({
-    is : 'ahb-page-location',
-
-      updateCropText : function() {
-          var cropLocality = [];
-          if( !this.crops ) {
-            this.cropText = '';
-            return;
-          }
-
-          if( this.crops.state.length > 0 ) cropLocality.push('Statewide');
-          if( this.crops.county.length > 0 ) cropLocality.push('County');
-          if( this.crops.zipCode.length > 0 ) cropLocality.push('Zipcode');
-
-          if( cropLocality.length == 0 ) {
-              this.cropText = 'Currently no crops found for this location.'
-          } else {
-              this.cropText = 'Crop Locality: '+cropLocality.join(', ');
-          }
-      },
-
-      updateText : function() {
-        if( !this.location ) return;
-        this.updateCropText();
-
-        this.$.currentLocation.innerHTML = this.location.county+', '+this.location.state+', '+
-          this.location.zipCode+'<br /><span>'+this.cropText+'</span>';
-      },
-
-      resize : function() {
-          this.$.map.resize();
-      },
-
-      startSearch : function() {
-          this.$.emptySearch.style.display = 'none';
-          this.$.completedSearch.style.display = 'none';
-          this.$.searching.style.display = 'block';
-          this.$.textBox.focus();
-      },
-
-      stopSearch : function() {
-        this.$.emptySearch.style.display = 'none';
-        this.$.searching.style.display = 'none';
-        this.$.completedSearch.style.display = 'block';
-      },
-
-      setSearchTimer : function() {
-          this.loading = true;
-          this.cropText = '';
-          if( this.searchTimer != -1 ) clearTimeout(this.searchTimer);
-          this.searchTimer = setTimeout(this.search.bind(this), 500);
-      },
-
-      search: function() {
-        this.query = this.$.textBox.value;
-
-        if (this.query && this.map) {
-          /*var places = new google.maps.places.PlacesService(this.map);
-          places.textSearch({query: this.query+' United States'}, this.gotResults.bind(this));*/
-          $.get('https://maps.googleapis.com/maps/api/geocode/json?address='+this.query+'&components=country:USA', this.gotResults.bind(this));
-        }
-      },
-
-      gotResults: function(resp, status) {
-          this.loading = false;
-          this.results = resp.results.splice(0,5);
-          this.renderResults();
-      },
-
-      loading : function(loading) {
-
-      },
-
-      renderResults : function() {
-        var html = '', loc;
-        for( var i = 0; i < this.results.length; i++ ) {
-          html += '<div>'+
-            '<a index="'+i+'" class="btn btn-link" style="margin-bottom:0">'+
-              '<i class="fa fa-map-marker"></i> '+this.results[i].formatted_address+
-            '</a></div>';
-        }
-
-        this.$.resultsPanel.innerHTML = html;
-
-        $(this.$.resultsPanel)
+    checkError : function() {
+      try {
+        FB.ucum.parse(FB.units.math.cleanDollars(this.$.input.value));
+      } catch(e) {
+        $(this).addClass('has-error');
+        $(this.$.input).addClass('text-danger');
+        this.error = true;
+
+        this.$.icon.style.display = 'inline';
+
+        this.$.message.innerHTML = '<div class="text text-danger">Invalid Units</div>'+this.getReminders();
+
+        $(this.$.message)
           .find('a')
-          .on('click', this.selectLocation.bind(this));
-      },
-
-      selectLocation : function(e) {
-          var loc = this.results[parseInt(e.currentTarget.getAttribute('index'))];
-          this.map.setCenter(loc.geometry.location);
-
-          this.setLocation(loc, true);
-          this.stopSearch();
-      },
-
-      initMap : function() {
-        this.map = this.$.map.map;
-        console.log(this.map);
-
-          google.maps.event.addListener(this.map, 'click', function(e) {
-              this.llLookUp(e.latLng.lat(), e.latLng.lng(), true);
+          .on('click', function(e){
+            this.$.input.value = e.currentTarget.innerHTML;
+            this.onChange();
           }.bind(this));
-
-          this.map.setOptions({
-              mapTypeControl: false,
-              panControl: false,
-              zoomControl: true,
-              zoomControlOptions: {
-                  style: google.maps.ZoomControlStyle.DEFAULT,
-                  position: google.maps.ControlPosition.LEFT_CENTER
-              },
-              streetViewControl: false
-          })
-      },
-
-      setLocation : function(loc, recheck) {
-          this.location = {};
-
-          if( loc.geometry && loc.geometry.location ) {
-              this.location.latitude = loc.geometry.location.lat;
-              this.location.longitude = loc.geometry.location.lng;
-              this.location.fixedLat = this.location.latitude.toFixed(4);
-              this.location.fixedLng = this.location.longitude.toFixed(4);
-
-              if( this.marker ) this.marker.setMap(null);
-              this.marker = new google.maps.Marker({
-                  position: new google.maps.LatLng(this.location.latitude, this.location.longitude),
-                  map: this.map
-              });
-          }
-
-          for( var i = 0; i < loc.address_components.length; i++ ) {
-              if( loc.address_components[i].types.indexOf('administrative_area_level_2') > -1 ) {
-                  this.location.county = loc.address_components[i].long_name;
-              } else if ( loc.address_components[i].types.indexOf('administrative_area_level_1') > -1 ) {
-                  this.location.state = loc.address_components[i].long_name;
-              } else if ( loc.address_components[i].types.indexOf('postal_code') > -1) {
-                  this.location.zipCode = loc.address_components[i].long_name;
-              }
-          }
-
-          if( !this.location.county || !this.location.state || !this.location.zipCode ) {
-              if( recheck ) this.llLookUp(this.location.latitude, this.location.longitude, false);
-              else alert('Location Lookup Error :(');
-          }
-
-          this.updateText();
-          this.stopSearch();
-
-          this.fire('location-select', this.location);
-      },
-
-      llLookUp : function(lat, lng, recheck) {
-          $.get('http://maps.googleapis.com/maps/api/geocode/json?latlng='+lat+','+lng+'&sensor=false', function(resp) {
-              if( resp.results.length > 0 ) {
-                  this.setLocation(resp.results[0], recheck);
-              }
-              // TODO: how do we want to handle case w/ no resp?
-          }.bind(this));
+        return;
       }
+      this.clearError();
+    },
+
+    clearError : function() {
+      this.error = false;
+      $(this).removeClass('has-error');
+      $(this.$.input).removeClass('text-danger');
+      this.$.message.innerHTML = '<span class="text text-success">Valid</span>';
+
+      this.$.icon.style.display = 'none';
+    },
+
+    onFocus : function() {
+      this.$.message.style.display = 'block';
+
+      if( this.block ) return;
+      this.style.width = '150px';
+      this.$.input.style.width = '150px';
+    },
+
+    onBlur : function() {
+      setTimeout(function(){
+        this.$.message.style.display = 'none';
+        if( this.block ) return;
+        this.style.width = '100px';
+        this.$.input.style.width = '100px';
+      }.bind(this), 100);
+
+
+    },
+
+    getReminders : function() {
+      var parts = this.$.input.value.replace(/[\]\[\.\/]/g, ' ').replace(/\s+/g,' ').split(' ');
+
+      var reminders = [];
+      var used = [];
+
+      for( var i = 0; i < parts.length; i++ ) {
+        if( parts[i] == '' ) continue;
+        var re = new RegExp('.*'+parts[i].trim()+'.*','i');
+
+        for( var key in FB.units.lookup ) {
+          if( key.match(re) && used.indexOf(key) == -1 && used.indexOf(FB.units.lookup[key].symbol) == -1 ) {
+            if( FB.units.lookup[key].symbol != key ) {
+              reminders.push('<b>'+key+'</b> = <a style="cursor:pointer">'+FB.units.lookup[key].symbol+'</a>');
+            } else {
+              reminders.push('<a style="cursor:pointer">'+FB.units.lookup[key].symbol+'</a>');
+            }
+
+            used.push(key);
+            used.push(FB.units.lookup[key].symbol);
+          }
+        }
+      }
+
+      if( reminders.length == 0 ) return '';
+      return '<div class="well well-sm"><div>Reminders</div><div>'+reminders.join('</div><div>')+'</div></div>';
+    }
   });
-
-
-var STATES = {
-  "alabama": "AL",
-  "alaska": "AK",
-  "american samoa": "AS",
-  "arizona": "AZ",
-  "arkansas": "AR",
-  "california": "CA",
-  "colorado": "CO",
-  "connecticut": "CT",
-  "delaware": "DE",
-  "district of columbia": "DC",
-  "federated states of micronesia": "FM",
-  "florida": "FL",
-  "georgia": "GA",
-  "guam": "GU",
-  "hawaii": "HI",
-  "idaho": "ID",
-  "illinois": "IL",
-  "indiana": "IN",
-  "iowa": "IA",
-  "kansas": "KS",
-  "kentucky": "KY",
-  "louisiana": "LA",
-  "maine": "ME",
-  "marshall islands": "MH",
-  "maryland": "MD",
-  "massachusetts": "MA",
-  "michigan": "MI",
-  "minnesota": "MN",
-  "mississippi": "MS",
-  "missouri": "MO",
-  "montana": "MT",
-  "nebraska": "NE",
-  "nevada": "NV",
-  "new hampshire": "NH",
-  "new jersey": "NJ",
-  "new mexico": "NM",
-  "new york": "NY",
-  "north carolina": "NC",
-  "north dakota": "ND",
-  "northern mariana islands": "MP",
-  "ohio": "OH",
-  "oklahoma": "OK",
-  "oregon": "OR",
-  "palau": "PW",
-  "pennsylvania": "PA",
-  "puerto rico": "PR",
-  "rhode island": "RI",
-  "south carolina": "SC",
-  "south dakota": "SD",
-  "tennessee": "TN",
-  "texas": "TX",
-  "utah": "UT",
-  "vermont": "VT",
-  "virgin islands": "VI",
-  "virginia": "VA",
-  "washington": "WA",
-  "west virginia": "WV",
-  "wisconsin": "WI",
-  "wyoming": "WY"
-}
 </script>
-<dom-module id="ahb-page-crop" assetpath="/public/elements/">
-  <style>
-      google-map {
-          height: 300px;
-          display: block;
-      }
-  </style>
-
-  <template>
-
-
-      <div style="padding: 10px">
-
-          <div id="locationTable" style="display:none">
-              <h4>Location</h4>
-              <table class="table">
-                  <tbody><tr>
-                      <td>Lat / Lng</td>
-                      <td id="llLabel"></td>
-                  </tr>
-                  <tr>
-                      <td>County</td>
-                      <td id="countyLabel"></td>
-                  </tr>
-                  <tr>
-                      <td>State</td>
-                      <td id="stateLabel"></td>
-                  </tr>
-                  <tr>
-                      <td>Zip Code</td>
-                      <td id="zipCodeLabel"></td>
-                  </tr>
-              </tbody></table>
-
-              <h3>Set Crop and Farm Parameters</h3>
-              <table class="table">
-                  <tbody><tr>
-                      <td>Select Crop:</td>
-                      <td>
-                          <select id="cropSelector" on-change="setSelected"></select>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>Farm Size:</td>
-                      <td>
-                          <input type="number" id="farmSize" class="form-control" style="width:100px;display:inline-block" value="10" on-change="setSelected"> ac
-                      </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td><a class="btn btn-default" style="display:none" id="viewBtn" href="#budget">View Budget</a></td>
-                  </tr>
-              </tbody></table>
-          </div>
-
-          <div id="noLocation">
-              <h4><i class="fa fa-warning"></i> You must first select a crop <a href="#location">location</a>!</h4>
-          </div>
-
-      </div>
-  </template>
-</dom-module>
-
-<script>
-    Polymer({
-      is : 'ahb-page-crop',
-
-      ready : function() {
-        this.firstTime = true;
-
-        this.data = {
-          crop : '',
-          size : 10
-        }
-
-        window.stateLookup = {};
-        for( var key in states ) stateLookup[states[key]] = key;
-      },
-
-      setSelected : function() {
-        var parts = this.$.cropSelector.value.split('::');
-        this.data = {
-          crop : parts[0],
-          locality : parts[1],
-          size : parseInt(this.$.farmSize.value),
-          location : this.location
-        }
-
-        if( this.data.crop && this.data.size ) {
-          this.fire('crop-size-update', this.data);
-          this.$.viewBtn.style.display = 'inline-block';
-        }
-      },
-
-      setFarmSize : function(size) {
-        this.data.size = size;
-        this.$.farmSize.value = size;
-      },
-
-      updateLocation : function(location) {
-        this.location = location;
-
-        if( !location ) {
-          this.$.noLocation.style.display = 'block';
-          this.$.locationTable.style.display = 'none';
-          return;
-        } else {
-          this.$.noLocation.style.display = 'none';
-          this.$.locationTable.style.display = 'block';
-        }
-
-        this.$.llLabel.innerHTML = location.fixedLat+', '+location.fixedLng;
-        this.$.countyLabel.innerHTML = location.county;
-        this.$.stateLabel.innerHTML = location.state;
-        this.$.zipCodeLabel.innerHTML = location.zipCode;
-
-        this.updateCrops();
-      },
-
-      updateSelected : function() {
-          var parts = this.selectedCropAndLocality.split('::');
-          this.selectedCrop = parts[0];
-          this.selectedLocality = parts[1];
-      },
-
-      updateCrops : function() {
-          $.get('/crops/get?location='+encodeURIComponent(JSON.stringify(this.location)), function(resp) {
-              this.processResponse(resp);
-
-              if( this.firstTime &&
-                  (this.crops.state.length > 0 || this.crops.county.length > 0 || this.crops.zipCode.length > 0 ) ) {
-                  this.firstTime = false;
-                  window.location.hash = 'crop';
-              }
-
-              this.renderCropSelector();
-          }.bind(this));
-      },
-
-      processResponse : function(resp) {
-        this.crops = {
-          state : [],
-          county : [],
-          zipCode : []
-        }
-
-        for( var i = 0; i < resp.length; i++ ) {
-
-          if( stateLookup[resp[i].location] ) {
-            this.crops.state.push(resp[i].commodity)
-          } else if ( resp[i].location.match(/\d\d\d\d\d/) ) {
-            this.crops.zipCode.push(resp[i].commodity)
-          } else {
-            this.crops.county.push(resp[i].commodity)
-          }
-
-        }
-      },
-
-      renderCropSelector : function() {
-        var html = '<option></option>', crop;
-
-
-        for( var i = 0; i < this.crops.state.length; i++ ) {
-          crop = this.crops.state[i];
-          html += '<option value="'+crop+'::statewide">'+crop+' (Statewide - '+this.location.state+')</option>';
-        }
-
-        for( var i = 0; i < this.crops.county.length; i++ ) {
-          crop = this.crops.county[i];
-          html += '<option value="'+crop+'::county">'+crop+' ('+this.location.county+')</option>';
-        }
-
-        for( var i = 0; i < this.crops.zipCode.length; i++ ) {
-          crop = this.crops.state[i];
-          html += '<option value="'+crop+'::zipcode">'+crop+' ('+this.location.zipCode+')</option>';
-        }
-
-        this.$.cropSelector.innerHTML = html;
-      }
-    })
-</script>
-
-<script>
-  var states = {
-    "Alabama": "AL",
-    "Alaska": "AK",
-    "American Samoa": "AS",
-    "Arizona": "AZ",
-    "Arkansas": "AR",
-    "California": "CA",
-    "Colorado": "CO",
-    "Connecticut": "CT",
-    "Delaware": "DE",
-    "District Of Columbia": "DC",
-    "Federated States Of Micronesia": "FM",
-    "Florida": "FL",
-    "Georgia": "GA",
-    "Guam": "GU",
-    "Hawaii": "HI",
-    "Idaho": "ID",
-    "Illinois": "IL",
-    "Indiana": "IN",
-    "Iowa": "IA",
-    "Kansas": "KS",
-    "Kentucky": "KY",
-    "Louisiana": "LA",
-    "Maine": "ME",
-    "Marshall Islands": "MH",
-    "Maryland": "MD",
-    "Massachusetts": "MA",
-    "Michigan": "MI",
-    "Minnesota": "MN",
-    "Mississippi": "MS",
-    "Missouri": "MO",
-    "Montana": "MT",
-    "Nebraska": "NE",
-    "Nevada": "NV",
-    "New Hampshire": "NH",
-    "New Jersey": "NJ",
-    "New Mexico": "NM",
-    "New York": "NY",
-    "North Carolina": "NC",
-    "North Dakota": "ND",
-    "Northern Mariana Islands": "MP",
-    "Ohio": "OH",
-    "Oklahoma": "OK",
-    "Oregon": "OR",
-    "Palau": "PW",
-    "Pennsylvania": "PA",
-    "Puerto Rico": "PR",
-    "Rhode Island": "RI",
-    "South Carolina": "SC",
-    "South Dakota": "SD",
-    "Tennessee": "TN",
-    "Texas": "TX",
-    "Utah": "UT",
-    "Vermont": "VT",
-    "Virgin Islands": "VI",
-    "Virginia": "VA",
-    "Washington": "WA",
-    "West Virginia": "WV",
-    "Wisconsin": "WI",
-    "Wyoming": "WY"
-  }
-</script>
-<dom-module id="ahb-interval-selector" assetpath="/public/elements/widgets/">
+<dom-module id="budget-operation-scheduler" assetpath="/public/elements/budget-components/">
   <style>
     :host {
-      white-space: nowrap;
-      display:inline-block;
+      display: block;
+      position: relative;
+      padding: 4px;
+      border-radius: 4px;
     }
-    input[type="number"] {
-      width: 50px;
+    :host:hover {
+      background-color: #f8f8f8;
+      color: #2196f3;
     }
-    input, select {
-      background-color: white;
-      color: orange;
+    #inputPanel {
+      font-size: 14px;
+      color: #333;
     }
-
+    #title {
+      cursor: pointer;
+    }
+    .length-label {
+      padding: 10px;
+      color: #666;
+    }
   </style>
 
   <template>
-    <select on-change="onSelectChange" value="{{interval::change}}" style="display:inline-block; width:auto">
-      <option value="One Time">One Time</option>
-      <option value="Annual">Annual</option>
-      <option value="Monthly">Monthly</option>
-      <option value="__ Per Year">__ Per Year</option>
-      <option value="Once Every __ Years">Once Every __ Years</option>
-    </select>
 
-    <input type="number" style="display:none" id="numInput" value="{{intervalAmount::change}}">
-  </template>
-</dom-module>
+    <div on-click="toggle" id="title">
+      <div><i class="fa fa-calendar-o"></i> Schedule: <span>{{displayText}}</span> <i class="fa fa-pencil" id="edit" style="display:none"></i></div>
+      <div><small id="dateRangeText"></small></div>
+    </div>
 
-<script>
-  Polymer({
-    is : 'ahb-interval-selector',
+    <div id="inputPanel">
+      <h5 class="page-header" style="text-align:center; margin-top: 0px">{{operationName}}</h5>
 
-    properties : {
-      interval : {
-        type : String,
-        notify : true
-      },
-      intervalAmount : {
-        type : Number,
-        notify : true
-      }
-    },
+      <div class="form-horizontal">
 
-    ready : function() {
-      this.interval = 'One Time';
-      this.intervalAmount = 1;
-    },
+        <div class="form-group" id="dates">
+          <label for="datesInput" class="col-sm-3 control-label"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
+          <div class="col-sm-9">
+            <div id="inputRoot"></div>
+            <div id="selectedDates">
 
-    onSelectChange : function(e) {
-      var val = e.currentTarget.value;
-      if( val == '__ Per Year' || val == 'Once Every __ Years') {
-        this.$.numInput.style.display = 'inline-block';
-      } else {
-        this.$.numInput.style.display = 'none';
-      }
-    }
-  })
-</script>
-<dom-module id="ahb-unit-selector" assetpath="/public/elements/widgets/">
-  <template>
-    <select>
-      <option value="acre">acre</option>
-      <option value="CWT">CWT</option>
-    </select>
-  </template>
-</dom-module>
 
-<script>
-  Polymer({
-    is : 'ahb-unit-selector'
-  })
-</script>
-<dom-module id="ahb-page-budget" assetpath="/public/elements/budget/">
-  <style>
-      tr {
-          opacity: 1;
-          background-color: white;
-
-          transition: all linear 200ms;
-          -webkit-transition: all linear 200ms;
-          -moz-transition: all linear 200ms;
-          -ms-transition: all linear 200ms;
-      }
-      tr[removing] {
-          opacity: 0;
-      }
-
-      .total {
-          border-top: 1px solid #ccc;
-          text-align: right;
-          padding-top: 10px;
-          color: #333;
-      }
-      .grandTotal {
-          border-top: 1px solid #888;
-          text-align: right;
-          padding-top: 10px;
-          /*font-weight: bold;*/
-      }
-      .addItem {
-          position:absolute;
-          left:0;
-          top:0;
-          background-color: white;
-          padding: 10px;
-          margin: 3px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          box-shadow: 0 0 5px #ccc;
-          z-index: 1000;
-      }
-      tr.hover:hover {
-          background-color: #eee;
-      }
-      .addTable td, .addTable th {
-          padding: 5px;
-          vertical-align: middle;
-      }
-      table tr td, table th  {
-          white-space: nowrap;
-      }
-      .arrowIcon {
-          font-size:25px
-      }
-
-      .item-row {
-        margin: 5px 0 0 20px;
-      }
-
-      @media(max-width: 768px) {
-          h2 {
-              font-size: 18px !important;
-          }
-          .arrowIcon {
-              font-size: 18px
-          }
-          .item-row {
-            margin: 5px 0 0 3px;
-          }
-      }
-
-      .lineitem {
-        padding: 10px;
-        margin: 10px;
-        border-bottom: 1px solid #ccc;
-      }
-
-      /*.input-nostyle {
-        color: orange;
-        border-left: none;
-        border-right: none;
-        border-bottom: 1px solid #ccc;
-        border-top: none;
-        margin: 3px;
-      }
-
-      .input-label {
-        color: #555;
-        padding: 3px 5px;
-      }*/
-
-      input {
-        color: orange;
-      }
-
-      .btn.btn-link {
-        color: #888;
-      }
-
-      .btn.btn-link:hover {
-        color: #2196f3;
-      }
-
-      sub {
-        font-size: 60%;
-        color: #444;
-      }
-  </style>
-
-  <template>
-      <div style="padding:10px" id="noData">
-          <h4><ahb-icon icon="fa-warning"></ahb-icon> Actions Required</h4>
-          <p>Please select a location, crop and farm size first!  Then we can calculate your budget.
-      </p></div>
-
-      <budget-interval-selector></budget-interval-selector>
-
-      <div style="padding:10px;display:none" id="main">
-
-        <div style="padding:10px;margin-bottom:10px;border-bottom:1px solid #ccc">
-            <div class="layout horizontal">
-                <div class="flex">
-                  <h4>
-                    <span>{{cropLabel}}</span>,
-                    <span>{{cropLocality}}</span>
-                  </h4>
-                </div>
+              <template is="dom-repeat" items="{{dates}}">
                 <div>
-                    <a class="btn btn-link" on-click="expandAll"><i class="fa fa-toggle-down"></i> Expand All</a>
-                    <a class="btn btn-link" on-click="collapseAll"><i class="fa fa-toggle-right"></i> Collapse All</a>
-                </div>
-            </div>
-        </div>
 
-        <h4>Duration:
-          <input type="number" on-input="recalc" value="{{duration::input}}" class="form-control" style="width:75px; display:inline-block">
-            <small>Months</small>
-        </h4>
+                  <div class="layout horizontal" style="margin-top:15px">
+                    <div class="flex"><h6 style="padding-right: 20px">{{item.dateFormatted}}</h6></div>
 
-        <template is="dom-repeat" items="{{phases}}" as="phase">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 style="margin: 5px 0">
-                <a class="btn btn-link phase-toggle" on-click="togglePhase" phase$="[[phase.name]]">
-                    <i class="fa fa-arrow-right"></i>
-                </a>
-                <span>{{phase.name}}</span>
-                <a class="btn btn-link" on-click="toggleAddPhase" phase$="[[phase.name]]"><i class="fa fa-plus"></i></a>
-
-                <input type="text" style="display:none; font-size: 16px" phase$="[[phase.name]]" placeholder="New Operation Name" on-keypress="newOppInputKeyPress">
-
-                <small class="pull-right" style="font-size: 20px"><ahb-dollar-label value="[[phase.total]]"></ahb-dollar-label>/<span>{{phase.units}}</span></small>
-              </h3>
-            </div>
-            <div class="panel-body" phase$="[[phase.name]]" style="display:none">
-
-              <template is="dom-repeat" items="{{phase.operations}}" as="operation">
-                <h4 class="page-header" style="margin-bottom:0;padding:0">
-                  <a class="btn btn-link opp-toggle" on-click="toggleOperation" phase$="[[phase.name]]" operation$="[[operation.name]]">
-                      <i class="fa fa-arrow-right"></i>
-                  </a>
-                  <span>{{operation.name}}</span>
-                  <a class="btn btn-link" on-click="addLineItem" phase$="[[phase.name]]" operation$="[[operation.name]]">
-                      <i class="fa fa-plus"></i>
-                  </a>
-                </h4>
-
-                <div class="operation-panel" phase$="[[phase.name]]" operation$="[[operation.name]]" style="display:none">
-                  <template is="dom-repeat" items="{{operation.materials}}" as="material">
-                    <div class="layout horizontal item-row">
-                      <div>
-                        <a class="btn btn-link" on-click="removeItem" material$="[[material.name]]" phase$="[[phase.name]]" operation$="[[operation.name]]">
-                            <i class="fa fa-times"></i>
-                        </a>
-                      </div>
-                      <div class="flex">
-                        <input type="text" value="{{material.name::input}}" on-input="recalc">
-                      </div>
-
-                      
-                          <div class="flex">
-                            <input type="number" value="{{material.amount::input}}" on-input="recalc">
-                            <sub>Amount</sub>
-                          </div>
-
-                          <div class="flex">
-                            <input type="text" value="{{material.units::input}}" on-input="recalc">
-                              <sub>Units</sub>
-                          </div>
-
-
-                          <div class="flex" style="text-align:center">
-                            <span class="input-label">@</span>&nbsp;
-                          </div>
-                      
-
-                      <div>
-
-                            <span class="input-label" style="padding-right:0">$</span>
-
-                            <input type="number" on-input="recalc" value="{{material.price::input}}">
-
-                            <span class="input-label">/<span>{{material.units}}</span></span>
-
-
-                      </div>
-
-                      <div style="text-align:right">
-                        <span class="input-label">
-                          = <ahb-dollar-label value="[[material.total]]" style="font-weight: bold"></ahb-dollar-label>
-                        </span>
-                      </div>
-
+                    <div class="length-label">Length:</div>
+                    <div>
+                      <input type="number" value="{{item.length::input}}" class="form-control" on-input="onLengthUpdate" style="max-width: 75px; margin-right: 5px">
                     </div>
-                  </template>
-
-                  <div style="margin-top: 10px; border-top: 1px solid #eee;"></div>
-                </div>
-
-                <h4>
-                  <div class="layout horizontal">
-                    <div class="flex"></div>
 
                     <div>
-                      <small style="vertical-align: middle">
-                        <ahb-dollar-label value="[[operation.subtotal]]"></ahb-dollar-label> <sub>Subtotal</sub>
-                        x&nbsp;<span>{{operation.timeMultiplier}}</span> <sub>Interval</sub>&nbsp;</small>
+                      <select value="{{item.units::input}}" class="form-control" on-change="onLengthUpdate">
+                        <option value="day">Day(s)</option>
+                        <option value="month">Month(s)</option>
+                        <option value="year">Year(s)</option>
+                      </select>
                     </div>
-
-                    <div style="white-space:nowrap">
-                      <ahb-interval-selector on-change="recalc" interval="{{operation.interval}}" interval-amount="{{operation.intervalAmount}}"></ahb-interval-selector>
-                    </div>
-                    
-                    
 
                     <div>
-                      <small style="vertical-align: middle">&nbsp;=
-                        <ahb-dollar-label value="[[operation.total]]"></ahb-dollar-label>/<span>{{operation.units}}</span>
-                      </small>
+                      <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
                     </div>
-                  </div>
-                </h4>
+                  </div> 
 
+                </div>
               </template>
             </div>
+
           </div>
-        </template>
-
-
-        <h3 class="total">
-            Subtotal = <ahb-dollar-label value="[[phaseTotal]]"></ahb-dollar-label> <small>/acre</small><br>
-            <small> x <span>
-            <input type="number" value="{{farmSize::input}}" style="width: 75px" on-input="recalc">
-            </span> acres</small>
-        </h3>
-
-        <h2 class="grandTotal">
-            <div style="float:left">Total</div>
-            <ahb-dollar-label value="[[grandTotal]]"></ahb-dollar-label>
-        </h2>
-        <h2 class="grandTotal">
-            <div style="float:left">Annualized</div>
-            <ahb-dollar-label value="[[annualized]]"></ahb-dollar-label>
-        </h2>
-
-        <h2 class="grandTotal" style="text-align: left">Cost Breakdown</h2><h2>
-        <div class="row">
-          <div class="col-md-4" id="phaseChartRoot"></div>
-          <div class="col-md-4" id="operationChartRoot"></div>
-          <div class="col-md-4" id="materialChartRoot"></div>
         </div>
+      </div> 
 
-    </h2></div>
+      <div id="chart" style="height:100px"></div>
 
+    </div> 
   </template>
 </dom-module>
 
-<script>var BudgetDemo = {
-  getLocalDemo : function() {
-    return [
-      {
-        name : 'Planting',
-        total : 300,
-        units : 'ac',
-        operations : [
-          {
-            name : 'Weed Control',
-            total : 150,
-            units : 'ac',
-            interval : '',
-            intervalAmount : 1,
-            timeMultiplier : 0,
-            materials : [
-              {
-                name : 'Herbicide',
-                amount : 15,
-                units : 'oz',
-                price : 15
-              },
-              {
-                name : 'Labor',
-                amount : 43,
-                units : 'hr',
-                price : 23
-              }
-            ]
-          }
-        ]
-      },
-      {
-        name : 'Maintain',
-        total : 5000,
-        units : 'ac',
-        operations : [
-          {
-            name : 'Weed Control',
-            total : 150,
-            units : 'ac',
-            interval : '',
-            intervalAmount : 1,
-            timeMultiplier : 0,
-            materials : [
-              {
-                name : 'Herbicide',
-                amount : 15,
-                units : 'oz',
-                price : 15
-              }
-            ],
-          },
-          {
-            name : 'Foo',
-            total : 10,
-            units : 'ac',
-            interval : '',
-            intervalAmount : 1,
-            timeMultiplier : 0,
-            materials : [
-              {
-                name : 'Bar',
-                amount : 15,
-                units : 'ac',
-                price : 15
-              }
-            ],
-          }
-        ]
-      },
-      {
-        name : 'Harvest',
-        total : 500,
-        units : 'ac',
-        operations : [
-          {
-            name : 'Pull Plant',
-            total : 100,
-            units : 'ac',
-            interval : '',
-            intervalAmount : 1,
-            timeMultiplier : 0,
-            materials : [
-              {
-                name : 'Labor',
-                amount : 5,
-                units : 'oz',
-                price : 8
-              }
-            ],
-          },
-          {
-            name : 'Package',
-            total : 1000,
-            units : 'ac',
-            interval : '',
-            intervalAmount : 1,
-            timeMultiplier : 0,
-            materials : [
-              {
-                name : 'Labor',
-                amount : 15,
-                units : 'oz',
-                price : 10
-              }
-            ],
-          }
-        ]
-      }
-    ];
-  }
-}
-</script>
-<script>Polymer({
-  is : 'ahb-page-budget',
-
-    behaviors : [ BudgetDemo ],
+<script>
+  Polymer({
+    is : 'budget-operation-scheduler',
 
     ready : function() {
-      this.rootUrl = '/budget/get?';
+      this.displayText = '';
+      this.dateRangeText = '';
 
-      this.recalcTimer = -1;
+      this.data = [];
+      this.dates = [];
 
-      this.duration = 12 * 3;  // in months
-      this.phaseTotal = 0;
-      this.farmSize = 10;
-      this.grandTotal = 0;
-      this.annualized = 0;
+      $(this.$.title)
+        .on('mouseover', function(){
+          this.$.edit.style.display = 'inline';
+        }.bind(this))
+        .on('mouseleave', function(){
+          this.$.edit.style.display = 'none';
+        }.bind(this))
 
-      this.phases = this.getLocalDemo();
-      this.recalc();
+      this.update();
+      $(window).on('resize', this.updateChart.bind(this));
     },
 
     attached : function() {
-      google.setOnLoadCallback(this.redrawCharts.bind(this));
-      $(window).on('resize', this.redrawCharts.bind(this));
-    },
-
-    updateCropSize : function(data) {
-      this.farmSize = data.size;
-      this.cropLabel = data.crop;
-
-      // TODO: defaulting to state for now
-      // should pick location based on data.locality;
-      this.cropLocality = data.location.state;
-
-      this.$.noData.style.display = 'none';
-      this.$.main.style.display = 'block';
-
-      this.query();
-    },
-
-    query : function() {
-      var url = this.rootUrl+'crop='+this.cropLabel.toUpperCase()+'&location='+STATES[this.cropLocality.toLowerCase()];
-      $.get(url, function(resp) {
-        this.prepareFromResponse(resp);
-        this.recalc();
-      }.bind(this));
-    },
-
-    prepareFromResponse : function(items) {
-      // reset
-      for( var i = 0; i < this.phases.length; i++ ) {
-        this.phases[i].total = '';
-        this.phases[i].operations = [];
-      }
-
-      var item, phase;
-      for( var i = 0; i < items.length; i++ ) {
-        item = items[i];
-
-        item.name = item.material;
-
-        // clean phase names
-        if( item.phase == 'annual' ) item.phase = 'Maintain';
-        else if( item.phase == '' ) item.phase = '';
-
-        phase = this.getPhase(item.phase);
-        if( !phase ) return;
-
-        operation = this.getOperation(phase, item.operation);
-        this.addMaterial(operation, item);
-      }
-    },
-
-    // debounce
-    recalc : function() {
-      if( this.recalcTimer != -1 ) clearTimeout(this.recalcTimer);
-
-      this.recalcTimer = setTimeout(function(){
-        this.recalcTimer = -1;
-        this._recalc();
-      }.bind(this), 50);
-    },
-
-    _recalc : function() {
-      this.phaseTotal = 0;
-      this.operationTotal = 0;
-      this.materialTotal = 0;
-      this.grandTotal = 0;
-
-      this.phases.forEach(function(phase){
-        phase.total = 0;
-        if( !phase.operations ) return;
-
-        phase.operations.forEach(function(operation){
-          operation.subtotal = 0;
-          operation.total = 0;
-          if( !operation.materials ) return;
-
-          operation.timeMultiplier = this.getIntervalMultiplier(operation);
-
-          operation.materials.forEach(function(material){
-            // TODO: check units here and update if needed
-            material.total = material.price * material.amount;
-            material.totalOverTime = material.total * operation.timeMultiplier;
-
-            this.materialTotal += material.totalOverTime;
-
-            operation.subtotal += material.total;
-          }.bind(this));
-
-
-          operation.total = operation.subtotal * operation.timeMultiplier;
-          phase.total += operation.total;
-
-          this.operationTotal += operation.total;
-
-        }.bind(this));
-
-        this.phaseTotal += phase.total;
+      this.popup = document.querySelector('budget-schedule-popup');
+      this.popup.on('hidden.bs.modal', function (e) {
+        this.editing = false;
       }.bind(this));
 
-      this.grandTotal = this.phaseTotal * this.farmSize;
-      this.annualized = this.grandTotal / this.getDurationInYears();
-
-      this.redrawCharts();
-
-      this.hack();
+      this.removeChild(this.$.inputPanel);
     },
 
-    redrawCharts : function() {
-      if( !window.google ) return;
-      var operations = {}, materials = {};
+    set : function(data, name) {
+      this.data = data;
+      this.operationName = name;
 
-      var width = $(this.$.phaseChartRoot).width();
+      this.copyDataArray();
 
-      // Phase Chart
-      var phaseData = [['Phase', '%']];
-      this.phases.forEach(function(phase){
-        phaseData.push([phase.name, this.getPrecent(phase.total, this.phaseTotal)]);
-
-        if( !phase.operations ) return;
-        phase.operations.forEach(function(operation){
-          var key = operation.name.replace(/\s/g, '').toLowerCase();
-
-          if( operations[key] ) {
-            operations[key].total += operation.total;
-          } else {
-            operations[key] = {
-              name : operation.name,
-              total : operation.total
-            }
-          }
-
-          operation.materials.forEach(function(material){
-            key = material.name.replace(/\s/g, '').toLowerCase();
-
-            if( materials[key] ) {
-              materials[key].total += material.totalOverTime;
-            } else {
-              materials[key] = {
-                name : material.name,
-                total : material.totalOverTime
-              }
-            }
-          }.bind(this));
-
-        }.bind(this));
-
-      }.bind(this));
-
-      var data = google.visualization.arrayToDataTable(phaseData);
-      var options = {
-        title: 'Phase',
-        width: width > 25 ? width : 25,
-        is3D: true,
-        animation:{
-          duration: 1000,
-          easing: 'out',
-        },
-
-        legend : {
-          position: 'top',
-          maxLines: 3
-        },
-        height: 400
-      };
-      if( !this.phaseChart ) {
-        this.phaseChart = new google.visualization.PieChart(this.$.phaseChartRoot);
-      }
-      this.phaseChart.draw(data, options);
-
-      // Operation Chart
-      var oppData = [['operation', '%']];
-      for( var key in operations ) {
-        var operation = operations[key];
-        oppData.push([operation.name, this.getPrecent(operation.total, this.operationTotal)]);
-      };
-
-      var data = google.visualization.arrayToDataTable(oppData);
-      options.title = 'Operation'
-      if( !this.operationChart ) {
-        this.operationChart = new google.visualization.PieChart(this.$.operationChartRoot);
-      }
-      this.operationChart.draw(data, options);
-
-      // Material Chart
-      var materialData = [['material', '%']];
-      for( var key in materials ) {
-        var material = materials[key];
-        materialData.push([material.name, this.getPrecent(material.total, this.materialTotal)]);
-      };
-
-      data = google.visualization.arrayToDataTable(materialData);
-      options.title = 'Material'
-      if( !this.materialChart ) {
-        this.materialChart = new google.visualization.PieChart(this.$.materialChartRoot);
-      }
-      this.materialChart.draw(data, options);
-
+      this.update(true);
     },
 
-    getPrecent : function(amount, total) {
-      if( total == 0 ) return 0;
-      return Math.round(100 * (amount / total));
-    },
+    // Polymer hack and keeping UI code out of data
+    copyDataArray : function() {
+      var tmp = [];
 
-    getDurationInYears : function() {
-      var years = this.duration / 12;
-      if( years < 1) years = 1;
-      return years;
-    },
+      for( var i = 0; i < this.data.length; i++ ) {
+        var date = this.toDate(this.data[i].date);
 
-    // get the multiplier for how often an operation will
-    // take place over the course of the crop.
-    getIntervalMultiplier : function(operation) {
-
-      if( operation.interval == 'One Time' ) return 1;
-
-      if( operation.interval == 'Annual' ) {
-        return Math.ceil(this.duration / 12);
+        tmp.push({
+          length : this.data[i].length,
+          units : this.data[i].units,
+          date : date,
+          dateFormatted : date.toDateString()
+        })
       }
 
-      if( operation.interval == 'Monthly' ) {
-        return this.duration;
-      }
-
-      if( operation.interval == '__ Per Year' ) {
-        return (this.duration / 12) * parseInt(operation.intervalAmount);
-      }
-
-      if( operation.interval == 'Once Every __ Years' ) {
-        return (this.duration / 12) / parseInt(operation.intervalAmount);
-      }
-
-      return 1;
+      this.dates = tmp;
     },
 
-    // As of polymer 1.0.4
-    // to update dom-repeat after modifications use this for now
-    // a fix should be coming soon....
-    hack : function() {
-      this.phases = $.extend(true, [], this.phases);
+    onLengthUpdate : function() {
+      this.update();
     },
 
-    _setLookup : function() {
-        for( var key in this.defaultSchema ) {
-            for( var i = 0; i < this.defaultSchema[key].length; i++ ) {
-               this.catLookup[this.defaultSchema[key][i].item] = key;
-            }
-        }
-    },
+    update : function(noEvent) {
+      this.$.dates.style.display = 'block';
+      this.displayText = ' x'+this.dates.length;
 
-    removeItem : function(e) {
-      var operation = e.currentTarget.getAttribute('operation');
-      var phase = e.currentTarget.getAttribute('phase');
-      var material = e.currentTarget.getAttribute('material');
-
-      var p = this.getPhase(phase);
-      var o = this.getOperation(p, operation);
-
-      for( var i = 0; i < o.materials.length; i++ ) {
-        if( o.materials[i].name == material ) {
-          o.materials.splice(i, 1);
-          break;
-        }
-      }
-
-      if( o.materials.length == 0 ) {
-        p.operations.splice(p.operations.indexOf(o), 1);
-      }
-
-      this.recalc();
-    },
-
-    toggleRemoved : function(e) {
-        var category = e.currentTarget.getAttribute('category');
-        this.removed[category].opened = !this.removed[category].opened;
-    },
-
-    toggle : function(e) {
-        var name = e.currentTarget.getAttribute('name');
-        this.opened[name] = !this.opened[name];
-    },
-
-    toggleAddPhase : function(e) {
-      var phase = e.currentTarget.getAttribute('phase');
-      var ele = $(this.querySelector('input[phase="'+phase+'"]')).toggle();
-      if( ele[0].style.display != 'none' ) ele.focus();
-    },
-
-    togglePhase : function(e) {
-      var phase = e.currentTarget.getAttribute('phase');
-      var ele = this.querySelector('.panel-body[phase="'+phase+'"]');
-      if( !ele ) return;
-
-      if( ele.style.display == 'none' ) {
-        e.currentTarget.querySelector('i').className = 'fa fa-arrow-down';
-        $(ele).show('fast');
-      } else {
-        e.currentTarget.querySelector('i').className = 'fa fa-arrow-right';
-        $(ele).hide('fast');
-      }
-    },
-
-    toggleOperation : function(e) {
-      var phase = e.currentTarget.getAttribute('phase');
-      var operation = e.currentTarget.getAttribute('operation');
-      var ele = this.querySelector('.operation-panel[phase="'+phase+'"][operation="'+operation+'"]');
-      if( !ele ) return;
-
-      if( ele.style.display == 'none' ) {
-        e.currentTarget.querySelector('i').className = 'fa fa-arrow-down';
-        $(ele).show('fast');
-      } else {
-        e.currentTarget.querySelector('i').className = 'fa fa-arrow-right';
-        $(ele).hide('fast');
-      }
-    },
-
-    newOppInputKeyPress : function(e) {
-      if( e.which == 13 && e.currentTarget.value.length >= 3 ) {
-
-        var phase = e.currentTarget.getAttribute('phase');
-        phase = this.getPhase(phase);
-        if( !phase ) return;
-
-        operation = this.getOperation(phase, e.currentTarget.value);
-
-        // add empty material
-        this.addMaterial(operation);
-
-        this.recalc();
-        $(e.currentTarget).hide();
-
-        // make sure panel is show
-        setTimeout(function(){
-          $(this.querySelector('.panel-body[phase="'+phase.name+'"]')).show('fast');
-          this.querySelector('.phase-toggle[phase="'+phase.name+'"] i').className = 'fa fa-arrow-down';
-          $(this.querySelector('.operation-panel[phase="'+phase.name+'"][operation="'+operation.name+'"]')).show('fast');
-          this.querySelector('.opp-toggle[phase="'+phase.name+'"][operation="'+operation.name+'"] i').className = 'fa fa-arrow-down';
-        }.bind(this), 50);
-
-      }
-    },
-
-    addLineItem : function(e) {
-      var phase = e.currentTarget.getAttribute('phase');
-      var operation = e.currentTarget.getAttribute('operation');
-
-      phase = this.getPhase(phase);
-      if( !phase ) return;
-
-      operation = this.getOperation(phase, operation);
-
-      this.addMaterial(operation);
-    },
-
-    getPhase : function(name) {
-      for( var i = 0; i < this.phases.length; i++ ) {
-        if( this.phases[i].name.toLowerCase() == name.toLowerCase() ) return this.phases[i];
-      }
-      return null;
-    },
-
-    getOperation : function(phase, name) {
-      if( !phase ) return null;
-      if( !phase.operations ) phase.operations = [];
-
-      for( var i = 0; i < phase.operations.length; i++ ) {
-        if( phase.operations[i].name == name ) return phase.operations[i];
-      }
-
-      // return new
-      var newOp = {
-        name : name,
-        total : 1,
-        units : 'ac',
-        interval : '',
-        intervalAmount : 1,
-        timeMultiplier : 0
-      }
-      phase.operations.push(newOp);
-      return newOp;
-    },
-
-    addMaterial : function(operation, item) {
-      if( !operation ) return null;
-      if( !operation.materials ) operation.materials = [];
-
-      operation.materials.push({
-        name : item ? item.name : '',
-        amount : item ? item.amount : 0,
-        units : item ? item.unit : '',
-        price : item ? item.price : 0
+      this.dates.sort(function(a, b){
+        if( a.date.getTime() > b.date.getTime() ) return 1;
+        else if( a.date.getTime() < b.date.getTime() ) return -1;
+        return 0;
       });
 
-      this.recalc();
+      var tmp = [];
+      for( var i = 0; i < this.dates.length; i++ ) {
+        tmp.push(this.toDateString(this.dates[i]));
+      }
+
+      this.data = tmp;
+      this.copyDataArray();
+
+      if( this.dates.length > 1 ) {
+        this.dateRangeText = this.dates[0].date.toDateString() + ' <i class="fa fa-long-arrow-right"></i> ' +
+                            this.dates[this.dates.length-1].date.toDateString();
+      } else if( this.dates.length == 1 ) {
+        this.dateRangeText = this.toDateString(this.dates[0]).date;
+      } else {
+        this.dateRangeText = '';
+      }
+      this.$.dateRangeText.innerHTML = this.dateRangeText;
+
+      if( !noEvent ) this.fire('schedule-update', this.data);
+
+      this.updateChart();
     },
 
-    _checkUpdate : function() {
-        if( this.location && this.selectedCrop && this.selectedCrop != '' && this.farmSize && this.farmSize != '' ) {
-            this.loadLocalityBudget();
+    updateChart : function() {
+      if( !this.editing ) return;
+
+      var container = this.$.chart;
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+      dataTable.addColumn({ type: 'string', id: 'Operation' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+
+      var arr = [];
+      this.dates.forEach(function(d){
+        var end = new Date(d.date.getTime()+this.getIntervalTime(d));
+        arr.push([this.operationName, d.date, end]);
+      }.bind(this));
+
+      dataTable.addRows(arr);
+      chart.draw(dataTable);
+    },
+
+    getIntervalTime : function(date) {
+      var l = parseInt(date.length);
+      if( date.units == 'year' ) {
+        return l * 86400000 * 365;
+      } else {
+        return l * 86400000 * 30;
+      }
+    },
+
+    toDate : function(dateStr) {
+      try {
+        var parts = dateStr.split('-');
+        return new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+      } catch(e) {
+        return new Date();
+      }
+    },
+
+    toDateString : function(d) {
+      return {
+        length : d.length,
+        units : d.units,
+        date : (d.date.getYear()+1900)+'-'+(d.date.getMonth()+1)+'-'+(d.date.getDate())
+      }
+    },
+
+    removeDate : function(e) {
+      var index = parseInt(e.currentTarget.getAttribute('index'));
+
+      this.data.splice(index, 1);
+      this.dates.splice(index, 1);
+
+      this.update();
+    },
+
+    recreateInput : function() {
+      var input = $('<input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>');
+      $(this.$.inputRoot).html('').append(input);
+
+      input
+        .datepicker({
+          format: 'mm/dd/yyyy',
+          orientation : 'top auto'
+        })
+        .on('changeDate', function(e){
+          this.dates.push({
+            date : e.date,
+            length : 1,
+            units : 'month'
+          });
+          this.update();
+          $(this.$.datesInput).datepicker('hide');
+        }.bind(this));
+    },
+
+    toggle : function() {
+      this.editing = true;
+
+      this.popup.setBody(this.$.inputPanel);
+      this.popup.show();
+
+      this.recreateInput();
+
+
+      setTimeout(this.updateChart.bind(this), 500);
+    }
+  });
+</script>
+<dom-module id="budget-operation" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display: block;
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
+    }
+  </style>
+
+  <template>
+
+    <h4 class="page-header" style="margin-top: 5px; text-transform: capitalize">
+      <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
+
+      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="saveNewName">
+      <span id="nameLabel" style="cursor:pointer" on-mouseenter="onMouseEnterName" on-mouseleave="onMouseLeaveName" on-click="editName"></span>
+      <span id="nameMsg" class="text text-danger" style="font-size: 14px"></span>
+      <i class="fa fa-pencil" style="display:none" id="renameIcon"></i>
+
+      <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
+    </div></h4>
+
+    <div class="row">
+      <div class="col-sm-8">
+        <h5>
+          <budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler>
+        </h5>
+      </div>
+      <div class="col-sm-4">
+        <table class="padding: 15px">
+          <tbody><tr>
+            <td><h4>Subtotal</h4></td>
+            <td style="padding-left: 10px ">
+              <h4 class="text text-success"><ahb-dollar-label id="subtotal"></ahb-dollar-label>
+              <span id="subtotalInfo"></span></h4>
+            </td>
+          </tr>
+          <tr>
+            <td><h4>Total</h4></td>
+            <td style="padding-left: 10px "><h4 class="text text-success"><ahb-dollar-label id="total"></ahb-dollar-label></h4></td>
+          </tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div id="content" style="display:none" class="animated zoomIn">
+      <div class="form-horizontal" style="margin: 25px 0 ">
+        <div class="form-group">
+          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
+          <div class="col-sm-9">
+            <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
+          </div>
+        </div>
+      </div>
+
+      <budget-materials-table id="materialTable" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
+
+      <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete Operation</a>
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-operation',
+
+    properties : {
+      operationname : {
+        type : String,
+        observer : 'update'
+      }
+    },
+
+    ready : function() {
+      this.firstScheduleEvent = true;
+      FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
+    },
+
+    attached : function() {
+      if( this.operation ) this.update();
+    },
+
+    // fired from operation controller
+    onOperationUpdate : function(operation) {
+      if( !this.operation ) return;
+      if( operation.name != this.operation.name ) return;
+
+      this.render();
+    },
+
+    // fire from schedule element
+    onScheduleUpdate : function(e) {
+      if( !this.operation ) return;
+
+      this.operation.schedule = e.detail;
+      FB.operationController.recalc();
+      this.updateTotals();
+    },
+
+    update : function() {
+      this.operation = FB.operationController.get(this.operationname);
+      this.$.schedule.set(this.operation.schedule, this.operation.name);
+      this.render();
+    },
+
+    delete : function() {
+      if( !confirm('Are your sure you want to delete this operation?') ) return;
+      FB.operationController.remove(this.operation.name);
+      FB.operationController.recalc();
+    },
+
+    showError : function(show) {
+      if( show ) this.$.errorIcon.style.display = 'inline';
+      else this.$.errorIcon.style.display = 'none';
+    },
+
+    checkError : function() {
+      for( var i = 0; i < this.operation.materials.length; i++ ) {
+        if( this.operation.materials[i].error ) {
+          this.showError(true);
+          return;
         }
+      }
+      this.showError(false);
     },
 
-    loadLocalityBudget : function() {
-        var loc = {};
-        var locStr = '';
+    render : function() {
+      if( !this.$.materialTable.setMaterials ) return;
+
+      this.$.nameLabel.innerHTML = this.operation.name;
+
+      if( !this.operation.materials ) return;
+
+      this.$.materialTable.setMaterials(this.operation, {isOperation : true});
+      this.updateTotals();
+      this.checkError();
+    },
+
+    updateTotals : function() {
+      var scheduled = this.operation.schedule ? this.operation.schedule.length : 0;
+      $(this.$.total).attr('value', this.operation.total);
+      $(this.$.subtotal).attr('value', this.operation.subtotal);
+      $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
+    },
+
+    onMaterialDelete : function(e) {
+      FB.operationController.add(this.operation, {replace: true});
+      this.updateTotals();
+    },
+
+    onMaterialSelect : function(e) {
+      var materialDef = e.detail;
+
+      var units;
+      if( materialDef.type == 'complex' ) {
+        units = materialDef.units;
+      } else {
+        units = FB.units.invert(materialDef.units);
+      }
+
+      FB.operationController.addUpdateMaterial(
+        this.operation,
+        {
+          name : materialDef.name,
+          amount : 1,
+          units : units
+        }
+      );
+
+      FB.operationController.add(this.operation, {replace: true});
+      this.render();
+    },
+
+    toggleContent : function() {
+      if( this.$.content.style.display == 'block' ) {
+        this.$.content.style.display = 'none'
+        this.$.icon.className = 'fa fa-toggle-right';
+      } else {
+        this.$.content.style.display = 'block'
+        this.$.icon.className = 'fa fa-toggle-down';
+      }
+    },
+
+    onMouseEnterName : function() {
+      this.$.renameIcon.style.display = 'inline-block';
+    },
+
+    onMouseLeaveName : function() {
+      this.$.renameIcon.style.display = 'none';
+    },
+
+    editName : function() {
+      this.$.nameLabel.style.display = 'none';
+      this.$.nameInput.style.display = 'inline-block';
+      this.$.nameInput.value = this.operation.name;
+      this.$.nameInput.focus();
+    },
+
+    onNameInputKeyUp : function(e) {
+      if( e.which == 13 ) this.$.nameInput.blur();
+    },
+
+    saveNewName : function() {
+      if( this.$.nameInput.value.replace(/\s/g, '') == '' ) {
+        this.$.nameMsg.innerHTML = 'Invalid Name.';
+        return;
+      }
+
+      var op = FB.operationController.get(this.$.nameInput.value);
+      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
+        this.$.nameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
+        return;
+      }
+
+      this.$.nameMsg.innerHTML = '';
+      var oldName = this.operation.name;
+      this.operation.name = this.$.nameInput.value;
+      this.$.nameLabel.innerHTML = this.operation.name;
+      this.$.nameLabel.style.display = 'inline-block';
+      this.$.nameInput.style.display = 'none';
+
+      FB.operationController.add(this.operation,
+          {
+            noRecalc: true,
+            noEvents: true,
+            rename : oldName
+          }
+      );
+    }
+
+  });
+</script>
+<dom-module id="budget-material" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display: inline-block;
+    }
+    #label:hover {
+      color: #2196f3;
+    }
+  </style>
+
+  <template>
+    <div id="label" style="cursor:pointer" on-click="toggle"><b><i class="fa fa-cube" id="icon"></i> <span id="nameLabel"></span></b></div>
+    <div id="error" class="text text-danger"></div>
+    <div id="price" style="white-space: nowrap">
+      <div id="forLabel"></div>
+      <span id="priceLabel"></span>
+      <span id="unitLabel"></span>
+      <a class="btn btn-link" id="edit"><i class="fa fa-edit"></i></a>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-material',
+
+    properties : {
+      material : {
+        type : String,
+        observer : 'render'
+      },
+      showPrice : {
+        type : Boolean,
+        observer : 'render',
+        value : false
+      }
+    },
+
+    attached : function() {
+      this.render();
+    },
+
+    render : function(material) {
+      this.updatePrice();
+
+      this.showError();
+
+      if( typeof material == 'string' ) this.material = material;
+      if( !this.material ) return;
 
 
-        if( this.selectedLocality == 'zipCode' ) {
-            loc.zipCode = this.location.zipCode;
-            locStr = this.location.zipCode;
-        } else if ( this.selectedLocality == 'county' ) {
-            loc.county = this.location.county;
-            loc.state = this.location.state;
-            locStr = this.location.county;
+
+      if( this.material.indexOf('--') > -1 ) {
+        this.$.forLabel.innerHTML = '(for '+this.material.split('--')[0]+')';
+      } else {
+        this.$.forLabel.innerHTML = '';
+      }
+
+      this.$.edit.href = '#budget/materials/'+this.material;
+
+      var m = FB.materialController.get(this.material);
+      if( m.error ) return this.showError(m);
+
+      if( m.fixed ) {
+        this.$.edit.style.display = 'none';
+        this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '')+' <span class="label label-warning">Fixed</span>';
+      } else {
+        this.$.edit.style.display = 'inline-block';
+        this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
+      }
+
+
+
+      // TODO: don't think this is the best place for this error checkError
+      // but at least we are getting it on screen
+      if( m.price === undefined ) {
+        return this.showError({message: 'No price set for this material'});
+      }
+
+      this.$.priceLabel.innerHTML = m.price;
+      this.$.unitLabel.innerHTML = FB.units.getLabel(m.units, true);
+      //this.data.materials[material].price.toFixed(2)
+    },
+
+    showError : function(err) {
+      if( !err ) {
+        this.$.error.style.display = 'none';
+        return;
+      }
+
+      this.$.error.style.display = 'block';
+      this.$.error.innerHTML = err.message;
+    },
+
+    toggle : function() {
+      this.showPrice = !this.showPrice;
+      this.updatePrice();
+    },
+
+    updatePrice : function() {
+      if( this.showPrice ) this.$.price.style.display = 'block';
+      else this.$.price.style.display = 'none';
+    }
+  });
+</script>
+<dom-module id="budget-section-overview" assetpath="/public/elements/budget-components/sections/">
+  <style>
+    :host {
+      display: block;
+      padding-top: 25px;
+    }
+    .card {
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
+    }
+  </style>
+  <template>
+
+    <div class="row">
+      <div class="col-md-6">
+
+        <div class="card">
+          <h4><i class="fa fa-info-circle"></i> Farm Information</h4>
+          <table class="table">
+            <tbody id="tbody">
+              <tr>
+                <td>Farm Size</td>
+                <td><input type="number" class="form-control" id="sizeInput" on-input="onFarmSizeChange"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+      <div class="col-md-6">
+
+        <div class="card">
+          <h4 class="page-header" style="margin-top: 11px"><i class="fa fa-dollar"></i> Total</h4>
+          <budget-total id="total"></budget-total>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <h4><i class="fa fa-calendar-o"></i> Operation Timeline</h4>
+      <budget-timeline id="timeline"></budget-timeline>
+
+      <h4>Spending Timeline</h4>
+      <budget-spending-timeline id="spendingTimeline"></budget-spending-timeline>
+    </div>
+
+    <div class="card">
+      <h4>JSON (debug)</h4>
+      <textarea id="json" class="form-control" style="height: 400px"></textarea>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-overview',
+
+    ready : function() {
+      FB.operationController.on('total-update', this.setJsonDump.bind(this));
+    },
+
+    setData : function(data) {
+      if( !data.farm ) return;
+
+      this.$.total.setData(data.farm);
+
+      for( var key in data.farm ) {
+        if( key == 'size' ) {
+          this.$.sizeInput.value = data.farm[key];
         } else {
-            loc.state = this.location.state;
-            locStr = this.location.state;
+          var row = $('<tr><td>'+key+'</td><td>'+data.farm[key]+'</td></tr>')[0];
+          this.$.tbody.appendChild(row);
         }
-
-        $.get('/budget/get?location='+locStr+'&crop='+this.selectedCrop,
-            function(resp) {
-                this.setBudget(resp);
-            }.bind(this)
-        );
+      }
     },
 
-    setBudget : function(budgetItems) {
-        this.test = [];
-        this.opened = {};
+    onFarmSizeChange : function() {
+      this.$.total.farm.size = this.$.sizeInput.value;
+      this.$.total.onTotalUpdate();
+    },
 
-        var tmpSchema = {
-          planting : {
-            name : 'Planting'
-          },
-          annual : {
-            name : 'Annual'
-          },
-          harvesting : {
-            name : 'Harvesting'
+    onShow : function() {
+      this.$.timeline.onShow();
+      this.$.spendingTimeline.onShow();
+    },
+
+    setJsonDump : function() {
+      // get latest data
+      var arr = [];
+
+      var materials = FB.materialController.get();
+
+      for( var key in materials.materials ) arr.push(materials.materials[key]);
+      for( var key in materials.complex ) arr.push(materials.complex[key]);
+
+      appData.materials = arr;
+      appData.operations = FB.operationController.get();
+
+      this.$.json.innerHTML = JSON.stringify(appData, '', '  ');
+    }
+  });
+</script>
+<dom-module id="budget-section-operations" assetpath="/public/elements/budget-components/sections/">
+  <template>
+
+    <div class="modal fade" id="createPopup" tabindex="-1" role="dialog" aria-labelledby="createPopupLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <h4 class="modal-title" id="createPopupLabel">Create New Operation</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="filterInput" class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="newNameInput" placeholder="New Operation Name" on-keyup="onNewNameKeyUp">
+                  <div id="newNameMsg"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer" style="text-align: right">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" on-click="createNew">Create</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: 25px 0 15px 0">
+      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cogs"></i> Create New Operation</a>
+    </div>
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <div class="form-horizontal" style="margin: 25px 0">
+          <div class="form-group">
+            <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+            </div>
+          </div>
+        </div>
+
+        <div id="searchMsg"></div>
+        <div id="root"></div>
+      </div>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-operations',
+
+    ready : function() {
+      this.filterTimer = -1;
+
+      this.popup = $(this.$.createPopup).remove();
+      $('body').append(this.popup);
+      this.popup.modal({show: false});
+
+      FB.operationController.on('operation-update', this.onOperationsUpdated.bind(this));
+      FB.operationController.on('operation-removed', function(e){
+        $(this.$.root).find('[operation="'+e.operation.name+'"]').remove();
+        this.filter();
+      }.bind(this));
+    },
+
+    onOperationsUpdated : function(e) {
+      if( e.replaced ) {
+
+        var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
+        current.attr('operation', operation.name);
+        /*var div = $(this.createPanel(e.operation));
+        div.insertAfter(current);
+        current.remove();*/
+
+      } else {
+
+        var current = $(this.$.root).find('[operation="'+e.operation.name+'"]');
+        if( current.length == 0 ) {
+          var div = $(this.createPanel(e.operation, e.isNew));
+          $(this.$.root).append(div);
+        }
+      }
+
+      this.filter();
+    },
+
+    setData : function(data) {
+      this.data = data;
+
+      this.data.operations.forEach(function(operation){
+        var ele = this.createPanel(operation);
+        this.$.root.appendChild(ele);
+      }.bind(this));
+
+      this._filter();
+    },
+
+    createPanel : function(operation, open) {
+      var ele = document.createElement('budget-operation');
+      ele.setAttribute('operation', operation.name);
+      ele.operationname = operation.name;
+      if( open ) ele.toggleContent();
+      return ele;
+    },
+
+    showCreate : function() {
+      this.$.newNameInput.value = '';
+      this.$.newNameMsg.innerHTML = '';
+      this.popup.modal('show');
+      setTimeout(function(){
+        this.$.newNameInput.focus();
+      }.bind(this), 500);
+    },
+
+    onShow : function(params) {
+      if( params.length > 0 ) {
+        this.$.filterInput.value = params[0];
+      }
+
+      this._filter();
+    },
+
+    onNewNameKeyUp : function(e) {
+      if( e.which == 13 ) this.createNew();
+    },
+
+    createNew : function() {
+      var name = this.$.newNameInput.value;
+
+      if( name.replace(/\s/g, '') == '' ) {
+        this.$.newNameMsg.innerHTML = 'Invalid Name.';
+        return;
+      }
+
+      var op = FB.operationController.get(name);
+      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
+        this.$.newNameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
+        return;
+      }
+      this.$.newNameMsg.innerHTML = '';
+
+      var op = {
+        name : name,
+        materials : [],
+        schedule : [],
+        units : '[acr_us]'
+      };
+
+      FB.operationController.add(op);
+      this.$.filterInput.value = name;
+      this.popup.modal('hide');
+    },
+
+    filter : function() {
+      if( this.filterTimer != -1 ) clearTimeout(this.filterTimer);
+      this.filterTimer = setTimeout(function(){
+        this.filterTimer = -1;
+        this._filter();
+      }.bind(this));
+    },
+
+    _filter : function() {
+      var txt = this.$.filterInput.value;
+
+      var matched = [], showAll = false;
+      if( txt == '' ) {
+        showAll = true;
+      } else {
+        matched = this.toNameArray(FB.operationController.find(txt));
+      }
+
+      var opEles = this.querySelectorAll('budget-operation');
+      for( var i = 0; i < opEles.length; i++ ) {
+        var ele = opEles[i];
+        if( showAll || matched.indexOf(ele.operationname) > -1 ) {
+          ele.style.display = 'block';
+        } else {
+          ele.style.display = 'none';
+        }
+      }
+
+      if( matched.length == 0 && !showAll ) {
+        this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
+        '. <a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
+
+        $(this.$.searchMsg)
+          .find('a')
+          .on('click', function() {
+            this.showCreate();
+            this.$.newNameInput.value = txt;
+          }.bind(this));
+      } else {
+        this.$.searchMsg.innerHTML = '';
+      }
+
+    },
+
+    toNameArray : function(ops) {
+      var arr = [];
+      ops.forEach(function(op){
+        arr.push(op.name);
+      });
+      return arr;
+    }
+  });
+</script>
+<dom-module id="budget-section-materials" assetpath="/public/elements/budget-components/sections/">
+  <style>
+    .card {
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
+    }
+  </style>
+
+  <template>
+
+    <div style="text-align: center; padding: 25px 0 15px 0">
+      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create New Material</a>
+    </div>
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+
+        <div class="form-horizontal" style="margin: 25px 0">
+          <div class="form-group">
+            <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
+
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" id="thisBudgetInput" on-click="_filter"> Only materials used in this budget.
+                </label>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div id="searchMsg"></div>
+        <div id="root"></div>
+
+      </div>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-materials',
+
+    ready : function() {
+      this.filterTimer = -1;
+      this.updateTimer = -1;
+      FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
+      FB.materialController.on('material-removed', function(e){
+        $(this.$.root).find('[material="'+e.material.name+'"]').remove();
+        this.filter();
+      }.bind(this));
+    },
+
+    attached : function() {
+      this.popup = document.querySelector('budget-material-popup');
+    },
+
+    onMaterialsUpdated : function(e) {
+
+      if( e.replaced ) {
+
+        var current = $(this.$.root).find('[material="'+e.replaced +'"]');
+        var div = $(this.createTable(e.material));
+        div.insertAfter(current);
+        current.remove();
+
+      } else {
+
+        var current = $(this.$.root).find('[material="'+e.material.name+'"]');
+        var div = $(this.createTable(e.material));
+        if( current.length == 0 ) {
+          $(this.$.root).append(div);
+        } else {
+          div.insertAfter(current);
+          current.remove();
+        }
+      }
+
+      this.filter();
+    },
+
+    setData : function(data) {
+      this.data = data;
+
+      this.$.root.innerHTML = '';
+
+      this.data.materials.forEach(function(material){
+        var div = this.createTable(material);
+        this.$.root.appendChild(div);
+      }.bind(this));
+
+      this._filter();
+    },
+
+    onShow : function(params) {
+      if( params.length > 0 ) {
+        this.$.filterInput.value = params.join('/');
+      }
+
+      this._filter();
+    },
+
+    showCreate : function() {
+      this.popup.create();
+    },
+
+    filter : function() {
+      if( this.filterTimer != -1 ) clearTimeout(this.filterTimer);
+      this.filterTimer = setTimeout(function(){
+        this.filterTimer = -1;
+        this._filter();
+      }.bind(this));
+    },
+
+    _filter : function() {
+      var txt = this.$.filterInput.value;
+
+      var matched = [], showAll = false;
+      if( txt == '' && !$(this.$.thisBudgetInput).is(':checked') ) {
+        showAll = true;
+      } else {
+        matched = this.toNameArray(FB.materialController.find(txt));
+      }
+
+      var opEles = this.querySelectorAll('[material]');
+      for( var i = 0; i < opEles.length; i++ ) {
+        var ele = opEles[i];
+        if( showAll || matched.indexOf(ele.getAttribute('material')) > -1 ) {
+          ele.style.display = 'block';
+        } else {
+          ele.style.display = 'none';
+        }
+      };
+
+      if( matched.length == 0 && !showAll ) {
+        this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
+        '. <a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
+
+        $(this.$.searchMsg)
+          .find('a')
+          .on('click', function() {
+            document.querySelector('budget-material-popup').create(txt);
+          });
+      } else {
+        this.$.searchMsg.innerHTML = '';
+      }
+
+    },
+
+    toNameArray : function(materials) {
+      var arr = [], include;
+      var thisBudget = $(this.$.thisBudgetInput).is(':checked');
+
+      if( thisBudget ) {
+        include = FB.utils.getActiveMaterials();
+      }
+
+      materials.forEach(function(material){
+        if( thisBudget ) {
+          if( include.indexOf(material.name) > -1 ) {
+            arr.push(material.name);
+          }
+        } else {
+          arr.push(material.name);
+        }
+
+      });
+      return arr;
+    },
+
+    createTable : function(material) {
+      var html =
+        '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
+          '<h5 class="material-name">' +
+            '<div class="layout horizontal center">'+
+              '<div class="flex">'+
+                (material.type == 'complex' ?
+                  '<i class="fa fa-cubes"></i> ' :
+                  '<i class="fa fa-cube"></i> '
+                )+material.name+
+              '</div>'+
+              '<div>'+
+                (material.fixed ? '<span class="label label-warning">Fixed</span>' : '<a class="btn btn-default btn-lg pull-right"><i class="fa fa-pencil"></i></a>') +
+            '</div></div>'+
+          '</h5>'+
+          '<div>'+(material.description || '')+'</div>'+
+          '<table class="table">' +
+            '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
+            '<tr>' +
+              '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
+              (material.type == 'complex' || material.fixed ?
+                '<td class="material-price">'+(material.price || '0')+' </td>' :
+                '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
+              ) +
+              '<td>'+
+                (material.fixed ?
+                  (material.units || '') :
+                  '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
+                )+
+              '</td>' +
+            '</tr>' +
+          '</table>' +
+        '</div>';
+
+      var row = $(html);
+
+      row.find('.material-price').on('input', function(){
+        this.updateFromEvent(row);
+      }.bind(this));
+      row.find('budget-unit-selector').on('units-change', function(){
+        this.updateFromEvent(row);
+      }.bind(this));
+      row.find('.btn-lg').on('click', function(){
+        document.querySelector('budget-material-popup').edit(material);
+      });
+
+      return row[0];
+    },
+
+    updateFromEvent : function(ele) {
+      if( this.updateTimer != -1 ) clearTimeout(this.updateTimer);
+
+      this.updateTimer = setTimeout(function(){
+        this.updateTimer = -1;
+        this._updateFromEvent(ele);
+      }.bind(this), 300);
+    },
+
+    _updateFromEvent : function(ele) {
+      console.log('updating');
+      var item = {
+        name : ele.find('.material-name').html(),
+        price : parseFloat(ele.find('.material-price').val()),
+        'class' : ele.find('.material-class').html(),
+        units : ele.find('budget-unit-selector')[0].getUnits()
+      };
+
+      FB.materialController.add(item, {replace: true});
+      FB.operationController.recalc();
+    }
+  });
+</script>
+<dom-module id="budget-sections" assetpath="/public/elements/budget-components/sections/">
+  <style>
+    .section {
+      display : none;
+    }
+  </style>
+
+  <template>
+    <ul class="nav nav-pills nav-justified" id="tabs">
+      <li role="presentation" class="active" id="btn-overview">
+        <a href="#budget/overview"><i class="fa fa-dashboard"></i> Overview</a>
+      </li>
+      <li role="presentation" id="btn-operations">
+        <a href="#budget/operations"><i class="fa fa-cogs"></i> Operations</a>
+      </li>
+      <li role="presentation" id="btn-materials">
+        <a href="#budget/materials"><i class="fa fa-cube"></i> Materials</a>
+      </li>
+    </ul>
+
+    <budget-section-overview id="overview" class="section"></budget-section-overview>
+    <budget-section-operations id="operations" class="section"></budget-section-operations>
+    <budget-section-materials id="materials" class="section"></budget-section-materials>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-sections',
+
+    ready : function() {
+      $(window).on('hashchange', this.setSection.bind(this));
+      this.setSection();
+    },
+
+    setSection : function() {
+      var parts = window.location.hash.replace(/#/,'').split('/');
+
+      // TODO: remove later
+      if( parts.length == 1 && parts[0] == '' ) {
+        window.location = '#budget/overview';
+      }
+
+      if( parts[0] != 'budget' ) return;
+
+      $(this).find('.section').hide();
+      $(this.$.tabs).find('li').removeClass('active');
+
+      var section;
+      if( this.$[parts[1]] ) {
+        section = this.$[parts[1]];
+        $(this.$.tabs).find('#btn-'+parts[1]).addClass('active');
+      } else {
+        section = this.$.overview;
+        $(this.$.tabs).find('#btn-overview').addClass('active');
+      }
+
+      section.style.display = 'block';
+      if( section.onShow ) section.onShow(parts.splice(2, parts.length-1));
+    },
+
+    setData : function(data) {
+      var sections = this.querySelectorAll('.section');
+      for( var i = 0; i < sections.length; i++ ) {
+        if( sections[i].setData ) sections[i].setData(data);
+      }
+    }
+  });
+</script>
+<dom-module id="ahb-budget" assetpath="/public/elements/budget-components/">
+  <template>
+    <budget-sections id="sections"></budget-sections>
+
+    Change Example Budget: <select id="budgetSelect" on-change="updateExample"></select>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'ahb-budget',
+
+    properties : {
+      example : {
+        type : String
+      }
+    },
+
+    attached : function() {
+      var item = window.localStorage.getItem('budget-demo');
+      if( item ) this.example = item;
+
+      var html = '';
+      for( var key in FB.examples.db ){
+        html += '<option value="'+key+'" '+(this.example == key ? 'selected' : '')+'>'+key+'</option>';
+      }
+      for( var key in FB.examples.app ){
+        html += '<option value="'+key+'" '+(this.example == key ? 'selected' : '')+'>'+key+'</option>';
+      }
+      this.$.budgetSelect.innerHTML = html;
+
+      this.demo();
+    },
+
+    updateExample : function() {
+      window.localStorage.setItem('budget-demo', this.$.budgetSelect.value);
+      window.location.reload();
+    },
+
+    demo : function() {
+      var appData;
+
+      if( FB.examples.db[this.example] ) {
+        appData = FB.transform(FB.examples.db[this.example]);
+      } else if( FB.examples.app[this.example] ) {
+        appData = FB.examples.app[this.example];
+      } else {
+        appData = {};
+        alert('Unknown static budget: '+this.example);
+        return;
+      }
+
+      window.appData = appData;
+
+      var options = {
+        noEvent : true,
+        noRecalc : true
+      }
+
+      appData.materials.forEach(function(material){
+        FB.materialController.add(material, options);
+      });
+
+      FB.materialController.recalc();
+
+      appData.operations.forEach(function(operation){
+        FB.operationController.add(operation, options);
+      });
+
+      FB.operationController.recalc();
+
+      this.$.sections.setData(appData);
+    }
+
+  });
+</script>
+<dom-module id="budget-total" assetpath="/public/elements/budget-components/">
+  <template>
+    <h4 style="text-align:right">Duration: <span class="text text-primary" id="durationText"></span></h4>
+    <h4 style="text-align:right">
+      Crop Lifetime Total:
+      <ahb-dollar-label id="totalLabel"></ahb-dollar-label> <small>Per Acre</small>
+    </h4>
+    <h4 style="text-align:right">
+      Crop Lifetime Total:
+      <ahb-dollar-label id="completeTotalLabel"></ahb-dollar-label> <small>Total</small>
+    </h4>
+    <h4 style="text-align:right">Average Monthly Cost: <ahb-dollar-label id="average"></ahb-dollar-label> <small>Per Acre</small></h4>
+    <h4 style="text-align:right">Average Yearly Cost: <ahb-dollar-label id="averageYear"></ahb-dollar-label> <small>Per Acre</small></h4>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-total',
+
+    attached : function() {
+      FB.operationController.on('total-update', this.onTotalUpdate.bind(this));
+    },
+
+    setData : function(farm) {
+      this.farm = farm;
+      this.onTotalUpdate();
+    },
+
+    onTotalUpdate : function(e) {
+      if( e ) this.data = e;
+      if( !this.data ) return;
+
+      this.$.totalLabel.value = this.data.total;
+
+      this.$.completeTotalLabel.value = this.data.total * ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+
+      if( this.data.range.start !== null && this.data.range.stop !== null ) {
+        var diff =  this.data.range.stop.getTime() - this.data.range.start.getTime();
+        if( diff < 86400000 * 30 ) diff = 86400000 * 30;
+
+        var days = diff / 86400000;
+        var months = Math.ceil(days / 30);
+        this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
+
+        this.$.average.value = this.data.total / months;
+        this.$.averageYear.value = (this.data.total / months) * 12;
+      } else {
+        this.$.durationText.innerHTML = 'Unknown';
+      }
+    },
+
+    toDateString : function(d) {
+      return (d.getMonth()+1)+'/'+(d.getYear()+1900);
+    }
+  })
+</script>
+<dom-module id="budget-timeline" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display : block;
+    }
+  </style>
+  <template>
+    <div id="chart" style="height: 450px"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-timeline',
+
+    attached : function() {
+      $(window).on('resize', this.drawChart.bind(this));
+
+      this.handlerSet = false;
+      FB.operationController.on('total-update', this.drawChart.bind(this));
+    },
+
+    onShow : function() {
+      this.drawChart();
+    },
+
+    drawChart : function(e) {
+      if( e && e.range ) this.data = e.range.all;
+
+      if( !window.google && !this.handlerSet ) {
+        googleChartLoadHandlers.push(this.drawChart.bind(this));
+        this.handlerSet = true;
+        return;
+      }
+
+      if( !this.data ) return;
+
+      this.$.chart.innerHTML = '';
+
+      var container = this.$.chart;
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+      dataTable.addColumn({ type: 'string', id: 'Operation' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+
+      var arr = [];
+      this.data.forEach(function(d){
+        var end = new Date(d.date.getTime()+this.getIntervalTime(d));
+        arr.push([d.name, d.date, end]);
+      }.bind(this));
+
+      dataTable.addRows(arr);
+      chart.draw(dataTable);
+
+      google.visualization.events.addListener(chart, 'select', function(){
+        try {
+          window.location = '#budget/operations/'+arr[chart.getSelection()[0].row][0];
+        } catch(e) {
+          console.log(e);
+        }
+      });
+    },
+
+    getIntervalTime : function(date) {
+      var l = parseInt(date.length);
+      if( date.units == 'year' ) {
+        return l * 86400000 * 365;
+      } else {
+        return l * 86400000 * 30;
+      }
+    }
+
+
+  })
+</script>
+<dom-module id="budget-spending-timeline" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display : block;
+    }
+  </style>
+  <template>
+    <div id="chart" style="height: 450px"></div>
+
+    <div class="horizontal layout">
+      <div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary" id="opBtn" on-click="byOperation">By Operation</button>
+          <button type="button" class="btn btn-default" id="totalBtn" on-click="byTotal">Total</button>
+        </div>
+      </div>
+      <div class="flex" id="selected" style="padding: 5px"></div>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-spending-timeline',
+
+    attached : function() {
+      this.type = 'all';
+
+      $(window).on('resize', this.drawChart.bind(this));
+
+      this.handlerSet = false;
+      FB.operationController.on('total-update', this.drawChart.bind(this));
+    },
+
+    byOperation : function() {
+      if( this.type == 'all' ) return;
+      this.type = 'all';
+      this.$.opBtn.className = 'btn btn-primary';
+      this.$.totalBtn.className = 'btn btn-default';
+      this.updateData();
+      this.drawChart();
+    },
+
+    byTotal : function() {
+      if( this.type == 'total' ) return;
+      this.type = 'total';
+      this.$.opBtn.className = 'btn btn-default';
+      this.$.totalBtn.className = 'btn btn-primary';
+      this.updateData();
+      this.drawChart();
+    },
+
+    onShow : function() {
+      this.drawChart();
+    },
+
+    updateData  : function() {
+      this.$.selected.innerHTML = '';
+
+      var operations = FB.operationController.get();
+      var header = ['Month'];
+
+      if( this.type == 'all' ) {
+        for( var i = 0; i < operations.length; i++ ) {
+          header.push(operations[i].name);
+        }
+      } else {
+        header.push('total');
+      }
+      this.data = [header];
+
+      for( var i = 0; i < this.months.length; i++ ) {
+        var arr = [this.months[i].month];
+
+        if( this.type == 'all' ) {
+          for( var j = 0; j < operations.length; j++ ) {
+            if( this.months[i][operations[j].name] ) {
+              arr.push(parseFloat(this.months[i][operations[j].name].toFixed(2)));
+            } else {
+              arr.push(1);
+            }
+          }
+        } else {
+          arr.push(parseFloat(this.months[i].total.toFixed(2)) || 1);
+        }
+
+        this.data.push(arr);
+      }
+    },
+
+    drawChart : function(e) {
+      if( e && e.spendingByMonth ) {
+        this.months = e.spendingByMonth;
+        this.updateData();
+      }
+
+      if( !window.google && !this.handlerSet ) {
+        googleChartLoadHandlers.push(this.drawChart.bind(this));
+        this.handlerSet = true;
+        return;
+      }
+
+      if( !this.data ) return;
+
+      this.$.chart.innerHTML = '';
+
+      var container = this.$.chart;
+      var chart = new google.visualization.LineChart(container);
+      var dataTable = google.visualization.arrayToDataTable(this.data);
+
+      chart.draw(dataTable, {
+        vAxis : {
+          logScale : true,
+          viewWindow : {
+            min : 100
+          }
+        }
+      });
+
+      google.visualization.events.addListener(chart, 'select', function(){
+        var selection = chart.getSelection()[0];
+        this.show(selection.row);
+      }.bind(this));
+    },
+
+    show : function(row) {
+      var info = this.months[row];
+      var html = '<div class="well"><h5>'+info.month+'</h5>';
+
+      for( var key in info ) {
+        if( key == 'month' ) continue;
+        if( key == 'total' ) {
+          html += '<div><b>'+key+': </b><ahb-dollar-label value="'+info[key]+'"></ahb-dollar-label></div>';
+        } else {
+          html += '<div><a href="#budget/operations/'+key+'">'+key+':</a> <ahb-dollar-label value="'+info[key]+'"></ahb-dollar-label></div>';
+        }
+      }
+
+      this.$.selected.innerHTML = html+'</div>';
+    }
+
+  })
+</script>
+<dom-module id="budget-material-popup" assetpath="/public/elements/budget-components/">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" on-click="cancel"><span aria-hidden="true">×</span></button>
+            <h4 class="modal-title" id="title"></h4>
+          </div>
+          <div class="modal-body">
+
+
+            <div class="form-horizontal">
+
+              <div id="parentMaterial"></div>
+              <div class="form-group">
+                <label for="nameInput" class="col-sm-3 control-label">Name</label>
+                <div class="col-sm-9">
+                  <input type="text" id="nameInput" class="form-control" on-input="onNameInput">
+                  <div class="text text-danger" id="nameInputMessage"></div>
+                </div>
+              </div>
+
+              <div class="form-group" id="classGroup">
+                <label for="optionInput" class="col-sm-3 control-label">Class</label>
+                <div class="col-sm-9">
+                  <budget-class-selector id="classInput"></budget-class-selector>
+                </div>
+              </div>
+
+              <div class="form-group" id="unitsGroup">
+                <label for="unitsInput" class="col-sm-3 control-label">Units</label>
+                <div class="col-sm-9">
+                  <div class="layout horizontal center">
+                    <div>us$/</div>
+                    <div class="flex">
+                      <budget-unit-selector id="unitsInput" on-units-change="editUnits" block=""></budget-unit-selector>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group" id="priceGroup">
+                <label for="priceInput" class="col-sm-3 control-label" id="priceLabel">Price</label>
+                <div class="col-sm-9">
+                  <input type="number" id="priceInput" class="form-control" on-input="onPriceInput">
+                  
+                </div>
+              </div>
+
+              <div class="form-group" id="complexGroup">
+                <label class="col-sm-3 control-label"><i class="fa fa-cubes"></i></label>
+                <div class="col-sm-9">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" id="isComplexInput" on-click="toggleComplex"> Is complex material
+                    </label>
+                  </div>
+                  <div class="help-block">This material requires other materials.</div>
+                </div>
+              </div>
+
+            </div> 
+
+            <div id="complexPanel" style="display:none" class="animated fadeIn">
+              <h4>Required Materials</h4>
+
+              <div class="form-horizontal" style="margin: 25px 0">
+                <div class="form-group">
+                  <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
+                  <div class="col-sm-9">
+                    <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
+
+                    <a style="cursor:pointer" on-click="toggleUnique"><i class="fa fa-plus"></i> Create Unique Material</a>
+
+
+                    <div id="createUniquePanel" style="display:none">
+                      <div class="help-block">Create a new required material that is unqiue (only used by) the
+                        <span id="nameLabel"></span> material.</div>
+
+                      <div class="form-horizontal">
+
+                        <div class="form-group">
+                          <label for="optionInput" class="col-sm-2 control-label">Class</label>
+                          <div class="col-sm-10">
+                            <budget-class-selector id="uniqueClassInput" on-change="onUniqueClassChange"></budget-class-selector>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="uniqueNameInput" class="col-sm-2 control-label">Name</label>
+                          <div class="col-sm-10">
+                            <input type="text" id="uniqueNameInput" class="form-control">
+                          </div>
+                        </div>
+
+                        <div class="form-group" id="unitsGroup">
+                          <label for="uniqueUnitsInput" class="col-sm-2 control-label">Units</label>
+                          <div class="col-sm-10">
+                            <div class="layout horizontal center">
+                              <div>us$/</div>
+                              <div class="flex">
+                                <budget-unit-selector id="uniqueUnitsInput" block=""></budget-unit-selector>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="uniquePriceInput" class="col-sm-2 control-label">Price</label>
+                          <div class="col-sm-10">
+                            <input type="number" id="uniquePriceInput" class="form-control">
+                          </div>
+                        </div>
+
+                        <div class="form-group" id="unitsGroup">
+                          <label class="col-sm-3 control-label"></label>
+                          <div class="col-sm-9">
+                            <div id="createUniqueMsg" class="text text-danger"></div>
+                            <a class="btn btn-primary" on-click="createUnique">Create</a>
+                            <a class="btn btn-cancel" on-click="cancelCreateUnique">Cancel</a>
+                          </div>
+                        </div>
+                      </div> 
+                    </div> 
+
+                  </div>
+                </div>
+
+              </div> 
+
+              <budget-materials-table id="materialTable" on-price-change="onPriceChange" on-delete="onMaterialDelete"></budget-materials-table>
+
+              <h4>Price <small><span id="current-price"></span> <span id="current-units"></span></small></h4>
+
+            </div>
+
+            <div class="horizontal layout center">
+              <div class="flex">
+                <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete</a>
+              </div>
+              <div style="text-align:right">
+                <a class="btn btn-primary" on-click="save">Save</a>
+                <a class="btn btn-cancel" on-click="cancel">Cancel</a>
+              </div>
+            </div>
+
+
+          </div> 
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+<script>
+  Polymer({
+    is : 'budget-material-popup',
+
+    ready : function() {
+      this.popup = $(this.$.popup).modal({show: false, backdrop: 'static'});
+
+      this.materialTableOptions = {
+        noNotes: true
+      };
+
+      $(window).on('hashchange', function(){
+        if( !this.showing ) return;
+
+        // when we manually hit the back button bellow this event will be
+        // triped again.  you can ignore it.
+        if( this.ignoreNextHashEvent ) {
+          this.ignoreNextHashEvent = false;
+          return;
+        }
+
+        if( confirm('Do you want to save and close?') ) {
+          this.save();
+        } else {
+          this.ignoreNextHashEvent = true;
+          window.history.back();
+        }
+      }.bind(this));
+    },
+
+    show : function() {
+      this.showing = true;
+      this.popup.modal('show');
+    },
+
+    hide : function() {
+      this.showing = false;
+      this.popup.modal('hide');
+    },
+
+    cancel : function() {
+      // remove any unique materials as they were added to the material
+      // controller so things didn't break
+      if( this.data.type == 'complex' ) {
+        for( var key in this.data.materials ) {
+          if( key.match(/--/) ) {
+            FB.materialController.remove(key);
+          }
+        }
+      }
+
+      // if we were creating
+      if( this.action == 'create' ) {
+        // not sure we need to do anything right now...
+
+      // cancel an edit
+      } else {
+        var materials = []
+
+        // reset any original unique materials
+        for( var i = 0; i < this.originalUniqueMaterials.length; i++ ) {
+          materials.push(this.originalUniqueMaterials[i]);
+        }
+        materials.push(this.originalData);
+
+        FB.materialController.bulkAdd(materials, {replace: true});
+      }
+
+      this.hide();
+    },
+
+    edit : function(material) {
+      this.action = 'edit';
+      this.$.title.innerHTML = '<i class="fa fa-pencil"></i> Edit Material';
+
+      this.data = material;
+
+      // make a copy for if we cancel
+      this.originalData = $.extend(true, {}, this.data);
+      this.originalUniqueMaterials = [];
+
+      if( this.data.name.match(/--/) ) {
+        var parts = this.data.name.split('--');
+        this.parentMaterial = parts[0];
+        this.$.parentMaterial.innerHTML = '<h5 style="border-bottom: 1px solid #ccc; text-align:center">Parent: '+parts[0]+'</h5>';
+        this.$.nameInput.value = parts[1];
+
+        this.$.complexGroup.style.display = 'none';
+      } else {
+        this.$.complexGroup.style.display = 'block';
+        this.$.parentMaterial.innerHTML = '';
+        this.$.nameInput.value = this.data.name;
+      }
+
+
+
+      if( this.data.type == 'complex' ) {
+        this.setComplex(true);
+        this.$.unitsInput.setUnits(this.data.units);
+
+        // JM - BASEPRICE
+        //if( this.data.materials[this.getBasePriceName()] ) {
+        //  this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
+        //} else {
+        this.$.priceInput.value = '';
+        //}
+
+        // snapshot all definitions of unique materials
+        for( var key in this.data.materials ) {
+          if( key.match(/--/) ) {
+            this.originalUniqueMaterials.push($.extend(true, {}, FB.materialController.get(key)));
           }
         }
 
-        /*
-        for( var i = 0; i < budgetItems.length; i++ ) {
-            var item = budgetItems[i];
-            if( !tmpSchema[item.phase] ) continue;
+      } else {
+        this.$.unitsInput.setUnits(FB.units.invert(this.data.units));
+        this.$.priceInput.value = this.data.price;
+        this.setComplex(false);
 
-            item.value = parseFloat(item.amount);
-            item.unitCost = parseFloat(item.cost);
-            item.total = 0;
-            item.removing = false;
-
-        //    tmpSchema[item.phase].schema.push(item);
-      }*/
-
-        for( var key in tmpSchema ) {
-            this.test.push(tmpSchema[key]);
+        if( this.$.classInput.isClass(this.data.class || '') ) {
+          this.$.classInput.setValue(this.data.class.toLowerCase());
         }
-        console.log(this.test);
+      }
 
-        this.$.schema.render();
-        //this.updateTotals();
+      this.recalc();
+
+      this.show();
     },
 
-    expandAll : function() {
-      var eles = this.querySelectorAll('.panel-body');
-      for( var i = 0; i < eles.length; i++ ) eles[i].style.display = 'block';
+    create : function(name) {
+      this.data = {
+        type : 'simple',
+        name : name || '',
+        units : '',
+        price : 0
+      };
+      this.action = 'create';
 
-      eles = this.querySelectorAll('.operation-panel');
-      for( var i = 0; i < eles.length; i++ ) eles[i].style.display = 'block';
+      this.$.title.innerHTML = '<i class="fa fa-cube"></i> Create Material';
+      this.$.complexGroup.style.display = 'block';
 
-      var icons = this.querySelectorAll('i.fa.fa-arrow-right');
-      for( var i = 0; i < icons.length; i++ ) icons[i].className = 'fa fa-arrow-down';
+      this.$.nameInput.value = name || '';
+      this.$.unitsInput.setUnits('');
+      this.$.priceInput.value = '';
+      this.$.classInput.setValue('other');
+      this.setComplex(false);
+
+      this.parentMaterial = null;
+      this.$.parentMaterial.innerHTML = '';
+
+      this.show();
     },
 
-    collapseAll : function() {
-      var eles = this.querySelectorAll('.panel-body');
-      for( var i = 0; i < eles.length; i++ ) eles[i].style.display = 'none';
+    onMaterialSelect : function(e) {
+      var materialDef = e.detail;
 
-      eles = this.querySelectorAll('.operation-panel');
-      for( var i = 0; i < eles.length; i++ ) eles[i].style.display = 'none';
+      var materialImpl = {
+        name : materialDef.name,
+        amount : 1
+      }
 
-      var icons = this.querySelectorAll('i.fa.fa-arrow-down');
-      for( var i = 0; i < icons.length; i++ ) icons[i].className = 'fa fa-arrow-right';
+      if( materialDef.type == 'complex' ) {
+        materialImpl.units = materialDef.units;
+      } else {
+        materialImpl.units = FB.units.invert(materialDef.units);
+      }
+
+      this.data.materials[materialImpl.name] = materialImpl;
+      this.recalc();
     },
 
-});
+
+    setComplex : function(isComplex) {
+      if( isComplex ) {
+        this.$.isComplexInput.setAttribute('checked', 'checked');
+        this.$.isComplexInput.checked = true;
+        this.$.complexPanel.style.display = 'block';
+
+        this.$.classGroup.style.display = 'none';
+
+        // BASEPRICE
+        //this.$.priceLabel.innerHTML = 'Base Price';
+        //this.$.priceMessage.style.display = 'block';
+        this.$.priceGroup.style.display = 'none';
+
+        this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
+        this.updatePriceLabel();
+      } else {
+        this.$.isComplexInput.removeAttribute('checked');
+        this.$.isComplexInput.checked = false;
+        this.$.complexPanel.style.display = 'none';
+
+        // BASEPRICE
+        //this.$.priceMessage.style.display = 'none';
+        //this.$.priceLabel.innerHTML = 'Price';
+        this.$.priceGroup.style.display = 'block';
+
+        this.$.classGroup.style.display = 'Block';
+      }
+    },
+
+    // BASEPRICE
+    //getBasePriceName : function() {
+    //  return this.data.name+'--Base Price';
+    //},
+
+    save : function() {
+      if( this.data.name == '' ) {
+        this.$.nameInputMessage.innerHTML = 'A material name is required';
+        return;
+      } else if( this.data.name.indexOf('--') > -1 ) {
+        this.$.nameInputMessage.innerHTML = '"--" is reserved and not allowed in the material name.';
+        return;
+      }
+      this.$.nameInputMessage.innerHTML = '';
+
+      if( this.data.type == 'simple' ) {
+        this.data.class = this.$.classInput.getValue();
+      }
+
+      var options = {};
+      if( this.action == 'edit' ) {
+        options.replace = true;
+
+        // if the name has changed, make sure we preform a rename
+        if( this.originalData.name != this.data.name ) {
+          options.rename = this.originalData.name;
+        }
+      }
+
+      console.log(this.data);
+      var result = FB.materialController.add(this.data, options);
+
+      if( result.error ) {
+        return alert(result.message);
+      }
+
+      // now re-save all required materials, this time we will fire events
+      var materials = [];
+      if( this.data.type == 'complex' ) {
+        for( var key in this.data.materials ) {
+          var m = FB.materialController.get(key);
+          if( !m.error ) {
+            materials.push(m);
+          }
+        }
+      }
+      FB.materialController.bulkAdd(materials, {replace: true});
+
+      this.hide();
+    },
+
+    delete : function() {
+      if( !confirm('Are you sure you want to delete this material?') ) return;
+
+      var usedBy = {
+        operations : [],
+        materials : []
+      };
+
+      var operations = FB.operationController.get();
+      for( var i = 0; i < operations.length; i++ ) {
+        if( !operations[i].materials ) continue;
+        if( operations[i].materials[this.data.name] ) {
+          usedBy.operations.push(operations[i]);
+        }
+      }
+
+      var materials = FB.materialController.get().complex;
+      for( var key in materials ) {
+        if( !materials[key].materials ) continue;
+        if( materials[key].materials[this.data.name] ) {
+          usedBy.materials.push(materials[key]);
+        }
+      }
+
+      if( usedBy.operations.length > 0 || usedBy.materials.length > 0 ) {
+        if( !confirm('This material is used by '+usedBy.operations.length+' operation(s) and '+usedBy.materials.length+' material(s).  '+
+              'Are you still sure you want to delete?  It will be removed from these operations and materials.') ) {
+          return;
+        }
+      }
+
+      // remove from all operations
+      var updates = usedBy.operations;
+      for( var i = 0; i < usedBy.operations.length; i++ ) {
+        delete usedBy.operations[i].materials[this.data.name];
+      }
+      FB.operationController.bulkAdd(updates, {replace: true});
+
+      // remove from all materials
+      updates = usedBy.materials;
+      for( var i = 0; i < usedBy.materials.length; i++ ) {
+        delete usedBy.materials[i].materials[this.data.name];
+      }
+
+      // remove this item
+      FB.materialController.remove(this.data.name);
+
+      // if this is complex and has unique materials, remove those as well
+      if( this.data.type == 'complex' ) {
+        for( var key in this.data.materials ) {
+          if( key.match(/--/) ) {
+            FB.materialController.remove(key);
+          }
+        }
+      }
+
+      FB.materialController.bulkAdd(updates, {replace: true});
+
+      this.hide();
+    },
+
+    /**
+     * Start fired by the material table
+     */
+    onPriceChange : function() {
+      FB.materialController.materialRecalc(this.data);
+
+      // make sure the price is set
+      // BASEPRICE
+      //if( this.data.materials[this.getBasePriceName()] ) {
+      //  this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
+      //}
+
+      // do not call recalc, will update material table
+      this.updatePriceLabel();
+    },
+
+    onMaterialDelete : function(e) {
+
+      // BASEPRICE
+      //if( e.detail.name == this.getBasePriceName() ) {
+      //  this.$.priceInput.value = '';
+      //}
+
+      this.updatePriceLabel();
+    },
+    /**
+     * End fired by the material table
+     */
+
+    /**
+     * Start main input control Fn's
+     */
+    onNameInput : function() {
+      var newName = this.$.nameInput.value;
+
+      if( this.parentMaterial ) {
+        newName = this.parentMaterial+'--'+newName;
+      }
+
+      if( this.data.name == newName || newName == '' ) return;
+
+      var m = FB.materialController.get(newName);
+      if( !m.error ) {
+        this.$.nameInputMessage.innerHTML = 'A material with this name already exists';
+        return;
+      }
+      this.$.nameInputMessage.innerHTML = '';
+
+      this.$.nameLabel.innerHTML = newName;
+      this.data.name = newName;
+
+      // if complex, we need to update the name of all unique materials
+      if( this.data.type == 'complex' ) {
+        var updated = [];
+
+        for( var key in this.data.materials ) {
+
+          // only want to update unique stuff
+          if( key.indexOf('--') > -1 ) {
+            // first lets update impl
+            var m = this.data.materials[key];
+            delete this.data.materials[key];
+            var newName = this.data.name+'--'+m.name.replace(/.*--/, '');
+            m.name = newName;
+            updated.push(m);
+
+            // now update def
+            m = FB.materialController.get(key);
+            if( m.error ) {
+              console.log('BADNESS!');
+              continue;
+            }
+            m.name = newName;
+
+            FB.materialController.add(m, {
+              rename: key,
+              noRecalc : true,
+              noEvent : true
+            });
+
+          }
+        }
+
+        for( var i = 0; i < updated.length; i++ ) {
+          this.data.materials[updated[i].name] = updated[i];
+        }
+
+        this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
+      }
+    },
+
+    recalc : function() {
+      FB.materialController.materialRecalc(this.data);
+
+      if( this.data.type == 'complex' ) {
+        this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
+        this.updatePriceLabel();
+      }
+    },
+
+    updatePriceLabel : function() {
+      this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
+
+      var label = FB.units.getLabel(this.data.units);
+      if( label != '' ) label = 'per '+label;
+      this.$['current-units'].innerHTML = label;
+    },
+
+    onPriceInput : function() {
+      var val = this.$.priceInput.value;
+
+      /* BASEPRICE
+      if( val == '' && this.data.type == 'complex' ) {
+        FB.materialController.remove(this.getBasePriceName());
+        delete this.data.materials[this.getBasePriceName()];
+        this.recalc();
+        return;
+      } */
+
+      var val = parseFloat(val);
+      if( isNaN(val) ) return;
+
+      /* BASEPRICE
+      if( this.data.type == 'complex' ) {
+        var material = FB.materialController.get(this.getBasePriceName());
+
+        if( material.error ) {
+          FB.materialController.add({
+            name : this.getBasePriceName(),
+            units : FB.units.invert(this.data.units),
+            price : val
+          });
+        } else {
+          material.price = val;
+        }
+
+        // verify
+        var name = this.getBasePriceName();
+        if( this.data.materials[name] ) {
+          this.data.materials[name].amount = 1;
+        } else {
+          this.data.materials[name] = {
+            amount : 1,
+            units : this.data.units,
+            name : name
+          }
+        }
+
+      } else { */
+      this.data.price = val;
+      //}
+
+
+      this.recalc();
+    },
+
+    toggleComplex : function() {
+      if( !this.data ) return;
+
+      if( this.data.materials ) {
+        var keys = Object.keys(this.data.materials).length;
+
+        // BASEPRICE
+        // var hasBase = this.data.materials[this.getBasePriceName()];
+        // if( keys === 0 || (keys === 1 && hasBase) ){
+        if( keys === 0 ){
+          delete this.data.materials;
+          delete this.data.class;
+          this.data.type = 'simple';
+          this.setComplex(false);
+
+        } else if ( confirm('Are your sure you want to make this a simple material?  All required '+
+              'materials will be removed') ) {
+
+          delete this.data.materials;
+          delete this.data.class;
+          this.data.type = 'simple';
+          this.setComplex(false);
+        } else {
+          this.setComplex(true);
+        }
+      } else {
+        this.data.type = 'complex';
+        this.data.materials = {};
+
+        // as there a simple price set?  make it the base price material
+        if( this.data.price !== undefined ) {
+          var price = parseFloat(this.$.priceInput.value);
+
+          if( !isNaN(price) ) {
+            /* var name = this.getBasePriceName();
+
+            this.data.materials[name] = {
+              amount : 1,
+              units : this.data.units,
+              name : name
+            }
+
+            FB.materialController.add({
+              units : FB.units.invert(this.data.units),
+              name : name,
+              price : price
+            });*/
+
+            this.data.materials.Estimate = {
+              amount : price,
+              units : 'us$'
+            }
+
+            this.recalc();
+          }
+        }
+
+
+        this.setComplex(true);
+      }
+    },
+
+    editUnits : function(e) {
+      if( this.editUnitsTimer != -1 ) clearTimeout(this.editUnitsTimer);
+      this.editUnitsTimer = setTimeout(function(){
+        this.editUnitsTimer = -1;
+        this._editUnits(e);
+      }.bind(this), 200);
+    },
+
+    _editUnits : function(e) {
+      if( e.detail.error ) return;
+
+
+
+      if( this.data.type == 'complex' ) {
+        var oldUnits = this.data.units;
+        var newUnits = e.detail.value;
+
+        this.$.materialTable.updateAmountFromUnits(oldUnits, newUnits);
+
+        this.data.units = newUnits;
+
+        /* BASEPRICE
+        var m = FB.materialController.get(this.getBasePriceName());
+        m.units = FB.units.invert(this.data.units);
+
+        var name = this.getBasePriceName();
+
+        if( this.data.materials[name] ) {
+          this.data.materials[name].units = this.data.units;
+          this.data.materials[name].amount = 1; // verify
+        }*/
+      } else {
+        this.data.units = FB.units.invert(e.detail.value);
+      }
+
+      this.recalc();
+    },
+    /**
+     * End main input control Fn's
+     */
+
+
+    /**
+     * Start Create Unique Fn's
+     */
+    createUnique : function() {
+      var data = {
+        class : this.$.uniqueClassInput.getValue(),
+        name : this.$.uniqueNameInput.value,
+        units : this.$.uniqueUnitsInput.getUnits(),
+        price : parseFloat(this.$.uniquePriceInput.value)
+      }
+
+      if( data.name == '' ) {
+        this.$.createUniqueMsg.innerHTML = 'You must provide a material name';
+        return;
+      } else if( isNaN(data.price) ) {
+        this.$.createUniqueMsg.innerHTML = 'Invalid price';
+        return;
+      } else if( this.$.uniqueUnitsInput.error ) {
+        this.$.createUniqueMsg.innerHTML = 'You must provide valid units';
+        return;
+      }
+
+      // we are almost good to go
+      // update name
+      data.name = this.data.name+'--'+data.name;
+
+      if( this.data.materials[data.name] ) {
+        this.$.createUniqueMsg.innerHTML = 'A unique material already has name: '+this.$.uniqueNameInput.value;
+        return;
+      }
+
+      data.units = 'us$/'+data.units;
+
+      // add to global controller, make sure no issues (most likely name conflict)
+      var resp = FB.materialController.add(data, {
+        noRecalc : true,
+        noEvent : true
+      });
+      if( resp.error ) {
+        this.$.createUniqueMsg.innerHTML = resp.message;
+        return;
+      }
+
+      var impl = {
+        name : data.name,
+        amount : 1,
+        units : FB.units.invert(data.units)
+      }
+
+      this.data.materials[impl.name] = impl;
+      this.recalc();
+
+      // this just resets and hides
+      this.cancelCreateUnique();
+    },
+
+    onUniqueClassChange : function() {
+      if( this.$.uniqueNameInput.value == '' || this.$.uniqueClassInput.isClass(this.$.uniqueNameInput.value) ) {
+        this.$.uniqueNameInput.value = this.$.uniqueClassInput.getValue();
+      }
+    },
+
+    cancelCreateUnique : function() {
+      this.$.uniqueNameInput.value = '';
+      this.$.uniqueUnitsInput.units = '';
+      this.$.uniquePriceInput.value = '';
+      this.$.createUniqueMsg.innerHTML = '';
+
+      this.toggleUnique();
+    },
+
+    toggleUnique : function() {
+      $(this.$.createUniquePanel).toggle();
+    },
+    /**
+     * End Create Unique Fn's
+     */
+  })
+</script>
+</dom-module><dom-module id="budget-material-search" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display: block;
+    }
+    #results {
+       display: none;
+       z-index: 1000;
+       position: absolute;
+       background-color: white;
+       padding: 10px;
+       border: 1px solid #ccc;
+    }
+  </style>
+  <template>
+
+    <input id="input" class="form-control" on-keyup="search" on-blur="onBlur" on-focus="showResults" placeholder="Search material by name">
+
+    <div id="results" on-click="onResultsClick"></div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-material-search',
+
+    ready : function() {
+      this.blurTimer = -1;
+      this.ignore = [];
+    },
+
+    setIgnoreList : function(ignore) {
+      this.ignore = ignore;
+    },
+
+    search : function() {
+      var results = FB.materialController.find(this.$.input.value);
+
+      this.cleanResults(results);
+
+      if( results.length > 0 ) {
+        var html = '';
+
+        for( var i = 0; i < results.length; i++ ) {
+          html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
+                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+
+                  '<div class="help-block">'+(results[i].class || '')+' '+(results[i].price || '')+' '+FB.units.getLabel(results[i].units || '', true)+'</div>'
+                  '</div>';
+        }
+
+        $(this.$.results)
+          .html(html)
+          .find('a')
+          .on('click', function(e){
+            this.onResultsClick();
+            this.fireSelect(e, results);
+            this.hideResults();
+          }.bind(this));
+
+      } else {
+        $(this.$.results).html('No matches found');
+      }
+    },
+
+    fireSelect : function(e, results) {
+      var ele = $(e.currentTarget);
+      var index = parseInt($(e.currentTarget).attr('index'));
+      var material = results[index];
+
+      setTimeout(function(){
+        $(this.$.input).val('').blur();
+      }.bind(this), 400);
+
+      this.fire('material-select', material);
+    },
+
+    showResults : function() {
+      this.search();
+      this.$.results.style.display = 'block';
+    },
+
+    onBlur : function() {
+      this.cancelBlur();
+
+      this.blurTimer = setTimeout(function(){
+        this.blurTimer = -1;
+        this.hideResults();
+      }.bind(this), 200);
+    },
+
+    cancelBlur : function() {
+      if( this.blurTimer == -1 ) return;
+
+      clearTimeout(this.blurTimer);
+      this.blurTimer = -1;
+    },
+
+    onResultsClick : function() {
+      this.cancelBlur();
+      this.$.input.focus();
+    },
+
+    hideResults : function() {
+      this.$.results.style.display = 'none';
+    },
+
+    cleanResults : function(results) {
+      for( var i = results.length-1; i >= 0; i-- ) {
+        if( this.ignore.indexOf(results[i].name) > -1 ) {
+          results.splice(i, 1);
+        } else if ( results[i].name.match(/^.*--/) ) {
+          results.splice(i, 1);
+        }
+      }
+    }
+
+  });
+</script>
+<dom-module id="budget-class-selector" assetpath="/public/elements/budget-components/">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <template>
+    <select id="input" class="form-control">
+      <option value="other">Other</option>
+      <option value="equipment">Equipment</option>
+      <option value="fertilizer">Fertilizer</option>
+      <option value="herbicide">Herbicide</option>
+      <option value="insurance">Insurance</option>
+      <option value="labor">Labor</option>
+      <option value="pesticide">Pesticide</option>
+      <option value="processing">Processing</option>
+      <option value="seed">Seed</option>
+      <option value="water">Water</option>
+    </select>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-class-selector',
+
+    properties : {
+      value : {
+        type : 'String',
+        observer : 'valueObserver',
+        value : 'other'
+      }
+    },
+
+    ready : function() {
+      this.list = [];
+      var options = this.querySelectorAll('option');
+      for( var i = 0; i < options.length; i++ ) {
+        this.list.push(options[i].getAttribute('value'));
+      }
+    },
+
+    isClass : function(txt) {
+      if( this.list.indexOf(txt.toLowerCase()) > -1 ) {
+        return true;
+      }
+      return false;
+    },
+
+    valueObserver : function() {
+      this.setValue();
+    },
+
+    setValue : function(value) {
+      if( value ) this.value = value;
+      this.$.input.value = this.value;
+    },
+
+    getValue : function() {
+      return this.$.input.value;
+    }
+
+  })
 </script>
 </div></body></html>

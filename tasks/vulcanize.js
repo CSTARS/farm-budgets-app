@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 
 	// Options
 	return {
-    default: {
+    build: {
       options: {
         inlineCss : true,
 				inlineScripts : true
@@ -14,6 +14,17 @@ module.exports = function(grunt) {
       files: {
         'dist/require.html': [
         'public/require.html'
+        ]
+      }
+    },
+		prototype: {
+      options: {
+        inlineCss : true,
+				inlineScripts : true
+      },
+      files: {
+        'dist/prototype/require.html': [
+        'public/prototype/require.html'
         ]
       }
     }

@@ -21,6 +21,17 @@ module.exports = function copyto(grunt) {
             options: {
                 ignore: []
             }
+        },
+        prototype: {
+            files: [{
+                cwd: 'public',
+                src: ['prototype/**/*'],
+                dest: 'dist/'
+            },{
+                cwd: 'public/bower_components/font-awesome',
+                src: ['fonts/**/*'],
+                dest: 'dist/prototype/'
+            }]
         }
     };
 };

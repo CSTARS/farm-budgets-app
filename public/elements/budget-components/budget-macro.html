@@ -118,7 +118,10 @@
       try {
         FB.ucum.parse(m.units);
       } catch(e) {
-        this.$.unitsInput.error = true;
+        console.log('BAD UNITS. nothing done :(');
+        console.log(e);
+      //  this.$.unitsInput.error = true;
+
       }
 
       this.render(this.renderType);

@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Budget Component Testing</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+
+  <script src="scripts/webcomponents.js"></script>
+
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+      // Load the Visualization API and the piechart package.
+      var googleChartLoadHandlers = [];
+      function onGoogleChartsLoad() {
+        googleChartLoadHandlers.forEach(function(handler){
+            handler();
+        });
+      }
+      google.load('visualization', '1.0', {'packages':['corechart', 'timeline']});
+      google.setOnLoadCallback(onGoogleChartsLoad);
+  </script>
+
+  <link rel="stylesheet" href="styles/main.css">
+
+
+  <script src="scripts/app.js"></script>
+
+  <link rel="import" href="require.html">
+
+
+
+
+</head>
+
+<body style="padding:10px">
+
+  <budget-complex-material-popup></budget-complex-material-popup>
+  <budget-schedule-popup></budget-schedule-popup>
+  <ahb-budget example="poplar bad"></ahb-budget>
+  <budget-material-popup></budget-material-popup>
+
+
+</body>
+</html>

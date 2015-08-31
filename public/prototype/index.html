@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Budget Component Testing</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+
+  <!-- build:js scripts/webcomponents.js -->
+  <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <!-- endbuild-->
+
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">
+      // Load the Visualization API and the piechart package.
+      var googleChartLoadHandlers = [];
+      function onGoogleChartsLoad() {
+        googleChartLoadHandlers.forEach(function(handler){
+            handler();
+        });
+      }
+      google.load('visualization', '1.0', {'packages':['corechart', 'timeline']});
+      google.setOnLoadCallback(onGoogleChartsLoad);
+  </script>
+
+  <!-- build:css styles/main.css -->
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../bower_components/bootswatch-dist/css/bootstrap.css">
+  <link rel="stylesheet" href="../bower_components/animate-css/animate.css">
+  <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.css">
+  <!-- endbuild-->
+
+
+  <!-- build:js scripts/app.js -->
+  <script src="../bower_components/jquery/dist/jquery.js"></script>
+  <script src="../bower_components/bootswatch-dist/js/bootstrap.js"></script>
+  <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
+  <script src="../js/lib.js"></script>
+  <!-- endbuild-->
+
+  <link rel="import" href="require.html">
+
+
+
+
+</head>
+
+<body style="padding:10px">
+
+  <budget-complex-material-popup></budget-complex-material-popup>
+  <budget-schedule-popup></budget-schedule-popup>
+  <ahb-budget example="poplar bad"></ahb-budget>
+  <budget-material-popup></budget-material-popup>
+
+
+</body>
+</html>
