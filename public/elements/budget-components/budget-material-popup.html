@@ -23,6 +23,13 @@
                 </div>
               </div>
 
+              <div class="form-group">
+                <label for="nameInput" class="col-sm-3 control-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea id="descriptionInput" class="form-control" on-input="onDescriptionInput"></textarea>
+                </div>
+              </div>
+
               <div class="form-group" id="classGroup">
                 <label for="optionInput" class="col-sm-3 control-label">Class</label>
                 <div class="col-sm-9">
@@ -251,7 +258,7 @@
         this.$.nameInput.value = this.data.name;
       }
 
-
+      this.$.descriptionInput.value = this.data.description || '';
 
       if( this.data.type == 'complex' ) {
         this.setComplex(true);
@@ -291,6 +298,7 @@
         type : 'simple',
         name : name || '',
         units : '',
+        description : '',
         price : 0
       };
       this.action = 'create';
@@ -301,6 +309,7 @@
       this.$.nameInput.value = name || '';
       this.$.unitsInput.setUnits('');
       this.$.priceInput.value = '';
+      this.$.descriptionInput.value = '';
       this.$.classInput.setValue('other');
       this.setComplex(false);
 
@@ -559,6 +568,10 @@
 
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
       }
+    },
+
+    onDescriptionInput : function() {
+      this.data.description = this.$.descriptionInput.value;
     },
 
     recalc : function() {

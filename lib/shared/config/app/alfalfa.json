@@ -1,0 +1,720 @@
+{
+  "classes": {
+    "fertilizer": [
+      "2,4-D"
+    ],
+    "equipment": [
+      "Challenger Tractor",
+      "Cooler/van",
+      "FR 6080 FH",
+      "Large Tractor",
+      "Mid-size Tractor",
+      "Semi-Tractor trailer",
+      "Small Tractor",
+      "Support Truck",
+      "Tandem Axle Truck",
+      "Tractor and sprayer"
+    ],
+    "pesticide": [
+      "Glyphosate",
+      "Goal 2XL",
+      "Trifluralin"
+    ],
+    "herbicide": [
+      "herbicide - manual"
+    ],
+    "labor": [
+      "hoeing",
+      "Laborer"
+    ],
+    "seed": [
+      "Poplar Cutting"
+    ]
+  },
+  "materials": [
+    {
+      "name": "Estimate",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "name": "Taxes",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "name": "Insurance",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "name": "Capitol Cost Recover",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "class": "fertilizer",
+      "name": "2,4-D",
+      "units": "us$/[qt_us]",
+      "price": 5,
+      "type": "simple"
+    },
+    {
+      "class": "pesticide",
+      "name": "Glyphosate",
+      "units": "us$/[qt_us]",
+      "price": 4,
+      "type": "simple",
+      "description": "foo"
+    },
+    {
+      "class": "pesticide",
+      "name": "Goal 2XL",
+      "units": "us$/[qt_us]",
+      "price": 30,
+      "type": "simple"
+    },
+    {
+      "class": "labor",
+      "name": "Laborer",
+      "units": "us$/h",
+      "price": 17,
+      "type": "simple"
+    },
+    {
+      "description": "Poplar cutting for planting",
+      "class": "seed",
+      "name": "Poplar Cutting",
+      "units": "us$/1",
+      "price": 0.08,
+      "type": "simple"
+    },
+    {
+      "class": "pesticide",
+      "name": "Trifluralin",
+      "units": "us$/[qt_us]",
+      "price": 7.5,
+      "type": "simple"
+    },
+    {
+      "name": "Challenger Tractor--Capitol Cost",
+      "price": 90,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Semi-Tractor trailer--Capitol Cost",
+      "price": 90,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "FR 6080 FH--Capitol Cost",
+      "price": 90,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Tandem Axle Truck--Capitol Cost",
+      "price": 90,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Cooler/van--Capitol Cost",
+      "price": 15,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Challenger Tractor--Labor",
+      "price": 35,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "FR 6080 FH--Labor",
+      "price": 35,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Tandem Axle Truck--Labor",
+      "price": 35,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Semi-Tractor trailer--Labor",
+      "price": 35,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Cooler/van--Labor",
+      "price": 10,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Equipment Fuel",
+      "price": 2.81,
+      "units": "us$/[gal_us]",
+      "type": "simple"
+    },
+    {
+      "name": "Support Truck--Capitol Cost",
+      "price": 25,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Support Truck--Labor",
+      "price": 30,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "type": "simple",
+      "name": "11-52-0",
+      "units": "us$/[lb_av]",
+      "description": "",
+      "price": 0.37,
+      "class": "fertilizer"
+    },
+    {
+      "type": "simple",
+      "name": "Ground Application",
+      "units": "us$/[acr_us]",
+      "description": "",
+      "price": 10.5,
+      "class": "other"
+    },
+    {
+      "type": "simple",
+      "name": "Roundup PowerMax",
+      "units": "us$/[pt_us]",
+      "description": "",
+      "price": 2.75,
+      "class": "herbicide"
+    },
+    {
+      "type": "simple",
+      "name": "Velpar L",
+      "units": "us$/[pt_us]",
+      "description": "",
+      "price": 14.41,
+      "class": "herbicide"
+    },
+    {
+      "type": "simple",
+      "name": "Warrior II",
+      "units": "us$/[foz_us]",
+      "description": "",
+      "price": 5.25,
+      "class": "pesticide"
+    },
+    {
+      "type": "simple",
+      "name": "Coragen",
+      "units": "us$/[foz_us]",
+      "description": "",
+      "price": 10.25,
+      "class": "pesticide"
+    },
+    {
+      "type": "simple",
+      "name": "Belt SC",
+      "units": "us$/[foz_us]",
+      "description": "",
+      "price": 9.4,
+      "class": "pesticide"
+    },
+    {
+      "type": "simple",
+      "name": "Water-Alfalfa-Pumped",
+      "units": "us$/[acr_us].[in_us]",
+      "description": "",
+      "price": 7.5,
+      "class": "water"
+    },
+    {
+      "type": "simple",
+      "name": "Gas",
+      "units": "us$/[gal_us]",
+      "description": "",
+      "price": 3.79,
+      "class": "equipment"
+    },
+    {
+      "class": "other",
+      "name": "ATV--Capital Recovery",
+      "units": "us$/h",
+      "price": 1.89,
+      "type": "simple"
+    },
+    {
+      "class": "insurance",
+      "name": "ATV--insurance",
+      "units": "us$/h",
+      "price": 0.01,
+      "type": "simple"
+    },
+    {
+      "class": "other",
+      "name": "ATV--Taxes",
+      "units": "us$/h",
+      "price": 0.09,
+      "type": "simple"
+    },
+    {
+      "class": "other",
+      "name": "ATV--Lube & Repairs",
+      "units": "us$/h",
+      "price": 1.2,
+      "type": "simple"
+    },
+    {
+      "class": "equipment",
+      "name": "Challenger Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 19.36,
+          "originalAmount": 19.36,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 54.4016
+        },
+        "Challenger Tractor--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 90
+        },
+        "Challenger Tractor--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 35
+        }
+      },
+      "price": 179.4016
+    },
+    {
+      "class": "equipment",
+      "name": "Cooler/van",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Cooler/van--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 10
+        },
+        "Cooler/van--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 15
+        },
+        "Equipment Fuel": {
+          "amount": 0.96,
+          "originalAmount": 0.96,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 2.6976
+        },
+        "Estimate": {
+          "units": "us$",
+          "amount": 1.2,
+          "error": null,
+          "price": 1.2
+        }
+      },
+      "price": 28.8976
+    },
+    {
+      "class": "equipment",
+      "name": "FR 6080 FH",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 13.2,
+          "originalAmount": 13.2,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 37.092
+        },
+        "FR 6080 FH--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 35
+        },
+        "FR 6080 FH--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 90
+        },
+        "Estimate": {
+          "units": "us$",
+          "amount": 30,
+          "error": null,
+          "price": 30
+        }
+      },
+      "price": 192.09199999999998
+    },
+    {
+      "description": "Manual Application of herbicide",
+      "class": "herbicide",
+      "name": "herbicide - manual",
+      "units": "100.[acr_us]",
+      "type": "complex",
+      "materials": {
+        "Glyphosate": {
+          "amount": 200,
+          "originalAmount": 200,
+          "units": "[qt_us]",
+          "error": null,
+          "price": 800
+        },
+        "Laborer": {
+          "amount": 96,
+          "originalAmount": 96,
+          "units": "h",
+          "error": null,
+          "price": 1632
+        }
+      },
+      "price": 2432
+    },
+    {
+      "class": "labor",
+      "name": "hoeing",
+      "units": "100.[acr_us]",
+      "type": "complex",
+      "materials": {
+        "Laborer": {
+          "amount": 192,
+          "originalAmount": 192,
+          "units": "h",
+          "error": null,
+          "price": 3264
+        }
+      },
+      "price": 3264
+    },
+    {
+      "class": "equipment",
+      "name": "Large Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 13.2,
+          "originalAmount": 13.2,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 37.092
+        },
+        "Large Tractor--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        },
+        "Large Tractor--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        }
+      },
+      "price": 37.092
+    },
+    {
+      "class": "equipment",
+      "name": "Mid-size Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Mid-size Tractor--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        },
+        "Mid-size Tractor--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        },
+        "Equipment Fuel": {
+          "amount": 3.96,
+          "originalAmount": 3.96,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 11.1276
+        }
+      },
+      "price": 11.1276
+    },
+    {
+      "class": "equipment",
+      "name": "Semi-Tractor trailer",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Semi-Tractor trailer--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 90
+        },
+        "Equipment Fuel": {
+          "amount": 6.5,
+          "originalAmount": 6.5,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 18.265
+        },
+        "Semi-Tractor trailer--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 35
+        }
+      },
+      "price": 143.265
+    },
+    {
+      "class": "equipment",
+      "name": "Small Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 1.98,
+          "originalAmount": 1.98,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 5.5638
+        },
+        "Small Tractor--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        },
+        "Small Tractor--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        }
+      },
+      "price": 5.5638
+    },
+    {
+      "class": "equipment",
+      "name": "Support Truck",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Support Truck--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 25
+        },
+        "Support Truck--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 30
+        },
+        "Equipment Fuel": {
+          "amount": 1.76,
+          "originalAmount": 1.76,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 4.9456
+        }
+      },
+      "price": 59.9456
+    },
+    {
+      "class": "equipment",
+      "name": "Tandem Axle Truck",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Tandem Axle Truck--Capitol Cost": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 90
+        },
+        "Equipment Fuel": {
+          "amount": 13.2,
+          "originalAmount": 13.2,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 37.092
+        },
+        "Tandem Axle Truck--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 35
+        }
+      },
+      "price": 162.09199999999998
+    },
+    {
+      "class": "equipment",
+      "name": "Tractor and sprayer",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 3.96,
+          "originalAmount": 3.96,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 11.1276
+        },
+        "Tractor and sprayer--Labor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": true
+        },
+        "Estimate": {
+          "units": "us$",
+          "amount": 50,
+          "error": null,
+          "price": 50
+        }
+      },
+      "price": 61.1276
+    },
+    {
+      "type": "complex",
+      "name": "ATV",
+      "units": "us$/h",
+      "description": "",
+      "price": 6.9799999999999995,
+      "materials": {
+        "Gas": {
+          "name": "Gas",
+          "amount": 1,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 3.79
+        },
+        "ATV--Capital Recovery": {
+          "name": "ATV--Capital Recovery",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 1.89
+        },
+        "ATV--insurance": {
+          "name": "ATV--insurance",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 0.01
+        },
+        "ATV--Taxes": {
+          "name": "ATV--Taxes",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 0.09
+        },
+        "ATV--Lube & Repairs": {
+          "name": "ATV--Lube & Repairs",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 1.2
+        }
+      }
+    }
+  ],
+  "operations": [
+    {
+      "name": "Weeds-Roundup PowerMax",
+      "materials": [
+        {
+          "name": "ATV",
+          "amount": 0,
+          "units": "us$/h",
+          "id": "c2b6880a-a297-4cb8-8ab8-8d3223a66d79",
+          "error": null,
+          "price": 0,
+          "originalAmount": 0
+        },
+        {
+          "name": "Roundup PowerMax",
+          "amount": 2,
+          "units": "[pt_us]",
+          "id": "743cbe08-4c69-4cd7-8612-8fb11c1a9ba0",
+          "error": null,
+          "price": 5.5,
+          "originalAmount": 2
+        }
+      ],
+      "schedule": [
+        {
+          "length": 1,
+          "units": "month",
+          "date": "2015-12-1"
+        }
+      ],
+      "units": "[acr_us]",
+      "subtotal": 5.5,
+      "total": 5.5
+    }
+  ],
+  "farm": {
+    "unit": "[acr_us]",
+    "size": "100",
+    "commodity": "POPLAR",
+    "location": "06113",
+    "farm": "clarksburg"
+  }
+}
