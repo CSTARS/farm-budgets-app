@@ -1,8 +1,5 @@
 {
   "classes": {
-    "custom": [
-      "estimate"
-    ],
     "capital": [
       "1/2 Ton Pickup",
       "3/4 Ton Pickup (Farm use)",
@@ -75,14 +72,6 @@
       "units": "us$",
       "fixed": true,
       "description": "Provide fixed cost for complex material",
-      "type": "simple"
-    },
-    {
-      "description": "Dollar estimate",
-      "class": "custom",
-      "name": "estimate",
-      "units": "us$/us$",
-      "price": 1,
       "type": "simple"
     },
     {
@@ -576,7 +565,7 @@
           "error": null,
           "price": 8.4972
         },
-        "estimate": {
+        "Estimate": {
           "amount": 45,
           "originalAmount": 45,
           "units": "us$/[acr_us]",
@@ -816,7 +805,7 @@
           "amount": 0.33,
           "units": "h",
           "name": "Plant-Roundup Ready Seed",
-          "id": "a25532e1-be54-4baa-bcd2-eeb9692a2627",
+          "id": "8a1706d0-e7c2-4e15-86ee-ffe6676e6501",
           "error": null,
           "price": 17.015988
         },
@@ -824,7 +813,7 @@
           "amount": 0.1,
           "units": "h",
           "name": "Roll-Cover Seed",
-          "id": "a9eb7b69-3dd0-4fff-b43d-566d8c1e47c5",
+          "id": "84bef376-6ba2-4c8e-9b39-6144f211f70e",
           "error": null,
           "price": 5.004200000000001
         },
@@ -832,7 +821,7 @@
           "amount": 2,
           "units": "h",
           "name": "Sprinkler Irrigate 2X",
-          "id": "5f6a964c-3222-4a22-8362-fedc052bb172",
+          "id": "9d9cf20a-8496-4ae4-bc54-2e22c4bb8582",
           "error": null,
           "price": 151.1344
         },
@@ -840,7 +829,7 @@
           "amount": 2,
           "units": "h",
           "name": "Labor-Irrigation",
-          "id": "9facdaea-7b55-49a5-93a0-1ad5c3d6a0da",
+          "id": "0c738d7c-d759-4e36-950a-68004b25aeab",
           "error": null,
           "price": 27.2
         },
@@ -849,7 +838,7 @@
           "amount": 0.05,
           "units": "h",
           "name": "ATV",
-          "id": "b32060eb-9192-459f-abbf-275c103a9c6e",
+          "id": "7381e058-34dd-4b9f-9943-4d41492cf648",
           "error": null,
           "price": 1.0995
         },
@@ -857,7 +846,7 @@
           "amount": 2.2,
           "units": "[pt_us]",
           "name": "Roundup PowerMax",
-          "id": "d33c6248-4cc3-4a04-bbfc-36c39d2c73a6",
+          "id": "ef5fabaf-02e2-4c51-af08-7c828599b70f",
           "error": null,
           "price": 6.050000000000001
         },
@@ -865,7 +854,7 @@
           "amount": 0.25,
           "units": "h",
           "name": "Service Truck",
-          "id": "d22a1e2d-4dc9-4fc4-bcf8-9b69a936b6f8",
+          "id": "97cc88ee-8830-42b2-b1db-fb1c79920847",
           "error": null,
           "price": 9.0123
         },
@@ -873,7 +862,7 @@
           "amount": 0.37,
           "units": "h",
           "name": "1/2 Ton Pickup",
-          "id": "a10741bf-dfcf-4a38-84b6-4a07a6ab4d6d",
+          "id": "469f69bd-5606-482c-9f53-4c544a8bf10c",
           "error": null,
           "price": 11.984004
         },
@@ -881,7 +870,7 @@
           "amount": 0.4,
           "units": "h",
           "name": "3/4 Ton Pickup (Farm use)",
-          "id": "2f2e1707-1bc2-4473-a0e7-cb8c9e392021",
+          "id": "3df0bf8c-9727-41b7-b4b4-e613e95959a3",
           "error": null,
           "price": 15.021440000000002
         },
@@ -889,16 +878,16 @@
           "amount": 40,
           "units": "[lb_av]",
           "name": "Alfalfa Seed RR",
-          "id": "2f047c22-c847-45c2-a4f3-e22e813c9726",
+          "id": "5c56b78b-745e-423f-8b2e-2c630b6265b6",
           "error": null,
           "price": 200
         },
         {
-          "note": "Irrigatoin Materials",
+          "note": "Irrigation Materials",
           "amount": 45,
           "units": "us$",
-          "name": "estimate",
-          "id": "35eac8eb-de01-4d0a-ac28-74571a3bbf4e",
+          "name": "Estimate",
+          "id": "a080ae18-eef8-4260-ac42-c6da7870bf3f",
           "error": null,
           "price": 45
         }
@@ -921,7 +910,7 @@
           "amount": 1,
           "units": "[acr_us]",
           "name": "Irrigation-Ditch/Tail Levee",
-          "id": "53f42128-6107-4859-9c20-dab5262463d8",
+          "id": "8cc642da-dd6e-45e5-a538-71a2374acdf1",
           "error": null,
           "price": 31.88348
         },
@@ -929,7 +918,7 @@
           "amount": 42,
           "units": "[acr_us].[in_us]",
           "name": "Water-Alfalfa-Pumped",
-          "id": "fb45913e-57f8-46c3-a8f3-2abb7ec7ec1d",
+          "id": "8380c620-988f-4a7b-96ad-3041c6fda144",
           "error": null,
           "price": 315
         },
@@ -937,7 +926,7 @@
           "amount": 9,
           "units": "h",
           "name": "Labor-Irrigation",
-          "id": "d83be696-217c-4fc3-8b9b-f513c827f0c6",
+          "id": "45d81d95-7413-4713-94b4-6842ad5b02fe",
           "error": null,
           "price": 122.39999999999999
         }
@@ -975,7 +964,7 @@
           "amount": 0.75,
           "units": "h",
           "name": "Swather 16'",
-          "id": "a2289d20-e3e0-4128-8604-07b452851050",
+          "id": "d24f20c3-d910-41dd-8826-dc76c9228177",
           "error": null,
           "price": 50.595000000000006
         },
@@ -983,7 +972,7 @@
           "amount": 0.6,
           "units": "h",
           "name": "Raking",
-          "id": "e7d067f8-f3e9-48fc-821a-465b4b837ca1",
+          "id": "e56921c0-8c52-4eb5-a8d7-dfd4f8eda1a3",
           "error": null,
           "price": 18.150959999999998
         },
@@ -991,7 +980,7 @@
           "amount": 0.93,
           "units": "h",
           "name": "Baling",
-          "id": "b7186464-1f5d-45a7-a8af-04a76fc0c509",
+          "id": "1694be8f-43a3-48e4-84fa-bb57bc274213",
           "error": null,
           "price": 92.13956400000002
         },
@@ -999,7 +988,7 @@
           "amount": 0.93,
           "units": "h",
           "name": "Bale Wagon 1300# Attm",
-          "id": "9dc0993e-f2bc-4ebe-a90b-7cf8275dabe1",
+          "id": "25997f6a-97b6-4e81-922a-b09ea2e25a73",
           "error": null,
           "price": 85.2996
         }
@@ -1037,8 +1026,8 @@
           "note": "Soil Samples",
           "amount": 4,
           "units": "us$",
-          "name": "estimate",
-          "id": "b72bd6fd-9b12-49d4-bcea-b3d71add3fdb",
+          "name": "Estimate",
+          "id": "512c5458-113d-440b-b9b4-6525936ca7b2",
           "error": null,
           "price": 4
         },
@@ -1046,7 +1035,7 @@
           "amount": 0.13,
           "units": "h",
           "name": "Stubble Disc",
-          "id": "cbd369aa-fc8a-4f2b-9538-9432c46d8b3f",
+          "id": "619e0b78-08c3-40c7-9fd7-46433b4e1143",
           "error": null,
           "price": 16.004196
         },
@@ -1054,7 +1043,7 @@
           "amount": 0.12,
           "units": "h",
           "name": "Chisel/Rip & Roll",
-          "id": "7365a45d-168a-4325-803c-2dda2504c617",
+          "id": "d5bfd089-7eaa-4329-a439-94d0b15e1923",
           "error": null,
           "price": 14.997407999999998
         },
@@ -1062,8 +1051,8 @@
           "note": "Laser Leveling (est 1/7th) cost",
           "amount": 12,
           "units": "us$",
-          "name": "estimate",
-          "id": "2aa51a97-9060-460f-bbf8-c6adab3666d3",
+          "name": "Estimate",
+          "id": "41872024-133f-484f-97db-a09803f0986a",
           "error": null,
           "price": 12
         },
@@ -1071,7 +1060,7 @@
           "amount": 0.24,
           "units": "h",
           "name": "Tri-Plane 2X",
-          "id": "2a28a2e9-1138-44e9-a1a5-7e4aa99e74b6",
+          "id": "d19c4d87-1d69-494e-9bc5-578c9e5df42c",
           "error": null,
           "price": 22.020767999999997
         },
@@ -1079,7 +1068,7 @@
           "amount": 264.86,
           "units": "[lb_av]",
           "name": "11-52-0",
-          "id": "bf805632-d797-4657-8f7f-2de48e314f71",
+          "id": "22b5742f-c19f-4628-967c-421864b96c83",
           "error": null,
           "price": 97.9982
         },
@@ -1087,8 +1076,8 @@
           "note": "extra fertilizer",
           "amount": 21,
           "units": "us$",
-          "name": "estimate",
-          "id": "577bb888-a3a2-4c2e-aeaa-656bdc221ed0",
+          "name": "Estimate",
+          "id": "27901407-9378-40a6-9c75-72280041dcba",
           "error": null,
           "price": 21
         },
@@ -1096,7 +1085,7 @@
           "amount": 0.19,
           "units": "h",
           "name": "Finish Disc & Roll 2X",
-          "id": "606c6fbe-0a87-4366-bc40-cee2c964d6e4",
+          "id": "58eba87d-c22b-4821-9497-e221236a5a64",
           "error": null,
           "price": 20.001831999999997
         },
@@ -1104,7 +1093,7 @@
           "amount": 0.14,
           "units": "h",
           "name": "Pull Border/Checks",
-          "id": "ad8a5916-cf69-432f-a124-1040399ddcf3",
+          "id": "b88dfec3-57dc-4fc6-a09f-fdd5ebf46357",
           "error": null,
           "price": 12.001248
         }
@@ -1127,7 +1116,7 @@
           "amount": 0.47,
           "units": "h",
           "name": "1/2 Ton Pickup",
-          "id": "c2a02702-4268-49d9-813d-d5f1f91e7463",
+          "id": "6efe69d9-46c5-4839-bcd9-00bbe448b969",
           "error": null,
           "price": 15.222924
         },
@@ -1135,7 +1124,7 @@
           "amount": 0.4,
           "units": "h",
           "name": "3/4 Ton Pickup (Farm use)",
-          "id": "f7e660b6-c7bc-4cb8-a8df-342da5c022d7",
+          "id": "0fa0f036-453f-4658-971d-51baa036124d",
           "error": null,
           "price": 15.021440000000002
         },
@@ -1143,7 +1132,7 @@
           "amount": 0.2,
           "units": "h",
           "name": "Service Truck",
-          "id": "fb510bc9-9f3c-499f-b67b-6da39825d432",
+          "id": "5178fe3c-0908-48be-909f-97ea98763f4b",
           "error": null,
           "price": 7.20984
         },
@@ -1151,8 +1140,8 @@
           "note": "Office Expense",
           "amount": 50,
           "units": "us$",
-          "name": "estimate",
-          "id": "fd300efc-fa7c-4f2f-acfe-ea9e8b46c051",
+          "name": "Estimate",
+          "id": "5a7e9ccf-d0b5-4bf1-96d9-77391505a37d",
           "error": null,
           "price": 50
         },
@@ -1160,8 +1149,8 @@
           "note": "Supervisor Salary",
           "amount": 43,
           "units": "us$",
-          "name": "estimate",
-          "id": "64ae38cc-cfee-4d26-86c5-c5566cd04131",
+          "name": "Estimate",
+          "id": "5b60d99d-31b8-4e4b-b352-f11112e969b0",
           "error": null,
           "price": 43
         },
@@ -1169,8 +1158,8 @@
           "note": "Liability Insurance",
           "amount": 1,
           "units": "us$",
-          "name": "estimate",
-          "id": "94abcd07-4615-4375-807a-2f20804a8fce",
+          "name": "Estimate",
+          "id": "e4e60d88-fd76-4e34-84a0-52bec3249241",
           "error": null,
           "price": 1
         },
@@ -1178,8 +1167,8 @@
           "note": "Miscellaneous Costs",
           "amount": 20,
           "units": "us$",
-          "name": "estimate",
-          "id": "9ad34ce4-3094-4b19-8d3f-a9d3ed7fa02f",
+          "name": "Estimate",
+          "id": "3f1e184d-94ec-4ac2-8359-e1336f062606",
           "error": null,
           "price": 20
         },
@@ -1187,8 +1176,8 @@
           "note": "Property Taxes",
           "amount": 81,
           "units": "us$",
-          "name": "estimate",
-          "id": "c6ebfb70-5f5c-443a-b7d7-ed2b6ab80ebe",
+          "name": "Estimate",
+          "id": "2a469a16-db6a-4dd3-a72b-2d7d86f99f51",
           "error": null,
           "price": 81
         },
@@ -1196,8 +1185,8 @@
           "note": "Property Insurance",
           "amount": 7,
           "units": "us$",
-          "name": "estimate",
-          "id": "4dbd198a-9c5c-4761-8526-00c10bebb108",
+          "name": "Estimate",
+          "id": "71d0c2ae-1a9b-4039-bfb3-74e7554cbf3b",
           "error": null,
           "price": 7
         },
@@ -1205,8 +1194,8 @@
           "note": "Investment Repairs",
           "amount": 2,
           "units": "us$",
-          "name": "estimate",
-          "id": "61ad2757-5f31-461f-8511-4edea73515e2",
+          "name": "Estimate",
+          "id": "fa83bf25-99ec-4282-b365-3eaa62b78b3e",
           "error": null,
           "price": 2
         },
@@ -1214,8 +1203,8 @@
           "note": "Shop Tools",
           "amount": 1,
           "units": "us$",
-          "name": "estimate",
-          "id": "85fb2e20-d017-47a5-b252-fce2f1e3f09d",
+          "name": "Estimate",
+          "id": "48909010-fa14-458f-ae8b-943d7350f514",
           "error": null,
           "price": 1
         },
@@ -1223,8 +1212,8 @@
           "note": "Hay Barn/Pole Barn",
           "amount": 2,
           "units": "us$",
-          "name": "estimate",
-          "id": "363c92bb-bb92-4fb0-aa80-ccc17fb8203e",
+          "name": "Estimate",
+          "id": "1afe3710-0b06-4607-9a39-4a16d35dd5d1",
           "error": null,
           "price": 2
         },
@@ -1232,8 +1221,8 @@
           "note": "Land 160 Acres",
           "amount": 380,
           "units": "us$",
-          "name": "estimate",
-          "id": "ab6411a7-36e2-4580-af60-5cf7a2b1da94",
+          "name": "Estimate",
+          "id": "2d4ca76d-62c3-4c01-aa6e-73a9713dd241",
           "error": null,
           "price": 380
         },
@@ -1241,8 +1230,8 @@
           "note": "Sprinkler Pipe",
           "amount": 1,
           "units": "us$",
-          "name": "estimate",
-          "id": "2032b9d5-54f3-4194-ba29-5ae98d468209",
+          "name": "Estimate",
+          "id": "7e01dae2-579f-4727-864b-ebbfd8b3ebc3",
           "error": null,
           "price": 1
         },
@@ -1250,8 +1239,8 @@
           "note": "Pipe Main Line 10in 1/2 Mile",
           "amount": 1,
           "units": "us$",
-          "name": "estimate",
-          "id": "5f570fe2-c36d-4f3f-84e6-a370ceef6309",
+          "name": "Estimate",
+          "id": "326ec6a5-f5b7-4a94-a681-078ddbf4feab",
           "error": null,
           "price": 1
         },
@@ -1259,8 +1248,8 @@
           "note": "Shop 8000 sqft",
           "amount": 4,
           "units": "us$",
-          "name": "estimate",
-          "id": "62bd8739-7854-47a4-8d90-b512fb940eb5",
+          "name": "Estimate",
+          "id": "f5e6f081-9c14-41a4-85b6-4db2ed9d53d8",
           "error": null,
           "price": 4
         },
@@ -1268,8 +1257,8 @@
           "note": "Establishment Costs 160 Ac",
           "amount": 230,
           "units": "us$",
-          "name": "estimate",
-          "id": "359c29a5-c735-4d5f-bd56-46fcdb0154a4",
+          "name": "Estimate",
+          "id": "067db7d6-8c00-4588-b33f-f8d8faea0430",
           "error": null,
           "price": 230
         },
@@ -1277,8 +1266,8 @@
           "note": "Equipment",
           "amount": 131,
           "units": "us$",
-          "name": "estimate",
-          "id": "c1237fd9-353b-475b-a82c-58158e0c1055",
+          "name": "Estimate",
+          "id": "9c2469f5-8948-4336-98e4-2e4d8285b6cc",
           "error": null,
           "price": 131
         }
@@ -1316,7 +1305,7 @@
           "amount": 0.05,
           "units": "h",
           "name": "ATV",
-          "id": "931fbff2-60aa-489f-aff3-5898628eafb1",
+          "id": "69636fcf-6121-43b4-9d78-5b6479f5a032",
           "error": null,
           "price": 1.0995
         },
@@ -1324,7 +1313,7 @@
           "amount": 1.5,
           "units": "[foz_us]",
           "name": "Warrior II",
-          "id": "600f1b5d-b29e-4c94-ae3f-e5cee3573fad",
+          "id": "ce025c9c-f790-4565-a466-4ac14ac5b565",
           "error": null,
           "price": 7.875
         },
@@ -1332,7 +1321,7 @@
           "amount": 0.05,
           "units": "h",
           "name": "ATV",
-          "id": "07e0fde3-7204-4f54-a271-8b797489f052",
+          "id": "64c5f366-4ea5-45ca-971c-b8b1efecbee4",
           "error": null,
           "price": 1.0995
         },
@@ -1340,7 +1329,7 @@
           "amount": 2,
           "units": "[foz_us]",
           "name": "Coragen",
-          "id": "65e09064-f626-41ac-bbd9-b8b56d799294",
+          "id": "03ae886e-e294-4eed-9b92-ccd0cfbff5c0",
           "error": null,
           "price": 20.5
         },
@@ -1348,7 +1337,7 @@
           "amount": 0.05,
           "units": "h",
           "name": "ATV",
-          "id": "6398baf4-1a75-4b2c-a0fd-8e04ae4857d5",
+          "id": "be6eb720-21b8-484d-8154-10be476c4120",
           "error": null,
           "price": 1.0995
         },
@@ -1356,7 +1345,7 @@
           "amount": 3,
           "units": "[foz_us]",
           "name": "Belt SC",
-          "id": "703ea276-f0c4-4d80-a8e9-b94fffc4cafa",
+          "id": "828838d6-665a-4f64-97c0-a1f32d3bf2d0",
           "error": null,
           "price": 28.200000000000003
         }
@@ -1394,7 +1383,7 @@
           "amount": 0.05,
           "units": "h",
           "name": "ATV",
-          "id": "65c0ba14-8d28-4b08-9d5e-ae1c051b38e9",
+          "id": "3d020237-675c-4868-82d7-f2f471b8b088",
           "error": null,
           "price": 1.0995
         },
@@ -1402,7 +1391,7 @@
           "amount": 4.4,
           "units": "[pt_us]",
           "name": "Velpar L",
-          "id": "481af38d-c656-43b0-8906-3738a4ba3662",
+          "id": "eaaf031f-052f-454a-897c-eed47724dea6",
           "error": null,
           "price": 63.404
         }
@@ -1440,7 +1429,7 @@
           "amount": 200,
           "units": "[lb_av]",
           "name": "11-52-0",
-          "id": "abd0ab06-6b2f-4fba-9918-67de814190ed",
+          "id": "eb2af8a1-f5de-4896-b25a-1fa4c7d0b728",
           "error": null,
           "price": 74
         },
@@ -1448,8 +1437,8 @@
           "note": "Fertilizer Materials",
           "amount": 21,
           "units": "us$",
-          "name": "estimate",
-          "id": "c97b0fb1-64fa-4d6f-9738-cc486ecd6a2e",
+          "name": "Estimate",
+          "id": "c8c4c9b5-cdab-411d-9636-518cf0eff078",
           "error": null,
           "price": 21
         }
