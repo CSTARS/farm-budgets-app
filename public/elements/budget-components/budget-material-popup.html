@@ -652,6 +652,11 @@
           delete this.data.materials;
           delete this.data.class;
           this.data.type = 'simple';
+
+          if( this.data.units ) {
+            this.data.units = FB.units.invert(this.data.units);
+          }
+
           this.setComplex(false);
 
         } else if ( confirm('Are your sure you want to make this a simple material?  All required '+
@@ -660,13 +665,22 @@
           delete this.data.materials;
           delete this.data.class;
           this.data.type = 'simple';
+          if( this.data.units ) {
+            this.data.units = FB.units.invert(this.data.units);
+          }
+
           this.setComplex(false);
         } else {
           this.setComplex(true);
         }
+
       } else {
         this.data.type = 'complex';
         this.data.materials = {};
+
+        if( this.data.units ) {
+          this.data.units = FB.units.invert(this.data.units);
+        }
 
         // as there a simple price set?  make it the base price material
         if( this.data.price !== undefined ) {
@@ -776,8 +790,9 @@
 
       data.units = 'us$/'+data.units;
 
-      // add to global controller, make sure no issues (most likely name conflict)
+      // add to global controller, make sure no issues
       var resp = FB.materialController.add(data, {
+        replace : true,
         noRecalc : true,
         noEvent : true
       });

@@ -7322,11 +7322,11 @@ Any number of components can use `<google-maps-api>` elements, and the library w
     }
 
     function _fireAmountChange(e) {
-      config.materialImpl.amount = parseInt(e.originalEvent.target.value);
+      config.materialImpl.amount = parseFloat(e.originalEvent.target.value);
       config.materialImpl.originalAmount = config.materialImpl.amount;
 
       setErrorStatus();
-      config.onAmountChange(config.materialImpl, parseInt(e.originalEvent.target.value));
+      config.onAmountChange(config.materialImpl, parseFloat(e.originalEvent.target.value));
       setPrice();
     }
 

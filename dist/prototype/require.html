@@ -6779,11 +6779,11 @@ this.fire('dom-change');
     }
 
     function _fireAmountChange(e) {
-      config.materialImpl.amount = parseInt(e.originalEvent.target.value);
+      config.materialImpl.amount = parseFloat(e.originalEvent.target.value);
       config.materialImpl.originalAmount = config.materialImpl.amount;
 
       setErrorStatus();
-      config.onAmountChange(config.materialImpl, parseInt(e.originalEvent.target.value));
+      config.onAmountChange(config.materialImpl, parseFloat(e.originalEvent.target.value));
       setPrice();
     }
 
@@ -7576,6 +7576,8 @@ this.fire('dom-change');
       var l = parseInt(date.length);
       if( date.units == 'year' ) {
         return l * 86400000 * 365;
+      } else if( date.units == 'day' ){
+        return l * 86400000;
       } else {
         return l * 86400000 * 30;
       }
@@ -7584,7 +7586,7 @@ this.fire('dom-change');
     toDate : function(dateStr) {
       try {
         var parts = dateStr.split('-');
-        return new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+        return new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
       } catch(e) {
         return new Date();
       }
@@ -7617,6 +7619,7 @@ this.fire('dom-change');
           orientation : 'top auto'
         })
         .on('changeDate', function(e){
+          console.log(e);
           this.dates.push({
             date : e.date,
             length : 1,
@@ -7668,6 +7671,7 @@ this.fire('dom-change');
         <h5>
           <budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler>
         </h5>
+
       </div>
       <div class="col-sm-4">
         <table class="padding: 15px">
@@ -7744,6 +7748,19 @@ this.fire('dom-change');
     update : function() {
       this.operation = FB.operationController.get(this.operationname);
       this.$.schedule.set(this.operation.schedule, this.operation.name);
+
+/*
+      this.$.radioEntireFarm.setAttribute('name', this.operation.name+'Radio');
+      this.$.radioPerAcre.setAttribute('name', this.operation.name+'Radio');
+
+      if( this.operation.perAcre ) {
+        this.$.radioPerAcre.setAttribute('checked', 'checked');
+        this.$.radioEntireFarm.removeAttribute('checked');
+      } else {
+        this.$.radioEntireFarm.setAttribute('checked', 'checked');
+        this.$.radioPerAcre.removeAttribute('checked');
+      }
+*/
       this.render();
     },
 
@@ -7785,6 +7802,12 @@ this.fire('dom-change');
       $(this.$.total).attr('value', this.operation.total);
       $(this.$.subtotal).attr('value', this.operation.subtotal);
       $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
+    },
+
+    updateUnit : function() {
+      this.operation.perAcre = $(this.$.radioPerAcre).is(':checked') ? true : false;
+      FB.operationController.add(this.operation, {replace: true});
+      this.updateTotals();
     },
 
     onMaterialDelete : function(e) {
@@ -8027,6 +8050,7 @@ this.fire('dom-change');
       <budget-spending-timeline id="spendingTimeline"></budget-spending-timeline>
     </div>
 
+    <a class="btn btn-link" on-click="toggleDebug">Toggle Debug</a>
     <div class="card" id="debug" style="display:none">
       <h4>JSON (debug)</h4>
       <textarea id="json" class="form-control" style="height: 400px"></textarea>
@@ -8068,12 +8092,23 @@ this.fire('dom-change');
 
       if( params.length > 0 && params[0] === 'debug' ) {
         this.$.debug.style.display = 'block';
+        this.setJsonDump();
       } else {
         this.$.debug.style.display = 'none';
       }
     },
 
+    toggleDebug : function() {
+      if( this.$.debug.style.display == 'block' ) {
+        window.location = '#budget/overview';
+      } else {
+        window.location = '#budget/overview/debug';
+      }
+    },
+
     setJsonDump : function() {
+      if( !window.appData ) return;
+
       // get latest data
       var arr = [];
 
@@ -8681,6 +8716,7 @@ this.fire('dom-change');
 
       FB.materialController.recalc();
 
+      FB.operationController.setFarmSize(appData.farm && appData.farm.size ? parseInt(appData.farm.size) : 1);
       appData.operations.forEach(function(operation){
         FB.operationController.add(operation, options);
       });
@@ -8818,6 +8854,8 @@ this.fire('dom-change');
       var l = parseInt(date.length);
       if( date.units == 'year' ) {
         return l * 86400000 * 365;
+      } else if( date.units == 'day' ) {
+        return l * 86400000;
       } else {
         return l * 86400000 * 30;
       }
@@ -8938,10 +8976,10 @@ this.fire('dom-change');
 
       chart.draw(dataTable, {
         vAxis : {
-          logScale : true,
-          viewWindow : {
-            min : 100
-          }
+          logScale : true
+          //viewWindow : {
+          //  min : 100
+          //}
         }
       });
 
@@ -8989,6 +9027,13 @@ this.fire('dom-change');
                 <div class="col-sm-9">
                   <input type="text" id="nameInput" class="form-control" on-input="onNameInput">
                   <div class="text text-danger" id="nameInputMessage"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="nameInput" class="col-sm-3 control-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea id="descriptionInput" class="form-control" on-input="onDescriptionInput"></textarea>
                 </div>
               </div>
 
@@ -9218,7 +9263,7 @@ this.fire('dom-change');
         this.$.nameInput.value = this.data.name;
       }
 
-
+      this.$.descriptionInput.value = this.data.description || '';
 
       if( this.data.type == 'complex' ) {
         this.setComplex(true);
@@ -9258,6 +9303,7 @@ this.fire('dom-change');
         type : 'simple',
         name : name || '',
         units : '',
+        description : '',
         price : 0
       };
       this.action = 'create';
@@ -9268,6 +9314,7 @@ this.fire('dom-change');
       this.$.nameInput.value = name || '';
       this.$.unitsInput.setUnits('');
       this.$.priceInput.value = '';
+      this.$.descriptionInput.value = '';
       this.$.classInput.setValue('other');
       this.setComplex(false);
 
@@ -9528,6 +9575,10 @@ this.fire('dom-change');
       }
     },
 
+    onDescriptionInput : function() {
+      this.data.description = this.$.descriptionInput.value;
+    },
+
     recalc : function() {
       FB.materialController.materialRecalc(this.data);
 
@@ -9606,6 +9657,11 @@ this.fire('dom-change');
           delete this.data.materials;
           delete this.data.class;
           this.data.type = 'simple';
+
+          if( this.data.units ) {
+            this.data.units = FB.units.invert(this.data.units);
+          }
+
           this.setComplex(false);
 
         } else if ( confirm('Are your sure you want to make this a simple material?  All required '+
@@ -9614,13 +9670,22 @@ this.fire('dom-change');
           delete this.data.materials;
           delete this.data.class;
           this.data.type = 'simple';
+          if( this.data.units ) {
+            this.data.units = FB.units.invert(this.data.units);
+          }
+
           this.setComplex(false);
         } else {
           this.setComplex(true);
         }
+
       } else {
         this.data.type = 'complex';
         this.data.materials = {};
+
+        if( this.data.units ) {
+          this.data.units = FB.units.invert(this.data.units);
+        }
 
         // as there a simple price set?  make it the base price material
         if( this.data.price !== undefined ) {
@@ -9730,8 +9795,9 @@ this.fire('dom-change');
 
       data.units = 'us$/'+data.units;
 
-      // add to global controller, make sure no issues (most likely name conflict)
+      // add to global controller, make sure no issues
       var resp = FB.materialController.add(data, {
+        replace : true,
         noRecalc : true,
         noEvent : true
       });
