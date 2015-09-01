@@ -1,0 +1,1465 @@
+{
+  "classes": {
+    "capital": [
+      "1/2 Ton Pickup",
+      "3/4 Ton Pickup (Farm use)",
+      "Bale Wagon 1300# Attm",
+      "Service Truck"
+    ],
+    "undefined": [
+      "ATV",
+      "Alfalfa Seed RR",
+      "Baling",
+      "Plant-Roundup Ready Seed",
+      "Raking",
+      "Roll-Cover Seed",
+      "Sprinkler Irrigate 2X",
+      "Swather 16'"
+    ],
+    "fertilizer": [
+      "11-52-0"
+    ],
+    "Insecticide": [
+      "Belt SC",
+      "Coragen",
+      "Warrior II"
+    ],
+    "cultural": [
+      "Chisel/Rip & Roll",
+      "Finish Disc & Roll 2X",
+      "Pull Border/Checks",
+      "Stubble Disc",
+      "Tri-Plane 2X"
+    ],
+    "irrigation": [
+      "Irrigation-Ditch/Tail Levee"
+    ],
+    "Herbicide": [
+      "Roundup PowerMax"
+    ],
+    "Irrigation": [
+      "Water-Alfalfa-Pumped"
+    ]
+  },
+  "materials": [
+    {
+      "name": "Estimate",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "name": "Taxes",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "name": "Insurance",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "name": "Capitol Cost Recover",
+      "price": 1,
+      "units": "us$",
+      "fixed": true,
+      "description": "Provide fixed cost for complex material",
+      "type": "simple"
+    },
+    {
+      "class": "fertilizer",
+      "name": "11-52-0",
+      "units": "us$/[lb_av]",
+      "price": 0.37,
+      "type": "simple"
+    },
+    {
+      "name": "Alfalfa Seed RR",
+      "units": "us$/[lb_av]",
+      "price": 5,
+      "type": "simple"
+    },
+    {
+      "class": "Insecticide",
+      "name": "Belt SC",
+      "units": "us$/[foz_us]",
+      "price": 9.4,
+      "type": "simple"
+    },
+    {
+      "class": "Insecticide",
+      "name": "Coragen",
+      "units": "us$/[foz_us]",
+      "price": 10.25,
+      "type": "simple"
+    },
+    {
+      "class": "Herbicide",
+      "name": "Roundup PowerMax",
+      "units": "us$/[pt_us]",
+      "price": 2.75,
+      "type": "simple"
+    },
+    {
+      "class": "Insecticide",
+      "name": "Warrior II",
+      "units": "us$/[foz_us]",
+      "price": 5.25,
+      "type": "simple"
+    },
+    {
+      "description": "Well supplied Alfalfa",
+      "class": "Irrigation",
+      "name": "Water-Alfalfa-Pumped",
+      "units": "us$/[acr_us].[in_us]",
+      "price": 7.5,
+      "type": "simple"
+    },
+    {
+      "name": "Bale Twine",
+      "price": 7,
+      "units": "us$/[acr_us]",
+      "type": "simple"
+    },
+    {
+      "name": "Fuel-Diesel",
+      "price": 3.88,
+      "units": "us$/[gal_us]",
+      "type": "simple"
+    },
+    {
+      "name": "Fuel-Gas",
+      "price": 3.79,
+      "units": "us$/[gal_us]",
+      "type": "simple"
+    },
+    {
+      "name": "Lube&Repair",
+      "price": 1,
+      "units": "us$/us$",
+      "type": "simple"
+    },
+    {
+      "name": "Velpar L",
+      "price": 14.41,
+      "units": "us$/[pt_us]",
+      "type": "simple"
+    },
+    {
+      "name": "Labor-Equipment Operator",
+      "price": 17,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "name": "Labor-Irrigation",
+      "price": 13.6,
+      "units": "us$/h",
+      "type": "simple"
+    },
+    {
+      "class": "capital",
+      "name": "1/2 Ton Pickup",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 5.41,
+          "originalAmount": 5.41,
+          "units": "us$",
+          "error": null,
+          "price": 5.41
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.11,
+          "originalAmount": 1.11,
+          "units": "h",
+          "error": null,
+          "price": 18.87
+        },
+        "Fuel-Diesel": {
+          "amount": 2.09,
+          "originalAmount": 2.09,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 8.1092
+        }
+      },
+      "price": 32.3892
+    },
+    {
+      "name": "ATV",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 1.2,
+          "originalAmount": 1.2,
+          "units": "us$",
+          "error": null,
+          "price": 1.2
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 17
+        },
+        "Fuel-Gas": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 3.79
+        }
+      },
+      "price": 21.99
+    },
+    {
+      "class": "capital",
+      "name": "3/4 Ton Pickup (Farm use)",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 5,
+          "originalAmount": 5,
+          "units": "us$",
+          "error": null,
+          "price": 5
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.18,
+          "originalAmount": 1.18,
+          "units": "h",
+          "error": null,
+          "price": 20.06
+        },
+        "Fuel-Diesel": {
+          "amount": 3.22,
+          "originalAmount": 3.22,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 12.4936
+        }
+      },
+      "price": 37.5536
+    },
+    {
+      "class": "capital",
+      "name": "Bale Wagon 1300# Attm",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 38.68,
+          "originalAmount": 38.68,
+          "units": "us$",
+          "error": null,
+          "price": 38.68
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.18,
+          "originalAmount": 1.18,
+          "units": "h",
+          "error": null,
+          "price": 20.06
+        },
+        "Fuel-Diesel": {
+          "amount": 8.5,
+          "originalAmount": 8.5,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 32.98
+        }
+      },
+      "price": 91.72
+    },
+    {
+      "name": "Baling",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "150HP4WD Tractor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 60.2248
+        },
+        "Bale Twine": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "[acr_us]",
+          "error": null,
+          "price": 7
+        },
+        " Baler1300# PTO": {
+          "name": " Baler1300# PTO",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 31.85
+        }
+      },
+      "price": 99.07480000000001
+    },
+    {
+      "description": "Pre Planting Preparation",
+      "class": "cultural",
+      "name": "Chisel/Rip & Roll",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 33.33,
+          "originalAmount": 33.33,
+          "units": "us$",
+          "error": null,
+          "price": 33.33
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.47,
+          "originalAmount": 1.47,
+          "units": "h",
+          "error": null,
+          "price": 24.99
+        },
+        "Fuel-Diesel": {
+          "amount": 17.18,
+          "originalAmount": 17.18,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 66.6584
+        }
+      },
+      "price": 124.9784
+    },
+    {
+      "description": "Preplanting",
+      "class": "cultural",
+      "name": "Finish Disc & Roll 2X",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 31.58,
+          "originalAmount": 31.58,
+          "units": "us$",
+          "error": null,
+          "price": 31.58
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.24,
+          "originalAmount": 1.24,
+          "units": "h",
+          "error": null,
+          "price": 21.08
+        },
+        "Fuel-Diesel": {
+          "amount": 13.56,
+          "originalAmount": 13.56,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 52.6128
+        }
+      },
+      "price": 105.27279999999999
+    },
+    {
+      "class": "irrigation",
+      "name": "Irrigation-Ditch/Tail Levee",
+      "units": "[acr_us]",
+      "type": "complex",
+      "materials": {
+        "150HP4WD Tractor": {
+          "amount": 0.2,
+          "originalAmount": 0.2,
+          "units": "h",
+          "error": null,
+          "price": 12.044960000000001
+        },
+        "205HP Crawler": {
+          "amount": 0.26,
+          "originalAmount": 0.26,
+          "units": "h",
+          "error": null,
+          "price": 19.83852
+        }
+      },
+      "price": 31.88348
+    },
+    {
+      "name": "Plant-Roundup Ready Seed",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 9.09,
+          "originalAmount": 9.09,
+          "units": "us$",
+          "error": null,
+          "price": 9.09
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.25,
+          "originalAmount": 1.25,
+          "units": "h",
+          "error": null,
+          "price": 21.25
+        },
+        "Fuel-Diesel": {
+          "amount": 5.47,
+          "originalAmount": 5.47,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 21.223599999999998
+        }
+      },
+      "price": 51.563599999999994
+    },
+    {
+      "description": "Preplanting",
+      "class": "cultural",
+      "name": "Pull Border/Checks",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 14.29,
+          "originalAmount": 14.29,
+          "units": "us$",
+          "error": null,
+          "price": 14.29
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.26,
+          "originalAmount": 1.26,
+          "units": "h",
+          "error": null,
+          "price": 21.42
+        },
+        "Fuel-Diesel": {
+          "amount": 12.89,
+          "originalAmount": 12.89,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 50.0132
+        }
+      },
+      "price": 85.72319999999999
+    },
+    {
+      "name": "Raking",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Rake 20'": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 4.61
+        },
+        "37HP 4WD Tractor": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 25.6416
+        }
+      },
+      "price": 30.2516
+    },
+    {
+      "name": "Roll-Cover Seed",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 10,
+          "originalAmount": 10,
+          "units": "us$",
+          "error": null,
+          "price": 10
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.18,
+          "originalAmount": 1.18,
+          "units": "h",
+          "error": null,
+          "price": 20.06
+        },
+        "Fuel-Diesel": {
+          "amount": 5.15,
+          "originalAmount": 5.15,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 19.982
+        }
+      },
+      "price": 50.042
+    },
+    {
+      "class": "capital",
+      "name": "Service Truck",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 4,
+          "originalAmount": 4,
+          "units": "us$",
+          "error": null,
+          "price": 4
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.18,
+          "originalAmount": 1.18,
+          "units": "h",
+          "error": null,
+          "price": 20.06
+        },
+        "Fuel-Diesel": {
+          "amount": 3.09,
+          "originalAmount": 3.09,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 11.989199999999999
+        }
+      },
+      "price": 36.0492
+    },
+    {
+      "name": "Sprinkler Irrigate 2X",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 1.5,
+          "originalAmount": 1.5,
+          "units": "us$",
+          "error": null,
+          "price": 1.5
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.21,
+          "originalAmount": 1.21,
+          "units": "h",
+          "error": null,
+          "price": 20.57
+        },
+        "Fuel-Diesel": {
+          "amount": 2.19,
+          "originalAmount": 2.19,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 8.4972
+        },
+        "Estimate": {
+          "amount": 45,
+          "originalAmount": 45,
+          "units": "us$/[acr_us]",
+          "error": null,
+          "price": 45
+        }
+      },
+      "price": 75.5672
+    },
+    {
+      "description": "Pre Planting Discing",
+      "class": "cultural",
+      "name": "Stubble Disc",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 30.77,
+          "originalAmount": 30.77,
+          "units": "us$",
+          "error": null,
+          "price": 30.77
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.36,
+          "originalAmount": 1.36,
+          "units": "h",
+          "error": null,
+          "price": 23.12
+        },
+        "Fuel-Diesel": {
+          "amount": 17.84,
+          "originalAmount": 17.84,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 69.2192
+        }
+      },
+      "price": 123.1092
+    },
+    {
+      "name": "Swather 16'",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 19.42,
+          "originalAmount": 19.42,
+          "units": "us$",
+          "error": null,
+          "price": 19.42
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1,
+          "originalAmount": 1,
+          "units": "h",
+          "error": null,
+          "price": 17
+        },
+        "Fuel-Diesel": {
+          "amount": 8,
+          "originalAmount": 8,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 31.04
+        }
+      },
+      "price": 67.46000000000001
+    },
+    {
+      "description": "Preplanting",
+      "class": "cultural",
+      "name": "Tri-Plane 2X",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Lube&Repair": {
+          "amount": 20.83,
+          "originalAmount": 20.83,
+          "units": "us$",
+          "error": null,
+          "price": 20.83
+        },
+        "Labor-Equipment Operator": {
+          "amount": 1.23,
+          "originalAmount": 1.23,
+          "units": "h",
+          "error": null,
+          "price": 20.91
+        },
+        "Fuel-Diesel": {
+          "amount": 12.89,
+          "originalAmount": 12.89,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 50.0132
+        }
+      },
+      "price": 91.75319999999999
+    },
+    {
+      "type": "complex",
+      "name": "150HP4WD Tractor",
+      "units": "h",
+      "description": "Large Tractor",
+      "price": 60.2248,
+      "materials": {
+        "Lube&Repair": {
+          "name": "Lube&Repair",
+          "amount": 9.43,
+          "units": "us$",
+          "error": null,
+          "price": 9.43,
+          "originalAmount": 9.43
+        },
+        "Fuel-Diesel": {
+          "name": "Fuel-Diesel",
+          "amount": 8.71,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 33.7948,
+          "originalAmount": 8.71
+        },
+        "Labor-Equipment Operator": {
+          "name": "Labor-Equipment Operator",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 17
+        }
+      }
+    },
+    {
+      "type": "complex",
+      "name": "205HP Crawler",
+      "units": "h",
+      "description": "",
+      "price": 76.30199999999999,
+      "materials": {
+        "Lube&Repair": {
+          "name": "Lube&Repair",
+          "amount": 13.13,
+          "units": "us$",
+          "error": null,
+          "price": 13.13,
+          "originalAmount": 13.13
+        },
+        "Fuel-Diesel": {
+          "name": "Fuel-Diesel",
+          "amount": 11.9,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 46.172,
+          "originalAmount": 11.9
+        },
+        "Labor-Equipment Operator": {
+          "name": "Labor-Equipment Operator",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 17
+        }
+      }
+    },
+    {
+      "type": "complex",
+      "name": "37HP 4WD Tractor",
+      "units": "h",
+      "description": "Small Tractor",
+      "price": 25.6416,
+      "materials": {
+        "Lube&Repair": {
+          "name": "Lube&Repair",
+          "amount": 1.58,
+          "units": "us$",
+          "error": null,
+          "price": 1.58,
+          "originalAmount": 1.58
+        },
+        "Fuel-Diesel": {
+          "name": "Fuel-Diesel",
+          "amount": 1.82,
+          "units": "[gal_us]",
+          "error": null,
+          "price": 7.0616,
+          "originalAmount": 1.82
+        },
+        "Labor-Equipment Operator": {
+          "name": "Labor-Equipment Operator",
+          "amount": 1,
+          "units": "h",
+          "error": null,
+          "price": 17
+        }
+      }
+    },
+    {
+      "type": "complex",
+      "name": "Rake 20'",
+      "units": "h",
+      "description": "",
+      "price": 4.61,
+      "materials": {
+        "Lube&Repair": {
+          "name": "Lube&Repair",
+          "amount": 4.61,
+          "units": "us$",
+          "error": null,
+          "price": 4.61,
+          "originalAmount": 4.61
+        }
+      }
+    },
+    {
+      "type": "complex",
+      "name": " Baler1300# PTO",
+      "units": "h",
+      "description": "",
+      "price": 31.85,
+      "materials": {
+        "Lube&Repair": {
+          "name": "Lube&Repair",
+          "amount": 31.85,
+          "units": "us$",
+          "error": null,
+          "price": 31.85,
+          "originalAmount": 31.85
+        }
+      }
+    }
+  ],
+  "operations": [
+    {
+      "name": "planting",
+      "materials": [
+        {
+          "amount": 0.33,
+          "units": "h",
+          "name": "Plant-Roundup Ready Seed",
+          "id": "8a1706d0-e7c2-4e15-86ee-ffe6676e6501",
+          "error": null,
+          "price": 17.015988
+        },
+        {
+          "amount": 0.1,
+          "units": "h",
+          "name": "Roll-Cover Seed",
+          "id": "84bef376-6ba2-4c8e-9b39-6144f211f70e",
+          "error": null,
+          "price": 5.004200000000001
+        },
+        {
+          "amount": 2,
+          "units": "h",
+          "name": "Sprinkler Irrigate 2X",
+          "id": "9d9cf20a-8496-4ae4-bc54-2e22c4bb8582",
+          "error": null,
+          "price": 151.1344
+        },
+        {
+          "amount": 2,
+          "units": "h",
+          "name": "Labor-Irrigation",
+          "id": "0c738d7c-d759-4e36-950a-68004b25aeab",
+          "error": null,
+          "price": 27.2
+        },
+        {
+          "note": "Roundup",
+          "amount": 0.05,
+          "units": "h",
+          "name": "ATV",
+          "id": "7381e058-34dd-4b9f-9943-4d41492cf648",
+          "error": null,
+          "price": 1.0995
+        },
+        {
+          "amount": 2.2,
+          "units": "[pt_us]",
+          "name": "Roundup PowerMax",
+          "id": "ef5fabaf-02e2-4c51-af08-7c828599b70f",
+          "error": null,
+          "price": 6.050000000000001
+        },
+        {
+          "amount": 0.25,
+          "units": "h",
+          "name": "Service Truck",
+          "id": "97cc88ee-8830-42b2-b1db-fb1c79920847",
+          "error": null,
+          "price": 9.0123
+        },
+        {
+          "amount": 0.37,
+          "units": "h",
+          "name": "1/2 Ton Pickup",
+          "id": "469f69bd-5606-482c-9f53-4c544a8bf10c",
+          "error": null,
+          "price": 11.984004
+        },
+        {
+          "amount": 0.4,
+          "units": "h",
+          "name": "3/4 Ton Pickup (Farm use)",
+          "id": "3df0bf8c-9727-41b7-b4b4-e613e95959a3",
+          "error": null,
+          "price": 15.021440000000002
+        },
+        {
+          "amount": 40,
+          "units": "[lb_av]",
+          "name": "Alfalfa Seed RR",
+          "id": "5c56b78b-745e-423f-8b2e-2c630b6265b6",
+          "error": null,
+          "price": 200
+        },
+        {
+          "note": "Irrigation Materials",
+          "amount": 45,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "a080ae18-eef8-4260-ac42-c6da7870bf3f",
+          "error": null,
+          "price": 45
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2015-09-01",
+          "length": "2",
+          "units": "month"
+        }
+      ],
+      "subtotal": 488.521832,
+      "total": 488.521832
+    },
+    {
+      "name": "irrigate",
+      "materials": [
+        {
+          "amount": 1,
+          "units": "[acr_us]",
+          "name": "Irrigation-Ditch/Tail Levee",
+          "id": "8cc642da-dd6e-45e5-a538-71a2374acdf1",
+          "error": null,
+          "price": 31.88348
+        },
+        {
+          "amount": 42,
+          "units": "[acr_us].[in_us]",
+          "name": "Water-Alfalfa-Pumped",
+          "id": "8380c620-988f-4a7b-96ad-3041c6fda144",
+          "error": null,
+          "price": 315
+        },
+        {
+          "amount": 9,
+          "units": "h",
+          "name": "Labor-Irrigation",
+          "id": "45d81d95-7413-4713-94b4-6842ad5b02fe",
+          "error": null,
+          "price": 122.39999999999999
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2016-04-01",
+          "length": "6",
+          "units": "month"
+        },
+        {
+          "date": "2017-04-01",
+          "length": "6",
+          "units": "month"
+        },
+        {
+          "date": "2018-04-01",
+          "length": "6",
+          "units": "month"
+        },
+        {
+          "date": "2019-04-01",
+          "length": "6",
+          "units": "month"
+        }
+      ],
+      "subtotal": 469.28348,
+      "total": 1877.13392
+    },
+    {
+      "name": "harvest",
+      "materials": [
+        {
+          "amount": 0.75,
+          "units": "h",
+          "name": "Swather 16'",
+          "id": "d24f20c3-d910-41dd-8826-dc76c9228177",
+          "error": null,
+          "price": 50.595000000000006
+        },
+        {
+          "amount": 0.6,
+          "units": "h",
+          "name": "Raking",
+          "id": "e56921c0-8c52-4eb5-a8d7-dfd4f8eda1a3",
+          "error": null,
+          "price": 18.150959999999998
+        },
+        {
+          "amount": 0.93,
+          "units": "h",
+          "name": "Baling",
+          "id": "1694be8f-43a3-48e4-84fa-bb57bc274213",
+          "error": null,
+          "price": 92.13956400000002
+        },
+        {
+          "amount": 0.93,
+          "units": "h",
+          "name": "Bale Wagon 1300# Attm",
+          "id": "25997f6a-97b6-4e81-922a-b09ea2e25a73",
+          "error": null,
+          "price": 85.2996
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2016-04-01",
+          "length": "6",
+          "units": "month"
+        },
+        {
+          "date": "2017-04-01",
+          "length": "6",
+          "units": "month"
+        },
+        {
+          "date": "2018-04-01",
+          "length": "6",
+          "units": "month"
+        },
+        {
+          "date": "2019-04-01",
+          "length": "6",
+          "units": "month"
+        }
+      ],
+      "subtotal": 246.18512400000003,
+      "total": 984.7404960000001
+    },
+    {
+      "name": "pre-plant",
+      "materials": [
+        {
+          "note": "Soil Samples",
+          "amount": 4,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "512c5458-113d-440b-b9b4-6525936ca7b2",
+          "error": null,
+          "price": 4
+        },
+        {
+          "amount": 0.13,
+          "units": "h",
+          "name": "Stubble Disc",
+          "id": "619e0b78-08c3-40c7-9fd7-46433b4e1143",
+          "error": null,
+          "price": 16.004196
+        },
+        {
+          "amount": 0.12,
+          "units": "h",
+          "name": "Chisel/Rip & Roll",
+          "id": "d5bfd089-7eaa-4329-a439-94d0b15e1923",
+          "error": null,
+          "price": 14.997407999999998
+        },
+        {
+          "note": "Laser Leveling (est 1/7th) cost",
+          "amount": 12,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "41872024-133f-484f-97db-a09803f0986a",
+          "error": null,
+          "price": 12
+        },
+        {
+          "amount": 0.24,
+          "units": "h",
+          "name": "Tri-Plane 2X",
+          "id": "d19c4d87-1d69-494e-9bc5-578c9e5df42c",
+          "error": null,
+          "price": 22.020767999999997
+        },
+        {
+          "amount": 264.86,
+          "units": "[lb_av]",
+          "name": "11-52-0",
+          "id": "22b5742f-c19f-4628-967c-421864b96c83",
+          "error": null,
+          "price": 97.9982
+        },
+        {
+          "note": "extra fertilizer",
+          "amount": 21,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "27901407-9378-40a6-9c75-72280041dcba",
+          "error": null,
+          "price": 21
+        },
+        {
+          "amount": 0.19,
+          "units": "h",
+          "name": "Finish Disc & Roll 2X",
+          "id": "58eba87d-c22b-4821-9497-e221236a5a64",
+          "error": null,
+          "price": 20.001831999999997
+        },
+        {
+          "amount": 0.14,
+          "units": "h",
+          "name": "Pull Border/Checks",
+          "id": "b88dfec3-57dc-4fc6-a09f-fdd5ebf46357",
+          "error": null,
+          "price": 12.001248
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2015-08-01",
+          "length": "5",
+          "units": "month"
+        }
+      ],
+      "subtotal": 220.023652,
+      "total": 220.023652
+    },
+    {
+      "name": "overhead",
+      "materials": [
+        {
+          "amount": 0.47,
+          "units": "h",
+          "name": "1/2 Ton Pickup",
+          "id": "6efe69d9-46c5-4839-bcd9-00bbe448b969",
+          "error": null,
+          "price": 15.222924
+        },
+        {
+          "amount": 0.4,
+          "units": "h",
+          "name": "3/4 Ton Pickup (Farm use)",
+          "id": "0fa0f036-453f-4658-971d-51baa036124d",
+          "error": null,
+          "price": 15.021440000000002
+        },
+        {
+          "amount": 0.2,
+          "units": "h",
+          "name": "Service Truck",
+          "id": "5178fe3c-0908-48be-909f-97ea98763f4b",
+          "error": null,
+          "price": 7.20984
+        },
+        {
+          "note": "Office Expense",
+          "amount": 50,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "5a7e9ccf-d0b5-4bf1-96d9-77391505a37d",
+          "error": null,
+          "price": 50
+        },
+        {
+          "note": "Supervisor Salary",
+          "amount": 43,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "5b60d99d-31b8-4e4b-b352-f11112e969b0",
+          "error": null,
+          "price": 43
+        },
+        {
+          "note": "Liability Insurance",
+          "amount": 1,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "e4e60d88-fd76-4e34-84a0-52bec3249241",
+          "error": null,
+          "price": 1
+        },
+        {
+          "note": "Miscellaneous Costs",
+          "amount": 20,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "3f1e184d-94ec-4ac2-8359-e1336f062606",
+          "error": null,
+          "price": 20
+        },
+        {
+          "note": "Property Taxes",
+          "amount": 81,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "2a469a16-db6a-4dd3-a72b-2d7d86f99f51",
+          "error": null,
+          "price": 81
+        },
+        {
+          "note": "Property Insurance",
+          "amount": 7,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "71d0c2ae-1a9b-4039-bfb3-74e7554cbf3b",
+          "error": null,
+          "price": 7
+        },
+        {
+          "note": "Investment Repairs",
+          "amount": 2,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "fa83bf25-99ec-4282-b365-3eaa62b78b3e",
+          "error": null,
+          "price": 2
+        },
+        {
+          "note": "Shop Tools",
+          "amount": 1,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "48909010-fa14-458f-ae8b-943d7350f514",
+          "error": null,
+          "price": 1
+        },
+        {
+          "note": "Hay Barn/Pole Barn",
+          "amount": 2,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "1afe3710-0b06-4607-9a39-4a16d35dd5d1",
+          "error": null,
+          "price": 2
+        },
+        {
+          "note": "Land 160 Acres",
+          "amount": 380,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "2d4ca76d-62c3-4c01-aa6e-73a9713dd241",
+          "error": null,
+          "price": 380
+        },
+        {
+          "note": "Sprinkler Pipe",
+          "amount": 1,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "7e01dae2-579f-4727-864b-ebbfd8b3ebc3",
+          "error": null,
+          "price": 1
+        },
+        {
+          "note": "Pipe Main Line 10in 1/2 Mile",
+          "amount": 1,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "326ec6a5-f5b7-4a94-a681-078ddbf4feab",
+          "error": null,
+          "price": 1
+        },
+        {
+          "note": "Shop 8000 sqft",
+          "amount": 4,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "f5e6f081-9c14-41a4-85b6-4db2ed9d53d8",
+          "error": null,
+          "price": 4
+        },
+        {
+          "note": "Establishment Costs 160 Ac",
+          "amount": 230,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "067db7d6-8c00-4588-b33f-f8d8faea0430",
+          "error": null,
+          "price": 230
+        },
+        {
+          "note": "Equipment",
+          "amount": 131,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "9c2469f5-8948-4336-98e4-2e4d8285b6cc",
+          "error": null,
+          "price": 131
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2016-01-01",
+          "length": "1",
+          "units": "year"
+        },
+        {
+          "date": "2017-01-01",
+          "length": "1",
+          "units": "year"
+        },
+        {
+          "date": "2018-01-01",
+          "length": "1",
+          "units": "year"
+        },
+        {
+          "date": "2019-01-01",
+          "length": "1",
+          "units": "year"
+        }
+      ],
+      "subtotal": 991.454204,
+      "total": 3965.816816
+    },
+    {
+      "name": "insect control",
+      "materials": [
+        {
+          "amount": 0.05,
+          "units": "h",
+          "name": "ATV",
+          "id": "69636fcf-6121-43b4-9d78-5b6479f5a032",
+          "error": null,
+          "price": 1.0995
+        },
+        {
+          "amount": 1.5,
+          "units": "[foz_us]",
+          "name": "Warrior II",
+          "id": "ce025c9c-f790-4565-a466-4ac14ac5b565",
+          "error": null,
+          "price": 7.875
+        },
+        {
+          "amount": 0.05,
+          "units": "h",
+          "name": "ATV",
+          "id": "64c5f366-4ea5-45ca-971c-b8b1efecbee4",
+          "error": null,
+          "price": 1.0995
+        },
+        {
+          "amount": 2,
+          "units": "[foz_us]",
+          "name": "Coragen",
+          "id": "03ae886e-e294-4eed-9b92-ccd0cfbff5c0",
+          "error": null,
+          "price": 20.5
+        },
+        {
+          "amount": 0.05,
+          "units": "h",
+          "name": "ATV",
+          "id": "be6eb720-21b8-484d-8154-10be476c4120",
+          "error": null,
+          "price": 1.0995
+        },
+        {
+          "amount": 3,
+          "units": "[foz_us]",
+          "name": "Belt SC",
+          "id": "828838d6-665a-4f64-97c0-a1f32d3bf2d0",
+          "error": null,
+          "price": 28.200000000000003
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2016-01-01",
+          "length": "9",
+          "units": "month"
+        },
+        {
+          "date": "2017-01-01",
+          "length": "9",
+          "units": "month"
+        },
+        {
+          "date": "2018-01-01",
+          "length": "9",
+          "units": "month"
+        },
+        {
+          "date": "2019-01-01",
+          "length": "9",
+          "units": "month"
+        }
+      ],
+      "subtotal": 59.8735,
+      "total": 239.494
+    },
+    {
+      "name": "weed control",
+      "materials": [
+        {
+          "amount": 0.05,
+          "units": "h",
+          "name": "ATV",
+          "id": "3d020237-675c-4868-82d7-f2f471b8b088",
+          "error": null,
+          "price": 1.0995
+        },
+        {
+          "amount": 4.4,
+          "units": "[pt_us]",
+          "name": "Velpar L",
+          "id": "eaaf031f-052f-454a-897c-eed47724dea6",
+          "error": null,
+          "price": 63.404
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2016-01-01",
+          "length": "9",
+          "units": "month"
+        },
+        {
+          "date": "2017-01-01",
+          "length": "9",
+          "units": "month"
+        },
+        {
+          "date": "2018-01-01",
+          "length": "9",
+          "units": "month"
+        },
+        {
+          "date": "2019-01-01",
+          "length": "9",
+          "units": "month"
+        }
+      ],
+      "subtotal": 64.5035,
+      "total": 258.014
+    },
+    {
+      "name": "fertilize",
+      "materials": [
+        {
+          "amount": 200,
+          "units": "[lb_av]",
+          "name": "11-52-0",
+          "id": "eb2af8a1-f5de-4896-b25a-1fa4c7d0b728",
+          "error": null,
+          "price": 74
+        },
+        {
+          "note": "Fertilizer Materials",
+          "amount": 21,
+          "units": "us$",
+          "name": "Estimate",
+          "id": "c8c4c9b5-cdab-411d-9636-518cf0eff078",
+          "error": null,
+          "price": 21
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "date": "2018-01-01",
+          "length": "9",
+          "units": "month"
+        }
+      ],
+      "subtotal": 95,
+      "total": 95
+    }
+  ],
+  "farm": {
+    "unit": "[acr_us]",
+    "size": "1",
+    "commodity": "ALFALFA",
+    "location": "06113",
+    "farm": "northern_ca"
+  }
+}
