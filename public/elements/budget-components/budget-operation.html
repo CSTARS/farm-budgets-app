@@ -28,6 +28,26 @@
         <h5>
           <budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler>
         </h5>
+<!--
+        <div class="layout horizontal">
+          <div>
+            <div class="radio" style="margin-right: 15px">
+              <label>
+                <input type="radio" id="radioEntireFarm" value="entireFarm" checked on-click="updateUnit">
+                Entire Farm
+              </label>
+            </div>
+          </div>
+          <div>
+            <div class="radio">
+              <label>
+                <input type="radio" id="radioPerAcre" value="perAcre" on-click="updateUnit">
+                Per Acre
+              </label>
+            </div>
+          </div>
+        </div>
+-->
       </div>
       <div class="col-sm-4">
         <table class="padding: 15px">
@@ -104,6 +124,19 @@
     update : function() {
       this.operation = FB.operationController.get(this.operationname);
       this.$.schedule.set(this.operation.schedule, this.operation.name);
+
+/*
+      this.$.radioEntireFarm.setAttribute('name', this.operation.name+'Radio');
+      this.$.radioPerAcre.setAttribute('name', this.operation.name+'Radio');
+
+      if( this.operation.perAcre ) {
+        this.$.radioPerAcre.setAttribute('checked', 'checked');
+        this.$.radioEntireFarm.removeAttribute('checked');
+      } else {
+        this.$.radioEntireFarm.setAttribute('checked', 'checked');
+        this.$.radioPerAcre.removeAttribute('checked');
+      }
+*/
       this.render();
     },
 
@@ -145,6 +178,12 @@
       $(this.$.total).attr('value', this.operation.total);
       $(this.$.subtotal).attr('value', this.operation.subtotal);
       $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
+    },
+
+    updateUnit : function() {
+      this.operation.perAcre = $(this.$.radioPerAcre).is(':checked') ? true : false;
+      FB.operationController.add(this.operation, {replace: true});
+      this.updateTotals();
     },
 
     onMaterialDelete : function(e) {
