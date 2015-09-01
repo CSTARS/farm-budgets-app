@@ -60,26 +60,38 @@
 
     onMaterialsUpdated : function(e) {
 
-      if( e.replaced ) {
+      var all = FB.materialController.get();
+      for( var key in all.materials ) {
+        if( key === e.replaced || key === e.material.name ) {
+          this.updateMaterialPanel(e.material.name, e.replaced);
+          break;
+        }
+      }
 
-        var current = $(this.$.root).find('[material="'+e.replaced +'"]');
-        var div = $(this.createTable(e.material));
-        div.insertAfter(current);
-        current.remove();
-
-      } else {
-
-        var current = $(this.$.root).find('[material="'+e.material.name+'"]');
-        var div = $(this.createTable(e.material));
-        if( current.length == 0 ) {
-          $(this.$.root).append(div);
-        } else {
-          div.insertAfter(current);
-          current.remove();
+      // now check all complex materials
+      for( var key in all.complex ) {
+        if( FB.materialController.contains(all.complex[key], e.material.name, e.replaced) ) {
+          var replaced = null;
+          if( key === e.replaced ) {
+            replaced = e.replaced;
+          }
+          this.updateMaterialPanel(key, replaced);
         }
       }
 
       this.filter();
+    },
+
+    updateMaterialPanel : function(name, replaced) {
+      var current = $(this.$.root).find('[material="'+(replaced || name)+'"]');
+      var div = $(this.createTable(name));
+
+      if( current.length == 0 ) {
+        $(this.$.root).append(div);
+      } else {
+        div.insertAfter(current);
+        current.remove();
+      }
     },
 
     setData : function(data) {
@@ -172,8 +184,13 @@
     },
 
     createTable : function(material) {
+      if( typeof material === 'string' ) {
+        material = FB.materialController.get(material);
+        if( material.error ) return;
+      }
+
       var html =
-        '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
+        '<div class="style-scope budget-section-materials card" material="'+material.name+'" material-table>'+
           '<h5 class="material-name">' +
             '<div class="layout horizontal center">'+
               '<div class="flex">'+
@@ -230,16 +247,17 @@
     },
 
     _updateFromEvent : function(ele) {
-      console.log('updating');
-      var item = {
-        name : ele.find('.material-name').html(),
-        price : parseFloat(ele.find('.material-price').val()),
-        'class' : ele.find('.material-class').html(),
-        units : ele.find('budget-unit-selector')[0].getUnits()
-      };
+      var m = FB.materialController.get(ele.attr('material'));
 
-      FB.materialController.add(item, {replace: true});
-      FB.operationController.recalc();
+      if( m.error ) {
+        return console.log('Error updating material');
+      }
+
+
+      m.price = parseFloat(ele.find('.material-price').val());
+      m.units = ele.find('budget-unit-selector')[0].getUnits();
+
+      FB.materialController.add(m, {replace: true});
     }
   });
 </script>

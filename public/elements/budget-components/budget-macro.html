@@ -115,14 +115,13 @@
       this.data = m;
 
       // first time check for bad units
-      try {
-        FB.ucum.parse(m.units);
-      } catch(e) {
-        console.log('BAD UNITS. nothing done :(');
-        console.log(e);
+      //try {
+      //  FB.ucum.parse(m.units);
+      //} catch(e) {
+      //  console.log('BAD UNITS. nothing done :(');
+      //  console.log(e);
       //  this.$.unitsInput.error = true;
-
-      }
+      //}
 
       this.render(this.renderType);
     },
@@ -181,6 +180,11 @@
 
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
+        if( list[i].error ) {
+          html += this.renderError(list[i]);
+          continue;
+        }
+
         html += '<tr><td>' +
             '<i>'+list[i].path + '</i> '+
             (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
@@ -191,6 +195,11 @@
       }
 
       this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+      $(this.$.main)
+        .find('.btn-create')
+        .on('click', function(){
+          document.querySelector('budget-material-popup').create($(this).attr('material'));
+        });
     },
 
     getPriceLabel : function() {
@@ -205,6 +214,11 @@
 
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
+        if( list[i].error ) {
+          html += this.renderError(list[i]);
+          continue;
+        }
+
         html += '<tr><td>' +
             list[i].count+'x ' +
             (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
@@ -213,12 +227,27 @@
       }
 
       this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+      $(this.$.main)
+        .find('.btn-create')
+        .on('click', function(){
+          document.querySelector('budget-material-popup').create($(this).attr('material'));
+        });
+    },
+
+    renderError : function(err) {
+      return '<tr><td class="text text-danger">'+err.message+'</td><td>'+
+        (err.code === 3 ? '<a class="btn btn-link btn-create" material="'+err.name+'">Create</a>' : '')+
+        '</td></tr>';
     },
 
     getCompressedMaterialList : function(materials, list) {
       for( var material in materials ) {
         var m = FB.materialController.get(material);
-        if( m.error ) continue;
+
+        if( m.error ) {
+          list.push(m);
+          continue;
+        }
 
         var index = this.listMaterialIndex(list, m.name);
         if( index == -1 ) {
@@ -238,7 +267,11 @@
     getTreeMaterialList : function(materials, path, list) {
       for( var material in materials ) {
         var m = FB.materialController.get(material);
-        if( m.error ) continue;
+
+        if( m.error ) {
+          list.push(m);
+          continue;
+        }
 
         var item = $.extend(true, {}, m);
         item.path = path;
@@ -270,33 +303,12 @@
       }
 
       // if the material name is not in our chain, we can quit
-      if( !this.has(e.material.name) ) {
+      if( !FB.materialController.contains(this.data, e.material.name, e.replaced) ) {
         return;
       }
 
       // rerender
       this.render(this.renderType);
-    },
-
-
-    has : function(material) {
-      if( material == this.data.name ) return true;
-      return this._has(material, this.data.materials);
-    },
-
-    _has : function(material, materials) {
-      //if( !scope ) scope = this;
-
-      for( var material in materials ) {
-        var m = FB.materialController.get(material);
-        if( m.error ) continue;
-
-        if( m.name === material ) return true;
-        if( m.type === 'complex' && m.materials ) {
-          return this._has(material, m.materials);
-        }
-      }
-      return false;
     }
   });
 </script>

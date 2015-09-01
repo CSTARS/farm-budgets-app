@@ -163,6 +163,7 @@
     var notesInput;
     if( cols.Notes ) {
       notesInput = $('<input type="text" class="form-control" />');
+      notesInput.on('input', updateNotes);
       cols.Notes.append(notesInput);
     }
 
@@ -176,17 +177,12 @@
     }
 
     function render() {
-      if( config.material.error ) {
-        errorLabel.show();
-        errorLabel.html(config.material.error.message);
-        //return;
-      } else {
-        setErrorStatus();
-      }
+      setErrorStatus();
 
       nameLabel[0].material = config.material.name;
       unitsInput[0].units = config.materialImpl.units
       amountInput.val(config.materialImpl.amount);
+
 
       cols.Price.html(
         (config.material.price ? config.material.price.toFixed(2) : '')+
@@ -206,9 +202,7 @@
       if( !config.materialImpl.error ) {
         errorLabel.hide();
       } else {
-        if( typeof config.materialImpl.error.math == 'object' ) debugger;
-        errorLabel.html(config.materialImpl.error.message+': '+config.materialImpl.error.math+
-          (config.materialImpl.error.debug ? '<br />'+config.materialImpl.error.debug : ''));
+        errorLabel.html(config.materialImpl.message);
         errorLabel.show();
       }
     }
@@ -294,6 +288,10 @@
 
     function setPrice() {
       subtotal[0].value = config.materialImpl.price;
+    }
+
+    function updateNotes() {
+      config.materialImpl.notes = notesInput.val();
     }
 
     render();

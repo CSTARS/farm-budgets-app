@@ -102,7 +102,13 @@
 
       if( !this.data ) return;
 
-      this.$.chart.innerHTML = '';
+      if( this.data.length == 1 ) {
+        this.$.chart.innerHTML = '<i class="fa fa-warning"></i> No Data';
+        return;
+      } else {
+        this.$.chart.innerHTML = '';
+      }
+
 
       var container = this.$.chart;
       var chart = new google.visualization.LineChart(container);

@@ -51,6 +51,10 @@
         arr.push([d.name, d.date, end]);
       }.bind(this));
 
+      if( arr.length == 0 ) {
+        return this.showEmpty();
+      }
+
       dataTable.addRows(arr);
       chart.draw(dataTable);
 
@@ -61,6 +65,10 @@
           console.log(e);
         }
       });
+    },
+
+    showEmpty : function() {
+      this.$.chart.innerHTML = '<i class="fa fa-warning"></i> No Data';
     },
 
     getIntervalTime : function(date) {

@@ -98,6 +98,7 @@
     ready : function() {
       this.firstScheduleEvent = true;
       FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
+      FB.materialController.on('material-update', this.onMaterialUpdate.bind(this));
     },
 
     attached : function() {
@@ -110,6 +111,21 @@
       if( operation.name != this.operation.name ) return;
 
       this.render();
+    },
+
+    onMaterialUpdate : function(e) {
+      if( !this.operation ) return;
+      if( !this.operation.materials ) return;
+
+      for( var i = 0; i < this.operation.materials.length; i++ ) {
+        var m = FB.materialController.get(this.operation.materials[i].name);
+        if( m.error ) continue;
+
+        if( FB.materialController.contains(m, e.material.name, e.replaced) ) {
+          this.render();
+          return;
+        }
+      }
     },
 
     // fire from schedule element

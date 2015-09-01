@@ -6478,7 +6478,7 @@ this.fire('dom-change');
       decimal : {
         type : Boolean,
         observer : 'update',
-        value : false
+        value : true
       }
     },
 
@@ -6658,6 +6658,7 @@ this.fire('dom-change');
     var notesInput;
     if( cols.Notes ) {
       notesInput = $('<input type="text" class="form-control" />');
+      notesInput.on('input', updateNotes);
       cols.Notes.append(notesInput);
     }
 
@@ -6671,17 +6672,12 @@ this.fire('dom-change');
     }
 
     function render() {
-      if( config.material.error ) {
-        errorLabel.show();
-        errorLabel.html(config.material.error.message);
-        //return;
-      } else {
-        setErrorStatus();
-      }
+      setErrorStatus();
 
       nameLabel[0].material = config.material.name;
       unitsInput[0].units = config.materialImpl.units
       amountInput.val(config.materialImpl.amount);
+
 
       cols.Price.html(
         (config.material.price ? config.material.price.toFixed(2) : '')+
@@ -6701,9 +6697,7 @@ this.fire('dom-change');
       if( !config.materialImpl.error ) {
         errorLabel.hide();
       } else {
-        if( typeof config.materialImpl.error.math == 'object' ) debugger;
-        errorLabel.html(config.materialImpl.error.message+': '+config.materialImpl.error.math+
-          (config.materialImpl.error.debug ? '<br />'+config.materialImpl.error.debug : ''));
+        errorLabel.html(config.materialImpl.message);
         errorLabel.show();
       }
     }
@@ -6789,6 +6783,10 @@ this.fire('dom-change');
 
     function setPrice() {
       subtotal[0].value = config.materialImpl.price;
+    }
+
+    function updateNotes() {
+      config.materialImpl.notes = notesInput.val();
     }
 
     render();
@@ -6915,14 +6913,13 @@ this.fire('dom-change');
       this.data = m;
 
       // first time check for bad units
-      try {
-        FB.ucum.parse(m.units);
-      } catch(e) {
-        console.log('BAD UNITS. nothing done :(');
-        console.log(e);
+      //try {
+      //  FB.ucum.parse(m.units);
+      //} catch(e) {
+      //  console.log('BAD UNITS. nothing done :(');
+      //  console.log(e);
       //  this.$.unitsInput.error = true;
-
-      }
+      //}
 
       this.render(this.renderType);
     },
@@ -6981,6 +6978,11 @@ this.fire('dom-change');
 
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
+        if( list[i].error ) {
+          html += this.renderError(list[i]);
+          continue;
+        }
+
         html += '<tr><td>' +
             '<i>'+list[i].path + '</i> '+
             (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
@@ -6991,6 +6993,11 @@ this.fire('dom-change');
       }
 
       this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+      $(this.$.main)
+        .find('.btn-create')
+        .on('click', function(){
+          document.querySelector('budget-material-popup').create($(this).attr('material'));
+        });
     },
 
     getPriceLabel : function() {
@@ -7005,6 +7012,11 @@ this.fire('dom-change');
 
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
+        if( list[i].error ) {
+          html += this.renderError(list[i]);
+          continue;
+        }
+
         html += '<tr><td>' +
             list[i].count+'x ' +
             (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td>' +
@@ -7013,12 +7025,27 @@ this.fire('dom-change');
       }
 
       this.$.main.innerHTML = this.getPriceLabel()+html+'</table>';
+      $(this.$.main)
+        .find('.btn-create')
+        .on('click', function(){
+          document.querySelector('budget-material-popup').create($(this).attr('material'));
+        });
+    },
+
+    renderError : function(err) {
+      return '<tr><td class="text text-danger">'+err.message+'</td><td>'+
+        (err.code === 3 ? '<a class="btn btn-link btn-create" material="'+err.name+'">Create</a>' : '')+
+        '</td></tr>';
     },
 
     getCompressedMaterialList : function(materials, list) {
       for( var material in materials ) {
         var m = FB.materialController.get(material);
-        if( m.error ) continue;
+
+        if( m.error ) {
+          list.push(m);
+          continue;
+        }
 
         var index = this.listMaterialIndex(list, m.name);
         if( index == -1 ) {
@@ -7038,7 +7065,11 @@ this.fire('dom-change');
     getTreeMaterialList : function(materials, path, list) {
       for( var material in materials ) {
         var m = FB.materialController.get(material);
-        if( m.error ) continue;
+
+        if( m.error ) {
+          list.push(m);
+          continue;
+        }
 
         var item = $.extend(true, {}, m);
         item.path = path;
@@ -7070,33 +7101,12 @@ this.fire('dom-change');
       }
 
       // if the material name is not in our chain, we can quit
-      if( !this.has(e.material.name) ) {
+      if( !FB.materialController.contains(this.data, e.material.name, e.replaced) ) {
         return;
       }
 
       // rerender
       this.render(this.renderType);
-    },
-
-
-    has : function(material) {
-      if( material == this.data.name ) return true;
-      return this._has(material, this.data.materials);
-    },
-
-    _has : function(material, materials) {
-      //if( !scope ) scope = this;
-
-      for( var material in materials ) {
-        var m = FB.materialController.get(material);
-        if( m.error ) continue;
-
-        if( m.name === material ) return true;
-        if( m.type === 'complex' && m.materials ) {
-          return this._has(material, m.materials);
-        }
-      }
-      return false;
     }
   });
 </script>
@@ -7437,7 +7447,7 @@ this.fire('dom-change');
                     </div>
 
                     <div>
-                      <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
+                      <a class="btn btn-link" index$="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
                     </div>
                   </div> 
 
@@ -7567,6 +7577,10 @@ this.fire('dom-change');
         var end = new Date(d.date.getTime()+this.getIntervalTime(d));
         arr.push([this.operationName, d.date, end]);
       }.bind(this));
+
+      if( arr.length == 0 ) {
+        return container.innerHTML = '<div class="alert alert-warning">This operation is not scheduled.</div>';
+      }
 
       dataTable.addRows(arr);
       chart.draw(dataTable);
@@ -7722,6 +7736,7 @@ this.fire('dom-change');
     ready : function() {
       this.firstScheduleEvent = true;
       FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
+      FB.materialController.on('material-update', this.onMaterialUpdate.bind(this));
     },
 
     attached : function() {
@@ -7734,6 +7749,21 @@ this.fire('dom-change');
       if( operation.name != this.operation.name ) return;
 
       this.render();
+    },
+
+    onMaterialUpdate : function(e) {
+      if( !this.operation ) return;
+      if( !this.operation.materials ) return;
+
+      for( var i = 0; i < this.operation.materials.length; i++ ) {
+        var m = FB.materialController.get(this.operation.materials[i].name);
+        if( m.error ) continue;
+
+        if( FB.materialController.contains(m, e.material.name, e.replaced) ) {
+          this.render();
+          return;
+        }
+      }
     },
 
     // fire from schedule element
@@ -7984,11 +8014,21 @@ this.fire('dom-change');
     showError : function(err) {
       if( !err ) {
         this.$.error.style.display = 'none';
+        this.$.label.style.display = 'block';
         return;
       }
 
       this.$.error.style.display = 'block';
+      this.$.label.style.display = 'none';
       this.$.error.innerHTML = err.message;
+
+      if( err.code === 3 ) {
+        var a = $('<a class="btn btn-link">Create</a>');
+        a.on('click', function(){
+          document.querySelector('budget-material-popup').create(err.name);
+        });
+        $(this.$.error).append(a);
+      }
     },
 
     toggle : function() {
@@ -8046,7 +8086,7 @@ this.fire('dom-change');
       <h4><i class="fa fa-calendar-o"></i> Operation Timeline</h4>
       <budget-timeline id="timeline"></budget-timeline>
 
-      <h4>Spending Timeline</h4>
+      <h4><i class="fa fa-line-chart"></i> Spending Timeline</h4>
       <budget-spending-timeline id="spendingTimeline"></budget-spending-timeline>
     </div>
 
@@ -8197,6 +8237,7 @@ this.fire('dom-change');
     },
 
     onOperationsUpdated : function(e) {
+
       if( e.replaced ) {
 
         var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
@@ -8211,6 +8252,8 @@ this.fire('dom-change');
         if( current.length == 0 ) {
           var div = $(this.createPanel(e.operation, e.isNew));
           $(this.$.root).append(div);
+        } else {
+          current[0].update();
         }
       }
 
@@ -8322,6 +8365,17 @@ this.fire('dom-change');
             this.showCreate();
             this.$.newNameInput.value = txt;
           }.bind(this));
+      } else if( opEles.length == 0 ) {
+
+        this.$.searchMsg.innerHTML = '<div class="alert alert-warning">Currently there are no operations. '+
+        '<a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
+
+        $(this.$.searchMsg)
+          .find('a')
+          .on('click', function() {
+            this.showCreate();
+          }.bind(this));
+
       } else {
         this.$.searchMsg.innerHTML = '';
       }
@@ -8399,26 +8453,38 @@ this.fire('dom-change');
 
     onMaterialsUpdated : function(e) {
 
-      if( e.replaced ) {
+      var all = FB.materialController.get();
+      for( var key in all.materials ) {
+        if( key === e.replaced || key === e.material.name ) {
+          this.updateMaterialPanel(e.material.name, e.replaced);
+          break;
+        }
+      }
 
-        var current = $(this.$.root).find('[material="'+e.replaced +'"]');
-        var div = $(this.createTable(e.material));
-        div.insertAfter(current);
-        current.remove();
-
-      } else {
-
-        var current = $(this.$.root).find('[material="'+e.material.name+'"]');
-        var div = $(this.createTable(e.material));
-        if( current.length == 0 ) {
-          $(this.$.root).append(div);
-        } else {
-          div.insertAfter(current);
-          current.remove();
+      // now check all complex materials
+      for( var key in all.complex ) {
+        if( FB.materialController.contains(all.complex[key], e.material.name, e.replaced) ) {
+          var replaced = null;
+          if( key === e.replaced ) {
+            replaced = e.replaced;
+          }
+          this.updateMaterialPanel(key, replaced);
         }
       }
 
       this.filter();
+    },
+
+    updateMaterialPanel : function(name, replaced) {
+      var current = $(this.$.root).find('[material="'+(replaced || name)+'"]');
+      var div = $(this.createTable(name));
+
+      if( current.length == 0 ) {
+        $(this.$.root).append(div);
+      } else {
+        div.insertAfter(current);
+        current.remove();
+      }
     },
 
     setData : function(data) {
@@ -8511,8 +8577,13 @@ this.fire('dom-change');
     },
 
     createTable : function(material) {
+      if( typeof material === 'string' ) {
+        material = FB.materialController.get(material);
+        if( material.error ) return;
+      }
+
       var html =
-        '<div class="style-scope budget-section-materials card" material="'+material.name+'">'+
+        '<div class="style-scope budget-section-materials card" material="'+material.name+'" material-table>'+
           '<h5 class="material-name">' +
             '<div class="layout horizontal center">'+
               '<div class="flex">'+
@@ -8569,16 +8640,17 @@ this.fire('dom-change');
     },
 
     _updateFromEvent : function(ele) {
-      console.log('updating');
-      var item = {
-        name : ele.find('.material-name').html(),
-        price : parseFloat(ele.find('.material-price').val()),
-        'class' : ele.find('.material-class').html(),
-        units : ele.find('budget-unit-selector')[0].getUnits()
-      };
+      var m = FB.materialController.get(ele.attr('material'));
 
-      FB.materialController.add(item, {replace: true});
-      FB.operationController.recalc();
+      if( m.error ) {
+        return console.log('Error updating material');
+      }
+
+
+      m.price = parseFloat(ele.find('.material-price').val());
+      m.units = ele.find('budget-unit-selector')[0].getUnits();
+
+      FB.materialController.add(m, {replace: true});
     }
   });
 </script>
@@ -8838,6 +8910,10 @@ this.fire('dom-change');
         arr.push([d.name, d.date, end]);
       }.bind(this));
 
+      if( arr.length == 0 ) {
+        return this.showEmpty();
+      }
+
       dataTable.addRows(arr);
       chart.draw(dataTable);
 
@@ -8848,6 +8924,10 @@ this.fire('dom-change');
           console.log(e);
         }
       });
+    },
+
+    showEmpty : function() {
+      this.$.chart.innerHTML = '<i class="fa fa-warning"></i> No Data';
     },
 
     getIntervalTime : function(date) {
@@ -8968,7 +9048,13 @@ this.fire('dom-change');
 
       if( !this.data ) return;
 
-      this.$.chart.innerHTML = '';
+      if( this.data.length == 1 ) {
+        this.$.chart.innerHTML = '<i class="fa fa-warning"></i> No Data';
+        return;
+      } else {
+        this.$.chart.innerHTML = '';
+      }
+
 
       var container = this.$.chart;
       var chart = new google.visualization.LineChart(container);
@@ -9241,6 +9327,14 @@ this.fire('dom-change');
     },
 
     edit : function(material) {
+      if( this.showing ) {
+        if( confirm('Do you want to save your changes before editing new material?') ) {
+          this.save(true);
+        } else {
+          return;
+        }
+      }
+
       this.action = 'edit';
       this.$.title.innerHTML = '<i class="fa fa-pencil"></i> Edit Material';
 
@@ -9299,6 +9393,14 @@ this.fire('dom-change');
     },
 
     create : function(name) {
+      if( this.showing ) {
+        if( confirm('Do you want to save your changes before creating new material?') ) {
+          this.save(true);
+        } else {
+          return;
+        }
+      }
+
       this.data = {
         type : 'simple',
         name : name || '',
@@ -9377,7 +9479,7 @@ this.fire('dom-change');
     //  return this.data.name+'--Base Price';
     //},
 
-    save : function() {
+    save : function(noHide) {
       if( this.data.name == '' ) {
         this.$.nameInputMessage.innerHTML = 'A material name is required';
         return;
@@ -9401,7 +9503,6 @@ this.fire('dom-change');
         }
       }
 
-      console.log(this.data);
       var result = FB.materialController.add(this.data, options);
 
       if( result.error ) {
@@ -9420,7 +9521,7 @@ this.fire('dom-change');
       }
       FB.materialController.bulkAdd(materials, {replace: true});
 
-      this.hide();
+      if( !noHide ) this.hide();
     },
 
     delete : function() {

@@ -71,6 +71,7 @@
     },
 
     onOperationsUpdated : function(e) {
+
       if( e.replaced ) {
 
         var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
@@ -85,6 +86,8 @@
         if( current.length == 0 ) {
           var div = $(this.createPanel(e.operation, e.isNew));
           $(this.$.root).append(div);
+        } else {
+          current[0].update();
         }
       }
 
@@ -196,6 +199,17 @@
             this.showCreate();
             this.$.newNameInput.value = txt;
           }.bind(this));
+      } else if( opEles.length == 0 ) {
+
+        this.$.searchMsg.innerHTML = '<div class="alert alert-warning">Currently there are no operations. '+
+        '<a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
+
+        $(this.$.searchMsg)
+          .find('a')
+          .on('click', function() {
+            this.showCreate();
+          }.bind(this));
+
       } else {
         this.$.searchMsg.innerHTML = '';
       }

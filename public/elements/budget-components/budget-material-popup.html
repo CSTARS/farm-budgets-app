@@ -236,6 +236,14 @@
     },
 
     edit : function(material) {
+      if( this.showing ) {
+        if( confirm('Do you want to save your changes before editing new material?') ) {
+          this.save(true);
+        } else {
+          return;
+        }
+      }
+
       this.action = 'edit';
       this.$.title.innerHTML = '<i class="fa fa-pencil"></i> Edit Material';
 
@@ -294,6 +302,14 @@
     },
 
     create : function(name) {
+      if( this.showing ) {
+        if( confirm('Do you want to save your changes before creating new material?') ) {
+          this.save(true);
+        } else {
+          return;
+        }
+      }
+
       this.data = {
         type : 'simple',
         name : name || '',
@@ -372,7 +388,7 @@
     //  return this.data.name+'--Base Price';
     //},
 
-    save : function() {
+    save : function(noHide) {
       if( this.data.name == '' ) {
         this.$.nameInputMessage.innerHTML = 'A material name is required';
         return;
@@ -396,7 +412,6 @@
         }
       }
 
-      console.log(this.data);
       var result = FB.materialController.add(this.data, options);
 
       if( result.error ) {
@@ -415,7 +430,7 @@
       }
       FB.materialController.bulkAdd(materials, {replace: true});
 
-      this.hide();
+      if( !noHide ) this.hide();
     },
 
     delete : function() {

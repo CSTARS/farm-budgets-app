@@ -62,7 +62,7 @@
                     </div>
 
                     <div>
-                      <a class="btn btn-link" index="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
+                      <a class="btn btn-link" index$="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
                     </div>
                   </div> <!-- end inline form -->
 
@@ -192,6 +192,10 @@
         var end = new Date(d.date.getTime()+this.getIntervalTime(d));
         arr.push([this.operationName, d.date, end]);
       }.bind(this));
+
+      if( arr.length == 0 ) {
+        return container.innerHTML = '<div class="alert alert-warning">This operation is not scheduled.</div>';
+      }
 
       dataTable.addRows(arr);
       chart.draw(dataTable);
