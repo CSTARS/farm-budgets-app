@@ -31,9 +31,9 @@
       if( e ) this.data = e;
       if( !this.data ) return;
 
-      this.$.totalLabel.value = this.data.total;
+      this.$.totalLabel.value = this.data.total / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
 
-      this.$.completeTotalLabel.value = this.data.total * ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+      this.$.completeTotalLabel.value = this.data.total;
 
       if( this.data.range.start !== null && this.data.range.stop !== null ) {
         var diff =  this.data.range.stop.getTime() - this.data.range.start.getTime();
@@ -43,8 +43,8 @@
         var months = Math.ceil(days / 30);
         this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
 
-        this.$.average.value = this.data.total / months;
-        this.$.averageYear.value = (this.data.total / months) * 12;
+        this.$.average.value = this.data.total / months / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+        this.$.averageYear.value = (this.data.total / (months / 12 )) / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
       } else {
         this.$.durationText.innerHTML = 'Unknown';
       }
