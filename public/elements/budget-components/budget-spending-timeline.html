@@ -124,29 +124,35 @@
 
       if( this.data.length == 1 ) {
         this.$.chart.innerHTML = '<i class="fa fa-warning"></i> No Data';
+        this.chart = null;
         return;
-      } else {
-        this.$.chart.innerHTML = '';
       }
 
 
-      var container = this.$.chart;
-      var chart = new google.visualization.LineChart(container);
+      if( !this.chart ) {
+        this.$.chart.innerHTML = '';
+        var container = this.$.chart;
+
+        this.chart = new google.visualization.LineChart(container);
+        google.visualization.events.addListener(this.chart, 'select', function(){
+          var selection = chart.getSelection()[0];
+          this.show(selection.row);
+        }.bind(this));
+      }
+
       var dataTable = google.visualization.arrayToDataTable(this.data);
 
-      chart.draw(dataTable, {
+      this.chart.draw(dataTable, {
         vAxis : {
           logScale : true
-          //viewWindow : {
-          //  min : 100
-          //}
-        }
+        },
+        animation:{
+          duration: 800,
+          easing: 'out',
+        },
       });
 
-      google.visualization.events.addListener(chart, 'select', function(){
-        var selection = chart.getSelection()[0];
-        this.show(selection.row);
-      }.bind(this));
+
     },
 
     show : function(row) {
