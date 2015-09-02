@@ -209,7 +209,7 @@
             '<tr>' +
               '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
               (material.type == 'complex' || material.fixed ?
-                '<td class="material-price">'+(material.price || '0')+' </td>' :
+                '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
                 '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
               ) +
               '<td>'+
