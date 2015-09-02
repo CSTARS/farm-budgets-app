@@ -6472,13 +6472,19 @@ this.fire('dom-change');
     properties : {
       value : {
         type : String,
-        observer : 'update',
-        value : '0'
+        observer : 'update'
       },
       decimal : {
         type : Boolean,
-        observer : 'update',
         value : true
+      },
+      first : {
+        type : Boolean,
+        value : true
+      },
+      timer : {
+        type : Number,
+        value : -1
       }
     },
 
@@ -6487,7 +6493,34 @@ this.fire('dom-change');
     },
 
     update : function() {
-      //if( typeof this.value !== 'string' ) this.value = this.value+'';
+      if( this.first ) {
+        this._update();
+        this.first = false;
+        return;
+      }
+
+      this.className = 'animated zoomOut';
+      if( this.timer != -1 ) clearTimeout(this.timer);
+
+      this.timer = setTimeout(function(){
+        this.timer = -1;
+
+        this._update();
+        this.style.visibility = 'hidden';
+        this.className = 'animated zoomIn'
+
+        setTimeout(function(){
+          this.style.visibility = 'visible';
+        }.bind(this), 25);
+
+        setTimeout(function(){
+          $(this).removeClass('zoomIn');
+        }.bind(this), 1000);
+
+      }.bind(this), 500);
+    },
+
+    _update : function() {
       var val = ''+parseFloat(this.value).toFixed(this.decimal ? 2 : 0);
       this.innerHTML = '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
@@ -8659,10 +8692,17 @@ this.fire('dom-change');
     .section {
       display : none;
     }
+    .nav > li {
+      display: table-cell;
+      width: 1%;
+    }
+    .nav > li > a {
+      border-radius: 0;
+    }
   </style>
 
   <template>
-    <ul class="nav nav-pills nav-justified" id="tabs">
+    <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
         <a href="#budget/overview"><i class="fa fa-dashboard"></i> Overview</a>
       </li>
@@ -8833,20 +8873,17 @@ this.fire('dom-change');
       if( e ) this.data = e;
       if( !this.data ) return;
 
-      this.$.totalLabel.value = this.data.total;
+      this.$.totalLabel.value = this.data.total / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
 
-      this.$.completeTotalLabel.value = this.data.total * ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+      this.$.completeTotalLabel.value = this.data.total;
 
       if( this.data.range.start !== null && this.data.range.stop !== null ) {
-        var diff =  this.data.range.stop.getTime() - this.data.range.start.getTime();
-        if( diff < 86400000 * 30 ) diff = 86400000 * 30;
-
-        var days = diff / 86400000;
-        var months = Math.ceil(days / 30);
+        var months = this.data.spendingByMonth.length;
+        
         this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
 
-        this.$.average.value = this.data.total / months;
-        this.$.averageYear.value = (this.data.total / months) * 12;
+        this.$.average.value = this.data.total / months / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+        this.$.averageYear.value = (this.data.total / (months / 12 )) / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
       } else {
         this.$.durationText.innerHTML = 'Unknown';
       }

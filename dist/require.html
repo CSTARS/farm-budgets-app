@@ -7347,13 +7347,19 @@ Any number of components can use `<google-maps-api>` elements, and the library w
     properties : {
       value : {
         type : String,
-        observer : 'update',
-        value : '0'
+        observer : 'update'
       },
       decimal : {
         type : Boolean,
-        observer : 'update',
         value : true
+      },
+      first : {
+        type : Boolean,
+        value : true
+      },
+      timer : {
+        type : Number,
+        value : -1
       }
     },
 
@@ -7362,7 +7368,34 @@ Any number of components can use `<google-maps-api>` elements, and the library w
     },
 
     update : function() {
-      //if( typeof this.value !== 'string' ) this.value = this.value+'';
+      if( this.first ) {
+        this._update();
+        this.first = false;
+        return;
+      }
+
+      this.className = 'animated zoomOut';
+      if( this.timer != -1 ) clearTimeout(this.timer);
+
+      this.timer = setTimeout(function(){
+        this.timer = -1;
+
+        this._update();
+        this.style.visibility = 'hidden';
+        this.className = 'animated zoomIn'
+
+        setTimeout(function(){
+          this.style.visibility = 'visible';
+        }.bind(this), 25);
+
+        setTimeout(function(){
+          $(this).removeClass('zoomIn');
+        }.bind(this), 1000);
+
+      }.bind(this), 500);
+    },
+
+    _update : function() {
       var val = ''+parseFloat(this.value).toFixed(this.decimal ? 2 : 0);
       this.innerHTML = '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
