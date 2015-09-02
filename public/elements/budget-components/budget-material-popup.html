@@ -46,6 +46,8 @@
                       <budget-unit-selector id="unitsInput" on-units-change="editUnits" block></budget-unit-selector>
                     </div>
                   </div>
+
+                  <div id="unitsInputMsg"></div>
                 </div>
               </div>
 
@@ -267,17 +269,16 @@
       }
 
       this.$.descriptionInput.value = this.data.description || '';
+      this.$.unitsInputMsg.innerHTML = '';
 
       if( this.data.type == 'complex' ) {
         this.setComplex(true);
         this.$.unitsInput.setUnits(this.data.units);
 
-        // JM - BASEPRICE
-        //if( this.data.materials[this.getBasePriceName()] ) {
-        //  this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
-        //} else {
         this.$.priceInput.value = '';
-        //}
+
+        // keep track of what we assume the amounts for this material are expecting
+        this.materialUnits = this.data.units;
 
         // snapshot all definitions of unique materials
         for( var key in this.data.materials ) {
@@ -331,8 +332,6 @@
         }
       }
 
-
-
       this.data = {
         type : 'simple',
         name : name || '',
@@ -347,6 +346,7 @@
 
       this.$.nameInput.value = name || '';
       this.$.unitsInput.setUnits('');
+      this.$.unitsInputMsg.innerHTML = '';
       this.$.priceInput.value = '';
       this.$.descriptionInput.value = '';
       this.$.classInput.setValue('other');
@@ -378,6 +378,9 @@
 
 
     setComplex : function(isComplex) {
+      // regarless, dismiss the units exhange message
+      this.$.unitsInputMsg.innerHTML = '';
+
       if( isComplex ) {
         this.$.isComplexInput.setAttribute('checked', 'checked');
         this.$.isComplexInput.checked = true;
@@ -643,36 +646,7 @@
       var val = parseFloat(val);
       if( isNaN(val) ) return;
 
-      /* BASEPRICE
-      if( this.data.type == 'complex' ) {
-        var material = FB.materialController.get(this.getBasePriceName());
-
-        if( material.error ) {
-          FB.materialController.add({
-            name : this.getBasePriceName(),
-            units : FB.units.invert(this.data.units),
-            price : val
-          });
-        } else {
-          material.price = val;
-        }
-
-        // verify
-        var name = this.getBasePriceName();
-        if( this.data.materials[name] ) {
-          this.data.materials[name].amount = 1;
-        } else {
-          this.data.materials[name] = {
-            amount : 1,
-            units : this.data.units,
-            name : name
-          }
-        }
-
-      } else { */
       this.data.price = val;
-      //}
-
 
       this.recalc();
     },
@@ -764,32 +738,62 @@
     _editUnits : function(e) {
       if( e.detail.error ) return;
 
-
-
       if( this.data.type == 'complex' ) {
-        var oldUnits = this.data.units;
+        //var oldUnits = this.data.units;
         var newUnits = e.detail.value;
 
-        this.$.materialTable.updateAmountFromUnits(oldUnits, newUnits);
+        this.handleAmountUnitChange(newUnits)
 
         this.data.units = newUnits;
-
-        /* BASEPRICE
-        var m = FB.materialController.get(this.getBasePriceName());
-        m.units = FB.units.invert(this.data.units);
-
-        var name = this.getBasePriceName();
-
-        if( this.data.materials[name] ) {
-          this.data.materials[name].units = this.data.units;
-          this.data.materials[name].amount = 1; // verify
-        }*/
       } else {
+        this.$.unitsInputMsg.innerHTML = '';
         this.data.units = FB.units.invert(e.detail.value);
       }
 
       this.recalc();
     },
+
+    handleAmountUnitChange : function(newUnits) {
+      if( !this.materialUnits || this.materialUnits == newUnits || Object.keys(this.data.materials).length == 0 ) {
+        this.$.unitsInputMsg.innerHTML = '';
+        return;
+      }
+
+      // prompt for update of child material amounts
+      var prompt = $(
+        '<div class="alert alert-dismissable alert-warning" style="margin-top: 5px">'+
+          '<button type="button" class="close">×</button>'+
+          '<h4>Question!</h4>'+
+          '<p>You have updated your materials units from <b>'+this.materialUnits+'</b> to <b>'+newUnits+'</b>. '+
+          'You should probably convert the amounts of each required material to match the unit change.</p>'+
+          '<div class="layout horizontal" style="margin-top: 5px">'+
+            '<div class="flex">'+
+              '<button class="btn btn-default" convert>Convert '+this.materialUnits+'<i class="fa fa-long-arrow-right"></i>'+newUnits+'</button>'+
+            '</div><div>'+
+              '<button class="btn btn-warning" close>Ignore</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>'
+      );
+      $(this.$.unitsInputMsg).html('').append(prompt);
+
+      prompt
+        .find('[convert]')
+        .on('click', function(){
+          this.$.materialTable.updateAmountFromUnits(this.materialUnits, newUnits);
+          this.materialUnits = newUnits;
+          this.$.unitsInputMsg.innerHTML = '';
+        }.bind(this));
+
+      prompt
+        .find('.close, [close]')
+        .on('click', function(){
+          this.materialUnits = newUnits;
+          this.$.unitsInputMsg.innerHTML = '';
+        }.bind(this));
+    },
+
+
     /**
      * End main input control Fn's
      */
