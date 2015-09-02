@@ -239,24 +239,48 @@
     },
 
     recreateInput : function() {
-      var input = $('<input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>');
+      var input = $('<div class="layout horizontal center">'+
+        '<div class="flex" style="padding-right: 15px">'+
+          '<input id="datesInput" class="form-control" placeholder="New Date (mm/dd/yyyy)"/>'+
+        '</div>'+
+        '<div><a class="btn btn-primary" disabled><i class="fa fa-calendar-plus-o"></i></a></div>'+
+      '</div>');
       $(this.$.inputRoot).html('').append(input);
 
+      var cDate = null;
+      var btn = input.find('a');
+
       input
+        .find('input')
         .datepicker({
           format: 'mm/dd/yyyy',
           orientation : 'top auto'
         })
         .on('changeDate', function(e){
-          console.log(e);
+          var date = e.date;
+          if( date.getFullYear() < 1900 || date.getFullYear() > 2200 ) {
+            cDate = null;
+            btn.attr('disabled', 'disabled');
+            return;
+          }
+
+          btn.removeAttr('disabled');
+          cDate = date;
+        }.bind(this));
+
+      btn
+        .on('click', function(){
+          if( cDate == null ) return;
+
           this.dates.push({
-            date : e.date,
+            date : cDate,
             length : 1,
             units : 'month'
           });
           this.update();
           $(this.$.datesInput).datepicker('hide');
         }.bind(this));
+
     },
 
     toggle : function() {
