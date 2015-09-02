@@ -6616,9 +6616,34 @@ this.fire('dom-change');
     },
 
     updateAmountFromUnits : function(from, to) {
-      for( var i = 0; i < this.controllers.length; i++ ) {
-        this.controllers[i].updateAmountFromUnits(from, to);
+      var value;
+      try {
+        var str = '('+FB.units.math.cleanDollars(to)+')/('+
+                  FB.units.math.cleanDollars(from) + ')';
+        var message = FB.units.math.cleanDollars(from) + ' to ' + FB.units.math.cleanDollars(to);
+
+        value = FB.ucum.canonicalize(str);
+
+        if( Object.keys(value.units).length != 0 ) {
+          return {
+            error : true,
+            message : 'Unable to convert: '+message,
+            math : str
+          }
+        }
+      } catch(e) {
+        return {
+          error : true,
+          message : 'Unable to convert: '+message,
+          math : str
+        }
       }
+
+      for( var i = 0; i < this.controllers.length; i++ ) {
+        this.controllers[i].updateAmountFromUnits(value.value);
+      }
+
+      return null;
     },
 
     initTable : function(rows) {
@@ -6735,29 +6760,9 @@ this.fire('dom-change');
       }
     }
 
-    function updateAmountFromUnits(from, to) {
-      try {
-        /*var str = '('+FB.units.math.cleanDollars(config.materialImpl.units)+').('+
-                  FB.units.math.cleanDollars(to) + ').(' +
-                  FB.units.math.cleanDollars(config.material.units)+')';*/
-        var str = '('+FB.units.math.cleanDollars(to)+')/('+
-                  FB.units.math.cleanDollars(from) + ')';
-
-        var value = FB.ucum.canonicalize(str);
-        config.materialImpl.amount = value.value * config.materialImpl.amount;
-
-        amountInput.val(config.materialImpl.amount);
-
-        config.materialImpl.error = null;
-      } catch(e) {
-        config.materialImpl.error = {
-          error : true,
-          message : 'Unable to convert',
-          math : str
-        }
-      }
-
-      setErrorStatus();
+    function updateAmountFromUnits(value) {
+      config.materialImpl.amount = value * config.materialImpl.amount;
+      amountInput.val(config.materialImpl.amount);
     }
 
     function fireUnitsChange(e) {
@@ -9961,7 +9966,11 @@ this.fire('dom-change');
       prompt
         .find('[convert]')
         .on('click', function(){
-          this.$.materialTable.updateAmountFromUnits(this.materialUnits, newUnits);
+          var error = this.$.materialTable.updateAmountFromUnits(this.materialUnits, newUnits);
+          if( error ) {
+            return alert(error.message);
+          }
+
           this.materialUnits = newUnits;
           this.$.unitsInputMsg.innerHTML = '';
         }.bind(this));

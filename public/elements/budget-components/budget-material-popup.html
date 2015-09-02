@@ -780,7 +780,11 @@
       prompt
         .find('[convert]')
         .on('click', function(){
-          this.$.materialTable.updateAmountFromUnits(this.materialUnits, newUnits);
+          var error = this.$.materialTable.updateAmountFromUnits(this.materialUnits, newUnits);
+          if( error ) {
+            return alert(error.message);
+          }
+
           this.materialUnits = newUnits;
           this.$.unitsInputMsg.innerHTML = '';
         }.bind(this));
