@@ -2388,7 +2388,7 @@
   ],
   "farm": {
     "unit": "[acr_us]",
-    "size": "100",
+    "size": "1",
     "commodity": "Alfalfa",
     "location": "Northern California",
     "farm": "generic"

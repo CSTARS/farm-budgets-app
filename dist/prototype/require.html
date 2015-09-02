@@ -8879,11 +8879,14 @@ this.fire('dom-change');
 
       if( this.data.range.start !== null && this.data.range.stop !== null ) {
         var months = this.data.spendingByMonth.length;
-        
+
         this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
 
         this.$.average.value = this.data.total / months / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
-        this.$.averageYear.value = (this.data.total / (months / 12 )) / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
+
+        var years = months / 12;
+        if( years < 1 ) years = 1;
+        this.$.averageYear.value = (this.data.total / years) / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
       } else {
         this.$.durationText.innerHTML = 'Unknown';
       }
