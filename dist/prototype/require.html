@@ -6617,30 +6617,20 @@ this.fire('dom-change');
 
     updateAmountFromUnits : function(from, to) {
       var value;
+
       try {
-        var str = '('+FB.units.math.cleanDollars(to)+')/('+
-                  FB.units.math.cleanDollars(from) + ')';
-        var message = FB.units.math.cleanDollars(from) + ' to ' + FB.units.math.cleanDollars(to);
-
-        value = FB.ucum.canonicalize(str);
-
-        if( Object.keys(value.units).length != 0 ) {
-          return {
-            error : true,
-            message : 'Unable to convert: '+message,
-            math : str
-          }
-        }
+        value = FB.ucum.convert(1, FB.units.math.cleanDollars(from), FB.units.math.cleanDollars(to));
+        if( value == 0 ) value = 1;
+        value = 1 / value;
       } catch(e) {
         return {
           error : true,
-          message : 'Unable to convert: '+message,
-          math : str
+          message : e,
         }
       }
 
       for( var i = 0; i < this.controllers.length; i++ ) {
-        this.controllers[i].updateAmountFromUnits(value.value);
+        this.controllers[i].updateAmountFromUnits(value);
       }
 
       return null;
