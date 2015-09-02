@@ -7,10 +7,17 @@
     .section {
       display : none;
     }
+    .nav > li {
+      display: table-cell;
+      width: 1%;
+    }
+    .nav > li > a {
+      border-radius: 0;
+    }
   </style>
 
   <template>
-    <ul class="nav nav-pills nav-justified" id="tabs">
+    <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
         <a href="#budget/overview"><i class="fa fa-dashboard"></i> Overview</a>
       </li>

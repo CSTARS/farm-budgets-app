@@ -5,20 +5,24 @@
     properties : {
       value : {
         type : String,
-        observer : 'update',
-        value : '0'
+        observer : 'update'
       },
       decimal : {
         type : Boolean,
-        observer : 'update',
         value : true
+      },
+      first : {
+        type : Boolean,
+        value : true
+      },
+      timer : {
+        type : Number,
+        value : -1
       }
     },
 
     ready : function() {
-      this.first = true;
       this.style.color = '#5cb85c';
-      this.timer = -1;
     },
 
     update : function() {
