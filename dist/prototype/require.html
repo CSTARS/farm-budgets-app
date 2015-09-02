@@ -8653,15 +8653,16 @@ this.fire('dom-change');
             '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
             '<tr>' +
               '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
-              (material.type == 'complex' || material.fixed ?
-                '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
-                '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
-              ) +
-              '<td>'+
-                (material.fixed ?
-                  (material.units || '') :
-                  '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
-                )+
+              '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' +
+              //(material.type == 'complex' || material.fixed ?
+              //  '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
+              //  '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
+              //) +
+              '<td>'+material.units+
+              //  (material.fixed ?
+              //    (material.units || '') :
+              //    '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
+              //  )+
               '</td>' +
             '</tr>' +
           '</table>' +
