@@ -235,7 +235,15 @@
       this.hide();
     },
 
-    edit : function(material) {
+    edit : function(material, creatingUniqueName) {
+      if( this.showing && this.data.name != material.name ) {
+        if( confirm('Do you want to save your changes before editing new material?') ) {
+          this.save(true);
+        } else {
+          return;
+        }
+      }
+
       this.action = 'edit';
       this.$.title.innerHTML = '<i class="fa fa-pencil"></i> Edit Material';
 
@@ -288,12 +296,43 @@
         }
       }
 
+      if( creatingUniqueName ) {
+        this.$.uniqueNameInput.value = creatingUniqueName;
+        $(this.$.createUniquePanel).show();
+      }
+
       this.recalc();
 
       this.show();
     },
 
     create : function(name) {
+      var root = '';
+      if( name && name.indexOf('--') > -1 ) {
+        root = name.split('--')[0];
+      }
+
+
+      if( this.showing && !(this.action == 'edit' && this.data.name == root) ) {
+        if( confirm('Do you want to save your changes before creating new material?') ) {
+          this.save(true);
+        } else {
+          return;
+        }
+      }
+
+      // see if we actually are trying to create a unique child
+      if( root ) {
+        var parts = name.split('--');
+        var m = FB.materialController.get(parts[0]);
+        if( m.type == 'complex' ) {
+          this.edit(m, parts[1]);
+          return;
+        }
+      }
+
+
+
       this.data = {
         type : 'simple',
         name : name || '',
@@ -372,7 +411,7 @@
     //  return this.data.name+'--Base Price';
     //},
 
-    save : function() {
+    save : function(noHide) {
       if( this.data.name == '' ) {
         this.$.nameInputMessage.innerHTML = 'A material name is required';
         return;
@@ -396,7 +435,6 @@
         }
       }
 
-      console.log(this.data);
       var result = FB.materialController.add(this.data, options);
 
       if( result.error ) {
@@ -415,7 +453,7 @@
       }
       FB.materialController.bulkAdd(materials, {replace: true});
 
-      this.hide();
+      if( typeof noHide !== 'boolean' || !noHide ) this.hide();
     },
 
     delete : function() {
@@ -782,12 +820,6 @@
       // we are almost good to go
       // update name
       data.name = this.data.name+'--'+data.name;
-
-      if( this.data.materials[data.name] ) {
-        this.$.createUniqueMsg.innerHTML = 'A unique material already has name: '+this.$.uniqueNameInput.value;
-        return;
-      }
-
       data.units = 'us$/'+data.units;
 
       // add to global controller, make sure no issues
@@ -801,13 +833,17 @@
         return;
       }
 
-      var impl = {
-        name : data.name,
-        amount : 1,
-        units : FB.units.invert(data.units)
+      // do we need to add a simple impl?
+      if( !this.data.materials[data.name] ) {
+        var impl = {
+          name : data.name,
+          amount : 1,
+          units : FB.units.invert(data.units)
+        }
+        this.data.materials[impl.name] = impl;
       }
 
-      this.data.materials[impl.name] = impl;
+
       this.recalc();
 
       // this just resets and hides

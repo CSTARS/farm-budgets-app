@@ -85,11 +85,21 @@
     showError : function(err) {
       if( !err ) {
         this.$.error.style.display = 'none';
+        this.$.label.style.display = 'block';
         return;
       }
 
       this.$.error.style.display = 'block';
+      this.$.label.style.display = 'none';
       this.$.error.innerHTML = err.message;
+
+      if( err.code === 3 ) {
+        var a = $('<a class="btn btn-link">Create</a>');
+        a.on('click', function(){
+          document.querySelector('budget-material-popup').create(err.name);
+        });
+        $(this.$.error).append(a);
+      }
     },
 
     toggle : function() {
