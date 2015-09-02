@@ -9,6 +9,7 @@
     "google-map": "~1.0.0",
     "iron-collapse": "https://github.com/PolymerElements/iron-collapse.git#1.0.1",
     "bootswatch-dist": "paper",
-    "bootstrap-datepicker": "~1.4.0"
+    "bootstrap-datepicker": "~1.4.0",
+    "odometer": "~0.4.7"
   }
 }
