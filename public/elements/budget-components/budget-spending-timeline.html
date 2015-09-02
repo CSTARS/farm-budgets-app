@@ -12,6 +12,7 @@
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary" id="opBtn" on-click="byOperation">By Operation</button>
           <button type="button" class="btn btn-default" id="totalBtn" on-click="byTotal">Total</button>
+          <button type="button" class="btn btn-default" id="cumulativeBtn" on-click="byCumlative">Cumulative</button>
         </div>
       </div>
       <div class="flex" id="selected" style="padding: 5px"></div>
@@ -37,6 +38,7 @@
       this.type = 'all';
       this.$.opBtn.className = 'btn btn-primary';
       this.$.totalBtn.className = 'btn btn-default';
+      this.$.cumulativeBtn.className = 'btn btn-default';
       this.updateData();
       this.drawChart();
     },
@@ -45,7 +47,18 @@
       if( this.type == 'total' ) return;
       this.type = 'total';
       this.$.opBtn.className = 'btn btn-default';
+      this.$.cumulativeBtn.className = 'btn btn-default';
       this.$.totalBtn.className = 'btn btn-primary';
+      this.updateData();
+      this.drawChart();
+    },
+
+    byCumlative : function() {
+      if( this.type == 'cumulative' ) return;
+      this.type = 'cumulative';
+      this.$.opBtn.className = 'btn btn-default';
+      this.$.cumulativeBtn.className = 'btn btn-primary';
+      this.$.totalBtn.className = 'btn btn-default';
       this.updateData();
       this.drawChart();
     },
@@ -64,10 +77,14 @@
         for( var i = 0; i < operations.length; i++ ) {
           header.push(operations[i].name);
         }
+      } else if( this.type == 'cumulative' ) {
+        header.push('cumulative');
       } else {
         header.push('total');
       }
       this.data = [header];
+
+      var c = 0;
 
       for( var i = 0; i < this.months.length; i++ ) {
         var arr = [this.months[i].month];
@@ -80,6 +97,9 @@
               arr.push(1);
             }
           }
+        } else if( this.type == 'cumulative' ) {
+          c += this.months[i].total || 0;
+          arr.push(parseFloat(c.toFixed(2)));
         } else {
           arr.push(parseFloat(this.months[i].total.toFixed(2)) || 1);
         }
