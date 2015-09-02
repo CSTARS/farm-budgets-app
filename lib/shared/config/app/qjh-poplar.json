@@ -577,70 +577,92 @@
   ],
   "operations": [
     {
-      "name": "crop care - established",
+      "name": "site prep",
       "materials": [
         {
-          "amount": 150,
-          "units": "[acr_us]",
-          "name": "hoeing",
-          "id": "64d674b9-909e-4773-8082-872572abb929",
+          "note": "Initial Spraying",
+          "amount": 3,
+          "units": "h",
+          "name": "Tractor and sprayer",
+          "id": "16712afe-f9fb-46cb-aba8-805d8606fe64",
           "error": null,
-          "price": 4896
+          "price": 273.3828
         },
         {
+          "note": "Initial Spraying",
           "amount": 100,
-          "units": "[acr_us]",
-          "name": "herbicide - manual",
-          "id": "17bbd18d-250d-4821-b79d-f42379a70034",
+          "units": "[qt_us]",
+          "name": "Glyphosate",
+          "id": "406cddf2-ee69-4ee4-ae8f-74801f0ac628",
           "error": null,
-          "price": 2432
+          "price": 400
+        },
+        {
+          "note": "Initial Spraying",
+          "amount": 125,
+          "units": "[qt_us]",
+          "name": "Goal 2XL",
+          "id": "c4e76bcc-1955-4123-be79-4bbd2f19e8e1",
+          "error": null,
+          "price": 3750
+        },
+        {
+          "note": "Initial Tillage",
+          "amount": 20,
+          "units": "h",
+          "name": "Large Tractor",
+          "id": "1809c3b5-0d49-40a9-b64b-21d79b7ceea4",
+          "error": null,
+          "price": 2841.8399999999997
+        },
+        {
+          "note": "Ripping",
+          "amount": 10,
+          "units": "h",
+          "name": "Large Tractor",
+          "id": "2476732d-0efb-4a26-a21b-4df3d1e8c1a3",
+          "error": null,
+          "price": 1420.9199999999998
+        },
+        {
+          "note": "Row Marking",
+          "amount": 25,
+          "units": "h",
+          "name": "Large Tractor",
+          "id": "2b1ddd65-f8a9-4360-ac47-502fed50ca4e",
+          "error": null,
+          "price": 3552.2999999999997
+        },
+        {
+          "note": "herbicide - preemergent",
+          "amount": 32,
+          "units": "h",
+          "name": "Challenger Tractor",
+          "id": "5ba9d023-f9d3-4d59-a960-70dbe42c9f02",
+          "error": null,
+          "price": 5740.8512,
+          "originalAmount": 32
+        },
+        {
+          "note": "herbicide - preemergent",
+          "amount": 50,
+          "units": "[qt_us]",
+          "name": "Trifluralin",
+          "id": "0be0b1d6-d52d-46a6-bf1a-240832825a85",
+          "error": null,
+          "price": 375
         }
       ],
       "units": "[acr_us]",
       "schedule": [
         {
-          "date": "2018-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2019-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2022-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2023-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2026-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2027-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2030-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2031-11-01",
-          "length": "1",
-          "units": "year"
+          "date": "2015-06-01",
+          "length": "3",
+          "units": "month"
         }
       ],
-      "subtotal": 7328,
-      "total": 58624
+      "subtotal": 18354.293999999998,
+      "total": 18354.293999999998
     },
     {
       "name": "planting",
@@ -650,7 +672,7 @@
           "amount": 20,
           "units": "h",
           "name": "Semi-Tractor trailer",
-          "id": "9819e461-d15d-4676-a919-0211bd9666fb",
+          "id": "9895e9ea-c924-4dca-947a-b672b4b5ff45",
           "error": null,
           "price": 2025.3
         },
@@ -658,7 +680,7 @@
           "amount": 145000,
           "units": "1",
           "name": "Poplar Cutting",
-          "id": "b63181ee-ae18-4706-a91b-8060fd5bd078",
+          "id": "1d0c21ed-65ae-4ffd-825e-ee80722bfdbf",
           "error": null,
           "price": 11600
         },
@@ -666,7 +688,7 @@
           "amount": 1080,
           "units": "h",
           "name": "Cooler/van",
-          "id": "3b1aece3-1726-4498-bb9e-2cadaf2be69a",
+          "id": "ee262ed0-20f0-453c-9593-4cff11ab528b",
           "error": null,
           "price": 4976.208
         },
@@ -674,7 +696,7 @@
           "amount": 480,
           "units": "h",
           "name": "Laborer",
-          "id": "09b478a2-5500-4dca-ac58-085a7c040f17",
+          "id": "f10c788f-593f-449b-8e12-707b3aba03d5",
           "error": null,
           "price": 8160
         }
@@ -697,7 +719,7 @@
           "amount": 25,
           "units": "[acr_us]",
           "name": "herbicide - manual",
-          "id": "bdc8371b-0ca8-4ac1-a81e-e8bc343d0dd1",
+          "id": "650c3f7b-7a4e-4c69-88d7-d0918cde72a4",
           "error": null,
           "price": 608
         },
@@ -706,7 +728,7 @@
           "amount": 140,
           "units": "[acr_us]",
           "name": "hoeing",
-          "id": "576b8e95-3519-4750-8a63-27ad9267e926",
+          "id": "b88019fd-02c9-4bc3-aeda-7b1d81e8c582",
           "error": null,
           "price": 4569.6
         }
@@ -723,61 +745,6 @@
       "total": 5177.6
     },
     {
-      "name": "harvest - established",
-      "materials": [
-        {
-          "amount": 35,
-          "units": "h",
-          "name": "FR 6080 FH",
-          "id": "e4d2c19d-f0f9-4299-a6fa-027bd3a02091",
-          "error": null,
-          "price": 8648.22
-        },
-        {
-          "amount": 175,
-          "units": "h",
-          "name": "Tandem Axle Truck",
-          "id": "cb33973d-fcc8-4fe8-934c-e3b3ab89969d",
-          "error": null,
-          "price": 42191.1,
-          "originalAmount": 175
-        },
-        {
-          "amount": 35,
-          "units": "h",
-          "name": "Support Truck",
-          "id": "55d2f1eb-8562-4872-b3af-99107ec35b17",
-          "error": null,
-          "price": 2098.096
-        }
-      ],
-      "units": "[acr_us]",
-      "schedule": [
-        {
-          "date": "2020-10-01",
-          "length": "1",
-          "units": "month"
-        },
-        {
-          "date": "2023-10-01",
-          "length": "1",
-          "units": "month"
-        },
-        {
-          "date": "2028-10-01",
-          "length": "1",
-          "units": "month"
-        },
-        {
-          "date": "2032-10-01",
-          "length": "1",
-          "units": "month"
-        }
-      ],
-      "subtotal": 52937.416,
-      "total": 211749.664
-    },
-    {
       "name": "crop care - yr1",
       "materials": [
         {
@@ -785,7 +752,7 @@
           "amount": 48,
           "units": "h",
           "name": "Small Tractor",
-          "id": "8271abef-991c-46c3-890a-c352938caf17",
+          "id": "2068c216-4838-46f7-85d0-36d10c5c3fed",
           "error": null,
           "price": 2763.0624
         },
@@ -794,7 +761,7 @@
           "amount": 500,
           "units": "[acr_us]",
           "name": "hoeing",
-          "id": "605ef71d-ac04-4670-89df-92d313dcb9f3",
+          "id": "68f6a064-94c4-453e-b36b-d51f4f4b96fc",
           "error": null,
           "price": 16320
         },
@@ -803,7 +770,7 @@
           "amount": 150,
           "units": "[acr_us]",
           "name": "herbicide - manual",
-          "id": "0772b289-0431-4919-b79a-c094f59a8671",
+          "id": "28903595-e3ca-43e0-ac38-d6d7bf56a67f",
           "error": null,
           "price": 3648
         },
@@ -812,7 +779,7 @@
           "amount": 96,
           "units": "h",
           "name": "Laborer",
-          "id": "e7b58094-28e3-4bee-8412-34a8c823e2bf",
+          "id": "2b24b578-9236-447e-8996-2dffb9d23e16",
           "error": null,
           "price": 1632
         }
@@ -829,133 +796,6 @@
       "total": 24363.0624
     },
     {
-      "name": "restoration",
-      "materials": [
-        {
-          "note": "disking",
-          "amount": 36,
-          "units": "h",
-          "name": "Large Tractor",
-          "id": "3237626d-b1d7-4600-bb26-ec645f8ca7e5",
-          "error": null,
-          "price": 5115.312,
-          "originalAmount": 36
-        },
-        {
-          "note": "herbicide",
-          "amount": 20,
-          "units": "h",
-          "name": "Tractor and sprayer",
-          "id": "d0188573-7f7c-4440-968e-e0bb40edf20b",
-          "error": null,
-          "price": 1822.5520000000001
-        },
-        {
-          "note": "herbicide",
-          "amount": 200,
-          "units": "[qt_us]",
-          "name": "Glyphosate",
-          "id": "669fac81-ab46-41c3-8e86-ba689b039f11",
-          "error": null,
-          "price": 800
-        },
-        {
-          "note": "herbicide",
-          "amount": 200,
-          "units": "[qt_us]",
-          "name": "2,4-D",
-          "id": "32f62229-8a1c-45fd-bbdf-96f18ce92e18",
-          "error": null,
-          "price": 1000
-        }
-      ],
-      "units": "[acr_us]",
-      "schedule": [
-        {
-          "date": "2032-11-01",
-          "length": "3",
-          "units": "month"
-        }
-      ],
-      "subtotal": 8737.864,
-      "total": 8737.864
-    },
-    {
-      "name": "crop care - post harvest",
-      "materials": [
-        {
-          "note": "Post harvest clean up",
-          "amount": 30,
-          "units": "h",
-          "name": "Mid-size Tractor",
-          "id": "7c083b3a-9bbe-412e-9c62-731a418312dc",
-          "error": null,
-          "price": 2343.828
-        },
-        {
-          "note": "Dormant Herbicide",
-          "amount": 8,
-          "units": "h",
-          "name": "Tractor and sprayer",
-          "id": "259d0283-378e-4713-b49d-4da48d0a6cac",
-          "error": null,
-          "price": 729.0208
-        },
-        {
-          "note": "Dormant Herbicide",
-          "amount": 200,
-          "units": "[qt_us]",
-          "name": "Glyphosate",
-          "id": "83fc9bcb-ae47-490e-8fd4-e2b556e1f8f6",
-          "error": null,
-          "price": 800
-        },
-        {
-          "note": "Dormant Herbicide",
-          "amount": 200,
-          "units": "[qt_us]",
-          "name": "Trifluralin",
-          "id": "51449920-5614-401b-90dd-980ec805eedc",
-          "error": null,
-          "price": 1500
-        },
-        {
-          "note": "post emergent",
-          "amount": 100,
-          "units": "[acr_us]",
-          "name": "herbicide - manual",
-          "id": "285c4706-ab4f-4a59-9f11-869ba8a22490",
-          "error": null,
-          "price": 2432
-        }
-      ],
-      "units": "[acr_us]",
-      "schedule": [
-        {
-          "date": "2017-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2021-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2025-11-01",
-          "length": "1",
-          "units": "year"
-        },
-        {
-          "date": "2029-11-01",
-          "length": "1",
-          "units": "year"
-        }
-      ],
-      "subtotal": 7804.8488,
-      "total": 31219.3952
-    },
-    {
       "name": "harvest - yr1",
       "materials": [
         {
@@ -963,7 +803,7 @@
           "amount": 26,
           "units": "h",
           "name": "FR 6080 FH",
-          "id": "904041f2-d1d6-4505-a4d0-ac66f1177127",
+          "id": "a7d2d8c8-5dcd-4e62-b901-85cdfa525dc8",
           "error": null,
           "price": 6424.392
         },
@@ -971,7 +811,7 @@
           "amount": 104,
           "units": "h",
           "name": "Tandem Axle Truck",
-          "id": "43d7cdf4-fc07-4f48-8a7f-0bf45b0ecaf2",
+          "id": "a7a980be-4db4-4f12-88a3-bb773dde5699",
           "error": null,
           "price": 25073.568,
           "originalAmount": 104
@@ -980,7 +820,7 @@
           "amount": 26,
           "units": "h",
           "name": "Support Truck",
-          "id": "695befd1-2a96-4dd1-8a6a-776b8fc1c4f0",
+          "id": "20d3e487-7d15-47e6-9e97-24b4ad01c97e",
           "error": null,
           "price": 1558.5855999999999
         }
@@ -997,92 +837,252 @@
       "total": 33056.5456
     },
     {
-      "name": "site prep",
+      "name": "crop care - post harvest",
       "materials": [
         {
-          "note": "Initial Spraying",
-          "amount": 3,
+          "note": "Post harvest clean up",
+          "amount": 30,
+          "units": "h",
+          "name": "Mid-size Tractor",
+          "id": "5855eda1-0a82-4784-be26-2e3dc9d84702",
+          "error": null,
+          "price": 2343.828
+        },
+        {
+          "note": "Dormant Herbicide",
+          "amount": 8,
           "units": "h",
           "name": "Tractor and sprayer",
-          "id": "e40fc829-b431-4de6-8bab-d4404cc26b12",
+          "id": "03105775-85bb-4236-95c2-24e1e40853a4",
           "error": null,
-          "price": 273.3828
+          "price": 729.0208
         },
         {
-          "note": "Initial Spraying",
-          "amount": 100,
+          "note": "Dormant Herbicide",
+          "amount": 200,
           "units": "[qt_us]",
           "name": "Glyphosate",
-          "id": "14d2d03d-ced7-4174-bfd9-8fff53537a09",
+          "id": "48539a8b-8cad-4145-a61d-167cbcd08a68",
           "error": null,
-          "price": 400
+          "price": 800
         },
         {
-          "note": "Initial Spraying",
-          "amount": 125,
-          "units": "[qt_us]",
-          "name": "Goal 2XL",
-          "id": "0458bbb4-a588-45cc-930d-fe4020748799",
-          "error": null,
-          "price": 3750
-        },
-        {
-          "note": "Initial Tillage",
-          "amount": 20,
-          "units": "h",
-          "name": "Large Tractor",
-          "id": "a4a8e3f3-c5ac-4607-ae0b-2dbe14267907",
-          "error": null,
-          "price": 2841.8399999999997
-        },
-        {
-          "note": "Ripping",
-          "amount": 10,
-          "units": "h",
-          "name": "Large Tractor",
-          "id": "efe45080-816b-4e04-8d29-911efa6286c9",
-          "error": null,
-          "price": 1420.9199999999998
-        },
-        {
-          "note": "Row Marking",
-          "amount": 25,
-          "units": "h",
-          "name": "Large Tractor",
-          "id": "b24ffc43-d707-4955-a454-327e30c711fd",
-          "error": null,
-          "price": 3552.2999999999997
-        },
-        {
-          "note": "herbicide - preemergent",
-          "amount": 32,
-          "units": "h",
-          "name": "Challenger Tractor",
-          "id": "26e20586-f291-4539-947b-85d5485c0a2d",
-          "error": null,
-          "price": 5740.8512,
-          "originalAmount": 32
-        },
-        {
-          "note": "herbicide - preemergent",
-          "amount": 50,
+          "note": "Dormant Herbicide",
+          "amount": 200,
           "units": "[qt_us]",
           "name": "Trifluralin",
-          "id": "629f0a51-40b3-409a-a8df-ebad856c8827",
+          "id": "b16d6fc9-5803-4404-b91c-43d904f403ae",
           "error": null,
-          "price": 375
+          "price": 1500
+        },
+        {
+          "note": "post emergent",
+          "amount": 100,
+          "units": "[acr_us]",
+          "name": "herbicide - manual",
+          "id": "fb650fd3-998d-41fa-885d-deee6812419c",
+          "error": null,
+          "price": 2432
         }
       ],
       "units": "[acr_us]",
       "schedule": [
         {
-          "date": "2015-06-01",
-          "length": "3",
-          "units": "month"
+          "length": "1",
+          "units": "year",
+          "date": "2017-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2020-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2023-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2026-11-1"
         }
       ],
-      "subtotal": 18354.293999999998,
-      "total": 18354.293999999998
+      "subtotal": 7804.8488,
+      "total": 31219.3952
+    },
+    {
+      "name": "crop care - established",
+      "materials": [
+        {
+          "amount": 150,
+          "units": "[acr_us]",
+          "name": "hoeing",
+          "id": "4741a52b-81c0-4309-bba9-8c5d4a3ae07c",
+          "error": null,
+          "price": 4896
+        },
+        {
+          "amount": 100,
+          "units": "[acr_us]",
+          "name": "herbicide - manual",
+          "id": "19e8fc01-2263-43e4-9f4b-95d063c6ec9c",
+          "error": null,
+          "price": 2432
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "length": "1",
+          "units": "year",
+          "date": "2018-11-1"
+        },
+        {
+          "length": "1",
+          "units": "year",
+          "date": "2019-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2021-11-1"
+        },
+        {
+          "length": "1",
+          "units": "year",
+          "date": "2022-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2024-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2025-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2027-11-1"
+        },
+        {
+          "length": 1,
+          "units": "year",
+          "date": "2028-11-1"
+        }
+      ],
+      "subtotal": 7328,
+      "total": 58624
+    },
+    {
+      "name": "harvest - established",
+      "materials": [
+        {
+          "amount": 35,
+          "units": "h",
+          "name": "FR 6080 FH",
+          "id": "6739ca2e-28eb-4881-8913-6fb518b27373",
+          "error": null,
+          "price": 8648.22
+        },
+        {
+          "amount": 175,
+          "units": "h",
+          "name": "Tandem Axle Truck",
+          "id": "0197543f-dfe3-4b4d-a53b-866738c7ff34",
+          "error": null,
+          "price": 42191.1,
+          "originalAmount": 175
+        },
+        {
+          "amount": 35,
+          "units": "h",
+          "name": "Support Truck",
+          "id": "9d570d9c-c6af-4aaa-a2a9-fac499163c2e",
+          "error": null,
+          "price": 2098.096
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "length": "1",
+          "units": "month",
+          "date": "2020-10-1"
+        },
+        {
+          "length": "1",
+          "units": "month",
+          "date": "2023-10-1"
+        },
+        {
+          "length": 1,
+          "units": "month",
+          "date": "2026-10-1"
+        },
+        {
+          "length": 1,
+          "units": "month",
+          "date": "2029-10-1"
+        }
+      ],
+      "subtotal": 52937.416,
+      "total": 211749.664
+    },
+    {
+      "name": "restoration",
+      "materials": [
+        {
+          "note": "disking",
+          "amount": 36,
+          "units": "h",
+          "name": "Large Tractor",
+          "id": "72b4f97b-812f-4667-b371-4f76376d7a8c",
+          "error": null,
+          "price": 5115.312,
+          "originalAmount": 36
+        },
+        {
+          "note": "herbicide",
+          "amount": 20,
+          "units": "h",
+          "name": "Tractor and sprayer",
+          "id": "b2fbf8d8-9d99-4531-a0df-77de07f5ab2e",
+          "error": null,
+          "price": 1822.5520000000001
+        },
+        {
+          "note": "herbicide",
+          "amount": 200,
+          "units": "[qt_us]",
+          "name": "Glyphosate",
+          "id": "e0edae0c-181b-4b13-8823-17d291ed4695",
+          "error": null,
+          "price": 800
+        },
+        {
+          "note": "herbicide",
+          "amount": 200,
+          "units": "[qt_us]",
+          "name": "2,4-D",
+          "id": "3b14e081-3602-4137-9053-890e4f4716c4",
+          "error": null,
+          "price": 1000
+        }
+      ],
+      "units": "[acr_us]",
+      "schedule": [
+        {
+          "length": "3",
+          "units": "month",
+          "date": "2029-11-1"
+        }
+      ],
+      "subtotal": 8737.864,
+      "total": 8737.864
     }
   ],
   "farm": {
