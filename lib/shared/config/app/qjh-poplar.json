@@ -494,22 +494,22 @@
         },
         "Tandem Axle Truck--Labor": {
           "name": "Tandem Axle Truck--Labor",
-          "amount": 4,
+          "amount": 1,
           "units": "h",
           "error": null,
-          "price": 104,
-          "originalAmount": 4
+          "price": 26,
+          "originalAmount": 1
         },
         "Lube & Repairs": {
           "name": "Lube & Repairs",
-          "amount": 100,
+          "amount": 25,
           "units": "us$",
           "error": null,
-          "price": 100,
-          "originalAmount": 100
+          "price": 25,
+          "originalAmount": 25
         }
       },
-      "price": 241.09199999999998
+      "price": 88.092
     },
     {
       "class": "equipment",
@@ -584,7 +584,7 @@
           "amount": 3,
           "units": "h",
           "name": "Tractor and sprayer",
-          "id": "16712afe-f9fb-46cb-aba8-805d8606fe64",
+          "id": "9d1e3b30-69f0-44fe-95bc-dcb17a966eda",
           "error": null,
           "price": 273.3828
         },
@@ -593,7 +593,7 @@
           "amount": 100,
           "units": "[qt_us]",
           "name": "Glyphosate",
-          "id": "406cddf2-ee69-4ee4-ae8f-74801f0ac628",
+          "id": "47c23220-01f4-44bd-8012-73f6a5eb918b",
           "error": null,
           "price": 400
         },
@@ -602,7 +602,7 @@
           "amount": 125,
           "units": "[qt_us]",
           "name": "Goal 2XL",
-          "id": "c4e76bcc-1955-4123-be79-4bbd2f19e8e1",
+          "id": "d4801be2-e19b-4faf-b5c7-c6976b2b7f8b",
           "error": null,
           "price": 3750
         },
@@ -611,7 +611,7 @@
           "amount": 20,
           "units": "h",
           "name": "Large Tractor",
-          "id": "1809c3b5-0d49-40a9-b64b-21d79b7ceea4",
+          "id": "af6f53d4-4557-4a14-8dda-b692cf0ab7d3",
           "error": null,
           "price": 2841.8399999999997
         },
@@ -620,7 +620,7 @@
           "amount": 10,
           "units": "h",
           "name": "Large Tractor",
-          "id": "2476732d-0efb-4a26-a21b-4df3d1e8c1a3",
+          "id": "0c5afe2a-05b5-4327-9841-5e0ab5e73a33",
           "error": null,
           "price": 1420.9199999999998
         },
@@ -629,7 +629,7 @@
           "amount": 25,
           "units": "h",
           "name": "Large Tractor",
-          "id": "2b1ddd65-f8a9-4360-ac47-502fed50ca4e",
+          "id": "61fec6e1-7d68-4b35-84ba-97d855158269",
           "error": null,
           "price": 3552.2999999999997
         },
@@ -638,7 +638,7 @@
           "amount": 32,
           "units": "h",
           "name": "Challenger Tractor",
-          "id": "5ba9d023-f9d3-4d59-a960-70dbe42c9f02",
+          "id": "38f9721d-00c4-43f0-95f0-63fbadeb9158",
           "error": null,
           "price": 5740.8512,
           "originalAmount": 32
@@ -648,7 +648,7 @@
           "amount": 50,
           "units": "[qt_us]",
           "name": "Trifluralin",
-          "id": "0be0b1d6-d52d-46a6-bf1a-240832825a85",
+          "id": "ab8177f9-15e4-4fd3-82a5-33df3b9d1914",
           "error": null,
           "price": 375
         }
@@ -672,7 +672,7 @@
           "amount": 20,
           "units": "h",
           "name": "Semi-Tractor trailer",
-          "id": "9895e9ea-c924-4dca-947a-b672b4b5ff45",
+          "id": "b40a26b6-86fc-4bad-bff8-36c8091f08fb",
           "error": null,
           "price": 2025.3
         },
@@ -680,7 +680,7 @@
           "amount": 145000,
           "units": "1",
           "name": "Poplar Cutting",
-          "id": "1d0c21ed-65ae-4ffd-825e-ee80722bfdbf",
+          "id": "27578444-81c0-48cd-92b6-c92ef939fb48",
           "error": null,
           "price": 11600
         },
@@ -688,7 +688,7 @@
           "amount": 1080,
           "units": "h",
           "name": "Cooler/van",
-          "id": "ee262ed0-20f0-453c-9593-4cff11ab528b",
+          "id": "d63db90a-7add-4245-ab99-afd352ce55e2",
           "error": null,
           "price": 4976.208
         },
@@ -696,7 +696,7 @@
           "amount": 480,
           "units": "h",
           "name": "Laborer",
-          "id": "f10c788f-593f-449b-8e12-707b3aba03d5",
+          "id": "7516c2b8-607a-40ad-8b3e-948d8be75c7d",
           "error": null,
           "price": 8160
         }
@@ -719,7 +719,7 @@
           "amount": 25,
           "units": "[acr_us]",
           "name": "herbicide - manual",
-          "id": "650c3f7b-7a4e-4c69-88d7-d0918cde72a4",
+          "id": "024b7b2c-6f66-47e1-979d-9ea9f7e6e253",
           "error": null,
           "price": 608
         },
@@ -728,7 +728,7 @@
           "amount": 140,
           "units": "[acr_us]",
           "name": "hoeing",
-          "id": "b88019fd-02c9-4bc3-aeda-7b1d81e8c582",
+          "id": "5804c605-62ca-48b6-a524-c636d74931df",
           "error": null,
           "price": 4569.6
         }
@@ -752,7 +752,7 @@
           "amount": 48,
           "units": "h",
           "name": "Small Tractor",
-          "id": "2068c216-4838-46f7-85d0-36d10c5c3fed",
+          "id": "db4d1f5c-7a48-494c-b585-d6a65fea0f49",
           "error": null,
           "price": 2763.0624
         },
@@ -761,7 +761,7 @@
           "amount": 500,
           "units": "[acr_us]",
           "name": "hoeing",
-          "id": "68f6a064-94c4-453e-b36b-d51f4f4b96fc",
+          "id": "87dc58ac-94e7-4931-9ab8-88574ca52bda",
           "error": null,
           "price": 16320
         },
@@ -770,7 +770,7 @@
           "amount": 150,
           "units": "[acr_us]",
           "name": "herbicide - manual",
-          "id": "28903595-e3ca-43e0-ac38-d6d7bf56a67f",
+          "id": "06f48e98-b4d3-499d-bb9e-d619dfa728c9",
           "error": null,
           "price": 3648
         },
@@ -779,7 +779,7 @@
           "amount": 96,
           "units": "h",
           "name": "Laborer",
-          "id": "2b24b578-9236-447e-8996-2dffb9d23e16",
+          "id": "dda34b66-57e4-41ad-9ef4-72561c81bc80",
           "error": null,
           "price": 1632
         }
@@ -803,7 +803,7 @@
           "amount": 26,
           "units": "h",
           "name": "FR 6080 FH",
-          "id": "a7d2d8c8-5dcd-4e62-b901-85cdfa525dc8",
+          "id": "313e90d0-ee5a-4a21-b34e-2dc3b62a7e34",
           "error": null,
           "price": 6424.392
         },
@@ -811,16 +811,17 @@
           "amount": 104,
           "units": "h",
           "name": "Tandem Axle Truck",
-          "id": "a7a980be-4db4-4f12-88a3-bb773dde5699",
+          "id": "0b11d637-9b45-4590-b0c6-c2b8f3701597",
           "error": null,
-          "price": 25073.568,
-          "originalAmount": 104
+          "price": 9161.568,
+          "originalAmount": 104,
+          "notes": "26 hrs x 4 trucks"
         },
         {
           "amount": 26,
           "units": "h",
           "name": "Support Truck",
-          "id": "20d3e487-7d15-47e6-9e97-24b4ad01c97e",
+          "id": "7773dadb-868b-4c3d-98db-44f48cab109e",
           "error": null,
           "price": 1558.5855999999999
         }
@@ -833,8 +834,8 @@
           "date": "2017-10-2"
         }
       ],
-      "subtotal": 33056.5456,
-      "total": 33056.5456
+      "subtotal": 17144.545599999998,
+      "total": 17144.545599999998
     },
     {
       "name": "crop care - post harvest",
@@ -844,7 +845,7 @@
           "amount": 30,
           "units": "h",
           "name": "Mid-size Tractor",
-          "id": "5855eda1-0a82-4784-be26-2e3dc9d84702",
+          "id": "0398138e-006a-4669-80cf-6af08b719c66",
           "error": null,
           "price": 2343.828
         },
@@ -853,7 +854,7 @@
           "amount": 8,
           "units": "h",
           "name": "Tractor and sprayer",
-          "id": "03105775-85bb-4236-95c2-24e1e40853a4",
+          "id": "34372c01-6124-43a5-ad9a-5c87baeff67e",
           "error": null,
           "price": 729.0208
         },
@@ -862,7 +863,7 @@
           "amount": 200,
           "units": "[qt_us]",
           "name": "Glyphosate",
-          "id": "48539a8b-8cad-4145-a61d-167cbcd08a68",
+          "id": "ae4af1f6-9908-4b24-a2c0-ca928b41d558",
           "error": null,
           "price": 800
         },
@@ -871,7 +872,7 @@
           "amount": 200,
           "units": "[qt_us]",
           "name": "Trifluralin",
-          "id": "b16d6fc9-5803-4404-b91c-43d904f403ae",
+          "id": "d17ee891-b2b8-403a-8b28-e4e13339f577",
           "error": null,
           "price": 1500
         },
@@ -880,7 +881,7 @@
           "amount": 100,
           "units": "[acr_us]",
           "name": "herbicide - manual",
-          "id": "fb650fd3-998d-41fa-885d-deee6812419c",
+          "id": "ca3c6bc7-1eaf-4a12-98d5-49ba207e9606",
           "error": null,
           "price": 2432
         }
@@ -918,7 +919,7 @@
           "amount": 150,
           "units": "[acr_us]",
           "name": "hoeing",
-          "id": "4741a52b-81c0-4309-bba9-8c5d4a3ae07c",
+          "id": "9d33b40b-8bc2-4841-a018-68f2de529caa",
           "error": null,
           "price": 4896
         },
@@ -926,7 +927,7 @@
           "amount": 100,
           "units": "[acr_us]",
           "name": "herbicide - manual",
-          "id": "19e8fc01-2263-43e4-9f4b-95d063c6ec9c",
+          "id": "aaeab839-780e-404c-98f3-e1b78171969d",
           "error": null,
           "price": 2432
         }
@@ -984,7 +985,7 @@
           "amount": 35,
           "units": "h",
           "name": "FR 6080 FH",
-          "id": "6739ca2e-28eb-4881-8913-6fb518b27373",
+          "id": "52a70aed-a900-46c1-b4b3-8ada33f592d8",
           "error": null,
           "price": 8648.22
         },
@@ -992,16 +993,17 @@
           "amount": 175,
           "units": "h",
           "name": "Tandem Axle Truck",
-          "id": "0197543f-dfe3-4b4d-a53b-866738c7ff34",
+          "id": "49a7db36-4237-4faf-b028-49661cb5b319",
           "error": null,
-          "price": 42191.1,
-          "originalAmount": 175
+          "price": 15416.1,
+          "originalAmount": 175,
+          "notes": "35 hrs * 5 trucks"
         },
         {
           "amount": 35,
           "units": "h",
           "name": "Support Truck",
-          "id": "9d570d9c-c6af-4aaa-a2a9-fac499163c2e",
+          "id": "4b1f0e19-ed6b-469f-9ca5-58661d049435",
           "error": null,
           "price": 2098.096
         }
@@ -1029,8 +1031,8 @@
           "date": "2029-10-1"
         }
       ],
-      "subtotal": 52937.416,
-      "total": 211749.664
+      "subtotal": 26162.416,
+      "total": 104649.664
     },
     {
       "name": "restoration",
@@ -1040,7 +1042,7 @@
           "amount": 36,
           "units": "h",
           "name": "Large Tractor",
-          "id": "72b4f97b-812f-4667-b371-4f76376d7a8c",
+          "id": "755dc099-4f27-4d9f-9fc4-8244e3f6ab27",
           "error": null,
           "price": 5115.312,
           "originalAmount": 36
@@ -1050,7 +1052,7 @@
           "amount": 20,
           "units": "h",
           "name": "Tractor and sprayer",
-          "id": "b2fbf8d8-9d99-4531-a0df-77de07f5ab2e",
+          "id": "bc6153e0-6161-4320-abb7-e16e51d6a433",
           "error": null,
           "price": 1822.5520000000001
         },
@@ -1059,7 +1061,7 @@
           "amount": 200,
           "units": "[qt_us]",
           "name": "Glyphosate",
-          "id": "e0edae0c-181b-4b13-8823-17d291ed4695",
+          "id": "f8def926-9d6c-43e3-ac5a-a29c51f91dd8",
           "error": null,
           "price": 800
         },
@@ -1068,7 +1070,7 @@
           "amount": 200,
           "units": "[qt_us]",
           "name": "2,4-D",
-          "id": "3b14e081-3602-4137-9053-890e4f4716c4",
+          "id": "16058df5-aa02-4a4c-99ba-daab419a9788",
           "error": null,
           "price": 1000
         }
