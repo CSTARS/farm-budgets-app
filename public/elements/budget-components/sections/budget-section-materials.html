@@ -5,6 +5,12 @@
       margin: 15px;
       box-shadow: 0 0 8px #ccc;
     }
+    @media(max-width: 768px) {
+      .card {
+        padding: 5px;
+        margin: 5px 0px;
+      }
+    }
   </style>
 
   <template>
@@ -204,23 +210,25 @@
             '</div></div>'+
           '</h5>'+
           '<div>'+(material.description || '')+'</div>'+
-          '<table class="table">' +
-            '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
-            '<tr>' +
-              '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
-              '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' +
-              //(material.type == 'complex' || material.fixed ?
-              //  '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
-              //  '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
-              //) +
-              '<td>'+material.units+
-              //  (material.fixed ?
-              //    (material.units || '') :
-              //    '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
-              //  )+
-              '</td>' +
-            '</tr>' +
-          '</table>' +
+          '<div style="overflow-x:auto">' +
+            '<table class="table">' +
+              '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
+              '<tr>' +
+                '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
+                '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' +
+                //(material.type == 'complex' || material.fixed ?
+                //  '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
+                //  '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
+                //) +
+                '<td>'+material.units+
+                //  (material.fixed ?
+                //    (material.units || '') :
+                //    '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
+                //  )+
+                '</td>' +
+              '</tr>' +
+            '</table>' +
+          '</div>' +
         '</div>';
 
       var row = $(html);

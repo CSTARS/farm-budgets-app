@@ -6490,6 +6490,7 @@ this.fire('dom-change');
 
     ready : function() {
       this.style.color = '#5cb85c';
+      this.style.display = 'inline-block';
     },
 
     update : function() {
@@ -6534,6 +6535,7 @@ this.fire('dom-change');
       this.defaultCols = ['Material', 'Notes', 'Amount', 'Units', 'Price', 'SubTotal', 'Remove'];
       this.cols = [];
       this.style.display = 'block';
+      this.style.overflowX = 'auto';
       this.controllers = [];
 
     },
@@ -7717,6 +7719,12 @@ this.fire('dom-change');
       margin: 15px;
       box-shadow: 0 0 8px #ccc;
     }
+    @media(max-width: 768px) {
+      :host {
+        padding: 5px;
+        margin: 5px 0px;
+      }
+    }
   </style>
 
   <template>
@@ -8105,6 +8113,12 @@ this.fire('dom-change');
       margin: 15px;
       box-shadow: 0 0 8px #ccc;
     }
+    @media(max-width: 768px) {
+      .card {
+        padding: 5px;
+        margin: 5px 0px;
+      }
+    }
   </style>
   <template>
 
@@ -8450,6 +8464,12 @@ this.fire('dom-change');
       margin: 15px;
       box-shadow: 0 0 8px #ccc;
     }
+    @media(max-width: 768px) {
+      .card {
+        padding: 5px;
+        margin: 5px 0px;
+      }
+    }
   </style>
 
   <template>
@@ -8649,23 +8669,25 @@ this.fire('dom-change');
             '</div></div>'+
           '</h5>'+
           '<div>'+(material.description || '')+'</div>'+
-          '<table class="table">' +
-            '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
-            '<tr>' +
-              '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
-              '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' +
-              //(material.type == 'complex' || material.fixed ?
-              //  '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
-              //  '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
-              //) +
-              '<td>'+material.units+
-              //  (material.fixed ?
-              //    (material.units || '') :
-              //    '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
-              //  )+
-              '</td>' +
-            '</tr>' +
-          '</table>' +
+          '<div style="overflow-x:auto">' +
+            '<table class="table">' +
+              '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
+              '<tr>' +
+                '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
+                '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' +
+                //(material.type == 'complex' || material.fixed ?
+                //  '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
+                //  '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
+                //) +
+                '<td>'+material.units+
+                //  (material.fixed ?
+                //    (material.units || '') :
+                //    '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
+                //  )+
+                '</td>' +
+              '</tr>' +
+            '</table>' +
+          '</div>' +
         '</div>';
 
       var row = $(html);
@@ -8882,6 +8904,12 @@ this.fire('dom-change');
 
     attached : function() {
       FB.operationController.on('total-update', this.onTotalUpdate.bind(this));
+
+      // make sure a total hasn't already been set
+      var total = FB.operationController.getCurrentTotal();
+      if( total !== null ) {
+        this.onTotalUpdate(total);
+      }
     },
 
     setData : function(farm) {
@@ -8937,6 +8965,12 @@ this.fire('dom-change');
 
       this.handlerSet = false;
       FB.operationController.on('total-update', this.drawChart.bind(this));
+
+      // make sure a total hasn't already been set
+      var total = FB.operationController.getCurrentTotal();
+      if( total !== null ) {
+        this.drawChart(total);
+      }
     },
 
     onShow : function() {
@@ -9037,6 +9071,12 @@ this.fire('dom-change');
 
       this.handlerSet = false;
       FB.operationController.on('total-update', this.drawChart.bind(this));
+
+      // make sure a total hasn't already been set
+      var total = FB.operationController.getCurrentTotal();
+      if( total !== null ) {
+        this.drawChart(total);
+      }
     },
 
     byOperation : function() {
@@ -10065,12 +10105,26 @@ this.fire('dom-change');
     }
     #results {
        display: none;
-       z-index: 1000;
+       z-index: 2000;
        position: absolute;
        background-color: white;
        padding: 10px;
        border: 1px solid #ccc;
     }
+    .result-card:hover {
+      color: #2196f3;
+    }
+    .result-card:hover h5 {
+      color: #2196f3;
+    }
+    .result-card:hover {
+      background-color: #f8f8f8;
+    }
+    .result-card {
+        cursor: pointer;
+        padding: 0 10px;
+    }
+
   </style>
   <template>
 
@@ -10102,15 +10156,23 @@ this.fire('dom-change');
         var html = '';
 
         for( var i = 0; i < results.length; i++ ) {
-          html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
-                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+
-                  '<div class="help-block">'+(results[i].class || '')+' '+(results[i].price || '')+' '+FB.units.getLabel(results[i].units || '', true)+'</div>'
-                  '</div>';
+          html +=
+            '<div index="'+i+'" class="style-scope budget-material-search result-card" style="'+( i < results.length - 1 ? 'border-bottom: 1px solid #ccc' : '')+'">'+
+              '<h5>'+
+                '<i class="fa fa-'+(results[i].type == 'complex' ? 'cubes' : 'cube')+'"></i> '+
+                  results[i].name +
+                  (results[i].class ? ' <small>'+results[i].class+'</small>' : '') +
+              '</h5>'+
+              '<div class="help-block">' +
+                '<ahb-dollar-label value="'+results[i].price+'"></ahb-dollar-label> '+
+                this.getUnitsLabel(results[i]) +
+              '</div>'+
+            '</div>';
         }
 
         $(this.$.results)
           .html(html)
-          .find('a')
+          .find('.result-card')
           .on('click', function(e){
             this.onResultsClick();
             this.fireSelect(e, results);
@@ -10120,6 +10182,18 @@ this.fire('dom-change');
       } else {
         $(this.$.results).html('No matches found');
       }
+    },
+
+    getUnitsLabel : function(material) {
+      var l = '';
+      if( material.type === 'complex' ) {
+        l = material.units;
+      } else {
+        l = FB.units.invert(material.units);
+      }
+      l = FB.units.math.cleanDollars(l);
+      if( l == '1' ) return '';
+      return 'per '+l;
     },
 
     fireSelect : function(e, results) {

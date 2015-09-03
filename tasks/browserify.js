@@ -8,7 +8,7 @@ module.exports = function browserify(grunt) {
   var files = {
     'lib/shared_build/lib.js': ['lib/shared/index.js']
   };
-	
+
   var browserifyOptions = {
     debug : true, // include source maps
     standalone : 'FB'
@@ -27,7 +27,8 @@ module.exports = function browserify(grunt) {
       options: {
         browserifyOptions : browserifyOptions,
         keepAlive : true,
-        watch : true
+        watch : true,
+        debug : true
       }
     }
   };

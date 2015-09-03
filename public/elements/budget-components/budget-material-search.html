@@ -5,12 +5,26 @@
     }
     #results {
        display: none;
-       z-index: 1000;
+       z-index: 2000;
        position: absolute;
        background-color: white;
        padding: 10px;
        border: 1px solid #ccc;
     }
+    .result-card:hover {
+      color: #2196f3;
+    }
+    .result-card:hover h5 {
+      color: #2196f3;
+    }
+    .result-card:hover {
+      background-color: #f8f8f8;
+    }
+    .result-card {
+        cursor: pointer;
+        padding: 0 10px;
+    }
+
   </style>
   <template>
 
@@ -48,15 +62,23 @@
         var html = '';
 
         for( var i = 0; i < results.length; i++ ) {
-          html += '<div><a class="btn btn-link" index="'+i+'"><i class="fa fa-plus"></i> '+
-                  results[i].name+'</a>'+(results[i].type == 'complex' ? ' <i class="fa fa-cubes"></i>' : '')+
-                  '<div class="help-block">'+(results[i].class || '')+' '+(results[i].price || '')+' '+FB.units.getLabel(results[i].units || '', true)+'</div>'
-                  '</div>';
+          html +=
+            '<div index="'+i+'" class="style-scope budget-material-search result-card" style="'+( i < results.length - 1 ? 'border-bottom: 1px solid #ccc' : '')+'">'+
+              '<h5>'+
+                '<i class="fa fa-'+(results[i].type == 'complex' ? 'cubes' : 'cube')+'"></i> '+
+                  results[i].name +
+                  (results[i].class ? ' <small>'+results[i].class+'</small>' : '') +
+              '</h5>'+
+              '<div class="help-block">' +
+                '<ahb-dollar-label value="'+results[i].price+'"></ahb-dollar-label> '+
+                this.getUnitsLabel(results[i]) +
+              '</div>'+
+            '</div>';
         }
 
         $(this.$.results)
           .html(html)
-          .find('a')
+          .find('.result-card')
           .on('click', function(e){
             this.onResultsClick();
             this.fireSelect(e, results);
@@ -66,6 +88,18 @@
       } else {
         $(this.$.results).html('No matches found');
       }
+    },
+
+    getUnitsLabel : function(material) {
+      var l = '';
+      if( material.type === 'complex' ) {
+        l = material.units;
+      } else {
+        l = FB.units.invert(material.units);
+      }
+      l = FB.units.math.cleanDollars(l);
+      if( l == '1' ) return '';
+      return 'per '+l;
     },
 
     fireSelect : function(e, results) {

@@ -7044,6 +7044,7 @@ Any number of components can use `<google-maps-api>` elements, and the library w
       this.defaultCols = ['Material', 'Notes', 'Amount', 'Units', 'Price', 'SubTotal', 'Remove'];
       this.cols = [];
       this.style.display = 'block';
+      this.style.overflowX = 'auto';
       this.controllers = [];
 
     },
@@ -7360,6 +7361,7 @@ Any number of components can use `<google-maps-api>` elements, and the library w
 
     ready : function() {
       this.style.color = '#5cb85c';
+      this.style.display = 'inline-block';
     },
 
     update : function() {

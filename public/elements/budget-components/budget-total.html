@@ -20,6 +20,12 @@
 
     attached : function() {
       FB.operationController.on('total-update', this.onTotalUpdate.bind(this));
+
+      // make sure a total hasn't already been set
+      var total = FB.operationController.getCurrentTotal();
+      if( total !== null ) {
+        this.onTotalUpdate(total);
+      }
     },
 
     setData : function(farm) {

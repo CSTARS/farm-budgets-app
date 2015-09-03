@@ -31,6 +31,12 @@
 
       this.handlerSet = false;
       FB.operationController.on('total-update', this.drawChart.bind(this));
+
+      // make sure a total hasn't already been set
+      var total = FB.operationController.getCurrentTotal();
+      if( total !== null ) {
+        this.drawChart(total);
+      }
     },
 
     byOperation : function() {
