@@ -7199,15 +7199,11 @@ Any number of components can use `<google-maps-api>` elements, and the library w
     var errorLabel = $('<div style="display:none" class="text text-danger"></div>');
     cols.Material.append(errorLabel);
 
-    // BASEPRICE
-    // var unitsInput = $('<budget-unit-selector '+(isBasePrice ? 'disabled' : '')+'></budget-unit-selector>');
     var unitsInput = $('<budget-unit-selector '+(config.material.fixed ? 'disabled' : '')+'></budget-unit-selector>');
     unitsInput.on('units-change', fireUnitsChange);
     cols.Units.append(unitsInput);
 
-    // BASEPRICE
-    //var amountInput = $('<input type="number" class="form-control" '+(isBasePrice ? 'disabled' : '')+' />');
-    var amountInput = $('<input type="number" class="form-control" />');
+    var amountInput = $('<input type="number" class="form-control" style="min-width: 50px" />');
     amountInput.on('input', fireAmountChange);
     cols.Amount.append(amountInput);
 
@@ -7216,7 +7212,7 @@ Any number of components can use `<google-maps-api>` elements, and the library w
 
     var notesInput;
     if( cols.Notes ) {
-      notesInput = $('<input type="text" class="form-control" />');
+      notesInput = $('<input type="text" class="form-control" style="min-width: 100px" />');
       notesInput.on('input', updateNotes);
       cols.Notes.append(notesInput);
     }
