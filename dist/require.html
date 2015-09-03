@@ -7231,7 +7231,7 @@ Any number of components can use `<google-maps-api>` elements, and the library w
 
       nameLabel[0].material = config.material.name;
       unitsInput[0].units = config.materialImpl.units
-      amountInput.val(config.materialImpl.amount);
+      amountInput.val(parseFloat(config.materialImpl.amount.toFixed(4)));
 
 
       cols.Price.html(

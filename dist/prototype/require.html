@@ -6722,7 +6722,7 @@ this.fire('dom-change');
 
       nameLabel[0].material = config.material.name;
       unitsInput[0].units = config.materialImpl.units
-      amountInput.val(config.materialImpl.amount);
+      amountInput.val(parseFloat(config.materialImpl.amount.toFixed(4)));
 
 
       cols.Price.html(
@@ -9596,9 +9596,7 @@ this.fire('dom-change');
 
         this.$.classGroup.style.display = 'none';
 
-        // BASEPRICE
-        //this.$.priceLabel.innerHTML = 'Base Price';
-        //this.$.priceMessage.style.display = 'block';
+
         this.$.priceGroup.style.display = 'none';
 
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
@@ -9608,19 +9606,10 @@ this.fire('dom-change');
         this.$.isComplexInput.checked = false;
         this.$.complexPanel.style.display = 'none';
 
-        // BASEPRICE
-        //this.$.priceMessage.style.display = 'none';
-        //this.$.priceLabel.innerHTML = 'Price';
         this.$.priceGroup.style.display = 'block';
-
         this.$.classGroup.style.display = 'Block';
       }
     },
-
-    // BASEPRICE
-    //getBasePriceName : function() {
-    //  return this.data.name+'--Base Price';
-    //},
 
     save : function(noHide) {
       if( this.data.name == '' ) {
@@ -9734,23 +9723,11 @@ this.fire('dom-change');
     onPriceChange : function() {
       FB.materialController.materialRecalc(this.data);
 
-      // make sure the price is set
-      // BASEPRICE
-      //if( this.data.materials[this.getBasePriceName()] ) {
-      //  this.$.priceInput.value = this.data.materials[this.getBasePriceName()].price;
-      //}
-
       // do not call recalc, will update material table
       this.updatePriceLabel();
     },
 
     onMaterialDelete : function(e) {
-
-      // BASEPRICE
-      //if( e.detail.name == this.getBasePriceName() ) {
-      //  this.$.priceInput.value = '';
-      //}
-
       this.updatePriceLabel();
     },
     /**
@@ -9907,19 +9884,6 @@ this.fire('dom-change');
           var price = parseFloat(this.$.priceInput.value);
 
           if( !isNaN(price) ) {
-            /* var name = this.getBasePriceName();
-
-            this.data.materials[name] = {
-              amount : 1,
-              units : this.data.units,
-              name : name
-            }
-
-            FB.materialController.add({
-              units : FB.units.invert(this.data.units),
-              name : name,
-              price : price
-            });*/
 
             this.data.materials.Estimate = {
               amount : price,
@@ -9995,6 +9959,7 @@ this.fire('dom-change');
 
           this.materialUnits = newUnits;
           this.$.unitsInputMsg.innerHTML = '';
+          this.recalc();
         }.bind(this));
 
       prompt
@@ -10002,6 +9967,7 @@ this.fire('dom-change');
         .on('click', function(){
           this.materialUnits = newUnits;
           this.$.unitsInputMsg.innerHTML = '';
+          this.recalc();
         }.bind(this));
     },
 
