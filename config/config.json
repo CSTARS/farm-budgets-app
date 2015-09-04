@@ -18,5 +18,9 @@
     "postgres" : {
       "url" : "postgres://username:password@localhost/database",
       "schema" : "farm_budget_data"
+    },
+
+    "mongo" : {
+      "url" : "mongodb://localhost:27017/farmBudgets"
     }
 }

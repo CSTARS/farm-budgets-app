@@ -15,7 +15,8 @@
     "all": "npm run build && npm run test"
   },
   "dependencies": {
-    "config": "^1.15.0",
+    "async": "^1.4.2",
+    "confit": "^2.0.3",
     "construx": "^1.0.0",
     "construx-copier": "^1.0.0",
     "construx-dustjs": "^1.0.0",
@@ -23,6 +24,8 @@
     "kraken-js": "^1.0.3",
     "makara": "^2.0.1",
     "merge-util": "^0.3.1",
+    "minimist": "^1.2.0",
+    "mongodb": "^2.0.42",
     "mongoose": "^4.0.8",
     "node-uuid": "^1.4.3",
     "pg": "^4.4.0",

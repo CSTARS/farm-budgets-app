@@ -1,56 +1,127 @@
 'use strict';
 
-var pg = global.pgClient;
-var stateHash = require('../lib/states.json');
-var schema = global.config.get('postgres').schema;
+var utils = require('../lib/modelUtils');
+var authorityModel = require('./authority');
+var materialModel = require('./materials');
+var uuid = require('node-uuid');
+var async = require('async');
+
+var collection, init = true;
 
 module.exports = function() {
+  if( init ) {
+    collection = global.db.collection('budget');
+    authorityModel = new authorityModel();
+    materialModel = new materialModel();
+    init = false;
+  }
+
   return {
       name: 'Budget',
-      get: getBudget
+      find: find,
+      save: save
   };
 };
 
-// get budget ex:
-// SELECT * FROM farm_budget_data.production pr
-// LEFT JOIN farm_budget_data.price pp
-// ON pr.material = pp.material and pr.location = pp.location
-// WHERE pr.location = 'CA' and pr.commodity = 'ASPARAGUS';
-function getBudget(crop, location, callback) {
-  if( stateHash[location] ) {
-    location = stateHash[location];
-  }
-  if( crop ) {
-    crop = crop.toUpperCase();
+
+function save(budget, callback) {
+  if( !budget ) {
+    return callback('No budget provided');
   }
 
-  var query = 'SELECT * '+
-    'FROM '+schema+'.production pr, '+schema+'.price pp, '+schema+'.material m ' +
-    'WHERE pr.location = $1 and pr.commodity = $2 and '+
-    'pr.material = pp.material and pr.material = m.material and pr.location = pp.location';
+  utils.validate(budget, authorityModel, function(err){
+    if( err ) {
+      return callback(err);
+    }
 
-  pg.query(query,
-    [location, crop],
-    function(err, result) {
+    // set guid, might be useful, we will see
+    if( !budget.id ) {
+      budget.id = uuid.v4();
+    }
+
+    // clean app data from budget
+    var materialIds = cleanBudget(budget);
+
+    // validate material id's
+    validateMaterials(materialIds, function(err) {
       if( err ) {
-        return callback(err);
+        return callback('Invalid material id(s): '+JSON.stringify(err));
       }
 
-      var rows = fillTmpData(result.rows);
-      callback(null, rows);
+      // update
+      collection.update({id: budget.id}, budget, {upsert: true}, callback);
+    });
+
+  });
+}
+
+function validateMaterials(ids, callback) {
+  var hasError = false;
+  var invalids = [];
+
+  async.eachSeries(
+    ids,
+    function(id, next) {
+      if( hasError ) {
+        return next();
+      }
+
+      if( id === null || id === undefined ) {
+        hasError = true;
+        invalids.push(id);
+        return next();
+      }
+
+      materialModel.get(id, function(err, material){
+        if( err ) {
+          invalids.push(id);
+          hasError = true;
+        } else if( !material ) {
+          invalids.push(id);
+          hasError = true;
+        }
+
+        next();
+      });
+    },
+    function(err) {
+      if( hasError ) {
+        callback(invalids);
+      } else {
+        callback();
+      }
     }
   );
 }
 
-function fillTmpData(rows) {
-  var operations = global.pgOperations;
+function cleanBudget(budget) {
+  var ids = [];
 
-  for( var i = 0; i < rows.length; i++ ) {
-    var tmp = operations[Math.floor(Math.random() * operations.length)];
+  delete budget.classes;
+  delete budget.materials;
 
-    rows[i].phase = tmp.phase;
-    rows[i].operation = tmp.operation;
+  if( !budget.operations ) {
+    budget.operations = [];
   }
 
-  return rows;
+  budget.operations.forEach(function(operation){
+    delete operation.error;
+
+    if( !operation.materials ) {
+      operation.materials = [];
+    }
+
+    operation.materials.forEach(function(material){
+      delete material.error;
+      ids.push(material.id);
+    });
+  });
+
+  return ids;
+}
+
+function find(query, callback) {
+  var q = utils.prepareQuery(query);
+
+  collection.find({'$and': q}).limit(20).toArray(callback);
 }
