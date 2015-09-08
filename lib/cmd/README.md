@@ -1,6 +1,6 @@
 ## Budget Command Line Tool
 
-/lib/cmd let's you interact with the budget database just list the budget application.  You have access to all model's and their functions.
+/lib/cmd let's you interact with the budget database just like the budget application.  You have access to all model's and their functions.
 
 #### Commands
 
@@ -28,4 +28,4 @@ can be used to populate MongoDB from the example budgets from this repo.  Curren
 ```
 node lib/cmd -m authority -f save '{name:"AHB",description:"Advanced Hardwood Biofuels, PNW"}'
 ```
-The budget name needs to be exposed in /lib/shared/index.js in examples.app.
+The budget name needs to be exposed in /lib/shared/index.js in examples.app
