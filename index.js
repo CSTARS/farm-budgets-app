@@ -5,6 +5,7 @@ var kraken = require('kraken-js');
 var merge = require('merge-util');
 var fs = require('fs');
 var postgres = require('./lib/postgres');
+var mongo = require('./lib/mongo');
 
 var options, app;
 
@@ -46,7 +47,15 @@ options = {
             console.log(err);
             process.exit();
           }
-          next(null, config);
+
+          mongo.connect(config, function(err){
+            if( err ) {
+              console.log(err);
+              process.exit();
+            }
+
+            next(null, config);
+          });
         });
     }
 };

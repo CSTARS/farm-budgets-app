@@ -1,0 +1,52 @@
+<dom-module id="budget-section-setup">
+  <style>
+    :host {
+      display: block;
+      padding-top: 25px;
+    }
+    .card {
+      padding: 15px;
+      margin: 15px;
+      box-shadow: 0 0 8px #ccc;
+    }
+    @media(max-width: 768px) {
+      .card {
+        padding: 5px;
+        margin: 5px 0px;
+      }
+    }
+  </style>
+  <template>
+
+    Change Example Budget: <select id="budgetSelect" on-change="updateExample"></select>
+
+    <a class="btn btn-link" on-click="toggleDebug">Toggle Debug</a>
+    <div class="card" id="debug" style="display:none">
+      <h4>JSON (debug)</h4>
+      <textarea id="json" class="form-control" style="height: 400px"></textarea>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'budget-section-setup',
+
+    attached : function() {
+      var html = '';
+      for( var key in FB.examples.db ){
+        html += '<option value="'+key+'" '+(this.example == key ? 'selected' : '')+'>'+key+'</option>';
+      }
+      for( var key in FB.examples.app ){
+        html += '<option value="'+key+'" '+(this.example == key ? 'selected' : '')+'>'+key+'</option>';
+      }
+
+      this.$.budgetSelect.innerHTML = html;
+    },
+
+    updateExample : function() {
+      window.localStorage.setItem('budget-demo', this.$.budgetSelect.value);
+      window.location.reload();
+    }
+  });
+</script>

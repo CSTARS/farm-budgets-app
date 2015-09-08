@@ -1,8 +1,6 @@
 <dom-module id="ahb-budget">
   <template>
     <budget-sections id="sections"></budget-sections>
-
-    Change Example Budget: <select id="budgetSelect" on-change="updateExample"></select>
   </template>
 </dom-module>
 
@@ -20,21 +18,7 @@
       var item = window.localStorage.getItem('budget-demo');
       if( item ) this.example = item;
 
-      var html = '';
-      for( var key in FB.examples.db ){
-        html += '<option value="'+key+'" '+(this.example == key ? 'selected' : '')+'>'+key+'</option>';
-      }
-      for( var key in FB.examples.app ){
-        html += '<option value="'+key+'" '+(this.example == key ? 'selected' : '')+'>'+key+'</option>';
-      }
-      this.$.budgetSelect.innerHTML = html;
-
       this.demo();
-    },
-
-    updateExample : function() {
-      window.localStorage.setItem('budget-demo', this.$.budgetSelect.value);
-      window.location.reload();
     },
 
     demo : function() {

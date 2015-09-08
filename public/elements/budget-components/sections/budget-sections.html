@@ -1,6 +1,7 @@
 <link rel="import" href="budget-section-overview.html" />
 <link rel="import" href="budget-section-operations.html" />
 <link rel="import" href="budget-section-materials.html" />
+<link rel="import" href="budget-section-setup.html" />
 
 <dom-module id="budget-sections">
   <style>
@@ -27,11 +28,15 @@
       <li role="presentation" id="btn-materials">
         <a href="#budget/materials"><i class="fa fa-cube"></i> Materials</a>
       </li>
+      <li role="presentation" id="btn-setup">
+        <a href="#budget/setup"><i class="fa fa-sliders"></i> Setup</a>
+      </li>
     </ul>
 
     <budget-section-overview id="overview" class="section"></budget-section-overview>
     <budget-section-operations id="operations" class="section"></budget-section-operations>
     <budget-section-materials id="materials" class="section"></budget-section-materials>
+    <budget-section-setup id="setup" class="section"></budget-section-setup>
   </template>
 </dom-module>
 

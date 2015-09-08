@@ -1,6 +1,6 @@
 'use strict';
 
-var CropsModel = require('../../models/crops');
+var CropsModel = require('../../models/cropsPg');
 var errorHandler = require('../../lib/handleError');
 
 module.exports = function (router) {
