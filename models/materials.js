@@ -16,7 +16,6 @@ module.exports = function() {
     init = false;
   }
 
-
   return {
       name: 'Material',
       find : find,
