@@ -7,6 +7,8 @@ var fs = require('fs');
 var postgres = require('./lib/postgres');
 var mongo = require('./lib/mongo');
 
+var authStack = require('../../../watershed/express-auth');
+
 var options, app;
 
 /*
@@ -54,11 +56,39 @@ options = {
               process.exit();
             }
 
+            var auth = {
+              db : global.db,
+              app : app,
+              config : config.get('auth'),
+              oauthNoUser : oauthNoUser
+            };
+            authStack.init(auth);
+
+            global.auth = auth;
+
             next(null, config);
           });
         });
     }
 };
+
+function oauthNoUser(collection, accessToken, refreshToken, profile, done) {
+  profile.refreshToken = refreshToken;
+  delete profile._raw;
+
+  var user = {
+    name : profile.displayName,
+    email : profile.emails[0].value,
+    username : profile.emails[0].value,
+    oauth : {
+      google : profile,
+    }
+  };
+
+  collection.insert(user, function(err, result){
+    done(err, user);
+  });
+}
 
 app = module.exports = express();
 app.use(kraken(options));

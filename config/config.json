@@ -22,5 +22,13 @@
 
     "mongo" : {
       "url" : "mongodb://localhost:27017/farmBudgets"
+    },
+
+    "auth" : {
+      "redirect" : "/login.html",
+      "url" : "http://localhost:3000",
+      "sessionSecret" : "thisisnotasecret",
+      "usersCollection" : "users",
+      "google" : "/etc/express-auth/google"
     }
 }

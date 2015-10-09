@@ -11,12 +11,18 @@ module.exports = function() {
   return {
       name: 'Authority',
       get : get,
+      getAll : getAll,
       save : save
   };
 };
 
 function get(name, callback) {
   collection.findOne({name: name}, callback);
+}
+
+// get all authorities for a user
+function getAll(username, callback) {
+  global.auth.acl.userRoles(username, callback);
 }
 
 function save(authority, callback) {
