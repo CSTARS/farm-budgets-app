@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Budget Component Testing</title>
+  <title>Budget Component Testing - Create Account</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
   <meta name="theme-color" content="#ffffff">
@@ -12,19 +12,6 @@
   <!-- build:js scripts/webcomponents.js -->
   <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   <!-- endbuild-->
-
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-  <script type="text/javascript">
-      // Load the Visualization API and the piechart package.
-      var googleChartLoadHandlers = [];
-      function onGoogleChartsLoad() {
-        googleChartLoadHandlers.forEach(function(handler){
-            handler();
-        });
-      }
-      google.load('visualization', '1.0', {'packages':['corechart', 'timeline']});
-      google.setOnLoadCallback(onGoogleChartsLoad);
-  </script>
 
   <!-- build:css styles/main.css -->
   <link rel="stylesheet" href="../styles/main.css">
@@ -38,25 +25,29 @@
   <!-- build:js scripts/app.js -->
   <script src="../bower_components/jquery/dist/jquery.js"></script>
   <script src="../bower_components/bootswatch-dist/js/bootstrap.js"></script>
-  <script src="../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
-  <script src="../js/lib.js"></script>
+  <script src="/auth/express-auth.js"></script>
   <!-- endbuild-->
 
-  <script src="/auth/express-auth.js"></script>
-
-  <link rel="import" href="require.html">
+  <link rel="import" href="auth-elements/auth-create-username.html" />
 
 </head>
+<body>
 
-<body style="padding:10px">
+  <auth-create-username></auth-create-username>
 
-  <budget-complex-material-popup></budget-complex-material-popup>
-  <budget-schedule-popup></budget-schedule-popup>
+  <script>
+    if( !ExpressAuth.user) {
+      // authorized but no account
+      window.location = '/prototype/login.html';
+    } else if( ExpressAuth.user.hasAccount ) {
+      // authorized and account created
+      window.location = '/prototype/';
+    }
 
-  <budget-material-popup></budget-material-popup>
-
-  <ahb-budget example="qjh/poplar"></ahb-budget>
-
-  <ucd-copyright></ucd-copyright>
+    ele = document.querySelector('auth-create-username');
+    ele.addEventListener('username-create', function(){
+      window.location = '/prototype/';
+    });
+  </script>
 </body>
 </html>

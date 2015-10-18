@@ -1,10 +1,12 @@
 'use strict';
 
-var pg = global.pgClient;
 var stateHash = require('../lib/states.json');
-var schema = global.config.get('postgres').schema;
+var pg, schema;
 
 module.exports = function() {
+  pg = global.pgClient;
+  schema = global.appConfig.get('postgres').schema;
+
   return {
       name: 'Location',
       get: getCropsForLocation

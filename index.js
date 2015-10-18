@@ -41,7 +41,7 @@ options = {
           console.log('Servering ./public');
         }
 
-        global.config = config;
+        global.appConfig = config;
 
         // connect to pg instance
         postgres.connect(config, function(err){
@@ -56,39 +56,21 @@ options = {
               process.exit();
             }
 
-            var auth = {
+            var authSetup = {
               db : global.db,
               app : app,
-              config : config.get('auth'),
-              oauthNoUser : oauthNoUser
+              config : config.get('auth')
             };
-            authStack.init(auth);
+            authStack(authSetup);
 
-            global.auth = auth;
+            // todo: this should just access the auth module
+            global.auth = authSetup;
 
             next(null, config);
           });
         });
     }
 };
-
-function oauthNoUser(collection, accessToken, refreshToken, profile, done) {
-  profile.refreshToken = refreshToken;
-  delete profile._raw;
-
-  var user = {
-    name : profile.displayName,
-    email : profile.emails[0].value,
-    username : profile.emails[0].value,
-    oauth : {
-      google : profile,
-    }
-  };
-
-  collection.insert(user, function(err, result){
-    done(err, user);
-  });
-}
 
 app = module.exports = express();
 app.use(kraken(options));

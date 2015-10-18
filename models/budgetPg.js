@@ -2,7 +2,7 @@
 
 var pg = global.pgClient;
 var stateHash = require('../lib/states.json');
-var schema = global.config.get('postgres').schema;
+var schema = global.appConfig.get('postgres').schema;
 
 module.exports = function() {
   return {

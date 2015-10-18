@@ -25,10 +25,9 @@
     },
 
     "auth" : {
-      "redirect" : "/login.html",
-      "url" : "http://localhost:3000",
+      "redirect" : "/prototype/login.html",
+      "url" : "http://localhost:3021",
       "sessionSecret" : "thisisnotasecret",
-      "usersCollection" : "users",
-      "google" : "/etc/express-auth/google"
+      "google" : "/etc/farm-budgets-app/google"
     }
 }
