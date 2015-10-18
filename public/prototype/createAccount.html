@@ -28,12 +28,20 @@
   <script src="/auth/express-auth.js"></script>
   <!-- endbuild-->
 
-  <link rel="import" href="auth-elements/auth-create-username.html" />
+  <link rel="import" href="/bower_components/polymer/polymer.html" />
+  <link rel="import" href="/auth-elements/auth-create-account.html" />
+  <link rel="import" href="/elements/ucd-copyright.html" />
 
 </head>
 <body>
 
-  <auth-create-username></auth-create-username>
+  <h2 class="page-header">Farm Budgets <small>Create Account<small></h2>
+
+  <div>
+    <auth-create-account style="max-width:350px; margin: auto"></auth-create-account>
+  </div>
+
+  <ucd-copyright></ucd-copyright>
 
   <script>
     if( !ExpressAuth.user) {
@@ -44,8 +52,8 @@
       window.location = '/prototype/';
     }
 
-    ele = document.querySelector('auth-create-username');
-    ele.addEventListener('username-create', function(){
+    ele = document.querySelector('auth-create-account');
+    ele.addEventListener('account-create', function(){
       window.location = '/prototype/';
     });
   </script>

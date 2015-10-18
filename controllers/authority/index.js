@@ -1,16 +1,17 @@
 'use strict';
 
 // checks the user is logged in
-var authMiddleware = require('../authMiddleware');
+var authUtils = require('../authMiddleware');
 var errorHandler = require('../../lib/handleError');
 var AuthorityModel = require('../../models/authority');
+var authMiddleware = authUtils.middleware;
 
 module.exports = function (router) {
     var model = new AuthorityModel();
     var auth = global.auth;
 
     router.get('/get/all', authMiddleware, function (req, res) {
-      model.getAll(req.user.username, function(err, authorities){
+      model.getAll(req.user, function(err, authorities){
         if( err ) {
           return errorHandler(err, res);
         }
@@ -24,16 +25,18 @@ module.exports = function (router) {
         return errorHandler('authority name required', res);
       }
 
-      if( !auth.acl.hasRole(req.query.authority) ) {
-        return errorHandler('You do not have access to authority: '+req.query.authority, res);
-      }
-
-      model.get(req.user.authority, function(err, authority){
-        if( err ) {
-          return errorHandler(err, res);
+      authUtils.hasAccess(req.user, req.query.authority, function(hasAccess){
+        if( !hasAccess ) {
+          return errorHandler('You do not have access to authority: '+req.query.authority, res);
         }
 
-        res.send(authority);
+        model.get(req.user.authority, function(err, authority){
+          if( err ) {
+            return errorHandler(err, res);
+          }
+
+          res.send(authority);
+        });
       });
     });
 

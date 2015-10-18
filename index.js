@@ -61,10 +61,7 @@ options = {
               app : app,
               config : config.get('auth')
             };
-            authStack(authSetup);
-
-            // todo: this should just access the auth module
-            global.auth = authSetup;
+            global.auth = authStack(authSetup);
 
             next(null, config);
           });

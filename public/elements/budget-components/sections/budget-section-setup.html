@@ -1,3 +1,5 @@
+<link rel="import" href="../setup/budget-setup-authorities.html" />
+
 <dom-module id="budget-section-setup">
   <style>
     :host {
@@ -17,6 +19,22 @@
     }
   </style>
   <template>
+
+    <a class="btn btn-link" href="/prototype/login.html">Login</a>
+
+    <div class="row">
+      <div class="col-md-4">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <a href="#budget/setup/authorities">My Authorities</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-8">
+        <budget-setup-authorities id="authorities"></budget-setup-authorities>
+      </div>
+    </div>
+
 
     Change Example Budget: <select id="budgetSelect" on-change="updateExample"></select>
 
@@ -42,6 +60,11 @@
       }
 
       this.$.budgetSelect.innerHTML = html;
+    },
+
+    onShow : function(params) {
+      console.log(params);
+      this.$.authorities.query();
     },
 
     updateExample : function() {
