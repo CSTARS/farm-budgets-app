@@ -46,7 +46,7 @@
                 </find-budget-location>
 
                 <find-budget-crop id="cropPage" on-crop-select="onCropSelect"></find-budget-crop>
-                <find-budget-list id="budgetPage"></find-budget-list>
+                <find-budget-list id="budgetPage" on-budget-select="onBudgetSelect"></find-budget-list>
               </div>
             </div>
 
@@ -67,8 +67,6 @@
         this.popup = $(this.$.popup).remove();
         $('body').append(this.popup);
         this.popup.modal({show: false});
-
-        this.show();
       },
 
       show : function() {
@@ -110,6 +108,13 @@
       onCropSelect : function(e) {
         this.crop = e.detail;
         this.$.currentCrop.innerHTML = this.crop;
+      },
+
+      onBudgetSelect : function(e) {
+        this.popup.modal('hide');
+        setTimeout(function(){
+          document.querySelector('ahb-budget').load(e.detail);
+        }, 200);
       },
 
       onLocationSelect : function(e) {

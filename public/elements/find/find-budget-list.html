@@ -76,7 +76,13 @@
       select : function(e) {
         var index = parseInt(e.currentTarget.getAttribute('index'));
         var id = this.data[index].id;
-        
+
+        $.get('/budget/get?id='+id, function(resp){
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+          this.fire('budget-select', resp);
+        }.bind(this));
       }
     });
   </script>

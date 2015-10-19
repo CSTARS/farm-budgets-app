@@ -15,26 +15,26 @@
     },
 
     attached : function() {
-      var item = window.localStorage.getItem('budget-demo');
-      if( item ) this.example = item;
+      var id = window.localStorage.getItem('current-budget');
 
-      this.demo();
+      if( id ) {
+        $.get('/budget/get?id='+id, function(resp){
+          if( resp.error ) {
+            alert(resp.message);
+            document.querySelector('find-budget-popup').show();
+          } else {
+            this.load(resp);
+          }
+        }.bind(this));
+      } else {
+        document.querySelector('find-budget-popup').show();
+      }
     },
 
-    demo : function() {
-      var appData;
-
-      if( FB.examples.db[this.example] ) {
-        appData = FB.transform(FB.examples.db[this.example]);
-      } else if( FB.examples.app[this.example] ) {
-        appData = FB.examples.app[this.example];
-      } else {
-        appData = {};
-        alert('Unknown static budget: '+this.example);
-        return;
-      }
-
+    load : function(appData) {
+      FB.reset();
       window.appData = appData;
+      window.localStorage.setItem('current-budget', appData.id);
 
       var options = {
         noEvent : true,

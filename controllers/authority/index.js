@@ -5,9 +5,21 @@ var authUtils = require('../auth');
 var errorHandler = require('../../lib/handleError');
 var AuthorityModel = require('../../models/authority');
 var authMiddleware = authUtils.middleware;
+var model = new AuthorityModel();
+
+global.auth.deserialize = function(user, done) {
+  model.getAll(user, function(err, authorities){
+    if( err ) {
+      return done(err);
+    }
+
+    user.authorities = authorities;
+
+    done(null, user);
+  });
+};
 
 module.exports = function (router) {
-    var model = new AuthorityModel();
     var auth = global.auth;
 
     router.get('/get/all', authMiddleware, function (req, res) {

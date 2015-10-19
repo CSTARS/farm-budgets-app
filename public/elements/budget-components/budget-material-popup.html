@@ -1,4 +1,6 @@
 <!-- reusable popup for complex materials -->
+<link rel="import" href="budget-material-advanced.html" />
+
 
 <dom-module id="budget-material-popup">
   <template>
@@ -12,7 +14,7 @@
           <div class="modal-body">
 
 
-            <div class="form-horizontal">
+            <div class="form-horizontal" id="simplePanel">
 
               <div id="parentMaterial"></div>
               <div class="form-group">
@@ -27,13 +29,6 @@
                 <label for="nameInput" class="col-sm-3 control-label">Description</label>
                 <div class="col-sm-9">
                   <textarea id="descriptionInput" class="form-control" on-input="onDescriptionInput"></textarea>
-                </div>
-              </div>
-
-              <div class="form-group" id="classGroup">
-                <label for="optionInput" class="col-sm-3 control-label">Class</label>
-                <div class="col-sm-9">
-                  <budget-class-selector  id="classInput"></budget-class-selector>
                 </div>
               </div>
 
@@ -148,9 +143,12 @@
 
             </div>
 
-            <div class="horizontal layout center">
+            <budget-material-advanced id="advancedPanel" style="display:none" on-close-advanced="hideAdvanced"></budget-material-advanced>
+
+            <div class="horizontal layout center" id="footer">
               <div class="flex">
                 <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete</a>
+                <a class="btn btn-link" on-click="toggleAdvanced"><i class="fa fa-cog"></i> Advanced</a>
               </div>
               <div style="text-align:right">
                 <a class="btn btn-primary" on-click="save">Save</a>
@@ -172,6 +170,7 @@
 
     ready : function() {
       this.popup = $(this.$.popup).modal({show: false, backdrop: 'static'});
+      this.showingAdvanced = false;
 
       this.materialTableOptions = {
         noNotes: true
@@ -204,6 +203,28 @@
     hide : function() {
       this.showing = false;
       this.popup.modal('hide');
+    },
+
+    hideAdvanced : function() {
+      this.$.simplePanel.style.display = 'block';
+      this.$.footer.style.display = 'flex';
+      if( this.data.type == 'complex' ) {
+        this.$.complexPanel.style.display = 'block';
+      }
+      this.$.advancedPanel.style.display = 'none';
+      this.showingAdvanced = false;
+    },
+
+    toggleAdvanced : function() {
+      if( !this.showingAdvanced ) {
+        this.$.simplePanel.style.display = 'none';
+        this.$.complexPanel.style.display = 'none';
+        this.$.advancedPanel.style.display = 'block';
+        this.$.footer.style.display = 'none';
+        this.showingAdvanced = true;
+      } else {
+        this.hideAdvanced();
+      }
     },
 
     cancel : function() {
@@ -250,6 +271,7 @@
       this.$.title.innerHTML = '<i class="fa fa-pencil"></i> Edit Material';
 
       this.data = material;
+      this.$.advancedPanel.data = material;
 
       // make a copy for if we cancel
       this.originalData = $.extend(true, {}, this.data);
@@ -291,10 +313,6 @@
         this.$.unitsInput.setUnits(FB.units.invert(this.data.units));
         this.$.priceInput.value = this.data.price;
         this.setComplex(false);
-
-        if( this.$.classInput.isClass(this.data.class || '') ) {
-          this.$.classInput.setValue(this.data.class.toLowerCase());
-        }
       }
 
       if( creatingUniqueName ) {
@@ -349,7 +367,6 @@
       this.$.unitsInputMsg.innerHTML = '';
       this.$.priceInput.value = '';
       this.$.descriptionInput.value = '';
-      this.$.classInput.setValue('other');
       this.setComplex(false);
 
       this.parentMaterial = null;
@@ -386,9 +403,6 @@
         this.$.isComplexInput.checked = true;
         this.$.complexPanel.style.display = 'block';
 
-        this.$.classGroup.style.display = 'none';
-
-
         this.$.priceGroup.style.display = 'none';
 
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
@@ -399,7 +413,6 @@
         this.$.complexPanel.style.display = 'none';
 
         this.$.priceGroup.style.display = 'block';
-        this.$.classGroup.style.display = 'Block';
       }
     },
 
@@ -413,9 +426,7 @@
       }
       this.$.nameInputMessage.innerHTML = '';
 
-      if( this.data.type == 'simple' ) {
-        this.data.class = this.$.classInput.getValue();
-      }
+      this.$.advancedPanel.save();
 
       var options = {};
       if( this.action == 'edit' ) {

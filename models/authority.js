@@ -1,12 +1,8 @@
 'use strict';
 
-var collection, init = true;
+var collection = global.db.collection('authority');
 
 module.exports = function() {
-  if( init ) {
-    collection = global.db.collection('authority');
-    init = false;
-  }
 
   return {
       name: 'Authority',
@@ -16,6 +12,7 @@ module.exports = function() {
   };
 };
 
+
 function get(name, callback) {
   collection.findOne({name: name}, callback);
 }
@@ -23,10 +20,19 @@ function get(name, callback) {
 // get all authorities for a user
 function getAll(user, callback) {
   if( user.admin ) {
-    console.log(1);
-    collection.find({},{name: 1, _id: 0}).toArray(callback);
+    collection.find({},{name: 1, _id: 0}).toArray(function(err, result){
+      if( err ) {
+        return callback(err);
+      }
+
+      var arr = [];
+      for( var i = 0; i < result.length; i++ ) {
+        arr.push(result[i].name);
+      }
+      arr.sort();
+      callback(null, arr);
+    });
   } else {
-    console.log(2);
     global.auth.acl.userRoles(user.username, callback);
   }
 }

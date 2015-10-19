@@ -59,7 +59,7 @@ options = {
             var authSetup = {
               db : global.db,
               app : app,
-              config : config.get('auth')
+              config : config.get('auth'),
             };
             global.auth = authStack(authSetup);
 

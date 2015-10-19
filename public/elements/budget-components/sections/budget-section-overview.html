@@ -24,11 +24,15 @@
         <div class="card">
           <h4><i class="fa fa-info-circle"></i> Farm Information</h4>
           <table class="table">
-            <tbody id="tbody">
+            <tbody>
               <tr>
                 <td>Farm Size</td>
                 <td><input type="number" class="form-control" id="sizeInput" on-input="onFarmSizeChange"/></td>
               </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <tbody id="tbody">
             </tbody>
           </table>
         </div>
@@ -72,6 +76,7 @@
       if( !data.farm ) return;
 
       this.$.total.setData(data.farm);
+      this.$.tbody.innerHTML = '';
 
       for( var key in data.farm ) {
         if( key == 'size' ) {

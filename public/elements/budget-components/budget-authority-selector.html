@@ -1,0 +1,30 @@
+<dom-module id="budget-authority-selector">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div id="noUser"></div>
+    <div id="user">
+      <select id="selector" class="form-control"></select>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-authority-selector',
+
+      ready: function() {
+        if( ExpressAuth.user ) {
+          this.$.user.style.display = 'block';
+          this.$.noUser.style.display = 'none';
+        } else {
+          this.$.user.style.display = 'none';
+          this.$.noUser.style.display = 'block';
+        }
+      }
+    });
+  </script>
+</dom-module>
