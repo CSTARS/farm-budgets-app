@@ -1,49 +1,71 @@
 'use strict';
 
-/*
-var authority = 'UCD Ext';
-var locality = ['California', 'northern'];
-var name = 'qjh/alfalfa';
-*/
-var authority = 'AHB';
-var locality = ['California', 'clarksburg', '95612'];
-var name = 'qjh/poplar';
+var dataList = [
+  {
+    authority : 'UCD Ext',
+    locality : ['California', 'northern'],
+    name : 'qjh/alfalfa',
+    moduleName : 'qjh-alfalfa'
+  },
+  {
+    authority : 'AHB',
+    locality : ['California', 'clarksburg', '95612'],
+    name : 'qjh/poplar',
+    moduleName : 'qjh-poplar'
+  }
+];
 
 var data = require('../../lib/shared');
 var connect = require('../../lib/cmd/connect');
 var async = require('async');
 
-var materialModel = require('../../models/materials');
-var budgetModel = require('../../models/budget');
+var materialModel;
+var budgetModel;
 
 connect(function(err, db){
   if( err ) {
     error(err);
   }
-
   global.db = db;
+
+  materialModel = require('../../models/materials');
+  budgetModel = require('../../models/budget');
+
   run();
 });
 
+var authority, locality, name, moduleName;
+
 function run() {
+
   materialModel = new materialModel();
   budgetModel = new budgetModel();
 
-  var budget = data.examples.app[name];
+  async.eachSeries(dataList, function(item, next){
+    authority = item.authority;
+    locality = item.locality;
+    name = item.name;
+    moduleName = item.moduleName;
+    var budget = require('../../lib/shared/config/app/'+moduleName);
 
-  insertMaterials(budget, function(err, nameLookup) {
-    if( err ) {
-      return console.log(err);
-    }
+    insertMaterials(budget, function(err, nameLookup) {
+      if( err ) {
+        console.log(err);
+        return next();
+      }
 
-    setMaterialIds(budget, nameLookup);
+      setMaterialIds(budget, nameLookup);
 
-    insertBudget(budget);
+      insertBudget(budget, next);
+    });
 
+  }, function(err){
+    console.log('done');
+    global.db.close();
   });
 }
 
-function insertBudget(budget) {
+function insertBudget(budget, next) {
   budget.authority = authority;
   budget.name = name;
   budget.locality = locality;
@@ -67,12 +89,14 @@ function insertBudget(budget) {
     }
 
     budgetModel.save(budget, function(err){
-      global.db.close();
+
       if( err ) {
-        return console.log(err);
+        console.log(err);
+        return next();
       }
 
       console.log('success');
+      next();
     });
   });
 }

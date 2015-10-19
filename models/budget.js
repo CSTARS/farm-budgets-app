@@ -46,6 +46,8 @@ function save(budget, callback) {
         return callback('Invalid material id(s): '+JSON.stringify(err));
       }
 
+      budget.materialIds = materialIds;
+
       // update
       collection.update({id: budget.id}, budget, {upsert: true}, callback);
     });
@@ -93,10 +95,16 @@ function validateMaterials(ids, callback) {
 }
 
 function cleanBudget(budget) {
-  var ids = [];
+  var ids = {};
 
   delete budget.classes;
-  delete budget.materials;
+
+  if( budget.materials ) {
+    for( var i = 0; i < budget.materials.length; i++ ) {
+      ids[budget.materials[i].id] = 1;
+    }
+    delete budget.materials;
+  }
 
   if( !budget.operations ) {
     budget.operations = [];
@@ -111,11 +119,11 @@ function cleanBudget(budget) {
 
     operation.materials.forEach(function(material){
       delete material.error;
-      ids.push(material.id);
+      ids[material.id] = 1;
     });
   });
 
-  return ids;
+  return Object.keys(ids);
 }
 
 function get(id, callback) {
@@ -131,32 +139,15 @@ function get(id, callback) {
       return callback(null, result);
     }
 
-    var materials = {}, i, j, opp;
-    for( i = 0; i < result.operations.length; i++ ) {
-      opp = result.operations[i];
-      if( !opp.materials ) {
-        continue;
-      }
-
-      for( j = 0; j < opp.materials.length; j++ ) {
-        materials[opp.materials[j].id] = 1;
-      }
-    }
-
-    var ids = Object.keys(materials);
-    if( ids.length === 0 ) {
-      result.materials = [];
-      return callback(null, result);
-    }
-
     materialCollection
-      .find({id : {'$in':ids}}, {_id: 0})
+      .find({id : {'$in': result.materialIds}}, {_id: 0})
       .toArray(function(err, materials){
         if( err ) {
           return callback(err);
         }
 
         result.materials = materials;
+        delete result.materialIds;
         callback(null, result);
       });
   });
@@ -174,7 +165,7 @@ function find(query, callback) {
   }
 
   collection
-    .find(query, {operations: 0})
+    .find(query, {operations: 0, materialIds: 0})
     .limit(20)
     .toArray(callback);
 }

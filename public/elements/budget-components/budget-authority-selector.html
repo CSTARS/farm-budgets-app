@@ -6,25 +6,67 @@
       }
     </style>
 
-    <div id="noUser"></div>
-    <div id="user">
-      <select id="selector" class="form-control"></select>
-    </div>
+    <div id="current"></div>
+    <select id="selector" class="form-control" on-input="onInput"></select>
 
   </template>
   <script>
     Polymer({
       is: 'budget-authority-selector',
 
-      ready: function() {
-        if( ExpressAuth.user ) {
-          this.$.user.style.display = 'block';
-          this.$.noUser.style.display = 'none';
-        } else {
-          this.$.user.style.display = 'none';
-          this.$.noUser.style.display = 'block';
+      properties : {
+        value : {
+          type : String,
+          observer : 'valueObserver'
+        },
+        default : {
+          type : String,
+          observer : 'defaultObserver'
         }
+      },
+
+      attached : function() {
+        if( !ExpressAuth.user ) {
+          this.$.selector.style.display = 'none';
+          return;
+        }
+
+        var html = '<option value=""></option><option value="__default__" style="display:none">Default</option>';
+        for( var i = 0; i < ExpressAuth.user.authorities.length; i++ ) {
+          var auth = ExpressAuth.user.authorities[i];
+          html += '<option value="'+auth+'">'+auth+'</option>';
+        }
+        html += '<option value="'+ExpressAuth.user.username+'">'+ExpressAuth.user.username+'</option>';
+        this.$.selector.innerHTML = html;
+      },
+
+      onInput : function() {
+        if( this.$.selector.value == '__default__' ) {
+          this.value = this.default;
+          this.$.selector.value = '';
+          return;
+        }
+
+        this.value = this.$.selector.value;
+        this.$.selector.value = '';
+      },
+
+      valueObserver : function() {
+        this.$.current.innerHTML = this.value;
+      },
+
+      defaultObserver : function() {
+        if( ExpressAuth.user ) {
+          if( this.default === '' ) {
+            this.$.selector.querySelector('[value="__default__"]').style.display = 'none';
+          } else {
+            this.$.selector.querySelector('[value="__default__"]').style.display = 'block';
+          }
+        }
+
+        this.value = this.default;
       }
+
     });
   </script>
 </dom-module>

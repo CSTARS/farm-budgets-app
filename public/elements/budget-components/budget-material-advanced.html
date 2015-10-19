@@ -13,21 +13,27 @@
       </div>
 
       <div class="form-group">
-        <label for="nameInput" class="col-sm-3 control-label">Authority</label>
-        <div class="col-sm-9" id="authority"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="locationInput" class="col-sm-3 control-label">Location</label>
+        <label for="nameInput" class="col-sm-3 control-label"><i class="fa fa-shield"></i> Authority</label>
         <div class="col-sm-9">
-          <textarea id="locationInput" class="form-control"></textarea>
+          <budget-authority-selector id="authority"></budget-authority-selector>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="sourceInput" class="col-sm-3 control-label">Source</label>
+        <label for="locationInput" class="col-sm-3 control-label"><i class="fa fa-map-marker"></i> Location</label>
+        <div class="col-sm-9">
+          <budget-location-selector id="locationInput"></budget-location-selector>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sourceInput" class="col-sm-3 control-label"><i class="fa fa-book"></i> Source</label>
         <div class="col-sm-9">
           <textarea id="sourceInput" class="form-control"></textarea>
+          <div class="help-block">Add any source (where the data came from) information for this material.
+            <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
+             is encouraged.  External links are encouraged.
+          </div>
         </div>
       </div>
 
@@ -54,7 +60,8 @@
       },
 
       dataObserver : function() {
-        this.$.authority.innerHTML = this.data.authority;
+        this.$.authority.default = this.data.authority;
+        this.$.locationInput.value = this.data.locality || [];
 
         if( this.$.classInput.isClass(this.data.class || '') ) {
           this.$.classInput.setValue(this.data.class.toLowerCase());
@@ -67,6 +74,7 @@
 
       save : function() {
         this.data.class = this.$.classInput.getValue();
+        this.data.locality = this.$.locationInput.value;
       },
 
       back : function() {

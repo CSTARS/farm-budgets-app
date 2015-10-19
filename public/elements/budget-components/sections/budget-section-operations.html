@@ -96,6 +96,7 @@
 
     setData : function(data) {
       this.data = data;
+      this.$.root.innerHTML = '';
 
       this.data.operations.forEach(function(operation){
         var ele = this.createPanel(operation);

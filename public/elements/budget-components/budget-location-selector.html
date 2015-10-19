@@ -1,0 +1,57 @@
+<dom-module id="budget-location-selector">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <input type="text" id="input" class="form-control" placeholder="Add locations, comma separate" on-blur="onBlur" on-keyup="onKeyUp" />
+    <div class="help-block">Ex: city, state, zip and/or county</div>
+    <div>
+      <template is="dom-repeat" items="{{value}}" id="list">
+        <a class="btn btn-primary btn-sm" index$="{{index}}" on-click="remove"><i class="fa fa-times"></i> <span>{{item}}</span></a>
+      </template>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-location-selector',
+
+      onKeyUp : function(e) {
+        if( e.which == 13 ) this.update();
+      },
+
+      onBlur : function() {
+        this.update();
+      },
+
+      update : function() {
+        var values = this.$.input.value.split(',');
+        if( !this.value ) this.value = [];
+
+        for( var i = 0; i < values.length; i++ ) {
+          values[i] = values[i].toLowerCase().trim();
+
+          if( FB.utils.statesLookup[values[i]] ) {
+            values[i] = FB.utils.statesLookup[values[i]].toLowerCase();
+          }
+
+          if( values[i] == '' ) continue;
+
+          if( this.value.indexOf(values[i]) == -1  ) {
+            this.push('value', values[i]);
+          }
+        }
+        this.$.input.value = '';
+      },
+
+      remove : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('index'));
+        this.splice('value', index, 1);
+      }
+
+    });
+  </script>
+</dom-module>
