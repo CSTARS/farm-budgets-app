@@ -1,0 +1,83 @@
+<dom-module id="find-budget-crop">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label for="cropInput" class="col-md-2 control-label">Crops</label>
+        <div class="col-md-10">
+          <div id="cropInputPanel">
+            <select class="form-control" id="cropInput" on-input="onInput"></select>
+            <div class="help-block">The above crops are available in your selected location</div>
+          </div>
+
+          <div id="noCrop" class="text text-warning">
+            There are no crops available for your selected region.
+          </div>
+
+          <div id="loading" class="label label-warning">
+            Loading...
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'find-budget-crop',
+
+      ready : function() {
+        this.cache = {};
+      },
+
+      show : function(localities) {
+        this.localities = localities;
+        this.$.noCrop.style.display = 'none';
+        this.$.cropInputPanel.style.display = 'none';
+
+        var str = JSON.stringify(this.localities || []);
+
+        if( this.cache[str] ) {
+          this.onResponse(this.cache[str]);
+        } else {
+          this.$.loading.style.display = 'block';
+          $.get('/crops/findForLocality?localities='+encodeURIComponent(str), function(resp){
+            this.cache[str] = resp;
+            this.onResponse(resp);
+          }.bind(this));
+        }
+      },
+
+      onResponse : function(resp) {
+        this.$.loading.style.display = 'none';
+
+        if( resp.error ) {
+          return alert(resp.message);
+        }
+
+        if( resp.length === 0 ) {
+          this.$.noCrop.style.display = 'block';
+          return;
+        }
+
+        var html = '<option></option>';
+        for( var i = 0; i < resp.length; i++ ) {
+          html += '<option value="'+resp[i]+'" '+(this.crop === resp[i] ? 'selected' : '')+'>'+resp[i]+'</option>';
+        }
+        this.$.cropInput.innerHTML = html;
+
+        this.$.cropInputPanel.style.display = 'block';
+      },
+
+      onInput : function() {
+        this.crop = this.$.cropInput.value;
+        this.fire('crop-select', this.$.cropInput.value);
+      }
+    });
+  </script>
+</dom-module>

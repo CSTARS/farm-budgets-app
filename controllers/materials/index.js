@@ -1,12 +1,13 @@
 'use strict';
 
-var authMiddleware = require('../authMiddleware');
+var authUtils = require('../auth');
 var errorHandler = require('../../lib/handleError');
 var MaterialModel = require('../../models/materials');
 
 module.exports = function (router) {
     var model = new MaterialModel();
     var auth = global.auth;
+    var authMiddleware = authUtils.middleware;
 
     router.get('/find', function (req, res) {
       model.get(req.query, function(err, budget){

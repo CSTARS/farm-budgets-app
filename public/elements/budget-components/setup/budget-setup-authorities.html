@@ -17,6 +17,10 @@
         $.get('/authority/get/all', function(resp){
           console.log(resp);
         });
+      },
+
+      onShow : function() {
+        this.query();
       }
     });
   </script>

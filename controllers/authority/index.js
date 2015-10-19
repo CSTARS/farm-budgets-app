@@ -1,7 +1,7 @@
 'use strict';
 
 // checks the user is logged in
-var authUtils = require('../authMiddleware');
+var authUtils = require('../auth');
 var errorHandler = require('../../lib/handleError');
 var AuthorityModel = require('../../models/authority');
 var authMiddleware = authUtils.middleware;

@@ -6,20 +6,18 @@ var materialModel = require('./materials');
 var uuid = require('node-uuid');
 var async = require('async');
 
-var collection, init = true;
+var collection = global.db.collection('budget');
+var materialCollection = global.db.collection('material');
+
+authorityModel = new authorityModel();
+materialModel = new materialModel();
 
 module.exports = function() {
-  if( init ) {
-    collection = global.db.collection('budget');
-    authorityModel = new authorityModel();
-    materialModel = new materialModel();
-    init = false;
-  }
-
   return {
       name: 'Budget',
       find: find,
-      save: save
+      save: save,
+      get : get
   };
 };
 
@@ -120,8 +118,63 @@ function cleanBudget(budget) {
   return ids;
 }
 
-function find(query, callback) {
-  var q = utils.prepareQuery(query);
+function get(id, callback) {
+  collection.findOne({id: id}, {_id: 0}, function(err, result){
+    if( err ) {
+      return callback(err);
+    }
+    if( !result ) {
+      return callback('Invalid budget id');
+    }
 
-  collection.find({'$and': q}).limit(20).toArray(callback);
+    if( !result.operations ) {
+      return callback(null, result);
+    }
+
+    var materials = {}, i, j, opp;
+    for( i = 0; i < result.operations.length; i++ ) {
+      opp = result.operations[i];
+      if( !opp.materials ) {
+        continue;
+      }
+
+      for( j = 0; j < opp.materials.length; j++ ) {
+        materials[opp.materials[j].id] = 1;
+      }
+    }
+
+    var ids = Object.keys(materials);
+    if( ids.length === 0 ) {
+      result.materials = [];
+      return callback(null, result);
+    }
+
+    materialCollection
+      .find({id : {'$in':ids}}, {_id: 0})
+      .toArray(function(err, materials){
+        if( err ) {
+          return callback(err);
+        }
+
+        result.materials = materials;
+        callback(null, result);
+      });
+  });
+}
+
+function find(query, callback) {
+  var q = [];
+  if( query !== '' ) {
+    q = utils.prepareQuery(query);
+  }
+
+  query = {};
+  if( q.length > 0 ) {
+    query.$and = q;
+  }
+
+  collection
+    .find(query, {operations: 0})
+    .limit(20)
+    .toArray(callback);
 }

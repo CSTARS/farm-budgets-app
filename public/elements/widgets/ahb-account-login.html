@@ -1,0 +1,22 @@
+<dom-module id="ahb-account-login">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+  </template>
+  <script>
+    Polymer({
+      is: 'ahb-account-login',
+
+      ready : function() {
+        if( ExpressAuth.user ) {
+          this.innerHTML = 'Hello, '+ExpressAuth.user.username;
+        } else {
+          this.innerHTML = '<a href="/prototype/login.html" class="btn btn-link">Login</a>';
+        }
+      }
+    });
+  </script>
+</dom-module>

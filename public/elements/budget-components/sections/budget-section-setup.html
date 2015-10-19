@@ -1,4 +1,5 @@
 <link rel="import" href="../setup/budget-setup-authorities.html" />
+<link rel="import" href="../setup/budget-setup-account.html" />
 
 <dom-module id="budget-section-setup">
   <style>
@@ -20,18 +21,29 @@
   </style>
   <template>
 
-    <a class="btn btn-link" href="/prototype/login.html">Login</a>
+    <div id="noAccess" style="text-align center">
+      <a class="btn btn-default btn-lg" href="/prototype/login.html">Login</a>
 
-    <div class="row">
+      <div class="well">
+        You must first login so you can edit and save budgets.
+      </div>
+
+    </div>
+
+    <div class="row" id="hasAccess">
       <div class="col-md-4">
         <ul class="list-group">
+          <li class="list-group-item">
+            <a href="#budget/setup/account">Account</a>
+          </li>
           <li class="list-group-item">
             <a href="#budget/setup/authorities">My Authorities</a>
           </li>
         </ul>
       </div>
-      <div class="col-md-8">
+      <div class="col-md-8" id="panels">
         <budget-setup-authorities id="authorities"></budget-setup-authorities>
+        <budget-setup-account id="account"></budget-setup-account>
       </div>
     </div>
 
@@ -63,8 +75,24 @@
     },
 
     onShow : function(params) {
-      console.log(params);
-      this.$.authorities.query();
+      if( !ExpressAuth.user ) {
+        this.$.noAccess.style.display = 'block';
+        this.$.hasAccess.style.display = 'none';
+        return;
+      } else {
+        this.$.noAccess.style.display = 'none';
+        this.$.hasAccess.style.display = 'block';
+      }
+
+      if( params.length == 0 ) {
+        return window.location = '#budget/setup/account';
+      }
+
+      if( !this.$[params[0]] ) return;
+      $(this.$.panels).children().hide();
+
+      this.$[params[0]].style.display = 'block';
+      this.$[params[0]].onShow();
     },
 
     updateExample : function() {

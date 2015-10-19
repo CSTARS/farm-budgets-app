@@ -1,4 +1,4 @@
-<dom-module id="ahb-page-location">
+<dom-module id="find-budget-location">
   <style>
       :host {
           display: block;
@@ -33,7 +33,16 @@
 
   <template>
 
+    <ul class="nav nav-tabs nav-justified" id="tabs">
+      <li role="presentation" class="active" id="btnMap" on-click="showMap">
+        <a><i class="fa fa-map-o"></i> Map</a>
+      </li>
+      <li role="presentation" id="btnText" on-click="showManual">
+        <a><i class="fa fa-terminal"></i> Manual</a>
+      </li>
+    </ul>
 
+    <div id="mapPanel" style="height:400px; position:relative">
       <google-map id="map" latitude="37.77493" longitude="-122.41942" on-google-map-ready="initMap"></google-map>
 
       <div class="location">
@@ -74,12 +83,80 @@
               </div>
           </div>
       </div>
+    </div>
+
+    <div id="textPanel" style="padding-top: 15px">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="locationInput" class="col-md-2 control-label">Location</label>
+          <div class="col-md-10">
+            <input type="text" class="form-control" id="locationInput" placeholder="Comma Separate" on-keyup="onKeyUp" on-blur="onBlur" />
+          </div>
+        </div>
+      </div>
+
+      <div id="locationBtns"></div>
+    </div>
+
   </template>
 </dom-module>
 
 <script>
   Polymer({
-    is : 'ahb-page-location',
+    is : 'find-budget-location',
+
+      onKeyUp : function(e) {
+        if( e.which == 13 ) this.setFiltersFromText();
+      },
+
+      onBlur : function() {
+        this.setFiltersFromText();
+      },
+
+      setFiltersFromText : function() {
+        if( this.$.locationInput.value.length == 0 ) return;
+
+        this.filters = this.$.locationInput.value.split(',');
+        for( var i = 0; i < this.filters.length; i++ ) {
+          this.filters[i] = this.filters[i].trim();
+        }
+        this.$.locationInput.value = '';
+
+        this.renderFilterBtns();
+        this.fire('filters-update', this.filters);
+      },
+
+      renderFilterBtns : function() {
+        var html = '';
+        for( var i = 0; i < this.filters.length; i++ ) {
+          html += '<a class="btn btn-primary" index="'+i+'"><i class="fa fa-times"></i> '+this.filters[i]+'</a> ';
+        }
+        this.$.locationBtns.innerHTML = html;
+        $(this.$.locationBtns)
+          .find('a')
+          .on('click', function(e){
+            var index = parseInt($(e.currentTarget).attr('index'));
+            $(e.currentTarget).remove();
+            this.filters.splice(index, 1);
+            this.fire('filters-update', this.filters);
+            this.renderFilterBtns();
+          }.bind(this));
+      },
+
+      showMap : function() {
+        this.$.btnText.className = '';
+        this.$.btnMap.className = 'active';
+        this.$.mapPanel.style.display = 'block';
+        this.$.textPanel.style.display = 'none';
+        this.$.map.resize();
+      },
+
+      showManual : function() {
+        this.$.btnText.className = 'active';
+        this.$.btnMap.className = '';
+        this.$.mapPanel.style.display = 'none';
+        this.$.textPanel.style.display = 'block';
+      },
 
       updateCropText : function() {
           var cropLocality = [];
@@ -177,22 +254,21 @@
 
       initMap : function() {
         this.map = this.$.map.map;
-        console.log(this.map);
 
-          google.maps.event.addListener(this.map, 'click', function(e) {
-              this.llLookUp(e.latLng.lat(), e.latLng.lng(), true);
-          }.bind(this));
+        google.maps.event.addListener(this.map, 'click', function(e) {
+            this.llLookUp(e.latLng.lat(), e.latLng.lng(), true);
+        }.bind(this));
 
-          this.map.setOptions({
-              mapTypeControl: false,
-              panControl: false,
-              zoomControl: true,
-              zoomControlOptions: {
-                  style: google.maps.ZoomControlStyle.DEFAULT,
-                  position: google.maps.ControlPosition.LEFT_CENTER
-              },
-              streetViewControl: false
-          })
+        this.map.setOptions({
+            mapTypeControl: false,
+            panControl: false,
+            zoomControl: true,
+            zoomControlOptions: {
+                style: google.maps.ZoomControlStyle.DEFAULT,
+                position: google.maps.ControlPosition.LEFT_CENTER
+            },
+            streetViewControl: false
+        });
       },
 
       setLocation : function(loc, recheck) {
@@ -228,6 +304,9 @@
 
           this.updateText();
           this.stopSearch();
+
+          this.filters = [this.location.state, this.location.county, this.location.zipCode];
+          this.renderFilterBtns();
 
           this.fire('location-select', this.location);
       },

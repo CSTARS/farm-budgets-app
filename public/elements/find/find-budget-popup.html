@@ -1,0 +1,153 @@
+<link rel="import" href="find-budget-location.html">
+<link rel="import" href="find-budget-crop.html">
+<link rel="import" href="find-budget-list.html">
+
+<dom-module id="find-budget-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .nav-list-item {
+        border-bottom: 1px solid #eee;
+        margin-bottom: 10px;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Find Crop Budget</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="nav-list-item">
+                  <div><a class="btn btn-link" on-click="showMap"><i class="fa fa-map-pin"></i> Location</a></div>
+                  <div id="locationBtns" style="text-align:right"></div>
+                </div>
+                <div class="nav-list-item">
+                  <div><a class="btn btn-link" on-click="showCrop"><i class="fa fa-leaf"></i> Crop</a></div>
+                  <div id="currentCrop" style="text-align:right"></div>
+                </div>
+                <div class="nav-list-item">
+                  <div><a class="btn btn-link" on-click="showBudget"><i class="fa fa-dollar"></i> Budget</a></div>
+                </div>
+              </div>
+              <div class="col-sm-8" id="panels">
+
+                <find-budget-location
+                  id="locationPage"
+                  on-location-select="onLocationSelect"
+                  on-filters-update="onFiltersUpdate">
+                </find-budget-location>
+
+                <find-budget-crop id="cropPage" on-crop-select="onCropSelect"></find-budget-crop>
+                <find-budget-list id="budgetPage"></find-budget-list>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'find-budget-popup',
+
+      ready : function() {
+        this.locationKeys = ['state', 'county', 'zipCode'];
+        this.crop = '';
+
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+
+        this.show();
+      },
+
+      show : function() {
+        this.popup.modal('show');
+        this.showMap();
+      },
+
+      hidePanels : function() {
+        $(this.$.panels).children().hide();
+      },
+
+      showMap : function() {
+        this.panel = 'map';
+        this.hidePanels();
+        this.$.locationPage.style.display = 'block';
+
+        this.$.locationPage.showMap();
+        setTimeout(function(){
+          this.$.locationPage.resize();
+        }.bind(this), 300);
+      },
+
+      showCrop : function() {
+        this.panel = 'crop';
+        this.hidePanels();
+        this.$.cropPage.style.display = 'block';
+
+        this.$.cropPage.show(this.locality);
+      },
+
+      showBudget : function() {
+        this.panel = 'budget';
+        this.hidePanels();
+        this.$.budgetPage.style.display = 'block';
+
+        this.$.budgetPage.show(this.crop);
+      },
+
+      onCropSelect : function(e) {
+        this.crop = e.detail;
+        this.$.currentCrop.innerHTML = this.crop;
+      },
+
+      onLocationSelect : function(e) {
+        var location = e.detail;
+        this.locality = [];
+        for( var i = 0; i < this.locationKeys.length; i++ ){
+          this.locality.push(location[this.locationKeys[i]]);
+        }
+        this.updateLocationBtns();
+      },
+
+      onFiltersUpdate : function(e) {
+        this.locality = e.detail;
+        this.updateLocationBtns();
+      },
+
+      updateLocationBtns : function() {
+        var html = '';
+        for( var i = 0; i < this.locality.length; i++ ) {
+          html += '<span class="label label-primary" style="cursor:pointer" index="'+i+'"><i class="fa fa-times"></i> '+this.locality[i]+'</span> ';
+        }
+        this.$.locationBtns.innerHTML = html;
+
+        $(this.$.locationBtns)
+          .find('.label-primary')
+          .on('click', function(e){
+            var index = parseInt($(e.currentTarget).attr('index'));
+            $(e.currentTarget).remove();
+            this.locality.splice(index, 1);
+            this.$.locationPage.filters = this.locality;
+            this.$.locationPage.renderFilterBtns();
+
+            if( this.panel = 'crop' ) {
+              this.$.cropPage.show(this.locality);
+            }
+          }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>

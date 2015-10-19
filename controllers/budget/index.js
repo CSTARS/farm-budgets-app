@@ -7,11 +7,29 @@ module.exports = function (router) {
     var model = new BudgetModel();
 
     router.get('/get', function (req, res) {
+      var id = req.query.id;
 
-      var location = req.query.location;
-      var crop = req.query.crop;
+      model.get(id, function(err, budget){
+        if( err ) {
+          return errorHandler(err, res);
+        }
+        res.send(budget);
+      });
+    });
 
-      model.get(crop, location, function(err, budget){
+    router.get('/find', function (req, res) {
+
+      var query = req.query.query || '';
+
+      if( query !== '' ) {
+        try {
+          query = JSON.parse(query);
+        } catch(e) {
+          return errorHandler('Query should by JSON formatted', res);
+        }
+      }
+
+      model.find(query, function(err, budget){
         if( err ) {
           return errorHandler(err, res);
         }

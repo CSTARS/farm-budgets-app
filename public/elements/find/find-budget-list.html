@@ -1,0 +1,83 @@
+<dom-module id="find-budget-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div id="noData"></div>
+
+    <template is="dom-repeat" items="{{data}}">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h4>
+            <span>{{item.name}}</span>
+            <small>{{item.authority}}</small>
+            <span class="pull-right"><a class="btn btn-link" on-click="select" index$="{{index}}">Select</a></span>
+          </h4>
+
+          <table class="table">
+            <tr>
+              <td>Crop</td>
+              <td>{{item.farm.commodity}}</td>
+            </tr>
+            <tr>
+              <td>Location</td>
+              <td>{{item.localityStr}}</td>
+            </tr>
+            <tr>
+              <td>Farm Name</td>
+              <td>{{item.farm.farm}}</td>
+            </tr><tr>
+              <td>Size</td>
+              <td><span>{{item.farm.size}}<span> <span>{{item.farm.unit}}</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </template>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'find-budget-list',
+
+      show : function(crop) {
+        if( this.crop === crop ) return;
+        this.crop = crop;
+
+        var query = '';
+        if( this.crop ) {
+          query = encodeURIComponent(JSON.stringify({'farm.commodity': this.crop}));
+        }
+
+        $.get('/budget/find?query='+query, this.onResponse.bind(this));
+      },
+
+      onResponse : function(resp) {
+        if( resp.error ) {
+          return alert(resp.message);
+        }
+
+        if( resp.length === 0 ) {
+          this.$.noData.innerHTML = 'No budgets found.';
+        } else {
+          this.$.noData.innerHTML = '';
+        }
+
+        for( var i = 0; i < resp.length; i++ ) {
+          resp[i].localityStr = resp[i].locality.join(', ');
+        }
+
+        this.data = resp;
+      },
+
+      select : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('index'));
+        var id = this.data[index].id;
+        
+      }
+    });
+  </script>
+</dom-module>

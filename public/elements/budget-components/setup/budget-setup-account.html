@@ -1,0 +1,37 @@
+<dom-module id="budget-setup-account">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h4>Account Info</h4>
+
+    <table class="table">
+      <tr>
+        <td>Username</td><td id="username"></td>
+      </tr>
+      <tr>
+        <td>Name</td><td id="name"></td>
+      </tr>
+      <tr>
+        <td>Email</td><td id="email"></td>
+      </tr>
+    </table>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-setup-account',
+
+      onShow : function() {
+        if( !ExpressAuth.user ) return;
+
+        this.$.username.innerHTML = ExpressAuth.user.username;
+        this.$.name.innerHTML = ExpressAuth.user.name;
+        this.$.email.innerHTML = ExpressAuth.user.email;
+      }
+    });
+  </script>
+</dom-module>
