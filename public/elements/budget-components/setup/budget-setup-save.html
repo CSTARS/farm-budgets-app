@@ -29,7 +29,13 @@
       </div>
 
       <h5>Materials</h5>
+
       <div class="padded">
+
+        <template is="dom-repeat" items="{{newMaterials}}">
+          <div class="alert alert-primary"><b>{{item}}</b> New</div>
+        </template>
+
         <template is="dom-repeat" items="{{materialChanges}}">
           <div class="panel panel-warning">
             <div class="panel-heading"><b>{{item.name}}</b> Changed</div>
@@ -38,13 +44,24 @@
             </div>
           </div>
         </template>
-      <div>
+      </div>
 
       <a class="btn btn-link" on-click="toggleUnchanged">Unchanged Materials</a>
       <div class="padded" id="unchanged" style="display:none">
         <template is="dom-repeat" items="{{materialNoChanges}}">
           <div><i class="fa fa-check text text-success"></i> <span>{{item}}</span></div>
         </template>
+      </div>
+
+      <div class="well">
+        <div class="layout horizontal">
+          <div class="flex">
+            <a class="btn btn-primary btn-lg">Save</a>
+          </div>
+          <div>
+            <a class="btn btn-primary btn-lg">Save as New</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -61,6 +78,12 @@
           }
         },
         materialNoChanges : {
+          type : Object,
+          value : function() {
+            return [];
+          }
+        },
+        newMaterials : {
           type : Object,
           value : function() {
             return [];
@@ -109,18 +132,24 @@
           this.$.budgetChangesInner.innerHTML = '<i class="fa fa-check text text-success"></i> No changes to your budget';
         }
 
-        var changes = [], noChanges = [];
+        var changes = [], noChanges = [], newArr = [];
         for( var i = 0; i < state.materials.length; i++ ) {
           if( state.materials[i].changes ) {
             hasChanges = true;
-            changes.push({
-              name : this.getTitle(state.materials[i].id),
-              original : state.materials[i].original
-            });
+            if( state.materials[i].isNew ) {
+              newArr.push(state.materials[i].name);
+            } else {
+              changes.push({
+                name : this.getTitle(state.materials[i].id),
+                original : state.materials[i].original
+              });
+            }
           } else {
             noChanges.push(this.getTitle(state.materials[i].id));
           }
         }
+
+        this.newMaterials = newArr;
         this.materialChanges = changes;
         this.materialNoChanges = noChanges;
 

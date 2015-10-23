@@ -8,11 +8,13 @@
 
     <table class="table" id="table"></table>
 
+    <div id="childMaterials"></div>
+
     <div class="well">
       <budget-setup-authority-selector id="authoritySelector"></budget-setup-authority-selector>
     </div>
 
-    <div class="help-block">Remember, materials may be used by other budgets</div>
+    <div class="help-block">*Remember, materials may be used by other budgets</div>
   </template>
   <script>
     Polymer({
@@ -33,7 +35,7 @@
         if( !this.original.id ) return;
 
         for( var i = 0; i < appData.materials.length; i++ ) {
-          if( appData.materials[i].id = this.original.id ) {
+          if( appData.materials[i].id === this.original.id ) {
             this.update(appData.materials[i], this.original);
             return;
           }
@@ -48,6 +50,10 @@
         var html = '<tr><th>Propery</th><th>Old Value</th><th>New Value</th><th>Status</th></tr>';
         for( var key in newMaterial ) {
           if( this.interested.indexOf(key) === -1 ) continue;
+
+          if( key === 'price' && newMaterial.type === 'complex' ) {
+            continue;
+          }
 
           var newProp = newMaterial[key];
           if( Array.isArray(newProp) ) {
@@ -81,9 +87,59 @@
             html += '<tr class="text text-danger"><td>'+key+'</td><td></td><td>'+oldProp+'</td><td><span class="label label-danger">Removed</span></td></tr>';
           }
         }
-        this.$.table.innerHTML = html;
+        this.$.table.innerHTML = html+'</table>';
 
         this.$.authoritySelector.update(newMaterial.authority, oldMaterial.authority, ExpressAuth.user);
+
+        if( newMaterial.type !== 'complex' ) {
+          this.$.childMaterials.innerHTML = '';
+          return;
+        }
+
+        var html = '<h5>Required Materials</h5>';
+
+        for( var key in newMaterial.materials ) {
+          if( !oldMaterial.materials[key] ) {
+            html += '<div><span class="label label-primary">New</span> '+key+'</div>';
+          }
+
+          var oldM = oldMaterial.materials[key];
+          var newM = newMaterial.materials[key];
+          if( oldM.amount != newM.amount || oldM.units != newM.units ) {
+            html += this.createChildMaterialTable(key, oldM, newM);
+          } else {
+            html += '<div><span class="label label-default">No Changes</span> '+key+'</div>';
+          }
+        }
+
+        for( var key in oldMaterial.materials ) {
+          if( !newMaterial.materials[key] ) {
+            html += '<div><span class="label label-danger">Removed</span> '+key+'</div>';
+          }
+        }
+
+        this.$.childMaterials.innerHTML = html;
+      },
+
+      createChildMaterialTable : function(name, oldMaterial, newMaterial) {
+        var html = '<div><span class="label label-warning">Changed</span> '+name+'</div>'+
+          '<table class="table">'+
+          '<tr><th>Propery</th><th>Old Value</th><th>New Value</th><th>Status</th></tr>';
+
+        var keys = ['amount', 'units'];
+        for( var i = 0; i < keys.length; i++ ) {
+          if( newMaterial[keys[i]] && !oldMaterial[keys[i]] ) {
+            html += '<tr class="text text-primary"><td>'+keys[i]+'</td><td>'+newMaterial[keys[i]]+'</td><td></td><td><span class="label label-primary">Added</span></td></tr>';
+          } else if( !newMaterial[keys[i]] && oldMaterial[keys[i]] ) {
+            html += '<tr class="text text-danger"><td>'+keys[i]+'</td><td></td><td>'+oldMaterial[keys[i]]+'</td><td><span class="label label-danger">Removed</span></td></tr>';
+          } else if( newMaterial[keys[i]] !== oldMaterial[keys[i]] ) {
+            html += '<tr class="text text-warning"><td>'+keys[i]+'</td><td>'+newMaterial[keys[i]]+'</td><td>'+oldMaterial[keys[i]]+'</td><td><span class="label label-warning">Changed</span></td></tr>';
+          } else {
+            html += '<tr><td>'+keys[i]+'</td><td>'+newMaterial[keys[i]]+'</td><td>'+oldMaterial[keys[i]]+'</td><td><span class="label label-default">No Change</span></td></tr>';
+          }
+        }
+
+        return html +'</table>';
       }
     });
   </script>

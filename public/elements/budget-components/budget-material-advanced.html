@@ -73,6 +73,7 @@
       },
 
       save : function() {
+        if( !this.data ) return;
         this.data.class = this.$.classInput.getValue();
         this.data.locality = this.$.locationInput.value;
       },
