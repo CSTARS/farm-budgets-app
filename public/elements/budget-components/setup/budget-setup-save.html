@@ -1,3 +1,6 @@
+<link rel="import" href="budget-setup-material-diff.html" />
+<link rel="import" href="budget-setup-authority-selector.html" />
+
 <dom-module id="budget-setup-save">
   <template>
     <style>
@@ -8,33 +11,41 @@
         background-color: #0d87e9;
         color: white;
       }
+      .padded {
+        margin-left: 20px;
+      }
     </style>
 
-    <h4 class="page-header" style="margin-top:0">Save Budget</h4>
+    <h4 class="page-header" style="margin-top:0">Save Budget <small>Your current changes</small></h4>
 
     <div id="noChanges" style="display:none" class="alert alert-primary">
       No changes!  Everything is up-to-date.
     </div>
     <div id="changes" style="display:none">
-      <h4>Your current changes</h4>
 
       <h5>Budget</h5>
-      <div id="budgetChanges"></div>
+      <div id="budgetChanges" class="padded">
+        <div id="budgetChangesInner"></div>
+      </div>
 
       <h5>Materials</h5>
-      <template is="dom-repeat" items="{{materialChanges}}">
-        <div class="panel panel-warning">
-          <div class="panel-heading"><b>{{item.name}}<b> Changed</div>
-          <div class="panel-body">
-            <div>Check Authority</div>
-            <div>Option to save as new</div>
+      <div class="padded">
+        <template is="dom-repeat" items="{{materialChanges}}">
+          <div class="panel panel-warning">
+            <div class="panel-heading"><b>{{item.name}}</b> Changed</div>
+            <div class="panel-body">
+              <budget-setup-material-diff original="{{item.original}}"></budget-setup-material-diff>
+            </div>
           </div>
-        </div>
-      </template>
+        </template>
+      <div>
 
-      <template is="dom-repeat" items="{{materialNoChanges}}">
-        <div><i class="fa fa-check text text-success"></i> <span>{{item}}</span></div>
-      </template>
+      <a class="btn btn-link" on-click="toggleUnchanged">Unchanged Materials</a>
+      <div class="padded" id="unchanged" style="display:none">
+        <template is="dom-repeat" items="{{materialNoChanges}}">
+          <div><i class="fa fa-check text text-success"></i> <span>{{item}}</span></div>
+        </template>
+      </div>
     </div>
 
   </template>
@@ -93,11 +104,9 @@
 
         if( state.budget.changes ) {
           hasChanges = true;
-          this.$.budgetChanges.className = 'alert alert-warning';
-          this.$.budgetChanges.innerHTML = 'Your budget has been updated';
+          this.$.budgetChangesInner.innerHTML = '<div class="alert alert-warning">Your budget has been updated</div>';
         } else {
-          this.$.budgetChanges.className = '';
-          this.$.budgetChanges.innerHTML = '<i class="fa fa-check text text-success"></i> No changes to your budget';
+          this.$.budgetChangesInner.innerHTML = '<i class="fa fa-check text text-success"></i> No changes to your budget';
         }
 
         var changes = [], noChanges = [];
@@ -105,7 +114,8 @@
           if( state.materials[i].changes ) {
             hasChanges = true;
             changes.push({
-              name : this.getTitle(state.materials[i].id)
+              name : this.getTitle(state.materials[i].id),
+              original : state.materials[i].original
             });
           } else {
             noChanges.push(this.getTitle(state.materials[i].id));
@@ -121,6 +131,10 @@
           this.$.changes.style.display = 'none';
           this.$.noChanges.style.display = 'block';
         }
+      },
+
+      toggleUnchanged : function() {
+        $(this.$.unchanged).toggle('slow');
       }
     });
   </script>

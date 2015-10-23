@@ -1,0 +1,90 @@
+<dom-module id="budget-setup-material-diff">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <table class="table" id="table"></table>
+
+    <div class="well">
+      <budget-setup-authority-selector id="authoritySelector"></budget-setup-authority-selector>
+    </div>
+
+    <div class="help-block">Remember, materials may be used by other budgets</div>
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-setup-material-diff',
+
+      properties : {
+        original : {
+          type : Object,
+          observer : 'originalObserver',
+          value : function() {
+            return {}
+          }
+        }
+      },
+
+      originalObserver : function() {
+        if( !this.original ) return;
+        if( !this.original.id ) return;
+
+        for( var i = 0; i < appData.materials.length; i++ ) {
+          if( appData.materials[i].id = this.original.id ) {
+            this.update(appData.materials[i], this.original);
+            return;
+          }
+        }
+      },
+
+      update : function(newMaterial, oldMaterial) {
+        this.interested = ['class','locality','name','price','units'];
+        this.newMaterial = newMaterial;
+        this.oldMaterial = oldMaterial;
+
+        var html = '<tr><th>Propery</th><th>Old Value</th><th>New Value</th><th>Status</th></tr>';
+        for( var key in newMaterial ) {
+          if( this.interested.indexOf(key) === -1 ) continue;
+
+          var newProp = newMaterial[key];
+          if( Array.isArray(newProp) ) {
+            newProp = newProp.join(', ');
+          }
+
+          if( !oldMaterial[key] ) {
+            html += '<tr class="text text-primary"><td>'+key+'</td><td>'+newProp+'</td><td></td><td><span class="label label-primary">Added</span></td></tr>';
+          }
+
+          var oldProp = oldMaterial[key];
+          if( Array.isArray(oldProp) ) {
+            oldProp = oldProp.join(', ');
+          }
+
+          if( oldProp != newProp ) {
+            html += '<tr class="text text-warning"><td>'+key+'</td><td>'+oldProp+'</td><td>'+newProp+'</td><td><span class="label label-warning">Changed</span></td></tr>';
+          } else {
+            html += '<tr><td>'+key+'</td><td>'+oldProp+'</td><td>'+newProp+'</td><td><span class="label label-default">No Changes</span></td></td></tr>';
+          }
+        }
+
+        for( var key in oldMaterial ) {
+          if( this.interested.indexOf(key) === -1 ) continue;
+          var oldProp = oldMaterial[key];
+          if( Array.isArray(oldProp) ) {
+            oldProp = oldProp.join(', ');
+          }
+
+          if( !newMaterial[key] ) {
+            html += '<tr class="text text-danger"><td>'+key+'</td><td></td><td>'+oldProp+'</td><td><span class="label label-danger">Removed</span></td></tr>';
+          }
+        }
+        this.$.table.innerHTML = html;
+
+        this.$.authoritySelector.update(newMaterial.authority, oldMaterial.authority, ExpressAuth.user);
+      }
+    });
+  </script>
+</dom-module>

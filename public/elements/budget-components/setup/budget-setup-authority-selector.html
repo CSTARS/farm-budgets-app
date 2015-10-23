@@ -1,0 +1,47 @@
+<dom-module id="budget-setup-authority-selector">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div id="badAuth" class="text text-danger">You do not have access to the current
+    authority <span id="authLabel"></span>.  Please select a new authority.</div>
+
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label for="" class="col-sm-3 control-label"><i class="fa fa-shield"></i> Authority</label>
+        <div class="col-sm-9">
+          <budget-authority-selector id="authority" on-change="onAuthUpdate"></budget-authority-selector>
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-setup-authority-selector',
+
+      update : function(newAuth, oldAuth, user) {
+        if( user.authorities.indexOf(newAuth) == -1 ) {
+          this.$.badAuth.style.display = 'block';
+          this.badAuth = true;
+          this.$.authLabel.innerHTML = newAuth;
+        } else {
+          this.$.badAuth.style.display = 'none';
+          this.badAuth = false;
+        }
+
+        this.$.authority.value = newAuth;
+
+      },
+
+      onAuthUpdate : function() {
+        this.$.badAuth.style.display = 'none';
+        this.badAuth = false;
+        this.fire('new-authority-selected', this.$.authority.value);
+      }
+    });
+  </script>
+</dom-module>
