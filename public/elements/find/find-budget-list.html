@@ -13,18 +13,18 @@
         <div class="panel-body">
           <h4>
             <span>{{item.name}}</span>
-            <small>{{item.authority}}</small>
+            <small><i class="fa fa-shield"></i> <span>{{item.authority}}</span></small>
             <span class="pull-right"><a class="btn btn-link" on-click="select" index$="{{index}}">Select</a></span>
           </h4>
 
           <table class="table">
             <tr>
               <td>Crop</td>
-              <td>{{item.farm.commodity}}</td>
+              <td><i class="fa fa-leaf"></i> <span>{{item.farm.commodity}}</span></td>
             </tr>
             <tr>
               <td>Location</td>
-              <td>{{item.localityStr}}</td>
+              <td><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">{{item.localityStr}}</span></td>
             </tr>
             <tr>
               <td>Farm Name</td>

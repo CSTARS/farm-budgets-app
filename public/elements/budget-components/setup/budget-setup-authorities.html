@@ -6,21 +6,27 @@
       }
     </style>
 
-    Hello Authorities
+    <template is="dom-repeat" items="{{authorities}}">
+      <div class="panel panel-default">
+        <div class="panel-body">{{authorities}}</div>
+      </div>
+    </template>
 
   </template>
   <script>
     Polymer({
       is: 'budget-setup-authorities',
 
-      query : function() {
-        $.get('/authority/get/all', function(resp){
-          console.log(resp);
-        });
+      ready : function() {
+        this.authorities = [];
+      },
+
+      set : function() {
+        this.authorities = ExpressAuth.user.authorities;
       },
 
       onShow : function() {
-        this.query();
+        this.set()
       }
     });
   </script>

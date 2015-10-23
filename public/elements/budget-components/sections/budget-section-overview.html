@@ -27,12 +27,26 @@
             <tbody>
               <tr>
                 <td>Farm Size</td>
-                <td><input type="number" class="form-control" id="sizeInput" on-input="onFarmSizeChange"/></td>
+                <td>
+                  <div class="layout horizontal">
+                    <div class="flex">
+                      <input type="number" class="form-control" id="sizeInput" on-input="onFarmSizeChange"/>
+                    </div>
+                    <div id="farmUnitsLabel"></div>
+                </td>
               </tr>
-            </tbody>
-          </table>
-          <table class="table">
-            <tbody id="tbody">
+              <tr>
+                <td>Crop</td>
+                <td id="cropLabel"></td>
+              </tr>
+              <tr>
+                <td>Locality</td>
+                <td id="localityLabel" style="text-transform:capitalize"></td>
+              </tr>
+              <tr>
+                <td>Budget Authority</td>
+                <td id="authorityLabel"></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -76,16 +90,13 @@
       if( !data.farm ) return;
 
       this.$.total.setData(data.farm);
-      this.$.tbody.innerHTML = '';
 
-      for( var key in data.farm ) {
-        if( key == 'size' ) {
-          this.$.sizeInput.value = data.farm[key];
-        } else {
-          var row = $('<tr><td>'+key+'</td><td>'+data.farm[key]+'</td></tr>')[0];
-          this.$.tbody.appendChild(row);
-        }
-      }
+      this.$.sizeInput.value = data.farm.size;
+      this.$.farmUnitsLabel.innerHTML = data.farm.unit;
+      this.$.cropLabel.innerHTML = '<i class="fa fa-leaf"></i> '+data.farm.commodity;
+      this.$.localityLabel.innerHTML = '<i class="fa fa-map-marker"></i> '+data.locality.join(', ');
+      this.$.authorityLabel.innerHTML = '<i class="fa fa-shield"></i> '+data.authority;
+
     },
 
     onFarmSizeChange : function() {

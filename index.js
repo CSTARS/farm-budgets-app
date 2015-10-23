@@ -4,7 +4,6 @@ var express = require('express');
 var kraken = require('kraken-js');
 var merge = require('merge-util');
 var fs = require('fs');
-var postgres = require('./lib/postgres');
 var mongo = require('./lib/mongo');
 
 var authStack = require('../../../watershed/express-auth');
@@ -43,28 +42,20 @@ options = {
 
         global.appConfig = config;
 
-        // connect to pg instance
-        postgres.connect(config, function(err){
+        mongo.connect(config, function(err){
           if( err ) {
             console.log(err);
             process.exit();
           }
 
-          mongo.connect(config, function(err){
-            if( err ) {
-              console.log(err);
-              process.exit();
-            }
+          var authSetup = {
+            db : global.db,
+            app : app,
+            config : config.get('auth'),
+          };
+          global.auth = authStack(authSetup);
 
-            var authSetup = {
-              db : global.db,
-              app : app,
-              config : config.get('auth'),
-            };
-            global.auth = authStack(authSetup);
-
-            next(null, config);
-          });
+          next(null, config);
         });
     }
 };

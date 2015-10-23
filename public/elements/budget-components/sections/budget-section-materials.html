@@ -198,21 +198,21 @@
 
       var html =
         '<div class="style-scope budget-section-materials card" material="'+material.name+'" material-table>'+
-          '<h5 class="material-name">' +
+          '<h5 class="material-name" style="margin-bottom: 5px">' +
             '<div class="layout horizontal center">'+
               '<div class="flex">'+
                 (material.type == 'complex' ?
                   '<i class="fa fa-cubes"></i> ' :
                   '<i class="fa fa-cube"></i> '
                 )+material.name+
-                ' <small>'+material.authority+'</small>'+
               '</div>'+
               '<div>'+
                 (material.fixed ? '<span class="label label-warning">Fixed</span>' : '<a class="btn btn-default btn-lg pull-right"><i class="fa fa-pencil"></i></a>') +
             '</div></div>'+
           '</h5>'+
-          '<div class="help-block">'+
-              ((material.locality && material.type != 'complex') ? '<b><i class="fa fa-map-marker"></i> '+material.locality.join(', ')+'</b> ' : '')+
+          '<div class="help-block" style="margin-bottom: 15px">'+
+              '<span><i class="fa fa-shield"></i> '+material.authority+'</span>'+
+              ((material.locality && material.type != 'complex') ? ' | <span style="text-transform: capitalize"><i class="fa fa-map-marker"></i> '+material.locality.join(', ')+'</span> ' : '')+
               ((material.locality && material.type != 'complex' && material.description ) ? ' | ' : '' )+
               (material.description || '')+
           '</div>'+

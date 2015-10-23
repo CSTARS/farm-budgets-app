@@ -1,5 +1,6 @@
 <link rel="import" href="../setup/budget-setup-authorities.html" />
 <link rel="import" href="../setup/budget-setup-account.html" />
+<link rel="import" href="../setup/budget-setup-save.html" />
 
 <dom-module id="budget-section-setup">
   <style>
@@ -34,7 +35,10 @@
       <div class="col-md-4">
         <ul class="list-group">
           <li class="list-group-item">
-            <a href="#budget/setup/account">Account</a>
+            <a href="#budget/setup/save">Save</a>
+          </li>
+          <li class="list-group-item">
+            <a href="#budget/setup/account">My Account</a>
           </li>
           <li class="list-group-item">
             <a href="#budget/setup/authorities">My Authorities</a>
@@ -42,6 +46,7 @@
         </ul>
       </div>
       <div class="col-md-8" id="panels">
+        <budget-setup-save id="save"></budget-setup-save>
         <budget-setup-authorities id="authorities"></budget-setup-authorities>
         <budget-setup-account id="account"></budget-setup-account>
       </div>
@@ -70,7 +75,7 @@
       }
 
       if( params.length == 0 ) {
-        return window.location = '#budget/setup/account';
+        return window.location = '#budget/setup/save';
       }
 
       if( !this.$[params[0]] ) return;

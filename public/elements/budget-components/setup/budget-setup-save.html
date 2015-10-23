@@ -1,0 +1,127 @@
+<dom-module id="budget-setup-save">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .alert-primary {
+        background-color: #0d87e9;
+        color: white;
+      }
+    </style>
+
+    <h4 class="page-header" style="margin-top:0">Save Budget</h4>
+
+    <div id="noChanges" style="display:none" class="alert alert-primary">
+      No changes!  Everything is up-to-date.
+    </div>
+    <div id="changes" style="display:none">
+      <h4>Your current changes</h4>
+
+      <h5>Budget</h5>
+      <div id="budgetChanges"></div>
+
+      <h5>Materials</h5>
+      <template is="dom-repeat" items="{{materialChanges}}">
+        <div class="panel panel-warning">
+          <div class="panel-heading"><b>{{item.name}}<b> Changed</div>
+          <div class="panel-body">
+            <div>Check Authority</div>
+            <div>Option to save as new</div>
+          </div>
+        </div>
+      </template>
+
+      <template is="dom-repeat" items="{{materialNoChanges}}">
+        <div><i class="fa fa-check text text-success"></i> <span>{{item}}</span></div>
+      </template>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-setup-save',
+
+      properties : {
+        materialChanges : {
+          type : Object,
+          value : function() {
+            return [];
+          }
+        },
+        materialNoChanges : {
+          type : Object,
+          value : function() {
+            return [];
+          }
+        }
+      },
+
+      attached : function() {
+        document.querySelector('ahb-budget').saveElement = this;
+      },
+
+      onBudgetLoad : function(budget) {
+        FB.save.init(budget);
+
+        if( this.waitingToShow ) {
+          this.waitingToShow = false;
+          this.onShow();
+        }
+      },
+
+      getTitle : function(id) {
+        for( var i = 0; i < appData.materials.length; i++ ) {
+          if( appData.materials[i].id == id ) {
+            return appData.materials[i].name;
+          }
+        }
+
+        return '';
+      },
+
+      onShow : function() {
+        if( !window.appData  ) {
+          this.waitingToShow = true;
+          return;
+        }
+
+        var state = FB.save.check(appData, ExpressAuth.user);
+        console.log(state);
+
+        var hasChanges = false;
+
+        if( state.budget.changes ) {
+          hasChanges = true;
+          this.$.budgetChanges.className = 'alert alert-warning';
+          this.$.budgetChanges.innerHTML = 'Your budget has been updated';
+        } else {
+          this.$.budgetChanges.className = '';
+          this.$.budgetChanges.innerHTML = '<i class="fa fa-check text text-success"></i> No changes to your budget';
+        }
+
+        var changes = [], noChanges = [];
+        for( var i = 0; i < state.materials.length; i++ ) {
+          if( state.materials[i].changes ) {
+            hasChanges = true;
+            changes.push({
+              name : this.getTitle(state.materials[i].id)
+            });
+          } else {
+            noChanges.push(this.getTitle(state.materials[i].id));
+          }
+        }
+        this.materialChanges = changes;
+        this.materialNoChanges = noChanges;
+
+        if( hasChanges ) {
+          this.$.changes.style.display = 'block';
+          this.$.noChanges.style.display = 'none';
+        } else {
+          this.$.changes.style.display = 'none';
+          this.$.noChanges.style.display = 'block';
+        }
+      }
+    });
+  </script>
+</dom-module>

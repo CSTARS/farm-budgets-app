@@ -55,6 +55,10 @@
       FB.operationController.recalc();
 
       this.$.sections.setData(appData);
+
+      if( this.saveElement ) {
+        this.saveElement.onBudgetLoad(appData);
+      }
     }
 
   });
