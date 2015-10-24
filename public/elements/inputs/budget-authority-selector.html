@@ -49,6 +49,7 @@
 
         this.value = this.$.selector.value;
         this.$.selector.value = '';
+        this.fire('authority-select');
       },
 
       valueObserver : function() {

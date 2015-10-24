@@ -49,14 +49,14 @@
               <div class="form-group">
                 <label for="unitsInput" class="col-sm-3 control-label">Location</label>
                 <div class="col-sm-9">
-                    <budget-location-selector id="locationInput"></budget-location-selector>
+                    <budget-location-selector id="locationInput" on-location-update="onLocationUpdate"></budget-location-selector>
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="authorityInput" class="col-sm-3 control-label">Authority</label>
                 <div class="col-sm-9">
-                    <budget-authority-selector id="authorityInput"></budget-authority-selector>
+                    <budget-authority-selector id="authorityInput" on-authority-select="onAuthoritySelect"></budget-authority-selector>
                 </div>
               </div>
             </div>
@@ -74,7 +74,11 @@
       ready : function() {
         this.popup = $(this.$.popup).remove();
         $('body').append(this.popup);
-        this.popup.modal({show: false});
+        this.popup
+          .modal({show: false})
+          .on('hidden.bs.modal', function(){
+            this.fire('editor-close');
+          }.bind(this));
       },
 
       show : function() {
@@ -94,8 +98,31 @@
         this.$.unitsInput.units = this.data.farm.unit;
         this.$.locationInput.setValue(this.data.locality);
         this.$.authorityInput.value = this.data.authority;
-      }
+      },
 
+      onNameInput : function() {
+        this.data.farm.farm = this.$.nameInput.value;
+      },
+
+      onCropInput : function() {
+        this.data.farm.commodity = this.$.cropInput.value;
+      },
+
+      onSizeInput : function() {
+        this.data.farm.size = this.$.sizeInput.value;
+      },
+
+      editUnits : function() {
+        this.data.farm.unit = this.$.unitsInput.units;
+      },
+
+      onLocationUpdate : function() {
+        this.data.locality = this.$.locationInput.value;
+      },
+
+      onAuthoritySelect : function() {
+        this.data.authority = this.$.authorityInput.value;
+      }
     });
   </script>
 </dom-module>

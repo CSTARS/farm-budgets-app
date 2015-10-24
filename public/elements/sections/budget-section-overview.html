@@ -21,8 +21,9 @@
     <div class="row">
       <div class="col-md-6">
 
-        <div class="card">
-          <h4><i class="fa fa-info-circle"></i> Farm Information <a class="btn btn-link" on-click="edit"><i class="fa fa-pencil"></i></a></h4>
+        <div class="card" id="infoCard" on-click="edit">
+          <h4 style="line-height:45px"><i class="fa fa-info-circle"></i> Farm Information
+            <a class="btn btn-link btn-lg"  id="editBtn" style="display:none"><i class="fa fa-pencil"></i></a></h4>
           <table class="table">
             <tbody>
               <tr>
@@ -81,6 +82,22 @@
 
     ready : function() {
       FB.operationController.on('total-update', this.setJsonDump.bind(this));
+
+      this.$.infoCard.addEventListener('mouseenter', function(){
+        this.$.editBtn.style.display = 'inline-block';
+      }.bind(this));
+      this.$.infoCard.addEventListener('mouseleave', function(){
+        this.$.editBtn.style.display = 'none';
+      }.bind(this));
+    },
+
+    attached : function() {
+      document
+        .querySelector('budget-farm-editor')
+        .addEventListener('editor-close', function(){
+          this.setData(FB.getData());
+          this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
+        }.bind(this));
     },
 
     setData : function(data) {
@@ -93,12 +110,6 @@
       this.$.cropLabel.innerHTML = '<i class="fa fa-leaf"></i> '+data.farm.commodity;
       this.$.localityLabel.innerHTML = '<i class="fa fa-map-marker"></i> '+data.locality.join(', ');
       this.$.authorityLabel.innerHTML = '<i class="fa fa-shield"></i> '+data.authority;
-
-    },
-
-    onFarmSizeChange : function() {
-      this.$.total.farm.size = this.$.sizeInput.value;
-      this.$.total.onTotalUpdate();
     },
 
     onShow : function(params) {
