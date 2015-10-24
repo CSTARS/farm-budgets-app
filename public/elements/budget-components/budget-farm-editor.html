@@ -1,0 +1,101 @@
+<dom-module id="budget-farm-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title">Edit Farm Budget Details</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="form-horizontal">
+
+              <div class="form-group">
+                <label for="nameInput" class="col-sm-3 control-label">Name</label>
+                <div class="col-sm-9">
+                  <input type="text" id="nameInput" class="form-control" on-input="onNameInput"  placeholder="Farm Name"/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="cropInput" class="col-sm-3 control-label">Crop</label>
+                <div class="col-sm-9">
+                  <input id="cropInput" type="text" class="form-control" on-input="onCropInput" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sizeInput" class="col-sm-3 control-label">Size</label>
+                <div class="col-sm-9">
+                  <input id="sizeInput" class="form-control" type="number" on-input="onSizeInput" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="unitsInput" class="col-sm-3 control-label">Units</label>
+                <div class="col-sm-9">
+                    <budget-unit-selector id="unitsInput" on-units-change="editUnits"></budget-unit-selector>
+
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="unitsInput" class="col-sm-3 control-label">Location</label>
+                <div class="col-sm-9">
+                    <budget-location-selector id="locationInput"></budget-location-selector>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="authorityInput" class="col-sm-3 control-label">Authority</label>
+                <div class="col-sm-9">
+                    <budget-authority-selector id="authorityInput"></budget-authority-selector>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-farm-editor',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+      },
+
+      show : function() {
+        var data = FB.getData();
+        if( !data.farm ) data.farm = {};
+        this.data = data;
+
+        this.updateInputs();
+
+        this.popup.modal('show');
+      },
+
+      updateInputs : function() {
+        this.$.nameInput.value = this.data.farm.farm;
+        this.$.cropInput.value = this.data.farm.commodity;
+        this.$.sizeInput.value = this.data.farm.size;
+        this.$.unitsInput.units = this.data.farm.unit;
+        this.$.locationInput.setValue(this.data.locality);
+        this.$.authorityInput.value = this.data.authority;
+      }
+
+    });
+  </script>
+</dom-module>

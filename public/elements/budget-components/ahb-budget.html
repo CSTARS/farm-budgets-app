@@ -36,23 +36,7 @@
       window.appData = appData;
       window.localStorage.setItem('current-budget', appData.id);
 
-      var options = {
-        noEvent : true,
-        noRecalc : true
-      }
-
-      appData.materials.forEach(function(material){
-        FB.materialController.add(material, options);
-      });
-
-      FB.materialController.recalc();
-
-      FB.operationController.setFarmSize(appData.farm && appData.farm.size ? parseInt(appData.farm.size) : 1);
-      appData.operations.forEach(function(operation){
-        FB.operationController.add(operation, options);
-      });
-
-      FB.operationController.recalc();
+      FB.load(appData);
 
       this.$.sections.setData(appData);
 

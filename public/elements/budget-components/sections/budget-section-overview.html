@@ -22,17 +22,14 @@
       <div class="col-md-6">
 
         <div class="card">
-          <h4><i class="fa fa-info-circle"></i> Farm Information</h4>
+          <h4><i class="fa fa-info-circle"></i> Farm Information <a class="btn btn-link" on-click="edit"><i class="fa fa-pencil"></i></a></h4>
           <table class="table">
             <tbody>
               <tr>
                 <td>Farm Size</td>
                 <td>
                   <div class="layout horizontal">
-                    <div class="flex">
-                      <input type="number" class="form-control" id="sizeInput" on-input="onFarmSizeChange"/>
-                    </div>
-                    <div id="farmUnitsLabel"></div>
+                    <span id="farmSizeLabel"></span>&nbsp;&nbsp;<span id="farmUnitsLabel"></span>
                 </td>
               </tr>
               <tr>
@@ -91,7 +88,7 @@
 
       this.$.total.setData(data.farm);
 
-      this.$.sizeInput.value = data.farm.size;
+      this.$.farmSizeLabel.innerHTML = data.farm.size;
       this.$.farmUnitsLabel.innerHTML = data.farm.unit;
       this.$.cropLabel.innerHTML = '<i class="fa fa-leaf"></i> '+data.farm.commodity;
       this.$.localityLabel.innerHTML = '<i class="fa fa-map-marker"></i> '+data.locality.join(', ');
@@ -139,6 +136,10 @@
       appData.operations = FB.operationController.get();
 
       this.$.json.innerHTML = JSON.stringify(appData, '', '  ');
+    },
+
+    edit : function() {
+      document.querySelector('budget-farm-editor').show();
     }
   });
 </script>

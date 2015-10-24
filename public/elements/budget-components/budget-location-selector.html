@@ -27,6 +27,15 @@
         this.update();
       },
 
+      setValue(value){
+        if( Array.isArray(value) ) {
+          this.$.input.value = value.join(', ');
+        } else {
+          this.$.input.value = value;
+        }
+        this.update();
+      },
+
       update : function() {
         var values = this.$.input.value.split(',');
         if( !this.value ) this.value = [];
@@ -34,8 +43,10 @@
         for( var i = 0; i < values.length; i++ ) {
           values[i] = values[i].toLowerCase().trim();
 
-          if( FB.utils.statesLookup[values[i]] ) {
-            values[i] = FB.utils.statesLookup[values[i]].toLowerCase();
+          if( FB.utils.statesLookup[values[i].toLowerCase()] ) {
+            values[i] = FB.utils.statesLookup[values[i].toLowerCase()].toLowerCase();
+          } else if( FB.utils.states[values[i].toLowerCase()] ) {
+            values[i] = values[i].toLowerCase();
           }
 
           if( values[i] == '' ) continue;
