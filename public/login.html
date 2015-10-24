@@ -10,21 +10,21 @@
   <meta name="theme-color" content="#ffffff">
 
   <!-- build:js scripts/webcomponents.js -->
-  <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
   <!-- endbuild-->
 
   <!-- build:css styles/main.css -->
-  <link rel="stylesheet" href="../styles/main.css">
-  <link rel="stylesheet" href="../bower_components/bootswatch-dist/css/bootstrap.css">
-  <link rel="stylesheet" href="../bower_components/animate-css/animate.css">
-  <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.css">
-  <link rel="stylesheet" href="../bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="bower_components/bootswatch-dist/css/bootstrap.css">
+  <link rel="stylesheet" href="bower_components/animate-css/animate.css">
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.css">
   <!-- endbuild-->
 
 
   <!-- build:js scripts/app.js -->
-  <script src="../bower_components/jquery/dist/jquery.js"></script>
-  <script src="../bower_components/bootswatch-dist/js/bootstrap.js"></script>
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/bootswatch-dist/js/bootstrap.js"></script>
   <script src="/auth/express-auth.js"></script>
   <!-- endbuild-->
 
@@ -47,10 +47,10 @@
   <script>
     if( ExpressAuth.user && !ExpressAuth.user.hasAccount ) {
       // authorized but no account
-      window.location = '/prototype/createAccount.html';
+      window.location = '/createAccount.html';
     } else if( ExpressAuth.user ) {
       // authorized and account created
-      window.location = '/prototype/';
+      window.location = '/';
     }
   </script>
 </body>

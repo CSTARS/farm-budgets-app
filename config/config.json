@@ -25,7 +25,7 @@
     },
 
     "auth" : {
-      "redirect" : "/prototype/login.html",
+      "redirect" : "/login.html",
       "url" : "http://localhost:3021",
       "sessionSecret" : "thisisnotasecret",
       "google" : "/etc/farm-budgets-app/google"

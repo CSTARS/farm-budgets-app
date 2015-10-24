@@ -4,15 +4,26 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Farm Budgets</title>
-  <meta name="description" content="Online application that allows for the calculation of farm budgets for a large number of crops">
+  <title>Budget Component Testing</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- build:js scripts/webcomponents.js -->
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <!-- endbuild-->
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
       // Load the Visualization API and the piechart package.
-      google.load('visualization', '1.0', {'packages':['corechart']});
+      var googleChartLoadHandlers = [];
+      function onGoogleChartsLoad() {
+        googleChartLoadHandlers.forEach(function(handler){
+            handler();
+        });
+      }
+      google.load('visualization', '1.0', {'packages':['corechart', 'timeline']});
+      google.setOnLoadCallback(onGoogleChartsLoad);
   </script>
 
   <!-- build:css styles/main.css -->
@@ -23,132 +34,30 @@
   <link rel="stylesheet" href="bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.css">
   <!-- endbuild-->
 
-  <!-- build:js scripts/platform.js -->
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <!-- endbuild-->
 
   <!-- build:js scripts/app.js -->
   <script src="bower_components/jquery/dist/jquery.js"></script>
   <script src="bower_components/bootswatch-dist/js/bootstrap.js"></script>
-  <script src="scripts/app.js"></script>
   <script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
+  <script src="js/lib.js"></script>
   <!-- endbuild-->
+
+  <script src="/auth/express-auth.js"></script>
 
   <link rel="import" href="require.html">
 
-
 </head>
 
-<body unresolved>
+<body style="padding:10px">
 
+  <budget-complex-material-popup></budget-complex-material-popup>
+  <budget-schedule-popup></budget-schedule-popup>
+  <budget-material-popup></budget-material-popup>
+  <find-budget-popup></find-budget-popup>
+  <budget-farm-editor></budget-farm-editor>
 
-  <div class="fullbleed">
-      <div class="vertical layout" style="height:100%">
-          <div style="height:63px">
-              <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-                  <a class="navbar-brand" onclick="showInfo()" style="cursor:pointer">
-                    AHB Farm Budgets
-                  </a>
+  <ahb-budget example="qjh/poplar"></ahb-budget>
 
-                  <div id="leftNav" class="nav-left"></div>
-                  <ul class="nav navbar-nav navbar-right" style="margin-right:10px">
-                    <li class="active">
-                      <a href="#location" nav-btn>
-                        <span class="hidden-xs"><i class="fa fa-map-marker"></i> Location</span>
-                        <span class="visible-xs"><i class="fa fa-map-marker"></i></span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#crop" nav-btn>
-                        <span class="hidden-xs"><i class="fa fa-leaf"></i> Crop</span>
-                        <span class="visible-xs"><i class="fa fa-leaf"></i></span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#budget" nav-btn>
-                        <span class="hidden-xs"><i class="fa fa-usd"></i> Budget</span>
-                        <span class="visible-xs"><i class="fa fa-usd"></i></span>
-                      </a>
-                    </li>
-                  </ul>
-              </nav>
-          </div>
-          <div class="flex" style="position:relative">
-              <div class="fullbleed">
-                <ahb-page-location id="location" class="page"></ahb-page-location>
-                <ahb-page-crop id="crop" style="display:none" class="page"></ahb-page-crop>
-                <ahb-page-budget id="budget" style="display:none" class="page"></ahb-page-budget>
-
-              </div>
-          </div>
-      </div>
-  </div>
-
-
-<div class="modal fade" id="infoModal" style="z-index: 10000">
-  <div class="modal-dialog" style="z-index: 10001">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">AHB - Farm Budgets App (v0.2)</h4>
-      </div>
-      <div class="modal-body">
-
-        <div class="alert alert-warning">
-          This is a early <b>demo</b> of the applications proposed functionality.  This application is not yet intended to
-          perform any real world analysis about crop budgets at this point.
-        </div>
-
-        <div class="well">
-          The Advanced Hardwood Biofuels Northwest project, AHB-NW investigates using poplar as a feedstock source for drop
-          in gasoline replacement in the Pacific Northwest.  UC Davis, is part of the sustainability group and created this
-          appication for crop budget modeling.
-        </div>
-
-        <h2>Instructions</h4>
-        <div>
-          <h4 class="page-header"><i class="fa fa-map-marker"></i> Select Location</h4>
-          <p>First use the map to find a location.  You can simply click the map to select a location as well.  Once a
-            location is set, the app will lookup all available crops for the location.</p>
-
-          <h4 class="page-header"><i class="fa fa-leaf"></i> Select Crop and Size</h4>
-          <p>On the crop page, you will be shown a list of crops for the selected location.  Select the crop you wish to
-            budget as well as the farm size.</p>
-
-          <h4 class="page-header"><i class="fa fa-usd"></i> View Budget</h4>
-          <p>Once you have selected a location, crop and farm size, click 'View Budget' to see the default budget for the
-            crop and location.  Click the arrows next to any budget phase to see operation and material details about the budget.
-            You can then modify any budget parameter you wish.  The application will recalulate as soon as modifications are made.</p>
-        </div>
-
-
-        <h2>Links</h2>
-        <div class="well">
-          <a href="https://github.com/CSTARS/farm-budgets-app" target="_blank">Code.</a><br />
-          <a href="https://github.com/CSTARS/farm-budgets-data" target="_blank">Data.</a><br />
-          <a href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Bugs/Issues.</a><br />
-          <a href="http://hardwoodbiofuels.org/" target="_blank">AHB Website</a><br>
-          <a href="https://plus.google.com/107620944323155568384/posts" target="_blank">UC Davis AHB Group on Google+</a><br>
-          <a href="http://www.ucdavis.edu" target="_blank">UC Davis</a><br>
-        </div>
-
-        <h2>Developers</h2>
-        <div class="well">
-            <div style="margin-bottom:15px">
-                <b>Quinn Hart</b> <a href="mailto:qjhart@ucdavis" target="_blank">qjhart@ucdavis</a>, Data Wizard, Database Extraordinaire.
-            </div>
-            <div>
-                <b>Justin Merz</b> <a href="mailto:jrmerz@ucdavis.edu" target="_blank">jrmerz@ucdavis.edu</a>,
-                Application development, Lead Tube Connector.
-            </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
+  <ucd-copyright></ucd-copyright>
 </body>
 </html>
