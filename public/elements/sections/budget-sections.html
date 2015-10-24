@@ -32,8 +32,9 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-right">
             <li><a class="btn btn-link" on-click="find">Find Budget</a></li>
-            <li><a class="btn btn-link" on-click="find">Start from Scratch</a></li>
-            <li><a class="btn btn-link" on-click="find">Import Material</a></li>
+            <li><a class="btn btn-link" on-click="startNew">Start from Scratch</a></li>
+            <li><a class="btn btn-link" on-click="clone">Clone Budget</a></li>
+            <li><a class="btn btn-link">Import Material</a></li>
            </ul>
         </div>
 
@@ -106,6 +107,40 @@
       for( var i = 0; i < sections.length; i++ ) {
         if( sections[i].setData ) sections[i].setData(data);
       }
+    },
+
+    clone : function() {
+      if( !confirm('Are you sure you want to clone this budget?  Any unsaved changes will be lost.') ) return;
+
+      var data = FB.getData();
+      data.name = '';
+      data.id = FB.utils.guid();
+
+      document.querySelector('ahb-budget').load(data);
+      document.querySelector('budget-farm-editor').show();
+      this.$.overview.updateTotal();
+    },
+
+    startNew : function() {
+      if( !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
+
+      var newData = {
+        id : FB.utils.guid(),
+        authority : '',
+        locality : [],
+        farm : {
+          farm : '',
+          commodity : '',
+          unit : '[acr_us]',
+          size : 1
+        },
+        operations : [],
+        materials : []
+      }
+
+      document.querySelector('ahb-budget').load(newData);
+      document.querySelector('budget-farm-editor').show();
+      this.$.overview.updateTotal();
     }
   });
 </script>
