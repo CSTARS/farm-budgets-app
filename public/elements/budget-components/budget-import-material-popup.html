@@ -1,0 +1,235 @@
+<dom-module id="budget-import-material-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Import Material</h4>
+          </div>
+          <div class="modal-body">
+            <div id="main">
+              <input type="text" class="form-control" placeholder="Material Text Search" on-keyup="onKeyUp" id="input" />
+
+              <template is="dom-repeat" items="{{items}}">
+                <div class="panel panel-default">
+                  <div class="panel-body">
+                      <h4>
+                        <i class$="{{item.icon}}"></i>
+                        <span>{{item.name}}</span>
+                        <small><i class="fa fa-shield"></i> <span>{{item.authority}}</span></small>
+
+                        <a class="btn btn-primary pull-right" on-click="import" index$="{{index}}">Import</a>
+                      </h4>
+
+                      <div class="help-block">
+                        <i class="fa fa-map-marker"></i>
+                          <span>{{item.locationStr}}</span>
+                          <span>{{item.description}}</span>
+                          <span>{{item.class}}
+                      </div>
+
+                      <div>
+                        <span>{{item.price}}</span> per
+                        <span>{{item.units}}</span>
+                      </div>
+                  </div>
+                </div>
+              </template>
+
+            </div>
+            <div id="select">
+              <div>This complex material <b><i class="fa fa-cubes"></i> <span id="currentComplexLabel"></span></b> has the following required materials:</div>
+
+              <div class="well">
+                <ul>
+                  <template is="dom-repeat" items="{{complexMaterialRequires}}">
+                    <li><b>{{item.name}}</b> <span style="color:#888"><span>{{item.amount}}</span><span>{{item.units}}</span></span></li>
+                  </template>
+                <ul>
+              </div>
+
+              <div id="loading">
+                Loading...
+              </div>
+
+              <div id="authHasRequired">
+                <div style="margin-bottom: 20px">
+                  The materials authority <b><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel"></span></b> has the required materials for the same location.
+                  Would you like to import them as well?
+                </div>
+                <div class="layout horizontal">
+                  <div class="flex">
+
+                    <a class="btn btn-default">Import Material and Required Materials</a>
+                    <a class="btn btn-default">Import Only Material</a>
+                  </div>
+                  <div>
+                    <a class="btn btn-default" on-click="cancelComplex">Cancel</a>
+                  </div>
+                </div>
+              </div>
+
+              <div id="authNoRequired">
+                <div style="margin-bottom: 20px" class="text text-danger">
+                  The materials authority <b><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel"></span></b> does not have the required materials for the same location.
+                  Would you will need to import these materials for other locations or authorities after.
+                </div>
+                <div class="layout horizontal">
+                  <div class="flex">
+                    <a class="btn btn-default">Import Material</a>
+                  </div>
+                  <div>
+                    <a class="btn btn-default" on-click="cancelComplex">Cancel</a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-import-material-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+
+        this.searchTimer = -1;
+        this.cache = {};
+        this.currentIds = [];
+        this.complexMaterialRequires = [];
+      },
+
+      hide : function() {
+        this.popup.modal('hide');
+      },
+
+      show : function() {
+        this.popup.modal('show');
+
+        this.$.main.style.display = 'block';
+        this.$.select.style.display = 'none';
+
+        this.currentIds = [];
+        var materials = FB.materialController.get();
+        for( var type in materials ) {
+          for( var name in materials[type] ) {
+              if( materials[type][name].id ) {
+                this.currentIds.push(materials[type][name].id);
+              }
+          }
+        }
+
+        var data = FB.getData();
+        if( data && data.locality ) {
+          this.$.input.value = data.locality.join(' ');
+        }
+
+        setTimeout(function(){
+          this.$.input.focus();
+        }.bind(this), 200);
+      },
+
+      import : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('index'));
+        var material = this.items[index];
+        var arr = [];
+
+        for( var key in material.materials ) {
+          arr.push({
+            name : key,
+            amount : material.materials[key].amount,
+            units : material.materials[key].units,
+          });
+        }
+
+        this.complexMaterialRequires = arr;
+
+        if( material.type !== 'complex' ) {
+          this.hide();
+          return;
+        }
+
+        this.$.main.style.display = 'none';
+        this.$.select.style.display = 'block';
+
+        this.$.currentComplexLabel.innerHTML = material.name;
+        this.$.currentComplexAuthLabel.innerHTML = material.authority;
+
+        this.$.loading.style.display = 'block';
+        this.$.authHasRequired.style.display = 'none';
+        this.$.authNoRequired.style.display = 'none';
+
+        $.get('/materials/hasRequired?id='+material.id, function(resp){
+          this.$.loading.style.display = 'none';
+
+          var valid = true;
+          for( var key in resp ) {
+            if( !resp[key] ) {
+              value = false;
+            }
+          }
+
+          if( valid ) {
+            this.$.authHasRequired.style.display = 'block';
+          } else {
+            this.$.authNoRequired.style.display = 'block';
+          }
+        }.bind(this));
+      },
+
+      cancelComplex : function() {
+        this.$.main.style.display = 'block';
+        this.$.select.style.display = 'none';
+      },
+
+      onKeyUp : function() {
+        if( this.searchTimer != -1 ) clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(function(){
+          this.searchTimer = -1;
+          this.search();
+        }.bind(this), 300);
+      },
+
+      search : function() {
+        var data = {
+          query : {
+            id : {'$nin' : this.currentIds},
+            '$text' : {'$search' : this.$.input.value}
+          }
+        };
+
+        $.post('/materials/find', data, function(resp) {
+          for( var i = 0; i < resp.length; i++ ) {
+            resp[i].icon = resp[i].type == 'complex' ? 'fa fa-cubes' : 'fa fa-cube';
+            resp[i].locationStr = resp[i].locality.join(', ');
+            if( resp[i].description ) {
+              resp[i].description = ' | '+resp[i].description;
+            }
+            if( resp[i].class ) {
+              resp[i].class = ' | '+resp[i].class;
+            }
+          }
+
+          this.items = resp;
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>

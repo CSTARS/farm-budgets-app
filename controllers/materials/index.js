@@ -9,13 +9,24 @@ module.exports = function (router) {
     var auth = global.auth;
     var authMiddleware = authUtils.middleware;
 
-    router.get('/find', function (req, res) {
-      model.get(req.query, function(err, budget){
+
+    router.get('/hasRequired', function (req, res) {
+      model.hasRequired(req.query.id, function(err, checklist){
         if( err ) {
           return res.send({error:true, message: err});
         }
 
-        res.send(budget);
+        res.send(checklist);
+      });
+    });
+
+    router.post('/find', function (req, res) {
+      model.find(req.body.query, function(err, materials){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(materials);
       });
     });
 

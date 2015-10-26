@@ -34,7 +34,7 @@
             <li><a class="btn btn-link" on-click="find">Find Budget</a></li>
             <li><a class="btn btn-link" on-click="startNew">Start from Scratch</a></li>
             <li><a class="btn btn-link" on-click="clone">Clone Budget</a></li>
-            <li><a class="btn btn-link">Import Material</a></li>
+            <li><a class="btn btn-link" on-click="import">Import Material</a></li>
            </ul>
         </div>
 
@@ -107,6 +107,10 @@
       for( var i = 0; i < sections.length; i++ ) {
         if( sections[i].setData ) sections[i].setData(data);
       }
+    },
+
+    import : function() {
+      document.querySelector('budget-import-material-popup').show();
     },
 
     clone : function() {

@@ -20,7 +20,8 @@ module.exports = function() {
       name: 'Material',
       find : find,
       save : save,
-      get : get
+      get : get,
+      hasRequired : hasRequired
   };
 };
 
@@ -60,16 +61,74 @@ function save(material, callback) {
 
 
 function find(query, callback) {
-  var q = utils.prepareQuery(query);
+  var q = {
+    $and : [
+      {name : {'$not' : new RegExp('--')}},
+      query
+    ]
+  };
 
-  if( query.class ) {
-    q.push({class: query.class});
-  }
+  collection.find(
+    q,
+    {
+      _id: 0,
+      score: {
+        $meta: 'textScore'
+      }
+    }).sort({ score: { $meta: 'textScore' } }).limit(20).toArray(callback);
+}
 
-  // for now, do not return child materials
-  q.push({name : {'$not' : new RegExp('--')}});
+// given a complex material id.  Does the same authority have the materials
+// in the same location
+function hasRequired(id, callback) {
+  get(id, function(err, material){
+    if( err ) {
+      return callback(err);
+    }
 
-  collection.find({'$and': q}).limit(20).toArray(callback);
+    if( !material ) {
+      return callback('Invalid material id');
+    }
+
+    if( !material.materials ) {
+      return callback(null, {});
+    }
+
+    var localityQuery = [];
+    for( var i = 0; i < material.locality.length; i++ ) {
+      localityQuery.push({
+        locality : material.locality[i]
+      });
+    }
+
+    var query = {
+      $or : []
+    };
+
+    var checklist = {};
+    for( var key in material.materials ) {
+      checklist[key] = false;
+      query.$or.push({
+        name : key,
+        authority : material.authority,
+        $and : localityQuery
+      });
+    }
+
+    collection
+      .find(query, {name: 1})
+      .toArray(function(err, results){
+        if( err ) {
+          return callback(err);
+        }
+
+        for( var i = 0; i < results.length; i++ ) {
+          checklist[results[i].name] = true;
+        }
+
+        callback(null, checklist);
+      });
+  });
 }
 
 function cleanMaterial(material) {
