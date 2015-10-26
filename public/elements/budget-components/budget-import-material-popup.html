@@ -78,7 +78,7 @@
 
               <div id="authNoRequired">
                 <div style="margin-bottom: 20px" class="text text-danger">
-                  The materials authority <b><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel"></span></b> does not have the required materials for the same location.
+                  The materials authority <b><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel2"></span></b> does not have the required materials for the same location.
                   Would you will need to import these materials for other locations or authorities after.
                 </div>
                 <div class="layout horizontal">
@@ -170,6 +170,7 @@
 
         this.$.currentComplexLabel.innerHTML = material.name;
         this.$.currentComplexAuthLabel.innerHTML = material.authority;
+        this.$.currentComplexAuthLabel2.innerHTML = material.authority;
 
         this.$.loading.style.display = 'block';
         this.$.authHasRequired.style.display = 'none';

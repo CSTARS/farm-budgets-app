@@ -6,7 +6,6 @@
       }
     </style>
 
-    <div id="current"></div>
     <select id="selector" class="form-control" on-input="onInput"></select>
 
   </template>
@@ -15,10 +14,6 @@
       is: 'budget-authority-selector',
 
       properties : {
-        value : {
-          type : String,
-          observer : 'valueObserver'
-        },
         default : {
           type : String,
           observer : 'defaultObserver'
@@ -31,7 +26,7 @@
           return;
         }
 
-        var html = '<option value=""></option><option value="__default__" style="display:none">Default</option>';
+        var html = '<option value=""></option>';
         for( var i = 0; i < ExpressAuth.user.authorities.length; i++ ) {
           var auth = ExpressAuth.user.authorities[i];
           html += '<option value="'+auth+'">'+auth+'</option>';
@@ -41,29 +36,16 @@
       },
 
       onInput : function() {
-        if( this.$.selector.value == '__default__' ) {
-          this.value = this.default;
-          this.$.selector.value = '';
-          return;
-        }
-
         this.value = this.$.selector.value;
         this.$.selector.value = '';
         this.fire('authority-select');
       },
 
-      valueObserver : function() {
-        this.$.current.innerHTML = this.value;
-      },
-
       defaultObserver : function() {
-        if( ExpressAuth.user ) {
-          if( this.default === '' ) {
-            this.$.selector.querySelector('[value="__default__"]').style.display = 'none';
-          } else {
-            this.$.selector.querySelector('[value="__default__"]').style.display = 'block';
-          }
-        }
+        this.$.selector.value = this.default;
+        $(this.$.selector)
+          .find('[value="'+this.default+'"]')
+          .html(this.default+' (Current)');
 
         this.value = this.default;
       }
