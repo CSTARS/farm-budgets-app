@@ -33,14 +33,25 @@
 
       ready : function() {
         this.cache = {};
+        this.update([]);
       },
 
       show : function(localities) {
+        this.update(localities);
+      },
+
+      update : function(localities) {
         this.localities = localities;
         this.$.noCrop.style.display = 'none';
         this.$.cropInputPanel.style.display = 'none';
 
-        var str = JSON.stringify(this.localities || []);
+        if( !this.localities ) {
+          this.localities = [];
+        }
+
+        var query = FB.utils.queryHelper(this.localities);
+
+        var str = JSON.stringify(query);
 
         if( this.cache[str] ) {
           this.onResponse(this.cache[str]);
@@ -53,12 +64,15 @@
         }
       },
 
+
       onResponse : function(resp) {
         this.$.loading.style.display = 'none';
 
         if( resp.error ) {
           return alert(resp.message);
         }
+
+        this.fire('crop-count', resp.length);
 
         if( resp.length === 0 ) {
           this.$.noCrop.style.display = 'block';

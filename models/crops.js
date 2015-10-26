@@ -12,18 +12,6 @@ module.exports = function() {
 };
 
 
-function findForLocality(localities, callback) {
-  if( !Array.isArray(localities) ) {
-    localities = [localities];
-  }
-  for( var i = 0; i < localities.length; i++ ) {
-    localities[i] = {locality: localities[i].toLowerCase().trim()};
-  }
-
-  var query = {};
-  if( localities.length > 0 ) {
-    query.$and = localities;
-  }
-
+function findForLocality(query, callback) {
   collection.distinct('farm.commodity', query ,callback);
 }

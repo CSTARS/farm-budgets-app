@@ -6,6 +6,9 @@
       }
     </style>
 
+    <input type="text" class="form-control" placeholder="Text Search" id="textSearch" on-keyup="onKeyUp" />
+    <div class="help-block">A generic text search on budget name, farm name, crop and localition name</div>
+
     <div id="noData"></div>
 
     <template is="dom-repeat" items="{{data}}">
@@ -14,15 +17,15 @@
           <h4>
             <span>{{item.name}}</span>
             <small><i class="fa fa-shield"></i> <span>{{item.authority}}</span></small>
-            <span class="pull-right"><a class="btn btn-link" on-click="select" index$="{{index}}">Select</a></span>
+            <span class="pull-right"><a class="btn btn-primary" on-click="select" index$="{{index}}" style="margin-top:-10px">Select</a></span>
           </h4>
 
           <table class="table">
-            <tr>
+            <tr class="text text-success">
               <td>Crop</td>
               <td><i class="fa fa-leaf"></i> <span>{{item.farm.commodity}}</span></td>
             </tr>
-            <tr>
+            <tr class="text text-primary">
               <td>Location</td>
               <td><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">{{item.localityStr}}</span></td>
             </tr>
@@ -43,16 +46,52 @@
     Polymer({
       is: 'find-budget-list',
 
-      show : function(crop) {
-        if( this.crop === crop ) return;
+      ready : function() {
+        this.cache = {};
+        this.countCache = {};
+        this.update();
+      },
+
+      update : function(locality, crop) {
+        this.locality = locality;
         this.crop = crop;
 
-        var query = '';
-        if( this.crop ) {
-          query = encodeURIComponent(JSON.stringify({'farm.commodity': this.crop}));
+        var query = FB.utils.queryHelper(locality, crop, this.$.textSearch.value);
+        query = encodeURIComponent(JSON.stringify(query));
+
+        if( this.cache[query] ) {
+          this.onResponse(this.cache[query]);
+        } else {
+          $.get('/budget/find?query='+query, function(resp){
+            this.cache[query] = resp;
+            this.onResponse(resp);
+          }.bind(this));
         }
 
-        $.get('/budget/find?query='+query, this.onResponse.bind(this));
+        if( this.countCache[query] ) {
+          this.onCountResponse(this.countCache[query]);
+        } else {
+          $.get('/budget/findCount?query='+query, function(resp){
+            this.countCache[query] = resp;
+            this.onCountResponse(resp);
+          }.bind(this));
+        }
+      },
+
+      onKeyUp : function() {
+        if( this.searchTimer != -1 ) clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(function(){
+          this.searchTimer = -1;
+          this.update(this.locality, this.crop);
+        }.bind(this), 200);
+      },
+
+      onCountResponse : function(resp) {
+        this.fire('budget-count', resp.count);
+      },
+
+      show : function(locality, crop) {
+        this.update(locality, crop);
       },
 
       onResponse : function(resp) {

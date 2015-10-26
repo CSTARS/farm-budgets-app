@@ -36,4 +36,24 @@ module.exports = function (router) {
         res.send(budget);
       });
     });
+
+    router.get('/findCount', function (req, res) {
+
+      var query = req.query.query || '';
+
+      if( query !== '' ) {
+        try {
+          query = JSON.parse(query);
+        } catch(e) {
+          return errorHandler('Query should by JSON formatted', res);
+        }
+      }
+
+      model.findCount(query, function(err, budget){
+        if( err ) {
+          return errorHandler(err, res);
+        }
+        res.send(budget);
+      });
+    });
 };

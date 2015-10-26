@@ -91,11 +91,11 @@
           <label for="locationInput" class="col-md-2 control-label">Location</label>
           <div class="col-md-10">
             <input type="text" class="form-control" id="locationInput" placeholder="Comma Separate" on-keyup="onKeyUp" on-blur="onBlur" />
+            <budget-location-filter-display id="locationBtns" on-location-update="onLocationUpdate"></budget-location-filter-display>
           </div>
         </div>
       </div>
 
-      <div id="locationBtns"></div>
     </div>
 
   </template>
@@ -117,9 +117,23 @@
         if( this.$.locationInput.value.length == 0 ) return;
 
         this.filters = this.$.locationInput.value.split(',');
+        var firstState = -1;
         for( var i = 0; i < this.filters.length; i++ ) {
-          this.filters[i] = this.filters[i].trim();
+          this.filters[i] = this.filters[i].trim().toLowerCase();
+          if( FB.utils.states[this.filters[i]] && firstState == -1 ) {
+            firstState = i;
+          } else if( FB.utils.statesLookup[this.filters[i]] ) {
+            this.filters[i] = FB.utils.statesLookup[this.filters[i]];
+            if( firstState == -1 ) firstState = i;
+          }
         }
+
+        // look if there is a state filter, if there is replace
+        if( firstState != -1 ) {
+          var filter = this.filters.splice(firstState, 1)[0];
+          this.filters.splice(0,0,filter);
+        }
+
         this.$.locationInput.value = '';
 
         this.renderFilterBtns();
@@ -127,20 +141,13 @@
       },
 
       renderFilterBtns : function() {
-        var html = '';
-        for( var i = 0; i < this.filters.length; i++ ) {
-          html += '<a class="btn btn-primary" index="'+i+'"><i class="fa fa-times"></i> '+this.filters[i]+'</a> ';
-        }
-        this.$.locationBtns.innerHTML = html;
-        $(this.$.locationBtns)
-          .find('a')
-          .on('click', function(e){
-            var index = parseInt($(e.currentTarget).attr('index'));
-            $(e.currentTarget).remove();
-            this.filters.splice(index, 1);
-            this.fire('filters-update', this.filters);
-            this.renderFilterBtns();
-          }.bind(this));
+        this.$.locationBtns.value = this.filters;
+        this.$.locationBtns.update();
+      },
+
+      onLocationUpdate : function(e) {
+        this.filters = e.detail;
+        this.fire('filters-update', this.filters);
       },
 
       showMap : function() {
@@ -308,7 +315,7 @@
           this.filters = [this.location.state, this.location.county, this.location.zipCode];
           this.renderFilterBtns();
 
-          this.fire('location-select', this.location);
+          this.fire('location-select', this.filters);
       },
 
       llLookUp : function(lat, lng, recheck) {

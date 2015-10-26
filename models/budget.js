@@ -16,6 +16,7 @@ module.exports = function() {
   return {
       name: 'Budget',
       find: find,
+      findCount : findCount,
       save: save,
       get : get
   };
@@ -153,17 +154,16 @@ function get(id, callback) {
   });
 }
 
+function findCount(query, callback) {
+  collection.count(query, function(err, resp){
+    if( err ) {
+      return callback(err);
+    }
+    callback(null, {count: resp});
+  });
+}
+
 function find(query, callback) {
-  var q = [];
-  if( query !== '' ) {
-    q = utils.prepareQuery(query);
-  }
-
-  query = {};
-  if( q.length > 0 ) {
-    query.$and = q;
-  }
-
   collection
     .find(query, {operations: 0, materialIds: 0})
     .limit(20)

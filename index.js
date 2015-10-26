@@ -48,6 +48,8 @@ options = {
             process.exit();
           }
 
+          mongo.ensureIndexes();
+
           var authSetup = {
             db : global.db,
             app : app,

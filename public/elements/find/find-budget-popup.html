@@ -27,14 +27,22 @@
               <div class="col-sm-4">
                 <div class="nav-list-item">
                   <div><a class="btn btn-link" on-click="showMap"><i class="fa fa-map-pin"></i> Location</a></div>
-                  <div id="locationBtns" style="text-align:right"></div>
+                  <div style="text-align:right">
+                    <budget-location-filter-display id="locationBtns" style="display:inline-block" size="small" on-location-update="onLocationUpdate"></budget-location-filter-display>
+                  </div>
                 </div>
                 <div class="nav-list-item">
-                  <div><a class="btn btn-link" on-click="showCrop"><i class="fa fa-leaf"></i> Crop</a></div>
+                  <div>
+                    <a class="btn btn-link" on-click="showCrop"><i class="fa fa-leaf"></i> Crop</a>
+                    <span id="cropCountLabel"></span>
+                  </div>
                   <div id="currentCrop" style="text-align:right"></div>
                 </div>
                 <div class="nav-list-item">
-                  <div><a class="btn btn-link" on-click="showBudget"><i class="fa fa-dollar"></i> Budget</a></div>
+                  <div>
+                    <a class="btn btn-link" on-click="showBudget"><i class="fa fa-dollar"></i> Budget</a>
+                    <span id="budgetCountLabel"></span>
+                  </div>
                 </div>
               </div>
               <div class="col-sm-8" id="panels">
@@ -45,8 +53,8 @@
                   on-filters-update="onFiltersUpdate">
                 </find-budget-location>
 
-                <find-budget-crop id="cropPage" on-crop-select="onCropSelect"></find-budget-crop>
-                <find-budget-list id="budgetPage" on-budget-select="onBudgetSelect"></find-budget-list>
+                <find-budget-crop id="cropPage" on-crop-select="onCropSelect" on-crop-count="onCropCount"></find-budget-crop>
+                <find-budget-list id="budgetPage" on-budget-select="onBudgetSelect" on-budget-count="onBudgetCount"></find-budget-list>
               </div>
             </div>
 
@@ -94,7 +102,7 @@
         this.hidePanels();
         this.$.cropPage.style.display = 'block';
 
-        this.$.cropPage.show(this.locality);
+        //this.$.cropPage.show(this.locality);
       },
 
       showBudget : function() {
@@ -102,12 +110,23 @@
         this.hidePanels();
         this.$.budgetPage.style.display = 'block';
 
-        this.$.budgetPage.show(this.crop);
+        this.$.budgetPage.show(this.locality, this.crop);
       },
 
       onCropSelect : function(e) {
         this.crop = e.detail;
-        this.$.currentCrop.innerHTML = this.crop;
+        this.$.currentCrop.innerHTML = '<span class="label label-primary" style="cursor:pointer"><i class="fa fa-remove"></i> '+this.crop+'</span>';
+
+        $(this.$.currentCrop)
+          .find('span')
+          .on('click', function(){
+            this.crop = '';
+            this.$.currentCrop.innerHTML = '';
+
+            this.$.budgetPage.show(this.locality, this.crop);
+            this.$.cropPage.show(this.locality);
+          }.bind(this));
+        this.$.budgetPage.update(this.locality, this.crop);
       },
 
       onBudgetSelect : function(e) {
@@ -117,40 +136,42 @@
         }, 200);
       },
 
+      onCropCount : function(e) {
+        this.$.cropCountLabel.innerHTML = '('+e.detail+')';
+      },
+
+      onBudgetCount : function(e) {
+        this.$.budgetCountLabel.innerHTML = '('+e.detail+')';
+      },
+
       onLocationSelect : function(e) {
-        var location = e.detail;
-        this.locality = [];
-        for( var i = 0; i < this.locationKeys.length; i++ ){
-          this.locality.push(location[this.locationKeys[i]]);
-        }
+        this.locality = e.detail;
+        this.$.cropPage.update(this.locality);
+        this.$.budgetPage.update(this.locality, this.crop);
         this.updateLocationBtns();
       },
 
       onFiltersUpdate : function(e) {
         this.locality = e.detail;
+        this.$.cropPage.update(this.locality);
+        this.$.budgetPage.update(this.locality, this.crop);
         this.updateLocationBtns();
       },
 
       updateLocationBtns : function() {
-        var html = '';
-        for( var i = 0; i < this.locality.length; i++ ) {
-          html += '<span class="label label-primary" style="cursor:pointer" index="'+i+'"><i class="fa fa-times"></i> '+this.locality[i]+'</span> ';
-        }
-        this.$.locationBtns.innerHTML = html;
+        this.$.locationBtns.value = this.locality;
+        this.$.cropPage.update(this.locality);
+        this.$.budgetPage.update(this.locality, this.crop);
+        this.$.locationBtns.update(); // this should fire!?
+      },
 
-        $(this.$.locationBtns)
-          .find('.label-primary')
-          .on('click', function(e){
-            var index = parseInt($(e.currentTarget).attr('index'));
-            $(e.currentTarget).remove();
-            this.locality.splice(index, 1);
-            this.$.locationPage.filters = this.locality;
-            this.$.locationPage.renderFilterBtns();
+      onLocationUpdate : function(e) {
+        this.locality = e.detail;
+        this.$.cropPage.update(this.locality);
+        this.$.budgetPage.update(this.locality, this.crop);
 
-            if( this.panel = 'crop' ) {
-              this.$.cropPage.show(this.locality);
-            }
-          }.bind(this));
+        this.$.locationPage.filters = this.locality;
+        this.$.locationPage.renderFilterBtns();
       }
 
     });
