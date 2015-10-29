@@ -18,6 +18,17 @@
       var id = window.localStorage.getItem('current-budget');
 
       if( id ) {
+        try {
+          var localdata = window.localStorage.getItem(id);
+          if( localdata ) {
+            this.load(JSON.parse(localdata));
+            return;
+          }
+        } catch(e) {
+          console.log(e);
+          alert('Failed to load from local storage :(');
+        }
+
         $.get('/budget/get?id='+id, function(resp){
           if( resp.error ) {
             alert(resp.message);
@@ -43,6 +54,7 @@
       if( this.saveElement ) {
         this.saveElement.onBudgetLoad(appData);
       }
+      FB.localsave();
     }
 
   });

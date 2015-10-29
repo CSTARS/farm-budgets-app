@@ -88,6 +88,7 @@
         this.popup
           .modal({show: false})
           .on('hidden.bs.modal', function(){
+            FB.localsave();
             this.fire('editor-close');
           }.bind(this));
       },

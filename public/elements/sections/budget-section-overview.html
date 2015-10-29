@@ -48,6 +48,10 @@
                 <td>Budget Authority</td>
                 <td id="authorityLabel"></td>
               </tr>
+              <tr>
+                <td>Material Authorities</td>
+                <td id="materialAuthorityLabel"></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -92,6 +96,9 @@
       this.$.infoCard.addEventListener('mouseleave', function(){
         this.$.editBtn.style.display = 'none';
       }.bind(this));
+
+      FB.materialController.on('material-update', this.updateMaterialAuthorties.bind(this));
+      FB.materialController.on('material-removed', this.updateMaterialAuthorties.bind(this));
     },
 
     attached : function() {
@@ -119,6 +126,43 @@
       this.$.cropLabel.innerHTML = '<i class="fa fa-leaf"></i> '+data.farm.commodity;
       this.$.localityLabel.innerHTML = '<i class="fa fa-map-marker"></i> '+data.locality.join(', ');
       this.$.authorityLabel.innerHTML = '<i class="fa fa-shield"></i> '+data.authority;
+      this.updateMaterialAuthorties();
+    },
+
+    updateMaterialAuthorties : function() {
+      var authorities = {};
+      var materials = FB.materialController.get();
+      var m;
+
+      for( var name in materials.materials ) {
+        var m = materials.materials[name];
+        if( !m.authority || !m.locality ) continue;
+        if( authorities[m.authority+m.locality] ) continue;
+
+        authorities[m.authority+m.locality] = this.getMaterialAuthLabel(m);
+      }
+      for( var name in materials.complex ) {
+        var m = materials.complex[name];
+        if( !m.authority || !m.locality ) continue;
+        if( authorities[m.authority+m.locality] ) continue;
+
+        authorities[m.authority+m.locality] = this.getMaterialAuthLabel(m);
+      }
+
+      var html = '<table style="width:100%">';
+      for( var key in authorities ) {
+        html += authorities[key]
+      }
+
+      this.$.materialAuthorityLabel.innerHTML = html+'</table>';
+    },
+
+    getMaterialAuthLabel : function(m) {
+      return '<tr>'+
+          '<td><i class="fa fa-shield"></i> '+m.authority+'</td>'+
+          '<td style="text-align:center;width:25%"><span class="label label-default"><i class="fa fa-arrow-right"></i></span></td>'+
+          '<td><i class="fa fa-map-marker"></i> '+m.locality.join(', ')+'</td>'+
+        '</tr>';
     },
 
     onShow : function(params) {
