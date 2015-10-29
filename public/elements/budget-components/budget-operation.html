@@ -34,26 +34,6 @@
         <h5>
           <budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler>
         </h5>
-<!--
-        <div class="layout horizontal">
-          <div>
-            <div class="radio" style="margin-right: 15px">
-              <label>
-                <input type="radio" id="radioEntireFarm" value="entireFarm" checked on-click="updateUnit">
-                Entire Farm
-              </label>
-            </div>
-          </div>
-          <div>
-            <div class="radio">
-              <label>
-                <input type="radio" id="radioPerAcre" value="perAcre" on-click="updateUnit">
-                Per Acre
-              </label>
-            </div>
-          </div>
-        </div>
--->
       </div>
       <div class="col-sm-4">
         <table class="padding: 15px">
@@ -84,7 +64,14 @@
 
       <budget-materials-table id="materialTable" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
 
+
+      <a class="btn btn-link" on-click="toggleAddition" id="sourceBtn">Operation Sources</a>
       <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete Operation</a>
+
+      <div class="well" id="sources" style="display:none">
+        <div class="help-block">This operation is using the following authorities and locations:</div>
+        <div id="additionalTable"></div>
+      </div>
     </div>
 
   </template>
@@ -109,6 +96,10 @@
 
     attached : function() {
       if( this.operation ) this.update();
+    },
+
+    toggleAddition : function() {
+      $(this.$.sources).toggle('show');
     },
 
     // fired from operation controller
@@ -188,11 +179,32 @@
 
       this.$.nameLabel.innerHTML = this.operation.name;
 
-      if( !this.operation.materials ) return;
+      if( !this.operation.materials ) {
+        this.$.sourceBtn.style.display = 'none';
+        this.$.sources.style.display = 'none';
+        return;
+      }
 
       this.$.materialTable.setMaterials(this.operation, {isOperation : true});
       this.updateTotals();
       this.checkError();
+      this.updateSources();
+    },
+
+    updateSources : function() {
+      var hash = {};
+      for( var i = 0; i < this.operation.materials.length; i++ ) {
+        var m = FB.materialController.get(this.operation.materials[i].name);
+        if( m.error || !m.authority || !m.locality ) continue;
+        hash[m.authority+m.locality.join('')] = m;
+      }
+      var html = '<table class="table">'+
+        '<tr><th><i class="fa fa-shield"></i> Authority</th><th><i class="fa fa-map-marker"></i> Location</th></th>';
+      for( var key in hash ) {
+        html += '<tr><td>'+hash[key].authority+'</td><td>'+hash[key].locality.join(', ')+'</td></tr>';
+      }
+
+      this.$.additionalTable.innerHTML = html+'</table>';
     },
 
     updateTotals : function() {

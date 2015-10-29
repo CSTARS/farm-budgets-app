@@ -40,6 +40,7 @@
       <tr>
         <td>
           <span id="expand"><i class="fa fa-cubes" id="icon"></i> <span id="nameLabel"></span></span>
+          <div id="otherInfo" class="help-block" style="display:none"></div>
         </td>
         <td>
           <div style="width: 102px;display:none;" id="btns">
@@ -90,6 +91,7 @@
       $(this.$.expand).on('click',function() {
         $(this.$.main).toggle();
         $(this.$.btns).toggle();
+        $(this.$.otherInfo).toggle();
         $(this).toggleClass('open');
       }.bind(this));
     },
@@ -112,6 +114,18 @@
       if( m.error ) {
         return alert(JSON.stringify(m));
       }
+
+      var otherInfo = '';
+      if( m.authority ) {
+        otherInfo +='<i class="fa fa-shield"></i> '+m.authority;
+      }
+      if( m.locality ) {
+        if( m.authority ) {
+          otherInfo += ' | ';
+        }
+        otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+m.locality.join(', ')+'</span>';
+      }
+      this.$.otherInfo.innerHTML = otherInfo;
 
       this.data = m;
 
