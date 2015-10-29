@@ -1,0 +1,126 @@
+<dom-module id="budget-material-list-item">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="style-scope budget-section-materials card" material-table>
+      <h5 class="material-name" style="margin-bottom: 5px">
+        <div class="layout horizontal center">
+          <div class="flex">
+            <span id="icon"></span>
+            <span id="name"></span>
+          </div>
+          <div>
+            <span id="fixed" class="label label-warning">Fixed</span>
+            <a id="editIcon" class="btn btn-default btn-lg" on-click="edit"><i class="fa fa-pencil"></i></a>
+          </div>
+        </div>
+      </h5>
+      <div class="help-block" style="margin-bottom: 15px" id="otherInfo"></div>
+      <div style="overflow-x:auto">
+        <table class="table">
+          <tr>
+            <th>Class</th>
+            <th>Price</th>
+            <th>Units</th>
+          </tr>
+          <tr>
+            <td id="class" class="material-class"></td>
+            <td class="material-price"><ahb-dollar-label id="price"></ahb-dollar-label></td>
+            <td id="units"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div id="msg"></div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-list-item',
+
+      properties : {
+        material : {
+          type : Object,
+          observer : 'update'
+        }
+      },
+
+      edit : function() {
+        this.fire('edit-material');
+      },
+
+      update : function() {
+        if( !this.material ) return;
+        this.setAttribute('material-name', this.material.name);
+
+        this.$.icon.innerHTML = '<i class="fa fa-cube'+(this.material.type === 'complex' ? 's' : '')+'"></i>';
+        this.$.name.innerHTML = this.material.name;
+
+        if( this.material.fixed ) {
+          this.$.fixed.style.display = 'block';
+          this.$.editIcon.style.display = 'none';
+        } else {
+          this.$.fixed.style.display = 'none';
+          this.$.editIcon.style.display = 'block';
+        }
+
+        var otherInfo = '';
+        if( this.material.authority ) {
+          otherInfo +='<i class="fa fa-shield"></i> '+this.material.authority;
+        }
+        if( this.material.locality ) {
+          if( this.material.authority ) {
+            otherInfo += ' | ';
+          }
+          otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.locality.join(', ')+'</span>';
+        }
+        if( this.material.description ) {
+          if( this.material.authority || this.material.locality ) {
+            otherInfo += ' | ';
+          }
+          otherInfo += this.material.description;
+        }
+        this.$.otherInfo.innerHTML = otherInfo;
+
+        this.$.class.innerHTML = this.material.type == 'complex' ? 'Complex Material' : (this.material.class || 'Other');
+        this.$.price.value = this.material.price || '0';
+
+        this.$.units.innerHTML = this.material.units;
+
+        this.verify();
+      },
+
+      verify : function() {
+        this.$.msg.style.display = 'none';
+        if( !this.material ) return;
+        if( !this.material.materials || this.material.type !== 'complex' ) return;
+
+        var missing = '';
+        for( var key in this.material.materials ) {
+          var m = FB.materialController.get(key);
+          if( m.error ) {
+            missing += '<div><i class="fa fa-warning"></i> Missing required material: '+key+
+            ' <a style="cursor:pointer" material="'+key+'"><i class="fa fa-cloud-download"></i> Import</a></div>';
+          }
+        }
+
+        if( missing.length === 0 ) return;
+        this.$.msg.style.display = 'block';
+        this.$.msg.className = 'alert alert-warning';
+        this.$.msg.innerHTML = missing;
+
+        $(this.$.msg)
+          .find('a')
+          .on('click', function(e){
+            var material = e.currentTarget.getAttribute('material');
+            document.querySelector('budget-import-material-popup').show(material);
+          });
+      }
+    });
+  </script>
+</dom-module>

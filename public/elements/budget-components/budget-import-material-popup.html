@@ -16,6 +16,8 @@
           <div class="modal-body">
             <div id="main">
               <input type="text" class="form-control" placeholder="Material Text Search" on-keyup="onKeyUp" id="input" />
+              <div class="help-block">Text search on material name, description and/or localition.</div>
+
 
               <template is="dom-repeat" items="{{items}}">
                 <div class="panel panel-default">
@@ -45,7 +47,9 @@
 
             </div>
             <div id="select">
-              <div>This complex material <b><i class="fa fa-cubes"></i> <span id="currentComplexLabel"></span></b> has the following required materials:</div>
+              <div style="margin-bottom: 20px">
+                This complex material <span class="label label-default"><i class="fa fa-cubes"></i>
+                  <span id="currentComplexLabel"></span></span> has the following required materials:</div>
 
               <div class="well">
                 <ul>
@@ -61,14 +65,15 @@
 
               <div id="authHasRequired">
                 <div style="margin-bottom: 20px">
-                  The materials authority <b><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel"></span></b> has the required materials for the same location.
+                  The materials authority <span class="label label-default"><i class="fa fa-shield"></i>
+                  <span id="currentComplexAuthLabel"></span></span> has the required materials for the same location.
                   Would you like to import them as well?
                 </div>
                 <div class="layout horizontal">
                   <div class="flex">
 
-                    <a class="btn btn-default">Import Material and Required Materials</a>
-                    <a class="btn btn-default">Import Only Material</a>
+                    <a class="btn btn-primary" on-click="importAllComplex">Import Material and Required Materials</a>
+                    <a class="btn btn-default" on-click="importOnlyComplex">Import Only Material</a>
                   </div>
                   <div>
                     <a class="btn btn-default" on-click="cancelComplex">Cancel</a>
@@ -78,7 +83,7 @@
 
               <div id="authNoRequired">
                 <div style="margin-bottom: 20px" class="text text-danger">
-                  The materials authority <b><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel2"></span></b> does not have the required materials for the same location.
+                  The materials authority <span class="label label-default"><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel2"></span></span> does not have the required materials for the same location.
                   Would you will need to import these materials for other locations or authorities after.
                 </div>
                 <div class="layout horizontal">
@@ -119,7 +124,7 @@
         this.popup.modal('hide');
       },
 
-      show : function() {
+      show : function(value) {
         this.popup.modal('show');
 
         this.$.main.style.display = 'block';
@@ -137,9 +142,10 @@
 
         var data = FB.getData();
         if( data && data.locality ) {
-          this.$.input.value = data.locality.join(' ');
+          this.$.input.value = data.locality.join(' ')+' '+(value ? value : '');
         }
 
+        this.search();
         setTimeout(function(){
           this.$.input.focus();
         }.bind(this), 200);
@@ -161,9 +167,11 @@
         this.complexMaterialRequires = arr;
 
         if( material.type !== 'complex' ) {
+          this.addMaterial(material.id);
           this.hide();
           return;
         }
+        this.selectedMaterial = material;
 
         this.$.main.style.display = 'none';
         this.$.select.style.display = 'block';
@@ -178,11 +186,14 @@
 
         $.get('/materials/hasRequired?id='+material.id, function(resp){
           this.$.loading.style.display = 'none';
+          this.selectedMaterial.validated = {};
 
           var valid = true;
           for( var key in resp ) {
-            if( !resp[key] ) {
+            if( resp[key] === false ) {
               value = false;
+            } else {
+              this.selectedMaterial.validated[key] = resp[key];
             }
           }
 
@@ -194,9 +205,29 @@
         }.bind(this));
       },
 
+      addMaterial : function(id, callback) {
+        $.get('/materials/get?id='+id, function(resp){
+          FB.materialController.add(resp);
+          if( callback ) callback();
+        });
+      },
+
       cancelComplex : function() {
         this.$.main.style.display = 'block';
         this.$.select.style.display = 'none';
+      },
+
+      importOnlyComplex : function() {
+        this.addMaterial(this.selectedMaterial.id);
+        this.hide();
+      },
+
+      importAllComplex : function() {
+        this.addMaterial(this.selectedMaterial.id);
+        for( var key in this.selectedMaterial.validated ) {
+          this.addMaterial(this.selectedMaterial.validated[key]);
+        }
+        this.hide();
       },
 
       onKeyUp : function() {

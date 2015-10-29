@@ -7,6 +7,7 @@
     </style>
 
     <select id="selector" class="form-control" on-input="onInput"></select>
+    <div class="help-block" id="noUser" style="display:none">You must login to update an authority</div>
 
   </template>
   <script>
@@ -17,12 +18,17 @@
         default : {
           type : String,
           observer : 'defaultObserver'
+        },
+        value : {
+          type : String,
+          observer : 'valueObserver'
         }
       },
 
       attached : function() {
         if( !ExpressAuth.user ) {
-          this.$.selector.style.display = 'none';
+          this.$.selector.setAttribute('disabled', 'disabled');
+          this.$.noUser.style.display = 'block';
           return;
         }
 
@@ -37,11 +43,20 @@
 
       onInput : function() {
         this.value = this.$.selector.value;
-        this.$.selector.value = '';
         this.fire('authority-select');
       },
 
+      valueObserver : function(value) {
+        if( !ExpressAuth.user ) {
+          this.$.selector.innerHTML = '<option value="'+value+'">'+value+'</option>';
+        } else {
+          this.$.selector.value = value;
+        }
+      },
+
       defaultObserver : function() {
+        if( !ExpressAuth.user ) return;
+
         this.$.selector.value = this.default;
         $(this.$.selector)
           .find('[value="'+this.default+'"]')

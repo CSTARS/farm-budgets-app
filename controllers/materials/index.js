@@ -20,6 +20,16 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/get', function (req, res) {
+      model.get(req.query.id, function(err, material){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(material);
+      });
+    });
+
     router.post('/find', function (req, res) {
       model.find(req.body.query, function(err, materials){
         if( err ) {

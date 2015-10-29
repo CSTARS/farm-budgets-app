@@ -1,3 +1,5 @@
+<link rel="import" href="../budget-components/budget-material-list-item.html" />
+
 <dom-module id="budget-section-materials">
   <style>
     .card {
@@ -27,12 +29,6 @@
             <label for="filterInput" class="col-sm-2 control-label">Filter</label>
             <div class="col-sm-10">
               <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
-
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" id="thisBudgetInput" on-click="_filter"> Only materials used in this budget.
-                </label>
-              </div>
 
             </div>
           </div>
@@ -89,7 +85,7 @@
     },
 
     updateMaterialPanel : function(name, replaced) {
-      var current = $(this.$.root).find('[material="'+(replaced || name)+'"]');
+      var current = $(this.$.root).find('[material-name="'+(replaced || name)+'"]');
       var div = $(this.createTable(name));
 
       if( current.length == 0 ) {
@@ -144,10 +140,10 @@
         matched = this.toNameArray(FB.materialController.find(txt));
       }
 
-      var opEles = this.querySelectorAll('[material]');
+      var opEles = this.querySelectorAll('budget-material-list-item');
       for( var i = 0; i < opEles.length; i++ ) {
         var ele = opEles[i];
-        if( showAll || matched.indexOf(ele.getAttribute('material')) > -1 ) {
+        if( showAll || matched.indexOf(ele.getAttribute('material-name')) > -1 ) {
           ele.style.display = 'block';
         } else {
           ele.style.display = 'none';
@@ -193,63 +189,21 @@
     createTable : function(material) {
       if( typeof material === 'string' ) {
         material = FB.materialController.get(material);
-        if( material.error ) return;
+
+        if( material.error ) {
+          console.log('Unabled to show material in list');
+          console.log(material);
+          return;
+        }
       }
 
-      var html =
-        '<div class="style-scope budget-section-materials card" material="'+material.name+'" material-table>'+
-          '<h5 class="material-name" style="margin-bottom: 5px">' +
-            '<div class="layout horizontal center">'+
-              '<div class="flex">'+
-                (material.type == 'complex' ?
-                  '<i class="fa fa-cubes"></i> ' :
-                  '<i class="fa fa-cube"></i> '
-                )+material.name+
-              '</div>'+
-              '<div>'+
-                (material.fixed ? '<span class="label label-warning">Fixed</span>' : '<a class="btn btn-default btn-lg pull-right"><i class="fa fa-pencil"></i></a>') +
-            '</div></div>'+
-          '</h5>'+
-          '<div class="help-block" style="margin-bottom: 15px">'+
-              '<span><i class="fa fa-shield"></i> '+material.authority+'</span>'+
-              ((material.locality && material.type != 'complex') ? ' | <span style="text-transform: capitalize"><i class="fa fa-map-marker"></i> '+material.locality.join(', ')+'</span> ' : '')+
-              ((material.locality && material.type != 'complex' && material.description ) ? ' | ' : '' )+
-              (material.description || '')+
-          '</div>'+
-          '<div style="overflow-x:auto">' +
-            '<table class="table">' +
-              '<tr><th>Class</th><th>Price</th><th>Units</th></tr>' +
-              '<tr>' +
-                '<td class="material-class">'+(material.type == 'complex' ? 'Complex Material' : material.class || 'other')+'</td>' +
-                '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' +
-                //(material.type == 'complex' || material.fixed ?
-                //  '<td class="material-price"><ahb-dollar-label value="'+(material.price || '0')+'"></ahb-dollar-label></td>' :
-                //  '<td><input type="number" class="form-control material-price" value="'+(material.price || '0')+'" /></td>'
-                //) +
-                '<td>'+material.units+
-                //  (material.fixed ?
-                //    (material.units || '') :
-                //    '<budget-unit-selector units="'+(material.units || '')+'" ></budget-unit-selector>'
-                //  )+
-                '</td>' +
-              '</tr>' +
-            '</table>' +
-          '</div>' +
-        '</div>';
-
-      var row = $(html);
-
-      row.find('.material-price').on('input', function(){
-        this.updateFromEvent(row);
-      }.bind(this));
-      row.find('budget-unit-selector').on('units-change', function(){
-        this.updateFromEvent(row);
-      }.bind(this));
-      row.find('.btn-lg').on('click', function(){
+      var ele = document.createElement('budget-material-list-item');
+      ele.material = material;
+      ele.addEventListener('edit-material', function(){
         document.querySelector('budget-material-popup').edit(material);
       });
 
-      return row[0];
+      return ele;
     },
 
     updateFromEvent : function(ele) {
@@ -262,7 +216,7 @@
     },
 
     _updateFromEvent : function(ele) {
-      var m = FB.materialController.get(ele.attr('material'));
+      var m = FB.materialController.get(ele.attr('material-name'));
 
       if( m.error ) {
         return console.log('Error updating material');

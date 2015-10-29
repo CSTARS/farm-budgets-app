@@ -26,7 +26,7 @@ module.exports = function() {
 };
 
 function get(id, callback){
-  collection.findOne({id: id}, callback);
+  collection.findOne({id: id}, {_id: 0}, callback);
 }
 
 function save(material, callback) {
@@ -63,10 +63,24 @@ function save(material, callback) {
 function find(query, callback) {
   var q = {
     $and : [
-      {name : {'$not' : new RegExp('--')}},
+      {$or : [
+        {fixed : {'$exists' : false}},
+        {fixed : false},
+      ]},
       query
     ]
   };
+
+  // by default, don't search children, unless specifically asked for
+  var isChildQuery = false;
+  if( query && query.$text && query.$text.$search ) {
+    if( query.$text.$search.match(/--/) ) {
+      isChildQuery = true;
+    }
+  }
+  if( !isChildQuery ) {
+    q.$and.push({name : {'$not' : new RegExp('--')}});
+  }
 
   collection.find(
     q,
@@ -116,14 +130,14 @@ function hasRequired(id, callback) {
     }
 
     collection
-      .find(query, {name: 1})
+      .find(query, {name: 1, id: 1})
       .toArray(function(err, results){
         if( err ) {
           return callback(err);
         }
 
         for( var i = 0; i < results.length; i++ ) {
-          checklist[results[i].name] = true;
+          checklist[results[i].name] = results[i].id;
         }
 
         callback(null, checklist);
