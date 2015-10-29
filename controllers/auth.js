@@ -19,7 +19,25 @@ function hasAccess(user, authority, callback) {
   });
 }
 
+function hasAccessObject(user, object, callback) {
+  if( !object.authority ) {
+    return callback('no authority provided');
+  }
+  
+  hasAccess(user, object.authority, function(err, hasRole){
+    if( err ) {
+      return callback(err);
+    }
+    if( !hasRole ) {
+      return callback('You do not have access to authority: '+object.authority);
+    }
+
+    callback(null, true);
+  });
+}
+
 module.exports = {
   middleware : middleware,
-  hasAccess : hasAccess
+  hasAccess : hasAccess,
+  hasAccessObject : hasAccessObject
 };

@@ -46,20 +46,18 @@ module.exports = function (router) {
       if( !material ) {
         return errorHandler('material required', res);
       }
-      if( !material.authority ) {
-        return errorHandler('no material authority provided', res);
-      }
 
-      if( !auth.acl.hasRole(req.user.username, material.authority) ) {
-        return errorHandler('You do not have access to authority: '+req.query.authority, res);
-      }
-
-      model.save(material, function(err, result){
+      authUtils.hasAccessObject(req.user, material, function(err, hasRole){
         if( err ) {
-          return res.send({error:true, message: err});
+          return errorHandler(err, res);
         }
 
-        res.send(result);
+        model.save(material, function(err, result){
+          if( err ) {
+            return res.send({error:true, message: err});
+          }
+          res.send(result);
+        });
       });
     });
 };

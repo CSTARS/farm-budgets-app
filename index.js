@@ -6,7 +6,7 @@ var merge = require('merge-util');
 var fs = require('fs');
 var mongo = require('./lib/mongo');
 
-var authStack = require('../../../watershed/express-auth');
+var authStack = require('express-auth');
 
 var options, app;
 

@@ -3,12 +3,12 @@
 
 var saveTimer = -1;
 
-FB.localsave = function() {
+FB.localsave = function(auto) {
   if( saveTimer !== -1 ) clearTimeout(saveTimer);
 
   saveTimer = setTimeout(function(){
     saveTimer = -1;
-    FB._localsave();
+    FB._localsave(auto);
   }, 100);
 };
 

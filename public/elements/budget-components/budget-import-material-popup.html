@@ -48,13 +48,13 @@
             </div>
             <div id="select">
               <div style="margin-bottom: 20px">
-                This complex material <span class="label label-default"><i class="fa fa-cubes"></i>
+                This complex material <span class="label label-warning"><i class="fa fa-cubes"></i>
                   <span id="currentComplexLabel"></span></span> has the following required materials:</div>
 
               <div class="well">
-                <ul>
+                <ul class="text text-warning">
                   <template is="dom-repeat" items="{{complexMaterialRequires}}">
-                    <li><b>{{item.name}}</b> <span style="color:#888"><span>{{item.amount}}</span><span>{{item.units}}</span></span></li>
+                    <li><b>{{item.name}}</b>: <span style="color:#888"><span>{{item.amount}}</span><span>{{item.units}}</span></span></li>
                   </template>
                 <ul>
               </div>
@@ -65,7 +65,7 @@
 
               <div id="authHasRequired">
                 <div style="margin-bottom: 20px">
-                  The materials authority <span class="label label-default"><i class="fa fa-shield"></i>
+                  The materials authority <span class="label label-warning"><i class="fa fa-shield"></i>
                   <span id="currentComplexAuthLabel"></span></span> has the required materials for the same location.
                   Would you like to import them as well?
                 </div>
@@ -83,8 +83,10 @@
 
               <div id="authNoRequired">
                 <div style="margin-bottom: 20px" class="text text-danger">
-                  The materials authority <span class="label label-default"><i class="fa fa-shield"></i> <span id="currentComplexAuthLabel2"></span></span> does not have the required materials for the same location.
-                  Would you will need to import these materials for other locations or authorities after.
+                  The materials authority <span class="label label-warning"><i class="fa fa-shield"></i>
+                  <span id="currentComplexAuthLabel2"></span></span> does not have the required materials
+                  for the same location.  Would you will need to import these materials for other
+                  locations or authorities after.
                 </div>
                 <div class="layout horizontal">
                   <div class="flex">

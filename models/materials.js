@@ -5,9 +5,13 @@ var authorityModel = require('./authority');
 var utils = require('../lib/modelUtils');
 var init = true;
 
+var schema = require('../lib/shared/save/schema');
+var strip = require('../lib/shared/save/strip');
+var history = require('mongo-object-history');
+
 var collection;
 // units can be an empty string, just not undefined or null
-var required = ['price', 'units'];
+var required = ['price', 'units', 'type'];
 
 module.exports = function() {
   if( init ) {
@@ -29,7 +33,7 @@ function get(id, callback){
   collection.findOne({id: id}, {_id: 0}, callback);
 }
 
-function save(material, callback) {
+function save(material, user, callback) {
   if( !material ) {
     return callback('No material provided');
   }
@@ -55,7 +59,24 @@ function save(material, callback) {
     }
 
     // update
-    collection.update({id: material.id}, material, {upsert: true}, callback);
+    collection.update(
+      {id: material.id},
+      material,
+      {upsert: true},
+      function(err, result) {
+        if( err ) {
+          return callback(err);
+        }
+
+        history.track('material', material, user, function(err, result){
+          if( err ) {
+            return callback(err);
+          }
+
+          return result;
+        });
+      }
+    );
   });
 }
 
@@ -146,20 +167,9 @@ function hasRequired(id, callback) {
 }
 
 function cleanMaterial(material) {
-  delete material.error;
-
-  if( !material.materials ) {
-    material.type = 'simple';
-    return;
-  }
-
-  material.type = 'complex';
-  delete material.price;
-
-  for( var key in material.materials ) {
-    delete material.materials[key].error;
-    delete material.materials[key].name;
-    delete material.materials[key].originalAmount;
-    delete material.materials[key].price;
+  if( material.type === 'complex' ) {
+    strip(schema.complexMaterial, material);
+  } else {
+    strip(schema.material, material);
   }
 }
