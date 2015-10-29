@@ -1,0 +1,94 @@
+<dom-module id="budget-material-save-prompt">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" on-click="cancel"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title">Warning!</h4>
+          </div>
+
+          <div class="modal-body">
+            <div class="alert alert-warning" style="margin-bottom: 70px">
+              You have changed the materials <b><i class="fa fa-sheild"></i> authority</b> and/or the
+              <b><i class="fa fa-map-marker"></i> location</b>.  Did you want
+              to update this material or save as a new material?
+            </div>
+
+            <div class="layout horizontal">
+              <div class="flex">
+                <div><a class="btn btn-primary btn-lg" on-click="saveAsNew">Save as New Material</a></div>
+                <div class="help-block">
+                  The original material will remain as it was and a new material will be created
+                  and used with this budget.
+                </div>
+              </div>
+
+              <div class="flex">
+                <div><a class="btn btn-default btn-lg" on-click="update">Update Current Material</a></div>
+                <div class="help-block">
+                  The current material will be updated with the new authority and/or location.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" on-click="cancel">Cancel</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-save-prompt',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+
+        this.popup.on('hidden.bs.modal', function (e) {
+          if( !this.callback || !this.op ) return;
+          var resp = {};
+          resp[this.op] = true;
+          this.callback(resp);
+        }.bind(this));
+      },
+
+      show : function(callback) {
+        this.callback = callback;
+        this.popup.modal('show');
+      },
+
+      hide : function() {
+        this.popup.modal('hide');
+      },
+
+      cancel : function() {
+        this.op = 'cancel';
+        this.hide();
+      },
+
+      saveAsNew : function() {
+        this.op = 'saveAsNew';
+        this.hide();
+      },
+
+      update : function() {
+        this.op = 'update';
+        this.hide();
+      }
+    });
+  </script>
+</dom-module>

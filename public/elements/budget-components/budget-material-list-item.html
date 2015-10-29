@@ -35,6 +35,10 @@
         </table>
       </div>
 
+      <div style="padding:10px">
+        <span>Used By: </span> <span id="usedBy"></span>
+      </div>
+
       <div id="msg"></div>
     </div>
 
@@ -91,6 +95,18 @@
         this.$.price.value = this.material.price || '0';
 
         this.$.units.innerHTML = this.material.units;
+
+        var operations = FB.operationController.get();
+        var usedBy = [];
+        for( var i = 0; i < operations.length; i++ ) {
+          for( var j = 0; j < operations[i].materials.length; j++ ) {
+            if( operations[i].materials[j].name == this.material.name ) {
+              usedBy.push('<a href="/#budget/operations/'+operations[i].name+'">'+operations[i].name+'</a>');
+              break;
+            }
+          }
+        }
+        this.$.usedBy.innerHTML = usedBy.length > 0 ? usedBy.join(', ') : 'None';
 
         this.verify();
       },

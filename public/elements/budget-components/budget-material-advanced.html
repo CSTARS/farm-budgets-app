@@ -15,7 +15,7 @@
       <div class="form-group">
         <label for="nameInput" class="col-sm-3 control-label"><i class="fa fa-shield"></i> Authority</label>
         <div class="col-sm-9">
-          <budget-authority-selector id="authority"></budget-authority-selector>
+          <budget-authority-selector id="authority" on-authority-select="onAuthoritySelect"></budget-authority-selector>
         </div>
       </div>
 
@@ -81,6 +81,10 @@
 
       back : function() {
         this.fire('close-advanced');
+      },
+
+      onAuthoritySelect : function(e) {
+        this.data.authority = e.detail;
       }
     });
   </script>

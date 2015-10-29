@@ -43,7 +43,7 @@
 
       onInput : function() {
         this.value = this.$.selector.value;
-        this.fire('authority-select');
+        this.fire('authority-select', this.value);
       },
 
       valueObserver : function(value) {
@@ -57,11 +57,16 @@
       defaultObserver : function() {
         if( !ExpressAuth.user ) return;
 
-        this.$.selector.value = this.default;
-        $(this.$.selector)
+        var ele = $(this.$.selector)
           .find('[value="'+this.default+'"]')
           .html(this.default+' (Current)');
 
+        if( ele.length === 0 ) {
+          var option = $('<option value="'+this.default+'">'+this.default+' (Current)</option>');
+          $(this.$.selector).append(option);
+        }
+
+        this.$.selector.value = this.default;
         this.value = this.default;
       }
 

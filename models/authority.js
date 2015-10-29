@@ -19,7 +19,9 @@ function get(name, callback) {
 
 // get all authorities for a user
 function getAll(user, callback) {
-  if( user.admin ) {
+  if( !user.username ) {
+    callback(null, []);
+  } else if( user.admin ) {
     collection.find({},{name: 1, _id: 0}).toArray(function(err, result){
       if( err ) {
         return callback(err);
@@ -33,7 +35,7 @@ function getAll(user, callback) {
       callback(null, arr);
     });
   } else {
-    global.auth.acl.userRoles(user.username, callback);
+    global.auth.acl().userRoles(user.username, callback);
   }
 }
 

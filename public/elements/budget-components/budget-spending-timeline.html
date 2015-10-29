@@ -140,10 +140,10 @@
         var container = this.$.chart;
 
         this.chart = new google.visualization.LineChart(container);
-        google.visualization.events.addListener(this.chart, 'select', function(){
+        /*google.visualization.events.addListener(this.chart, 'select', function(){
           var selection = chart.getSelection()[0];
           this.show(selection.row);
-        }.bind(this));
+        }.bind(this));*/
       }
 
       var dataTable = google.visualization.arrayToDataTable(this.data);

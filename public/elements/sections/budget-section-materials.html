@@ -18,7 +18,9 @@
   <template>
 
     <div style="text-align: center; padding: 25px 0 15px 0">
-      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create New Material</a>
+      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create Material</a>
+      &nbsp;&nbsp;
+      <a class="btn btn-primary btn-lg" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a>
     </div>
 
     <div class="row">
@@ -50,6 +52,7 @@
       this.filterTimer = -1;
       this.updateTimer = -1;
       FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
+      FB.operationController.on('material-added', this.onMaterialAdded.bind(this));
       FB.materialController.on('material-removed', function(e){
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
@@ -58,6 +61,14 @@
 
     attached : function() {
       this.popup = document.querySelector('budget-material-popup');
+    },
+
+    import : function() {
+      document.querySelector('budget-import-material-popup').show();
+    },
+
+    onMaterialAdded : function(e) {
+      this.updateMaterialPanel(e.material, false);
     },
 
     onMaterialsUpdated : function(e) {
@@ -102,10 +113,18 @@
 
       this.$.root.innerHTML = '';
 
-      this.data.materials.forEach(function(material){
+      var materials = FB.materialController.get();
+      for( var name in materials.materials ) {
+        var material = materials.materials[name];
         var div = this.createTable(material);
         this.$.root.appendChild(div);
-      }.bind(this));
+      }
+
+      for( var name in materials.complex ) {
+        var material = materials.complex[name];
+        var div = this.createTable(material);
+        this.$.root.appendChild(div);
+      }
 
       this._filter();
     },
