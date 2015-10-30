@@ -11,11 +11,11 @@ function middleware(req, res, next) {
 // TODO: do we really need to error check grr.
 function hasAccess(user, authority, callback) {
   if( user.admin ) {
-    return callback(true);
+    return callback(null, true);
   }
 
   auth.acl.hasRole(user.username, authority, function(err, hasRole){
-    callback(hasRole);
+    callback(err, hasRole);
   });
 }
 
@@ -23,7 +23,7 @@ function hasAccessObject(user, object, callback) {
   if( !object.authority ) {
     return callback('no authority provided');
   }
-  
+
   hasAccess(user, object.authority, function(err, hasRole){
     if( err ) {
       return callback(err);

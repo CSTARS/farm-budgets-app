@@ -6,12 +6,9 @@
       }
     </style>
 
-    <div class="form-horizontal" >
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-3 control-label"></label>
-        <div class="col-sm-9"><h5><i class="fa fa-cog"></i> Advanced Material Settings</h5></div>
-      </div>
+    <h4 style="margin-bottom: 35px"><i class="fa fa-cog"></i> Advanced Material Settings</h4>
 
+    <div class="form-horizontal" >
       <div class="form-group">
         <label for="nameInput" class="col-sm-3 control-label"><i class="fa fa-shield"></i> Authority</label>
         <div class="col-sm-9">
@@ -29,7 +26,7 @@
       <div class="form-group">
         <label for="sourceInput" class="col-sm-3 control-label"><i class="fa fa-book"></i> Source</label>
         <div class="col-sm-9">
-          <textarea id="sourceInput" class="form-control"></textarea>
+          <budget-markdown-input id="sourceInput"></budget-markdown-input>
           <div class="help-block">Add any source (where the data came from) information for this material.
             <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
              is encouraged.  External links are encouraged.

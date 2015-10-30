@@ -1,0 +1,59 @@
+<dom-module id="budget-material-history">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h4>
+      <i class="fa fa-history"></i> Material History
+      <a class="btn btn-link pull-right" on-click="back"><i class="fa fa-arrow-left"></i> Back</i></a>
+    </h4>
+
+    <div id="root" style="padding: 10px"></div>
+
+    <div class="modal-footer">
+      <a class="btn btn-link pull-right" on-click="back"><i class="fa fa-arrow-left"></i> Back</i></a>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-history',
+
+      show : function(id) {
+        this.$.root.innerHTML = 'Loading...';
+        $.get('/history/'+id, this.onHistoryResponse.bind(this));
+      },
+
+      onHistoryResponse : function(resp) {
+        if( resp.length == 0 ) {
+          this.$.root.innerHTML = 'No History';
+        }
+
+        var table =
+          '<table class="table">'+
+            '<tr>'+
+              '<th>Action</th>'+
+              '<th>User</th>'+
+              '<th>Date & Time</th>'+
+            '</tr>';
+
+        for( var i = 0; i < resp.length; i++ ) {
+          table +=
+            '<tr>'+
+              '<td>'+(resp[i].created ? '<span class="label label-success">Created</span>' : '<span class="label label-warning">Updated</span>')+'</td>'+
+              '<td>'+resp[i].user+'</td>'+
+              '<td>'+(new Date(resp[i].datetime).toLocaleString())+'</td>'+
+            '</tr>';
+        }
+        this.$.root.innerHTML = table+'</table>';
+      },
+
+      back : function() {
+        this.fire('close-history');
+      }
+
+    });
+  </script>
+</dom-module>

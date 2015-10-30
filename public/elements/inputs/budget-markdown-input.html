@@ -1,0 +1,65 @@
+<dom-module id="budget-markdown-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div style="height:50px">
+      <div class="btn-group pull-right" role="group">
+        <button type="button" class="btn btn-default btn-sm active" id="inputBtn" on-click="showInput">Input</button>
+        <button type="button" class="btn btn-default btn-sm" id="previewBtn" on-click="showPreview">Preview</button>
+      </div>
+    </div>
+
+    <textarea class="form-control" id="input" style="height: 175px"></textarea>
+    <div id="preview" style="display:none" class="well well-sm"></div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-markdown-input',
+
+      ready : function() {
+        this.showingInput = true;
+      },
+
+      set value(value) {
+        this.$.input.value = value;
+        if( !this.showingInput ) {
+          this.updateMarked();
+        }
+      },
+
+      get value() {
+        return this.$.input.value;
+      },
+
+      updateMarked : function() {
+        this.$.preview.innerHTML = marked(this.$.input.value);
+      },
+
+      showPreview : function() {
+        this.showingInput = false;
+        $(this).find('.btn-default').removeClass('active');
+        this.$.previewBtn.classList.add('active');
+
+        this.updateMarked();
+
+        this.$.input.style.display = 'none';
+        this.$.preview.style.display = 'block';
+      },
+
+      showInput : function() {
+        this.showingInput = true;
+        $(this).find('.btn-default').removeClass('active');
+        this.$.inputBtn.classList.add('active');
+        this.$.input.style.display = 'block';
+        this.$.preview.style.display = 'none';
+      }
+
+
+    });
+  </script>
+</dom-module>

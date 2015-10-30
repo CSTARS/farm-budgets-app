@@ -1,5 +1,6 @@
 <!-- reusable popup for complex materials -->
 <link rel="import" href="budget-material-advanced.html" />
+<link rel="import" href="budget-material-history.html" />
 
 <script src="controls.js"></script> <!-- always needs to be first import -->
 <script src="cancel.js"></script>
@@ -16,7 +17,7 @@
     <div class="modal fade" id="popup">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header" id="header">
             <button type="button" class="close" aria-label="Close" on-click="cancel"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="title"></h4>
           </div>
@@ -153,6 +154,7 @@
             </div>
 
             <budget-material-advanced id="advancedPanel" style="display:none" on-close-advanced="hideAdvanced"></budget-material-advanced>
+            <budget-material-history id="historyPanel" style="display:none" on-close-history="hideHistory"></budget-material-history>
 
             <div id="authorityMessage"></div>
 
@@ -160,9 +162,10 @@
               <div class="flex">
                 <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete</a>
                 <a class="btn btn-link" on-click="toggleAdvanced" id="advancedBtn"><i class="fa fa-cog"></i> Advanced</a>
+                <a class="btn btn-link" on-click="toggleHistory" id="historyBtn"><i class="fa fa-history"></i> History</a>
               </div>
               <div style="text-align:right">
-                <a class="btn btn-primary" on-click="save">Save</a>
+                <a class="btn btn-primary" on-click="save" id="saveBtn">Save</a>
                 <a class="btn btn-cancel" on-click="cancel">Cancel</a>
               </div>
             </div>

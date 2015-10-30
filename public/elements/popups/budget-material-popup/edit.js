@@ -65,6 +65,8 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
     $(this.$.createUniquePanel).show();
   }
 
+    this.$.historyBtn.style.display = 'inline-block';
+
   this.recalc();
   this.show();
 };

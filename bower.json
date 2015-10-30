@@ -10,6 +10,7 @@
     "iron-collapse": "https://github.com/PolymerElements/iron-collapse.git#1.0.1",
     "bootswatch-dist": "paper",
     "bootstrap-datepicker": "~1.4.0",
-    "odometer": "~0.4.7"
+    "odometer": "~0.4.7",
+    "marked": "~0.3.5"
   }
 }

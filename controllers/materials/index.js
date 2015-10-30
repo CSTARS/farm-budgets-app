@@ -98,6 +98,6 @@ function save(material, user, callback) {
       return callback(err);
     }
 
-    model.save(material, callback);
+    model.save(material, user.username, callback);
   });
 }

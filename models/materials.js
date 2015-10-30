@@ -5,7 +5,7 @@ var authorityModel = require('./authority');
 var utils = require('../lib/modelUtils');
 var init = true;
 
-var schema = require('../lib/shared/save/schema');
+var schema = require('../lib/shared/save/schema')();
 var strip = require('../lib/shared/save/strip');
 var history = require('mongo-object-history');
 
@@ -33,7 +33,7 @@ function get(id, callback){
   collection.findOne({id: id}, {_id: 0}, callback);
 }
 
-function save(material, user, callback) {
+function save(material, username, callback) {
   if( !material ) {
     return callback('No material provided');
   }
@@ -52,31 +52,29 @@ function save(material, user, callback) {
     // remove common attachments from app
     cleanMaterial(material);
 
-
     // set guid, might be useful, we will see
     if( !material.id ) {
       material.id = uuid.v4();
     }
 
     // update
-    collection.update(
-      {id: material.id},
-      material,
-      {upsert: true},
-      function(err, result) {
-        if( err ) {
-          return callback(err);
-        }
+    history.track('material', material, username, function(err, result){
+      if( err ) {
+        return callback(err);
+      }
 
-        history.track('material', material, user, function(err, result){
+      collection.update(
+        {id: material.id},
+        material,
+        {upsert: true},
+        function(err, result) {
           if( err ) {
             return callback(err);
           }
-
-          return result;
-        });
-      }
-    );
+          callback(null, result);
+        }
+      );
+    });
   });
 }
 

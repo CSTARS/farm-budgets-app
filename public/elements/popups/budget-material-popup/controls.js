@@ -17,6 +17,7 @@ var BudgetMaterialPopup = {
       this.$.complexPanel.style.display = 'block';
     }
     this.$.advancedPanel.style.display = 'none';
+    this.$.header.style.display = 'block';
     this.showingAdvanced = false;
   },
 
@@ -26,9 +27,35 @@ var BudgetMaterialPopup = {
       this.$.complexPanel.style.display = 'none';
       this.$.advancedPanel.style.display = 'block';
       this.$.footer.style.display = 'none';
+      this.$.header.style.display = 'none';
       this.showingAdvanced = true;
     } else {
       this.hideAdvanced();
+    }
+  },
+
+  hideHistory : function() {
+    this.$.simplePanel.style.display = 'block';
+    this.$.footer.style.display = 'flex';
+    if( this.data.type == 'complex' ) {
+      this.$.complexPanel.style.display = 'block';
+    }
+    this.$.historyPanel.style.display = 'none';
+    this.$.header.style.display = 'block';
+    this.showingHistory = false;
+  },
+
+  toggleHistory : function() {
+    if( !this.showingHistory ) {
+      this.$.simplePanel.style.display = 'none';
+      this.$.complexPanel.style.display = 'none';
+      this.$.historyPanel.style.display = 'block';
+      this.$.historyPanel.show(this.data.id);
+      this.$.footer.style.display = 'none';
+      this.$.header.style.display = 'none';
+      this.showingHistory = true;
+    } else {
+      this.hideHistory();
     }
   },
 

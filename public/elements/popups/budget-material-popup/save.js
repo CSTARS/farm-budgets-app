@@ -1,4 +1,9 @@
 BudgetMaterialPopup.save = function(noHide) {
+  if( this.saving ) {
+    console.log('Already saving');
+    return;
+  }
+
   // check name
   if( this.data.name == '' ) {
     this.$.nameInputMessage.innerHTML = 'A material name is required';
@@ -65,7 +70,8 @@ BudgetMaterialPopup._savePrompt = function(noHide, options) {
       if( resp.saveAsNew ) {
         this.data.id = FB.utils.guid();
       }
-      this._save(false, options);
+
+      this._save(noHide, options);
     }.bind(this));
 
   }.bind(this), 300);
@@ -76,6 +82,7 @@ BudgetMaterialPopup._save = function(noHide, options) {
 
   var result = FB.materialController.add(this.data, options);
   if( result.error ) {
+    this.setSaving(false);
     return alert(result.message);
   }
 
@@ -85,10 +92,22 @@ BudgetMaterialPopup._save = function(noHide, options) {
   }
 
   // save remote
-  //$.post('/materials/save', this.data, function(resp){});
+  $.post('/materials/save', this.data, function(resp){
+    this._onSaveComplete(noHide, resp);
+  }.bind(this));
+}
+
+BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
+  if( resp.error ) {
+    console.log(resp);
+    alert('Failed to save to server.  '+resp.message+'.\n\n  Your material has been saved locally.');
+    this.setSaving(false);
+    return;
+  }
 
   if( this.data.type === 'simple' ) {
     if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+    this.setSaving(false);
     return;
   }
 
@@ -107,9 +126,43 @@ BudgetMaterialPopup._save = function(noHide, options) {
 
   if( materials.length > 0 ) {
     FB.materialController.bulkAdd(materials, {replace: true});
-    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+
+    $.post('/materials/saveBulk', materials, function(resp){
+      if( resp.error ) {
+        alert('Failed to save required materials :(');
+        console.log(resp);
+        this.setSaving(false);
+        return;
+      }
+
+      for( var i = 0; i < resp.results.length; i++ ) {
+        if( resp.results[i].error ) {
+          alert('Failed to save required materials :(');
+          console.log(resp);
+          this.setSaving(false);
+          return;
+        }
+      }
+
+      if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+    }.bind(this));
+    return;
   }
+
+  if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+  this.setSaving(false);
 }
+
+BudgetMaterialPopup.setSaving = function(saving) {
+  this.saving = saving;
+  if( saving ) {
+    this.$.saveBtn.innerHTML = 'Saving...';
+    this.$.saveBtn.setAttribute('disabled', 'disabled');
+  } else {
+    this.$.saveBtn.innerHTML = 'Save';
+    this.$.saveBtn.removeAttribute('disabled');
+  }
+};
 
 /*_saveRequiredMaterials : function(index, keys, callback) {
   // TODO: need to save all unique materials

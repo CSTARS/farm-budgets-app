@@ -46,5 +46,7 @@ BudgetMaterialPopup.create = function(name) {
   this.parentMaterial = null;
   this.$.parentMaterial.innerHTML = '';
 
+  this.$.historyBtn.style.display = 'none';
+
   this.show();
 };
