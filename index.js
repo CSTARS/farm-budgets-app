@@ -7,6 +7,7 @@ var fs = require('fs');
 var mongo = require('./lib/mongo');
 
 var authStack = require('express-auth');
+var history = require('mongo-object-history');
 
 var options, app;
 
@@ -49,6 +50,7 @@ options = {
           }
 
           mongo.ensureIndexes();
+          setupHistoryTracking();
 
           var authSetup = {
             db : global.db,
@@ -61,6 +63,26 @@ options = {
         });
     }
 };
+
+function setupHistoryTracking() {
+  var budgetCollection = global.db.collection('budget');
+  var materialCollection = global.db.collection('material');
+  var historyCollection = global.db.collection('history');
+
+  var config = {
+    get : {
+      budget : function(id, callback) {
+        budgetCollection.findOne({id: id}, callback);
+      },
+      material : function(id, callback) {
+        materialCollection.findOne({id: id}, callback);
+      }
+    },
+    collection : historyCollection
+  };
+
+  history.init(config);
+}
 
 app = module.exports = express();
 app.use(kraken(options));

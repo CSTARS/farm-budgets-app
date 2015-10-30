@@ -150,7 +150,7 @@
             <div class="horizontal layout center" id="footer">
               <div class="flex">
                 <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete</a>
-                <a class="btn btn-link" on-click="toggleAdvanced"><i class="fa fa-cog"></i> Advanced</a>
+                <a class="btn btn-link" on-click="toggleAdvanced" id="advancedBtn"><i class="fa fa-cog"></i> Advanced</a>
               </div>
               <div style="text-align:right">
                 <a class="btn btn-primary" on-click="save">Save</a>
@@ -288,7 +288,10 @@
         this.$.nameInput.value = parts[1];
 
         this.$.complexGroup.style.display = 'none';
+        this.$.advancedBtn.style.display = 'none';
       } else {
+        this.parentMaterial = null;
+        this.$.advancedBtn.style.display = 'inline-block';
         this.$.complexGroup.style.display = 'block';
         this.$.parentMaterial.innerHTML = '';
         this.$.nameInput.value = this.data.name;
@@ -296,6 +299,7 @@
 
       this.$.descriptionInput.value = this.data.description || '';
       this.$.unitsInputMsg.innerHTML = '';
+      this.$.nameInputMessage.innerHTML = '';
 
       if( this.data.type == 'complex' ) {
         this.setComplex(true);
@@ -370,6 +374,7 @@
       this.$.unitsInputMsg.innerHTML = '';
       this.$.priceInput.value = '';
       this.$.descriptionInput.value = '';
+      this.$.nameInputMessage.innerHTML = '';
       this.setComplex(false);
 
       this.parentMaterial = null;
@@ -493,31 +498,48 @@
     },
 
     _save : function(noHide, options) {
+      this.setSaving(true);
+
       var result = FB.materialController.add(this.data, options);
+      if( result.error ) {
+        return alert(result.message);
+      }
 
       // if the material is a 'save as new', update operations
       if( this.originalData.id !== this.data.id ) {
         FB.operationController.replaceMaterial(this.data.name, this.data.id);
       }
 
-      if( result.error ) {
-        return alert(result.message);
+      // save remote
+      //$.post('/materials/save', this.data, function(resp){});
+
+      if( this.data.type === 'simple' ) {
+        if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+        return;
       }
 
       // now re-save all required materials, this time we will fire events
       var materials = [];
       if( this.data.type == 'complex' ) {
         for( var key in this.data.materials ) {
+          if( !key.match(/--/) ) continue;
           var m = FB.materialController.get(key);
-          if( !m.error ) {
-            materials.push(m);
-          }
+          if( m.error ) continue;
+
+          m.parent = this.data.id;
+          materials.push(m);
         }
       }
-      FB.materialController.bulkAdd(materials, {replace: true});
 
-      if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+      if( materials.length > 0 ) {
+        FB.materialController.bulkAdd(materials, {replace: true});
+        if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+      }
     },
+
+    /*_saveRequiredMaterials : function(index, keys, callback) {
+      // TODO: need to save all unique materials
+    },*/
 
     delete : function() {
       if( !confirm('Are you sure you want to delete this material?') ) return;

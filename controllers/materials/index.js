@@ -1,11 +1,13 @@
 'use strict';
 
+var async = require('async');
 var authUtils = require('../auth');
 var errorHandler = require('../../lib/handleError');
 var MaterialModel = require('../../models/materials');
+var model;
 
 module.exports = function (router) {
-    var model = new MaterialModel();
+    model = new MaterialModel();
     var auth = global.auth;
     var authMiddleware = authUtils.middleware;
 
@@ -47,17 +49,55 @@ module.exports = function (router) {
         return errorHandler('material required', res);
       }
 
-      authUtils.hasAccessObject(req.user, material, function(err, hasRole){
+      save(material, req.user, function(err, resp){
         if( err ) {
-          return errorHandler(err, res);
+          return res.send({error:true, message: err});
         }
-
-        model.save(material, function(err, result){
-          if( err ) {
-            return res.send({error:true, message: err});
-          }
-          res.send(result);
-        });
+        res.send(resp);
       });
     });
+
+    router.post('/saveBulk', authMiddleware, function (req, res) {
+      var materials = req.body;
+
+      if( !materials ) {
+        return errorHandler('materials required', res);
+      }
+      if( Array.isArray(materials) ) {
+        return errorHandler('materials must be an array', res);
+      }
+
+      var results = [];
+
+      async.eachSeries(
+        materials,
+        function(material, next){
+          save(material, req.user, function(err, resp){
+            if( err ) {
+              results.push({error:true, message: err});
+            } else {
+              results.push(resp);
+            }
+            next();
+          });
+        },
+        function(err) {
+          res.send({
+            error : err,
+            results : results
+          });
+        }
+      );
+
+    });
 };
+
+function save(material, user, callback) {
+  authUtils.hasAccessObject(user, material, function(err, hasRole){
+    if( err ) {
+      return callback(err);
+    }
+
+    model.save(material, callback);
+  });
+}
