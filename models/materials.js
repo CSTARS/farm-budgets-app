@@ -44,7 +44,7 @@ function save(material, username, callback) {
     }
   }
 
-  utils.validate(material, authorityModel, function(err){
+  utils.validate(material, username, authorityModel, function(err){
     if( err ) {
       return callback(err);
     }

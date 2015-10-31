@@ -1,10 +1,12 @@
 'use strict';
 
+var authUtils = require('../auth');
 var BudgetModel = require('../../models/budget');
 var errorHandler = require('../../lib/handleError');
 
 module.exports = function (router) {
     var model = new BudgetModel();
+    var authMiddleware = authUtils.middleware;
 
     router.get('/get', function (req, res) {
       var id = req.query.id;
@@ -54,6 +56,28 @@ module.exports = function (router) {
           return errorHandler(err, res);
         }
         res.send(budget);
+      });
+    });
+
+    router.post('/save', authMiddleware, function (req, res) {
+      var budget = req.body;
+
+      if( !budget ) {
+        return errorHandler('budget required', res);
+      }
+
+      authUtils.hasAccessObject(req.user, budget, function(err, hasRole){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        model.save(budget, req.user.username, function(err, result){
+          if( err ) {
+            return res.send({error:true, message: err});
+          }
+
+          res.send(result);
+        });
       });
     });
 };

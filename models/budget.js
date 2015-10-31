@@ -1,5 +1,7 @@
 'use strict';
 
+var schema = require('../lib/shared/save/schema')();
+var strip = require('../lib/shared/save/strip');
 var utils = require('../lib/modelUtils');
 var authorityModel = require('./authority');
 var materialModel = require('./materials');
@@ -8,6 +10,7 @@ var async = require('async');
 
 var collection = global.db.collection('budget');
 var materialCollection = global.db.collection('material');
+var history = require('mongo-object-history');
 
 authorityModel = new authorityModel();
 materialModel = new materialModel();
@@ -23,12 +26,12 @@ module.exports = function() {
 };
 
 
-function save(budget, callback) {
+function save(budget, username, callback) {
   if( !budget ) {
     return callback('No budget provided');
   }
 
-  utils.validate(budget, authorityModel, function(err){
+  utils.validate(budget, username, authorityModel, function(err){
     if( err ) {
       return callback(err);
     }
@@ -38,19 +41,35 @@ function save(budget, callback) {
       budget.id = uuid.v4();
     }
 
+    if( budget.farm && budget.farm.commodity ) {
+      budget.farm.commodity = budget.farm.commodity.trim().toLowerCase();
+    }
+
     // clean app data from budget
-    var materialIds = cleanBudget(budget);
+    cleanBudget(budget);
 
     // validate material id's
-    validateMaterials(materialIds, function(err) {
+    if( !budget.materialIds ) {
+      budget.materialIds = [];
+    }
+    validateMaterials(budget.materialIds, function(err) {
       if( err ) {
         return callback('Invalid material id(s): '+JSON.stringify(err));
       }
 
-      budget.materialIds = materialIds;
+      history.track('budget', budget, username, function(err, result){
+        if( err ) {
+          return callback(err);
+        }
 
-      // update
-      collection.update({id: budget.id}, budget, {upsert: true}, callback);
+        // update
+        collection.update({id: budget.id}, budget, {upsert: true}, function(error, result) {
+          if( err ) {
+            return callback(err);
+          }
+          callback(null, budget);
+        });
+      });
     });
 
   });
@@ -96,35 +115,7 @@ function validateMaterials(ids, callback) {
 }
 
 function cleanBudget(budget) {
-  var ids = {};
-
-  delete budget.classes;
-
-  if( budget.materials ) {
-    for( var i = 0; i < budget.materials.length; i++ ) {
-      ids[budget.materials[i].id] = 1;
-    }
-    delete budget.materials;
-  }
-
-  if( !budget.operations ) {
-    budget.operations = [];
-  }
-
-  budget.operations.forEach(function(operation){
-    delete operation.error;
-
-    if( !operation.materials ) {
-      operation.materials = [];
-    }
-
-    operation.materials.forEach(function(material){
-      delete material.error;
-      ids[material.id] = 1;
-    });
-  });
-
-  return Object.keys(ids);
+  return strip(schema.budget, budget);
 }
 
 function get(id, callback) {

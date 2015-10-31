@@ -96,8 +96,6 @@
       },
 
       onBudgetLoad : function(budget) {
-        FB.save.init(budget);
-
         if( this.waitingToShow ) {
           this.waitingToShow = false;
           this.onShow();

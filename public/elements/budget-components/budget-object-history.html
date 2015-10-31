@@ -1,0 +1,47 @@
+<dom-module id="budget-object-history">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div id="root"></div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-object-history',
+
+      show : function(id) {
+        this.$.root.innerHTML = 'Loading...';
+        $.get('/history/'+id, this.onHistoryResponse.bind(this));
+      },
+
+      onHistoryResponse : function(resp) {
+        if( resp.length == 0 ) {
+          this.$.root.innerHTML = 'No History';
+          return;
+        }
+
+        var table =
+          '<table class="table">'+
+            '<tr>'+
+              '<th>Action</th>'+
+              '<th>User</th>'+
+              '<th>Date & Time</th>'+
+            '</tr>';
+
+        for( var i = 0; i < resp.length; i++ ) {
+          table +=
+            '<tr>'+
+              '<td>'+(resp[i].created ? '<span class="label label-success">Created</span>' : '<span class="label label-warning">Updated</span>')+'</td>'+
+              '<td>'+resp[i].user+'</td>'+
+              '<td>'+(new Date(resp[i].datetime).toLocaleString())+'</td>'+
+            '</tr>';
+        }
+        this.$.root.innerHTML = table+'</table>';
+      }
+    });
+  </script>
+</dom-module>
