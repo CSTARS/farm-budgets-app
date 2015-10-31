@@ -25,14 +25,14 @@
                       <h4>
                         <i class$="{{item.icon}}"></i>
                         <span>{{item.name}}</span>
-                        <small><i class="fa fa-shield"></i> <span>{{item.authority}}</span></small>
+                        <small><i class="fa fa-shield"></i> <span>{{item.locationStr}}</span></small>
 
                         <a class="btn btn-primary pull-right" on-click="import" index$="{{index}}">Import</a>
                       </h4>
 
                       <div class="help-block">
                         <i class="fa fa-map-marker"></i>
-                          <span>{{item.locationStr}}</span>
+                          <span>{{item.authority}}</span>
                           <span>{{item.description}}</span>
                           <span>{{item.class}}
                       </div>
@@ -126,7 +126,7 @@
         this.popup.modal('hide');
       },
 
-      show : function(value) {
+      show : function(value, location) {
         this.popup.modal('show');
 
         this.$.main.style.display = 'block';
@@ -144,7 +144,7 @@
 
         var data = FB.getData();
         if( data && data.locality ) {
-          this.$.input.value = data.locality.join(' ')+' '+(value ? value : '');
+          this.$.input.value = (location ? location : data.locality.join(' '))+' '+(value ? value : '');
         }
 
         this.search();

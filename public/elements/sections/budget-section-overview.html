@@ -55,8 +55,24 @@
             </tbody>
           </table>
 
-          <div style="text-align:right">
-            <a class="btn btn-warning" style="display:none" id="saveBudgetBtn" on-click="save">Save Budget Changes</a>
+          <div class="layout horizontal">
+            <div class="flex">
+              <a class="btn btn-link" on-click="toggleHistory"><i class="fa fa-history"></i> History</a>
+            </div>
+            <div>
+              <a class="btn btn-warning" style="display:none" id="saveBudgetBtn" on-click="save">Save Budget Changes</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="historyCard" style="display:none">
+          <h4>
+            <i class="fa fa-history"></i> Budget History
+            <a class="btn btn-link pull-right" on-click="toggleHistory"><i class="fa fa-back"></i> Back</a>
+          </h4>
+          <budget-object-history id="history"></budget-object-history>
+          <div style="height:40px">
+            <a class="btn btn-link pull-right" on-click="toggleHistory"><i class="fa fa-back"></i> Back</a>
           </div>
         </div>
 
@@ -92,6 +108,8 @@
     is : 'budget-section-overview',
 
     ready : function() {
+      this.showingHistory = false;
+
       FB.operationController.on('total-update', this.setJsonDump.bind(this));
 
       this.$.infoCard.addEventListener('mouseenter', function(){
@@ -119,10 +137,6 @@
 
     updateTotal : function() {
       this.$.total.onTotalUpdate();
-    },
-
-    onShow : function() {
-      this.checkForChanges();
     },
 
     checkForChanges : function() {
@@ -171,6 +185,7 @@
     setData : function(data) {
       if( !data.farm ) return;
 
+      this.budgetId = data.id;
       this.$.total.setData(data.farm);
 
       this.$.budgetNameLabel.innerHTML = data.name;
@@ -222,12 +237,23 @@
     onShow : function(params) {
       this.$.timeline.onShow();
       this.$.spendingTimeline.onShow();
+      this.checkForChanges();
 
       if( params.length > 0 && params[0] === 'debug' ) {
         this.$.debug.style.display = 'block';
         this.setJsonDump();
       } else {
         this.$.debug.style.display = 'none';
+      }
+    },
+
+    toggleHistory : function() {
+      this.showingHistory = !this.showingHistory;
+      $(this.$.infoCard).toggle();
+      $(this.$.historyCard).toggle();
+
+      if( this.showingHistory ) {
+        this.$.history.show(this.budgetId);
       }
     },
 

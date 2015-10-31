@@ -128,7 +128,7 @@ function get(id, callback) {
     }
 
     if( !result.operations ) {
-      return callback(null, result);
+      result.operations = [];
     }
 
     materialCollection

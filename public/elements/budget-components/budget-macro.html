@@ -193,7 +193,11 @@
 
         html += '<tr><td style="white-space: nowrap">' +
             '<i>'+list[i].path + '</i> '+
-            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td style="white-space: nowrap">' +
+            (list[i].type == 'complex' ?
+              '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' :
+              '<budget-material material="'+list[i].name+'"></budget-material>'
+            )
+            +'</td><td style="white-space: nowrap">' +
 
               list[i].amount+' '+FB.units.getLabel(list[i].units, true)+' = $'+
               list[i].price.toFixed(2)+' </span>'
@@ -205,6 +209,11 @@
         .find('.btn-create')
         .on('click', function(){
           document.querySelector('budget-material-popup').create($(this).attr('material'));
+        });
+      $(this.$.main)
+        .find('.btn-find')
+        .on('click', function(){
+          document.querySelector('budget-import-material-popup').show($(this).attr('location')+' '+$(this).attr('material'));
         });
     },
 
@@ -238,11 +247,17 @@
         .on('click', function(){
           document.querySelector('budget-material-popup').create($(this).attr('material'));
         });
+      $(this.$.main)
+        .find('.btn-find')
+        .on('click', function(){
+          document.querySelector('budget-import-material-popup').show($(this).attr('material'), $(this).attr('location'));
+        });
     },
 
     renderError : function(err) {
       return '<tr><td class="text text-danger">'+err.message+'</td><td>'+
-        (err.code === 3 ? '<a class="btn btn-link btn-create" material="'+err.name+'">Create</a>' : '')+
+        (err.code === 3 ? '<a class="btn btn-link btn-find" material="'+err.name+'" location="'+(this.data.locality ? this.data.locality.join(' ') : '')+'">Find</a> '+
+                          '<a class="btn btn-link btn-create" material="'+err.name+'">Create</a>' : '')+
         '</td></tr>';
     },
 

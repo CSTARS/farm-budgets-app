@@ -114,11 +114,14 @@
     },
 
     clone : function() {
-      if( !confirm('Are you sure you want to clone this budget?  Any unsaved changes will be lost.') ) return;
+      var updated = FB.save.checkBudget(FB.getData());
+      if( updated && !confirm('Are you sure you want to clone this budget?  Any unsaved changes will be lost.') ) return;
 
       var data = FB.getData();
       data.name = '';
       data.id = FB.utils.guid();
+
+      window.location = '#budget/overview';
 
       document.querySelector('ahb-budget').load(data);
       document.querySelector('budget-farm-editor').show();
@@ -126,7 +129,8 @@
     },
 
     startNew : function() {
-      if( !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
+      var updated = FB.save.checkBudget(FB.getData());
+      if( updated && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
 
       var newData = {
         id : FB.utils.guid(),
