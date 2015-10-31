@@ -8,6 +8,7 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
   }
 
   this.action = 'edit';
+  this.$.saveBtn.innerHTML = 'Save';
   this.$.title.innerHTML = 'Edit Material';
 
   // copy so we don't actually edit anything
@@ -65,7 +66,8 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
     $(this.$.createUniquePanel).show();
   }
 
-    this.$.historyBtn.style.display = 'inline-block';
+  this.$.historyBtn.style.display = 'inline-block';
+    this.$.deleteBtn.style.display = 'inline-block';
 
   this.recalc();
   this.show();

@@ -19,6 +19,7 @@ FB._localsave = function(auto) {
 
   var materials = FB.materialController.get();
   for( var key in materials.materials ) {
+    if( key === 'Velpar') debugger;
     data.materials.push(materials.materials[key]);
   }
   for( var key in materials.complex ) {
@@ -34,7 +35,9 @@ FB._localsave = function(auto) {
 }
 
 // listen to events and save
-FB.materialController.on('material-update', FB.localsave);
+FB.materialController.on('material-update', function(){
+  FB.localsave();
+});
 FB.materialController.on('material-removed', FB.localsave);
 FB.operationController.on('operation-removed', FB.localsave);
 FB.operationController.on('operation-update', FB.localsave);

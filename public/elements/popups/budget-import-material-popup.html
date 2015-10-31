@@ -25,13 +25,13 @@
                       <h4>
                         <i class$="{{item.icon}}"></i>
                         <span>{{item.name}}</span>
-                        <small><i class="fa fa-shield"></i> <span>{{item.locationStr}}</span></small>
+                        <small><i class="fa fa-map-marker"></i> <span>{{item.locationStr}}</span></small>
 
-                        <a class="btn btn-primary pull-right" on-click="import" index$="{{index}}">Import</a>
+                        <a class="btn btn-primary pull-right" on-click="onImportClick" index$="{{index}}"><i class="fa fa-cloud-download"></i> Import</a>
                       </h4>
 
                       <div class="help-block">
-                        <i class="fa fa-map-marker"></i>
+                        <i class="fa fa-shield"></i>
                           <span>{{item.authority}}</span>
                           <span>{{item.description}}</span>
                           <span>{{item.class}}
@@ -132,15 +132,7 @@
         this.$.main.style.display = 'block';
         this.$.select.style.display = 'none';
 
-        this.currentIds = [];
-        var materials = FB.materialController.get();
-        for( var type in materials ) {
-          for( var name in materials[type] ) {
-              if( materials[type][name].id ) {
-                this.currentIds.push(materials[type][name].id);
-              }
-          }
-        }
+        this.currentIds = FB.getMaterialIds();
 
         var data = FB.getData();
         if( data && data.locality ) {
@@ -153,9 +145,19 @@
         }.bind(this), 200);
       },
 
-      import : function(e) {
+      onImportClick : function(e) {
         var index = parseInt(e.currentTarget.getAttribute('index'));
-        var material = this.items[index];
+        this.import(this.items[index]);
+      },
+
+      showImport : function(material, value, location) {
+        this.show(value, location);
+        setTimeout(function(){
+          this.import(material);
+        }.bind(this), 200);
+      },
+
+      import : function(material) {
         var arr = [];
 
         for( var key in material.materials ) {

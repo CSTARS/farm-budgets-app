@@ -125,6 +125,11 @@
     copyDataArray : function() {
       var tmp = [];
 
+      if( !this.data ) {
+        this.dates = tmp;
+        return;
+      }
+
       for( var i = 0; i < this.data.length; i++ ) {
         var date = this.toDate(this.data[i].date);
 

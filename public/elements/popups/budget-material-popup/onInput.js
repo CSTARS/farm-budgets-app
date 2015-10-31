@@ -72,6 +72,10 @@ BudgetMaterialPopup.onNameInput = function() {
 
     this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
   }
+
+  if( this.action == 'create' ) {
+    this.suggest();
+  }
 };
 
 BudgetMaterialPopup.onDescriptionInput = function() {

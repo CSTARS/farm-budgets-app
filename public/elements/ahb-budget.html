@@ -43,8 +43,16 @@
       try {
         var localdata = window.localStorage.getItem(id);
         localdata = JSON.parse(localdata);
+
+        var materialIds = [];
+        if( localdata.materials ) {
+          for( var i = 0; i < localdata.materials.length; i++ ) {
+            materialIds.push(localdata.materials[i].id);
+          }
+        }
+
         if( localdata &&
-            FB.save.checkBudget(localdata) &&
+            (FB.save.checkBudget(localdata) || FB.save.checkMaterials(materialIds)) &&
             confirm('You have a local budget with changes, would you like to load that?  If no, your '+
                     'local changes will be discarded.') ) {
           this.load(localdata);

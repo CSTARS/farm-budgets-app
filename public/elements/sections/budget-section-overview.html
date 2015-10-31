@@ -143,9 +143,17 @@
       var updated = FB.save.checkBudget(FB.getData());
       if( updated ) {
         this.$.saveBudgetBtn.style.display = 'inline-block';
-      } else {
-        this.$.saveBudgetBtn.style.display = 'none';
+        return true;
       }
+
+      var updated = FB.save.checkMaterials(FB.getMaterialIds());
+      if( updated ) {
+        this.$.saveBudgetBtn.style.display = 'inline-block';
+        return true;
+      }
+
+      this.$.saveBudgetBtn.style.display = 'none';
+      return false;
     },
 
     save : function() {

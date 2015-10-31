@@ -160,7 +160,7 @@
 
             <div class="horizontal layout center" id="footer">
               <div class="flex">
-                <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete</a>
+                <a class="btn btn-link" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete</a>
                 <a class="btn btn-link" on-click="toggleAdvanced" id="advancedBtn"><i class="fa fa-cog"></i> Advanced</a>
                 <a class="btn btn-link" on-click="toggleHistory" id="historyBtn"><i class="fa fa-history"></i> History</a>
               </div>
@@ -187,6 +187,7 @@
     ready : function() {
       this.popup = $(this.$.popup).modal({show: false, backdrop: 'static'});
       this.showingAdvanced = false;
+      this.suggestTimer = -1;
 
       this.materialTableOptions = {
         noNotes: true
@@ -298,6 +299,71 @@
           this.$.unitsInputMsg.innerHTML = '';
           this.recalc();
         }.bind(this));
+    },
+
+    suggest : function() {
+      if( this.suggestTimer != -1 ) clearTimeout(this.suggestTimer);
+      this.suggestTimer = setTimeout(function(){
+        this.suggestTimer = -1;
+        this._suggest();
+      }.bind(this), 500);
+    },
+
+    _suggest : function() {
+      var data = {
+        query : {
+          id : {'$nin' : this.currentIds},
+          '$text' : {'$search' : this.data.name}
+        }
+      };
+      var nameMatch = new RegExp('('+this.data.name.replace(/\s+/g,'|')+')', 'i');
+      var localityMatch = new RegExp('('+this.data.locality.join('|')+')', 'i');
+
+      $.post('/materials/find', data, function(resp) {
+        var c = 0;
+        var html = '<div class="well well-sm animated fadeIn">'+
+            '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+            '<table style="width: 100%;color:#555">';
+
+        for( var i = 0; i < resp.length; i++ ) {
+          if( nameMatch.test(resp[i].name) ) {
+            for( var j = 0; j < resp[i].locality.length; j++ ) {
+              if( localityMatch.test(resp[i].locality[j]) ) {
+                html += '<tr>'+
+                  '<td><a style="cursor:pointer;padding:5px" index="'+i+'"><i class="fa fa-cloud-download"></i></a></td>'+
+                  '<td><i class="fa fa'+(resp[i].type == 'complex' ? 'fa fa-cubes' : 'fa fa-cube')+'"></i> '+
+                    resp[i].name + '</td>'+
+                  '<td><i class="fa fa-map-marker"></i> '+ resp[i].locality.join(', ')+'</td>'+
+                  '<td> <i class="fa fa-shield"></i> '+ resp[i].authority+'</td></tr>';
+                c++;
+                break;
+              }
+            }
+          }
+        }
+
+        if( c > 0 ) {
+          html = '<div class="help-block">Perhaps you want to import one of the following suggestions instead?</div>'+html+'</table></div>';
+        } else {
+          html = '';
+        }
+
+        this.$.nameInputMessage.innerHTML = html;
+        $(this.$.nameInputMessage)
+          .find('a')
+          .on('click', function(e){
+            var index = parseInt(e.currentTarget.getAttribute('index'));
+            this.cancel();
+            setTimeout(function(){
+              document.querySelector('budget-import-material-popup').showImport(resp[index], this.data.name, this.data.locality.join(' '));
+            }.bind(this), 250);
+          }.bind(this));
+        $(this.$.nameInputMessage)
+          .find('button')
+          .on('click', function(){
+            $(this).parent().remove();
+          });
+      }.bind(this));
     }
   })
 </script>
