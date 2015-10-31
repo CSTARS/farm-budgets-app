@@ -16,6 +16,7 @@ BudgetMaterialPopup.save = function(noHide) {
 
   // check access
   if( ExpressAuth.user ) {
+    // check if user has access to authroity
     if( !FB.utils.hasAccess(ExpressAuth.user, this.data.authority) ) {
       this.$.authorityMessage.innerHTML =
         '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You do not have access to the authority '+
@@ -25,7 +26,8 @@ BudgetMaterialPopup.save = function(noHide) {
 
     // if the user doesn't have access to the original authority but has access to
     // the new authority, save as a new material
-    } else if( this.data.authority != this.originalData.authority &&
+    } else if( this.action == 'edit' &&
+      this.data.authority != this.originalData.authority &&
       !FB.utils.hasAccess(ExpressAuth.user, this.originalData.authority)  ) {
         this.data.id = FB.utils.guid();
     }
@@ -87,32 +89,14 @@ BudgetMaterialPopup._save = function(noHide, options) {
   }
 
   // if the material is a 'save as new', update operations
-  if( this.originalData.id !== this.data.id ) {
-    FB.operationController.replaceMaterial(this.data.name, this.data.id);
-  }
-
-  // save remote
-  $.post('/materials/save', this.data, function(resp){
-    this._onSaveComplete(noHide, resp);
-  }.bind(this));
-}
-
-BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
-  if( resp.error ) {
-    console.log(resp);
-    alert('Failed to save to server.  '+resp.message+'.\n\n  Your material has been saved locally.');
-    this.setSaving(false);
-    return;
-  }
-
-  if( this.data.type === 'simple' ) {
-    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
-    this.setSaving(false);
-    return;
+  if( this.originalData && this.action === 'edit' ) {
+    if( this.originalData.id !== this.data.id ) {
+      FB.operationController.replaceMaterial(this.data.name, this.data.id);
+    }
   }
 
   // now re-save all required materials, this time we will fire events
-  var materials = [];
+  var requiredMaterials = [];
   if( this.data.type == 'complex' ) {
     for( var key in this.data.materials ) {
       if( !key.match(/--/) ) continue;
@@ -120,37 +104,56 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
       if( m.error ) continue;
 
       m.parent = this.data.id;
-      materials.push(m);
+      m.authority = this.data.authority;
+      m.locality = this.data.locality;
+      requiredMaterials.push(m);
     }
   }
 
-  if( materials.length > 0 ) {
-    FB.materialController.bulkAdd(materials, {replace: true});
+  if( requiredMaterials.length > 0 ) {
+    FB.materialController.bulkAdd(requiredMaterials, {replace: true});
+  }
 
-    $.post('/materials/saveBulk', materials, function(resp){
-      if( resp.error ) {
-        alert('Failed to save required materials :(');
-        console.log(resp);
-        this.setSaving(false);
-        return;
-      }
+  // save remote
+  $.post('/materials/save', this.data, function(resp){
+    this._onSaveComplete(noHide, requiredMaterials, resp);
+  }.bind(this));
+}
 
-      for( var i = 0; i < resp.results.length; i++ ) {
-        if( resp.results[i].error ) {
-          alert('Failed to save required materials :(');
-          console.log(resp);
-          this.setSaving(false);
-          return;
-        }
-      }
-
-      if( typeof noHide !== 'boolean' || !noHide ) this.hide();
-    }.bind(this));
+BudgetMaterialPopup._onSaveComplete = function(noHide, requiredMaterials, resp) {
+  if( resp.error ) {
+    console.log(resp);
+    alert('Failed to save to server.  '+resp.message+'.\n\n  Your material has been saved locally.');
+    this.setSaving(false);
     return;
   }
 
-  if( typeof noHide !== 'boolean' || !noHide ) this.hide();
-  this.setSaving(false);
+  if( this.data.type === 'simple' || requiredMaterials.length === 0 ) {
+    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+    this.setSaving(false);
+    return;
+  }
+
+
+  $.post('/materials/saveBulk', {materials: requiredMaterials}, function(resp){
+    this.setSaving(false);
+
+    if( resp.error ) {
+      alert('Failed to save required materials :(');
+      console.log(resp);
+      return;
+    }
+
+    for( var i = 0; i < resp.results.length; i++ ) {
+      if( resp.results[i].error ) {
+        alert('Failed to save required materials :(');
+        console.log(resp);
+        return;
+      }
+    }
+
+    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+  }.bind(this));
 }
 
 BudgetMaterialPopup.setSaving = function(saving) {

@@ -58,12 +58,12 @@ module.exports = function (router) {
     });
 
     router.post('/saveBulk', authMiddleware, function (req, res) {
-      var materials = req.body;
+      var materials = req.body.materials;
 
       if( !materials ) {
         return errorHandler('materials required', res);
       }
-      if( Array.isArray(materials) ) {
+      if( !Array.isArray(materials) ) {
         return errorHandler('materials must be an array', res);
       }
 
