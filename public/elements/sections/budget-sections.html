@@ -15,12 +15,31 @@
     .nav > li > a {
       border-radius: 0;
     }
+    .dropdown-menu.dropdown-menu-right a {
+      text-align: left !important;
+    }
   </style>
 
   <template>
     <div class="layout horizontal center" style="border-bottom: 1px solid #ccc">
       <div class="flex">
-        <h5>Farm Budgets <small>Advanced Hardwood Biofuels</small></h5>
+        <h5>
+          Farm Budgets <small>Advanced Hardwood Biofuels</small>
+
+          <div class="btn-group" style="display:none" id="saveBudgetBtn">
+            <button type="button" class="btn btn-warning" on-click="save" id="saveBudgetBtnInner"><i class="fa fa-save"></i> Save Budget Changes</button>
+            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+              <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#"><i class="fa fa-save"></i> Save</a></li>
+              <li><a href="#"><i class="fa fa-plus-circle"></i> Save as New</a></li>
+            </ul>
+          </div>
+
+          <!--<a class="btn btn-warning" style="display:none" id="saveBudgetBtn" on-click="save">Save Budget Changes</a>-->
+        </h5>
       </div>
       <div style="padding:10px">
         <ahb-account-login></ahb-account-login>
@@ -31,10 +50,11 @@
             <i class="fa fa-ellipsis-v"></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-right">
-            <li><a class="btn btn-link" on-click="find">Find Budget</a></li>
-            <li><a class="btn btn-link" on-click="startNew">Start from Scratch</a></li>
-            <li><a class="btn btn-link" on-click="clone">Clone Budget</a></li>
-            <li><a class="btn btn-link" on-click="import">Import Material</a></li>
+            <li><a class="btn btn-link" on-click="find"><i class="fa fa-search"></i> Find Budget</a></li>
+            <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start from Scratch</a></li>
+            <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Clone Current Budget</a></li>
+            <li><a class="btn btn-link" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a></li>
+            <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
         </div>
 
@@ -69,7 +89,69 @@
 
     ready : function() {
       $(window).on('hashchange', this.setSection.bind(this));
+
+      document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkForChanges.bind(this));
+      FB.materialController.on('material-update', this.checkForChanges.bind(this));
+      FB.materialController.on('material-removed', this.checkForChanges.bind(this));
+      FB.operationController.on('operation-update', this.checkForChanges.bind(this));
+      FB.operationController.on('operation-removed', this.checkForChanges.bind(this));
+
       this.setSection();
+    },
+
+    attached : function() {
+      this.checkForChanges();
+    },
+
+    checkForChanges : function() {
+      var updated = FB.save.checkBudget(FB.getData());
+      if( updated ) {
+        this.$.saveBudgetBtn.style.display = 'inline-block';
+        return true;
+      }
+
+      var updated = FB.save.checkMaterials(FB.getMaterialIds());
+      if( updated ) {
+        this.$.saveBudgetBtn.style.display = 'inline-block';
+        return true;
+      }
+
+      this.$.saveBudgetBtn.style.display = 'none';
+      return false;
+    },
+
+    save : function() {
+      var budget = $.extend(true,{}, FB.getData());
+      FB.save.strip(FB.save.schema.budget, budget);
+
+      budget.materialIds = [];
+
+      var materials = FB.materialController.get();
+      for( var name in materials.materials ) {
+        if( !materials.materials[name].id ) continue;
+        budget.materialIds.push(materials.materials[name].id);
+      }
+      for( var name in materials.complex ) {
+        if( !materials.complex[name].id ) continue;
+        budget.materialIds.push(materials.complex[name].id);
+      }
+
+      this.$.saveBudgetBtnInner.innerHTML = 'Saving...';
+      this.$.saveBudgetBtnInner.setAttribute('disabled', 'disabled');
+
+      $.post('/budget/save', budget, function(resp){
+        this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
+        this.$.saveBudgetBtnInner.removeAttribute('disabled');
+
+        if( resp.error ) {
+          return alert(resp.message);
+        }
+
+        // the server may have cleanup some stuff
+        document.querySelector('ahb-budget').reload(budget.id);
+        this.$.saveBudgetBtn.style.display = 'none';
+      }.bind(this));
+
     },
 
     find : function() {
@@ -78,6 +160,7 @@
 
     setSection : function() {
       var parts = window.location.hash.replace(/#/,'').split('/');
+      this.checkForChanges();
 
       // TODO: remove later
       if( parts.length == 1 && parts[0] == '' ) {

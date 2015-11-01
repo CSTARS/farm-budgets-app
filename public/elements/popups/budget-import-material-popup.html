@@ -24,7 +24,11 @@
                   <div class="panel-body">
                       <h4>
                         <i class$="{{item.icon}}"></i>
-                        <span>{{item.name}}</span>
+                        <!--<span>{{item.name}}</span>-->
+                        <template is="dom-repeat" items="{{item.nameParts}}">
+                          <span class$="{{item.className}}">{{item.label}}</span>
+                        </template>
+
                         <small><i class="fa fa-map-marker"></i> <span>{{item.locationStr}}</span></small>
 
                         <a class="btn btn-primary pull-right" on-click="onImportClick" index$="{{index}}"><i class="fa fa-cloud-download"></i> Import</a>
@@ -250,8 +254,32 @@
           }
         };
 
+        var re = null;
+        try {
+          re = new RegExp('('+this.$.input.value.trim().replace(/\s+/g,'|')+')','ig');
+        } catch(e) {
+        }
+
+
         $.post('/materials/find', data, function(resp) {
           for( var i = 0; i < resp.length; i++ ) {
+            if( re ) {
+              var parts = resp[i].name.replace(re,'::__$1__::').split('::');
+              resp[i].nameParts = [];
+              for( var j = 0; j < parts.length; j++ ) {
+                resp[i].nameParts.push({
+                  label : parts[j].replace(/^__/,'').replace(/__$/,''),
+                  className : parts[j].match(/__.*__/) ? 'label label-success' : ''
+                });
+              }
+            } else {
+              resp[i].nameParts = [{
+                label : resp[i].name,
+                className : ''
+              }];
+            }
+
+
             resp[i].icon = resp[i].type == 'complex' ? 'fa fa-cubes' : 'fa fa-cube';
             resp[i].locationStr = resp[i].locality.join(', ');
             if( resp[i].description ) {

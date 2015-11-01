@@ -60,7 +60,6 @@
               <a class="btn btn-link" on-click="toggleHistory"><i class="fa fa-history"></i> History</a>
             </div>
             <div>
-              <a class="btn btn-warning" style="display:none" id="saveBudgetBtn" on-click="save">Save Budget Changes</a>
             </div>
           </div>
         </div>
@@ -121,8 +120,6 @@
 
       FB.materialController.on('material-update', this.updateMaterialAuthorties.bind(this));
       FB.materialController.on('material-removed', this.updateMaterialAuthorties.bind(this));
-
-      document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkForChanges.bind(this));
     },
 
     attached : function() {
@@ -131,63 +128,11 @@
         .addEventListener('editor-close', function(){
           this.setData(FB.getData());
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
-          this.checkForChanges();
         }.bind(this));
     },
 
     updateTotal : function() {
       this.$.total.onTotalUpdate();
-    },
-
-    checkForChanges : function() {
-      var updated = FB.save.checkBudget(FB.getData());
-      if( updated ) {
-        this.$.saveBudgetBtn.style.display = 'inline-block';
-        return true;
-      }
-
-      var updated = FB.save.checkMaterials(FB.getMaterialIds());
-      if( updated ) {
-        this.$.saveBudgetBtn.style.display = 'inline-block';
-        return true;
-      }
-
-      this.$.saveBudgetBtn.style.display = 'none';
-      return false;
-    },
-
-    save : function() {
-      var budget = $.extend(true,{}, FB.getData());
-      FB.save.strip(FB.save.schema.budget, budget);
-
-      budget.materialIds = [];
-
-      var materials = FB.materialController.get();
-      for( var name in materials.materials ) {
-        if( !materials.materials[name].id ) continue;
-        budget.materialIds.push(materials.materials[name].id);
-      }
-      for( var name in materials.complex ) {
-        if( !materials.complex[name].id ) continue;
-        budget.materialIds.push(materials.complex[name].id);
-      }
-
-      this.$.saveBudgetBtn.innerHTML = 'Saving...';
-      this.$.saveBudgetBtn.setAttribute('disabled', 'disabled');
-
-      $.post('/budget/save', budget, function(resp){
-        this.$.saveBudgetBtn.innerHTML = 'Save Budget Changes';
-        this.$.saveBudgetBtn.removeAttribute('disabled');
-
-        if( resp.error ) {
-          return alert(resp.message);
-        }
-
-        // the server may have cleanup some stuff
-        document.querySelector('ahb-budget').reload(budget.id);
-        this.$.saveBudgetBtn.style.display = 'none';
-      }.bind(this));
-
     },
 
     setData : function(data) {
@@ -245,7 +190,6 @@
     onShow : function(params) {
       this.$.timeline.onShow();
       this.$.spendingTimeline.onShow();
-      this.checkForChanges();
 
       if( params.length > 0 && params[0] === 'debug' ) {
         this.$.debug.style.display = 'block';

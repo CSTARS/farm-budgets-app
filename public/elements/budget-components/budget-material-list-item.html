@@ -36,7 +36,8 @@
       </div>
 
       <div style="padding:10px">
-        <span>Used in Operation(s): </span> <span id="usedBy"></span>
+        <div id="usedBy"></div>
+        <div id="requiredBy"></div>
       </div>
 
       <div id="msg"></div>
@@ -96,6 +97,13 @@
 
         this.$.units.innerHTML = this.material.units;
 
+        this.setUsedByOps();
+        this.setRequiredBy();
+
+        this.verify();
+      },
+
+      setUsedByOps : function() {
         var operations = FB.operationController.get();
         var usedBy = [];
         for( var i = 0; i < operations.length; i++ ) {
@@ -106,9 +114,19 @@
             }
           }
         }
-        this.$.usedBy.innerHTML = usedBy.length > 0 ? usedBy.join(', ') : 'None';
+        this.$.usedBy.innerHTML = usedBy.length > 0 ? ('Used in Operation(s): '+usedBy.join(', ')) : '';
+      },
 
-        this.verify();
+      setRequiredBy : function() {
+        var complexMaterials = FB.materialController.get().complex;
+        var requiredBy = [];
+        for( var name in complexMaterials ) {
+          if( !complexMaterials[name].materials ) continue;
+          if( complexMaterials[name].materials[this.material.name] ) {
+            requiredBy.push('<a href="/#budget/materials/'+name+'">'+name+'</a>');
+          }
+        }
+        this.$.requiredBy.innerHTML = requiredBy.length > 0 ? ('Required By: '+requiredBy.join(', ')) : '';
       },
 
       verify : function() {
