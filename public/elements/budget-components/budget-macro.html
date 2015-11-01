@@ -182,7 +182,7 @@
 
     renderTree : function() {
       var list = [];
-      this.getTreeMaterialList(this.data.materials, '', list);
+      this.getTreeMaterialList(this.data, '', list);
 
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
@@ -195,7 +195,7 @@
             '<i>'+list[i].path + '</i> '+
             (list[i].type == 'complex' ?
               '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' :
-              '<budget-material material="'+list[i].name+'"></budget-material>'
+              '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>'
             )
             +'</td><td style="white-space: nowrap">' +
 
@@ -225,7 +225,7 @@
 
     renderCompressed : function() {
       var list = [];
-      this.getCompressedMaterialList(this.data.materials, list);
+      this.getCompressedMaterialList(this.data, list);
 
       var html = '<table class="table" style="padding-top:5px;margin-bottom:0">';
       for( var i = 0; i < list.length; i++ ) {
@@ -236,7 +236,7 @@
 
         html += '<tr><td style="white-space: nowrap">' +
             list[i].count+'x ' +
-            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'"></budget-material>' )+'</td><td style="white-space: nowrap">' +
+            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>' )+'</td><td style="white-space: nowrap">' +
             ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+FB.units.getLabel(list[i].units, true)+'</span>'
           '</td></tr>';
       }
@@ -255,15 +255,24 @@
     },
 
     renderError : function(err) {
-      return '<tr><td class="text text-danger">'+err.message+'</td><td>'+
-        (err.code === 3 ? '<a class="btn btn-link btn-find" material="'+err.name+'" location="'+(this.data.locality ? this.data.locality.join(' ') : '')+'">Find</a> '+
-                          '<a class="btn btn-link btn-create" material="'+err.name+'">Create</a>' : '')+
+      return '<tr><td class="text text-danger">'+err.message+'</td><td style="white-space:nowrap">'+
+        (err.code === 3 ? '<a class="btn btn-link btn-find" material="'+err.name+'" location="'+(this.data.locality ? this.data.locality.join(' ') : '')+'"><i class="fa fa-search"></i></a> '+
+                          '<a class="btn btn-link btn-create" material="'+err.name+'"><i class="fa fa-plus-circle"></i></a>' : '')+
         '</td></tr>';
     },
 
-    getCompressedMaterialList : function(materials, list) {
-      for( var material in materials ) {
+    getCompressedMaterialList : function(complex, list) {
+      for( var material in complex.materials ) {
         var m = FB.materialController.get(material);
+
+        if( m.error && complex.unique && complex.unique[material] ) {
+          m = {
+            name : material,
+            price : complex.unique[material].price,
+            units : complex.unique[material].units,
+            unique : true
+          }
+        }
 
         if( m.error ) {
           list.push(m);
@@ -280,14 +289,23 @@
         }
 
         if( m.type === 'complex' && m.materials) {
-          this.getCompressedMaterialList(m.materials, list);
+          this.getCompressedMaterialList(m, list);
         }
       }
     },
 
-    getTreeMaterialList : function(materials, path, list) {
-      for( var material in materials ) {
+    getTreeMaterialList : function(complex, path, list) {
+      for( var material in complex.materials ) {
         var m = FB.materialController.get(material);
+
+        if( m.error && complex.unique && complex.unique[material] ) {
+          m = {
+            name : material,
+            price : complex.unique[material].price,
+            units : complex.unique[material].units,
+            unique : true
+          }
+        }
 
         if( m.error ) {
           list.push(m);
@@ -296,14 +314,14 @@
 
         var item = $.extend(true, {}, m);
         item.path = path;
-        item.amount = materials[material].amount;
-        item.units = materials[material].units;
-        item.price = materials[material].price;
+        item.amount = complex.materials[material].amount;
+        item.units = complex.materials[material].units;
+        item.price = complex.materials[material].price;
         list.push(item);
 
         if( m.type === 'complex' &&  m.materials) {
           var p = path+m.name+' - ';
-          this.getTreeMaterialList(m.materials, p, list);
+          this.getTreeMaterialList(m, p, list);
         }
       }
     },

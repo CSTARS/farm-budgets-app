@@ -138,8 +138,12 @@
         for( var key in this.material.materials ) {
           var m = FB.materialController.get(key);
           if( m.error ) {
-            missing += '<div><i class="fa fa-warning"></i> Missing required material: '+key+
-            ' <a style="cursor:pointer" material="'+key+'"><i class="fa fa-cloud-download"></i> Import</a></div>';
+            if( this.material.unique && this.material.unique[key] ) {
+              continue;
+            }
+
+            missing += '<div><i class="fa fa-warning"></i> Missing required material: <i>'+key+
+            '</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a style="cursor:pointer" material="'+key+'"><i class="fa fa-cloud-download"></i> Import</a></div>';
           }
         }
 

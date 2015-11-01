@@ -23,10 +23,8 @@ BudgetMaterialPopup.cancel = function() {
     //}
     //materials.push(this.originalData);
 
-    //FB.materialController.add(this.originalData, {replace: true});
+    FB.materialController.add(this.originalData, {replace: true});
   }
-  
-  FB.materialController.add(this.originalData, {replace: true});
 
   this.hide();
 };

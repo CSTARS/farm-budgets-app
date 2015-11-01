@@ -33,16 +33,16 @@
     properties : {
       material : {
         type : String,
-        observer : 'render'
+        observer : 'changeObserver'
       },
       showPrice : {
         type : Boolean,
-        observer : 'render',
+        observer : 'changeObserver',
         value : false
       },
       parent : {
         type : String,
-        observer : 'render',
+        observer : 'changeObserver',
         value : function() {
           return '';
         }
@@ -53,13 +53,25 @@
       this.render();
     },
 
+    changeObserver : function() {
+      this.render();
+    },
+
     render : function(material) {
       this.updatePrice();
 
       this.showError();
 
-      if( typeof material == 'string' ) this.material = material;
-      if( !this.material ) return;
+      if( material && typeof material == 'string' ) {
+        this.material = material;
+      }
+
+      if( !this.material ) {
+        // wtf!?
+        //this.material = this.getAttribute('material');
+        //if( !this.material ) return;
+        return;
+      }
 
       var m;
       if( this.parent ) {
@@ -111,7 +123,6 @@
         this.$.edit.style.display = 'inline-block';
         this.$.nameLabel.innerHTML = this.material;
       }
-
 
 
       // TODO: don't think this is the best place for this error checkError
