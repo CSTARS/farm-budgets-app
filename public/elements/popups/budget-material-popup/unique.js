@@ -1,6 +1,5 @@
 BudgetMaterialPopup.createUnique = function() {
   var data = {
-    class : this.$.uniqueClassInput.getValue(),
     name : this.$.uniqueNameInput.value,
     units : this.$.uniqueUnitsInput.getUnits(),
     price : parseFloat(this.$.uniquePriceInput.value)
@@ -17,21 +16,30 @@ BudgetMaterialPopup.createUnique = function() {
     return;
   }
 
+  if( !this.data.unique ) {
+    this.data.unique = {};
+  }
+  /*if( this.data.materials[data.name] || this.data.required[data.name] ) {
+    this.$.createUniqueMsg.innerHTML = 'You already have a required material with this name.';
+    return;
+  }*/
+
   // we are almost good to go
   // update name
-  data.name = this.data.name+'--'+data.name;
+  //data.name = this.data.name+'--'+data.name;
   data.units = 'us$/'+data.units;
 
   // add to global controller, make sure no issues
-  var resp = FB.materialController.add(data, {
+  /*var resp = FB.materialController.add(data, {
     replace : true,
     noRecalc : true,
     noEvent : true
-  });
-  if( resp.error ) {
+  });*/
+
+  /*if( resp.error ) {
     this.$.createUniqueMsg.innerHTML = resp.message;
     return;
-  }
+  }*/
 
   // do we need to add a simple impl?
   if( !this.data.materials[data.name] ) {
@@ -41,8 +49,12 @@ BudgetMaterialPopup.createUnique = function() {
       units : FB.units.invert(data.units)
     }
     this.data.materials[impl.name] = impl;
+  } else {
+    this.data.materials[data.name].units = FB.units.invert(data.units);
   }
+  this.data.unique[data.name] = data;
 
+  FB.materialController.add(this.data, {replace: true});
 
   this.recalc();
 
@@ -50,11 +62,11 @@ BudgetMaterialPopup.createUnique = function() {
   this.cancelCreateUnique();
 };
 
-BudgetMaterialPopup.onUniqueClassChange = function() {
+/*BudgetMaterialPopup.onUniqueClassChange = function() {
   if( this.$.uniqueNameInput.value == '' || this.$.uniqueClassInput.isClass(this.$.uniqueNameInput.value) ) {
     this.$.uniqueNameInput.value = this.$.uniqueClassInput.getValue();
   }
-};
+};*/
 
 BudgetMaterialPopup.cancelCreateUnique = function() {
   this.$.uniqueNameInput.value = '';

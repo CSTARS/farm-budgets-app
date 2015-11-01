@@ -1,4 +1,4 @@
-BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
+BudgetMaterialPopup.edit = function(material) {
   if( this.showing && this.data.name != material.name ) {
     if( confirm('Do you want to save your changes before editing new material?') ) {
       this.save(true);
@@ -17,9 +17,9 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
 
   // make a copy for if we cancel
   this.originalData = $.extend(true, {}, this.data);
-  this.originalUniqueMaterials = [];
+  //this.originalUniqueMaterials = [];
 
-  if( this.data.name.match(/--/) ) {
+  /*if( this.data.name.match(/--/) ) {
     var parts = this.data.name.split('--');
     this.parentMaterial = parts[0];
     this.$.parentMaterial.innerHTML = '<h5 style="border-bottom: 1px solid #ccc; text-align:center">Parent: '+parts[0]+'</h5>';
@@ -27,13 +27,13 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
 
     this.$.complexGroup.style.display = 'none';
     this.$.advancedBtn.style.display = 'none';
-  } else {
+  } else {*/
     this.parentMaterial = null;
     this.$.advancedBtn.style.display = 'inline-block';
     this.$.complexGroup.style.display = 'block';
     this.$.parentMaterial.innerHTML = '';
     this.$.nameInput.value = this.data.name;
-  }
+  //}
 
   this.$.descriptionInput.value = this.data.description || '';
   this.$.unitsInputMsg.innerHTML = '';
@@ -49,11 +49,11 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
     this.materialUnits = this.data.units;
 
     // snapshot all definitions of unique materials
-    for( var key in this.data.materials ) {
+    /*for( var key in this.data.materials ) {
       if( key.match(/--/) ) {
         this.originalUniqueMaterials.push($.extend(true, {}, FB.materialController.get(key)));
       }
-    }
+    }*/
 
   } else {
     this.$.unitsInput.setUnits(FB.units.invert(this.data.units));
@@ -61,13 +61,13 @@ BudgetMaterialPopup.edit = function(material, creatingUniqueName) {
     this.setComplex(false);
   }
 
-  if( creatingUniqueName ) {
+  /*if( creatingUniqueName ) {
     this.$.uniqueNameInput.value = creatingUniqueName;
     $(this.$.createUniquePanel).show();
-  }
+  }*/
 
   this.$.historyBtn.style.display = 'inline-block';
-    this.$.deleteBtn.style.display = 'inline-block';
+  this.$.deleteBtn.style.display = 'inline-block';
 
   this.recalc();
   this.show();

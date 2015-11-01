@@ -15,19 +15,19 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <h4>
-            <span>{{item.name}}</span>
-            <small><i class="fa fa-shield"></i> <span>{{item.authority}}</span></small>
+            <span class="text text-success"><i class="fa fa-leaf"></i> <span>{{item.farm.commodity}}</span>
+            <small><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">{{item.localityStr}}</span></small>
             <span class="pull-right"><a class="btn btn-primary" on-click="select" index$="{{index}}" style="margin-top:-10px">Select</a></span>
           </h4>
 
           <table class="table">
-            <tr class="text text-success">
-              <td>Crop</td>
-              <td><i class="fa fa-leaf"></i> <span>{{item.farm.commodity}}</span></td>
+            <tr>
+              <td>Authority</td>
+              <td><i class="fa fa-shield"></i> <span>{{item.authority}}</span></td>
             </tr>
-            <tr class="text text-primary">
-              <td>Location</td>
-              <td><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">{{item.localityStr}}</span></td>
+            <tr>
+              <td>Budget Name</td>
+              <td>{{item.name}}</td>
             </tr>
             <tr>
               <td>Farm Name</td>

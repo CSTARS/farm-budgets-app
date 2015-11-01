@@ -12,10 +12,12 @@
   </style>
 
   <template>
-    <div id="label" style="cursor:pointer" on-click="toggle"><b><i class="fa fa-cube" id="icon"></i> <span id="nameLabel"></span></b></div>
+    <div id="label" style="cursor:pointer" on-click="toggle">
+      <b><i class="fa fa-cube" id="icon"></i> <span id="nameLabel"></span></b>
+      <span id="forLabel"></span>
+    </div>
     <div id="error" class="text text-danger"></div>
     <div id="price" style="white-space: nowrap">
-      <div id="forLabel"></div>
       <div id="otherInfo" class="help-block"></div>
       <span id="priceLabel"></span>
       <span id="unitLabel"></span>
@@ -37,6 +39,13 @@
         type : Boolean,
         observer : 'render',
         value : false
+      },
+      parent : {
+        type : String,
+        observer : 'render',
+        value : function() {
+          return '';
+        }
       }
     },
 
@@ -52,16 +61,36 @@
       if( typeof material == 'string' ) this.material = material;
       if( !this.material ) return;
 
-      if( this.material.indexOf('--') > -1 ) {
-        this.$.forLabel.innerHTML = '(for '+this.material.split('--')[0]+')';
+      var m;
+      if( this.parent ) {
+        this.$.forLabel.innerHTML = '(for '+this.parent+')';
+        // to edit this material, we need to fire an event
+        this.$.edit.removeAttribute('href');
+        this.$.edit.addEventListener('click', this.fireEditUnique.bind(this), false);
+        var complex = FB.materialController.get(this.parent);
+        if( complex.error ) return this.showError(complex);
+
+        if( !complex.unique || !complex.unique[this.material] ) {
+          return this.showError({message: 'Error finding unique material: '+this.material});
+        }
+
+        var unique = complex.unique[this.material];
+        m = {
+          name : this.material,
+          units : unique.units,
+          price : unique.price
+        }
+
       } else {
         this.$.forLabel.innerHTML = '';
+        this.$.edit.href = '#budget/materials/'+this.material;
+        this.$.edit.removeEventListener('click', this.fireEditUnique, false);
+
+        m = FB.materialController.get(this.material);
+        if( m.error ) return this.showError(m);
       }
 
-      this.$.edit.href = '#budget/materials/'+this.material;
 
-      var m = FB.materialController.get(this.material);
-      if( m.error ) return this.showError(m);
 
       var otherInfo = '';
       if( m.authority ) {
@@ -77,10 +106,10 @@
 
       if( m.fixed ) {
         this.$.edit.style.display = 'none';
-        this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '')+' <span class="label label-warning">Fixed</span>';
+        this.$.nameLabel.innerHTML = this.material+' <span class="label label-warning">Fixed</span>';
       } else {
         this.$.edit.style.display = 'inline-block';
-        this.$.nameLabel.innerHTML = this.material.replace(/.*--/, '');
+        this.$.nameLabel.innerHTML = this.material;
       }
 
 
@@ -94,6 +123,10 @@
       this.$.priceLabel.innerHTML = m.price;
       this.$.unitLabel.innerHTML = FB.units.getLabel(m.units, true);
       //this.data.materials[material].price.toFixed(2)
+    },
+
+    fireEditUnique : function() {
+      this.fire('edit-unique', this.material);
     },
 
     showError : function(err) {

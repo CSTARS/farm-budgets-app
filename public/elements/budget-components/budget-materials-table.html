@@ -21,6 +21,7 @@
       this.controllers = []
       this.data = data;
 
+      // this is an operations materials
       if( Array.isArray(this.data.materials) ) {
         this.initTable(this.data.materials.length);
 
@@ -30,11 +31,24 @@
           this.controllers.push(row);
         }
 
+      // this is a complex materials table
       } else {
         this.initTable(Object.keys(this.data.materials).length);
         var c = 2;
         for( var material in this.data.materials ) {
-          var m = FB.materialController.get(material);
+          // first we check the unique materials
+          var m;
+          if( this.data.unique && this.data.unique[material] ) {
+            m = {
+              name : material,
+              type : 'unique',
+              parent : this.data.name,
+              price : this.data.unique[material].price,
+              units : this.data.unique[material].units
+            };
+          } else {
+            m = FB.materialController.get(material);
+          }
           var row = this.initRow(c, m, this.data.materials[material]);
           this.controllers.push(row);
           c++;
@@ -155,6 +169,9 @@
       nameLabel = $('<budget-macro></budget-macro>');
     } else {
       nameLabel = $('<budget-material></budget-material>');
+      if( config.material.type == 'unique' ) {
+        nameLabel.attr('parent', config.material.parent);
+      }
     }
     cols.Material.append(nameLabel);
 
