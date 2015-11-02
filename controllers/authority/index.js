@@ -33,16 +33,19 @@ module.exports = function (router) {
     });
 
     router.get('/get', authMiddleware, function (req, res) {
-      if( !req.query.authority ) {
+      if( !req.query.name ) {
         return errorHandler('authority name required', res);
       }
 
-      authUtils.hasAccess(req.user, req.query.authority, function(hasAccess){
+      authUtils.hasAccess(req.user, req.query.authority, function(err, hasAccess){
+        if( err ) {
+          return errorHandler(err, res);
+        }
         if( !hasAccess ) {
           return errorHandler('You do not have access to authority: '+req.query.authority, res);
         }
 
-        model.get(req.user.authority, function(err, authority){
+        model.get(req.query.name, function(err, authority){
           if( err ) {
             return errorHandler(err, res);
           }
@@ -55,14 +58,10 @@ module.exports = function (router) {
     router.post('/create', authMiddleware, function (req, res) {
       var authority = req.body;
       if( !authority ) {
-        return errorHandler('authority name required', res);
+        return errorHandler('authority required', res);
       }
 
-      if( !auth.acl.hasRole(req.user.username, req.query.authority) ) {
-        return errorHandler('You do not have access to authority: '+req.query.authority, res);
-      }
-
-      model.create(req.user.authority, function(err, authority){
+      model.create(authority, function(err, authority){
         if( err ) {
           return errorHandler(err, res);
         }
@@ -71,21 +70,72 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/update', authMiddleware, function (req, res) {
-      if( !req.query.authority ) {
-        return errorHandler('authority name required', res);
+    router.get('/grantAccess', authMiddleware, function (req, res) {
+      if( !req.query.name || !req.query.username ) {
+        return errorHandler('authority name and username required', res);
       }
 
-      if( !auth.acl.hasRole(req.query.authority) ) {
-        return errorHandler('You do not have access to authority: '+req.query.authority, res);
-      }
-
-      model.update(req.user.authority, function(err, authority){
+      authUtils.hasAccess(req.user, req.query.name, function(err, hasAccess){
         if( err ) {
           return errorHandler(err, res);
         }
+        if( !hasAccess ) {
+          return errorHandler('You do not have access to authority: '+req.query.authority, res);
+        }
 
-        res.send(authority);
+        model.grantAccess(req.query.username, req.query.name, function(err, result){
+          if( err ) {
+            return errorHandler(err, res);
+          }
+
+          res.send(result);
+        });
+      });
+    });
+
+    router.get('/removeAccess', authMiddleware, function (req, res) {
+      if( !req.query.name || !req.query.username ) {
+        return errorHandler('authority name and username required', res);
+      }
+
+      authUtils.hasAccess(req.user, req.query.name, function(err, hasAccess){
+        if( err ) {
+          return errorHandler(err, res);
+        }
+        if( !hasAccess ) {
+          return errorHandler('You do not have access to authority: '+req.query.authority, res);
+        }
+
+        model.removeAccess(req.query.username, req.query.name, function(err, result){
+          if( err ) {
+            return errorHandler(err, res);
+          }
+
+          res.send(result);
+        });
+      });
+    });
+
+    router.post('/update', authMiddleware, function (req, res) {
+      if( !req.body.name ) {
+        return errorHandler('authority name required', res);
+      }
+
+      authUtils.hasAccess(req.user, req.body.authority, function(err, hasAccess){
+        if( err ) {
+          return errorHandler(err, res);
+        }
+        if( !hasAccess ) {
+          return errorHandler('You do not have access to authority: '+req.query.authority, res);
+        }
+
+        model.update(req.body, function(err, authority){
+          if( err ) {
+            return errorHandler(err, res);
+          }
+
+          res.send(authority);
+        });
       });
     });
 };

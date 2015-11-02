@@ -72,6 +72,7 @@
 
     ready : function() {
       this.editUnitsTimer = -1;
+      this.currentstate = null;
 
       this.data = {
         name : '[Not Set]',
@@ -105,6 +106,12 @@
     updateMaterial : function(material) {
       if( material ) this.material = material;
       if( !this.material ) return;
+
+      if( this.currentstate === this.material ) {
+        return; // nothing todo
+      } else {
+        this.currentstate = this.material;
+      }
 
       var m = FB.materialController.get(this.material);
 

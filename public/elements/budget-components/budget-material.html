@@ -49,6 +49,10 @@
       }
     },
 
+    ready : function() {
+      this.currentstate = null;
+    },
+
     attached : function() {
       this.render();
     },
@@ -58,18 +62,20 @@
     },
 
     render : function(material) {
-      this.updatePrice();
-
-      this.showError();
-
       if( material && typeof material == 'string' ) {
         this.material = material;
       }
 
+      if( this.currentstate === this.material+this.parent ) {
+        return; // nothing to do;
+      } else {
+        this.currentstate = this.material+this.parent;
+      }
+
+      this.updatePrice();
+      this.showError();
+
       if( !this.material ) {
-        // wtf!?
-        //this.material = this.getAttribute('material');
-        //if( !this.material ) return;
         return;
       }
 

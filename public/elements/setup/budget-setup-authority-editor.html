@@ -6,7 +6,12 @@
       }
     </style>
 
+    <h4 class="page-header" style="margin-top:0"><i class="fa fa-shield"></i> <span>{{authName}}</span></h4>
+    <div>{{authDescription}}</div>
 
+    <template is="dom-repeat" items="{{users}}">
+      <div>{{item}}</div>
+    </template>
 
   </template>
   <script>
@@ -21,7 +26,19 @@
       },
 
       authorityObserver : function() {
-        
+        if( !this.authority ) return;
+        $.get('/authority/get?name='+this.authority, this.onResponse.bind(this));
+      },
+
+      onResponse : function(resp) {
+        if( resp.error ) {
+          return alert(resp.message);
+        }
+
+        this.data = resp;
+        this.authName = resp.name;
+        this.authDescription = resp.description;
+        this.users = resp.users;
       }
     });
   </script>

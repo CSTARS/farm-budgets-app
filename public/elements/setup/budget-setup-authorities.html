@@ -11,7 +11,10 @@
     <div id="select">
       <template is="dom-repeat" items="{{authorities}}">
         <div class="panel panel-default">
-          <div class="panel-body"><a class="btn btn-link"><i class="fa fa-pencil"></i></a> <span>{{item}}</span></div>
+          <div class="panel-body">
+            <a class="btn btn-link" href$="{{item.href}}"><i class="fa fa-pencil"></i></a>
+            <span>{{item.label}}</span>
+          </div>
         </div>
       </template>
     </div>
@@ -28,7 +31,16 @@
       },
 
       set : function() {
-        this.authorities = ExpressAuth.user.authorities;
+        if( !ExpressAuth.user ) return;
+
+        var arr = [];
+        for( var i = 0; i < ExpressAuth.user.authorities.length; i++ ) {
+          arr.push({
+            label : ExpressAuth.user.authorities[i],
+            href : '#budget/setup/authorities/'+ExpressAuth.user.authorities[i]
+          });
+        }
+        this.authorities = arr;
       },
 
       onShow : function(params) {
