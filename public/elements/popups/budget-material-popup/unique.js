@@ -1,3 +1,20 @@
+BudgetMaterialPopup.editUnique = function(name) {
+  if( !this.data.unique ) {
+    return alert('Material has no unique material: '+name);
+  } else if( !this.data.unique[name] ) {
+    return alert('Material has no unique material: '+name);
+  }
+
+  this.$.uniqueNameInput.value = name;
+  this.$.uniqueUnitsInput.units = FB.units.invert(this.data.unique[name].units);
+  this.$.uniquePriceInput.value = this.data.unique[name].price;
+  this.$.createUniqueMsg.innerHTML = '';
+
+  this.$.createUniqueBtn.innerHTML = 'Update';
+
+  this.showUnique();
+}
+
 BudgetMaterialPopup.createUnique = function() {
   var data = {
     name : this.$.uniqueNameInput.value,

@@ -18,6 +18,20 @@
     .dropdown-menu.dropdown-menu-right a {
       text-align: left !important;
     }
+    #unsavedMessage {
+      padding: 5px;
+      position: fixed;
+      bottom : 0;
+      right : 0;
+      background-color: white;
+      border-radius: 3px 0 0 0;
+      box-shadow: 0 0 5px #ccc;
+      cursor: pointer;
+    }
+    #unsavedMessage:hover {
+      box-shadow: 0 0 5px #aaa;
+      background-color: #eee;
+    }
   </style>
 
   <template>
@@ -80,6 +94,10 @@
     <budget-section-operations id="operations" class="section"></budget-section-operations>
     <budget-section-materials id="materials" class="section"></budget-section-materials>
     <budget-section-setup id="setup" class="section"></budget-section-setup>
+
+    <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="displayNone">
+      <i class="fa fa-warning"></i> You have unsaved changes.
+    </div>
   </template>
 </dom-module>
 
@@ -91,10 +109,12 @@
       $(window).on('hashchange', this.setSection.bind(this));
 
       document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkForChanges.bind(this));
+      document.querySelector('budget-farm-editor').addEventListener('editor-close', this.checkForChanges.bind(this));
       FB.materialController.on('material-update', this.checkForChanges.bind(this));
       FB.materialController.on('material-removed', this.checkForChanges.bind(this));
-      FB.operationController.on('operation-update', this.checkForChanges.bind(this));
-      FB.operationController.on('operation-removed', this.checkForChanges.bind(this));
+      FB.operationController.on('update', this.checkForChanges.bind(this));
+
+      this.changesTimer = -1;
 
       this.setSection();
     },
@@ -103,20 +123,35 @@
       this.checkForChanges();
     },
 
+    scrollTop : function() {
+      $('html, body').animate({ scrollTop: '0px' });
+    },
+
     checkForChanges : function() {
+      if( this.changesTimer != -1 ) clearTimeout(this.changesTimer);
+      this.changesTimer = setTimeout(function(){
+        this.changesTimer = -1;
+        this._checkForChanges();
+      }.bind(this), 100);
+    },
+
+    _checkForChanges : function() {
       var updated = FB.save.checkBudget(FB.getData());
       if( updated ) {
         this.$.saveBudgetBtn.style.display = 'inline-block';
+        this.$.unsavedMessage.style.display = 'block';
         return true;
       }
 
       var updated = FB.save.checkMaterials(FB.getMaterialIds());
       if( updated ) {
         this.$.saveBudgetBtn.style.display = 'inline-block';
+        this.$.unsavedMessage.style.display = 'block';
         return true;
       }
 
       this.$.saveBudgetBtn.style.display = 'none';
+      this.$.unsavedMessage.style.display = 'none';
       return false;
     },
 
@@ -150,6 +185,7 @@
         // the server may have cleanup some stuff
         document.querySelector('ahb-budget').reload(budget.id);
         this.$.saveBudgetBtn.style.display = 'none';
+        this.$.unsavedMessage.style.display = 'none';
       }.bind(this));
 
     },

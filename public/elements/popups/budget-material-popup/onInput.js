@@ -118,3 +118,7 @@ BudgetMaterialPopup.onMaterialSelect = function(e) {
   this.data.materials[materialImpl.name] = materialImpl;
   this.recalc();
 };
+
+BudgetMaterialPopup.onEditUnique = function(e) {
+  this.editUnique(e.detail);
+}

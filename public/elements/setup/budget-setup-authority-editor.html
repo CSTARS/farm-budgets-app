@@ -1,0 +1,28 @@
+<dom-module id="budget-setup-authority-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-setup-authority-editor',
+
+      properties : {
+        authority : {
+          type : String,
+          observer : 'authorityObserver'
+        }
+      },
+
+      authorityObserver : function() {
+        
+      }
+    });
+  </script>
+</dom-module>

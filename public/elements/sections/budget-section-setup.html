@@ -1,6 +1,5 @@
 <link rel="import" href="../setup/budget-setup-authorities.html" />
 <link rel="import" href="../setup/budget-setup-account.html" />
-<link rel="import" href="../setup/budget-setup-save.html" />
 
 <dom-module id="budget-section-setup">
   <style>
@@ -35,9 +34,6 @@
       <div class="col-sm-3">
         <ul class="list-group">
           <li class="list-group-item">
-            <a href="#budget/setup/save">Save</a>
-          </li>
-          <li class="list-group-item">
             <a href="#budget/setup/account">My Account</a>
           </li>
           <li class="list-group-item">
@@ -46,7 +42,6 @@
         </ul>
       </div>
       <div class="col-sm-9" id="panels" style="padding-right: 30px">
-        <budget-setup-save id="save"></budget-setup-save>
         <budget-setup-authorities id="authorities"></budget-setup-authorities>
         <budget-setup-account id="account"></budget-setup-account>
       </div>
@@ -70,19 +65,17 @@
       }
 
       if( params.length == 0 ) {
-        return window.location = '#budget/setup/save';
+        return window.location = '#budget/setup/authorities';
       }
 
-      if( !this.$[params[0]] ) return;
+      var page = params[0];
+      params.splice(0,1);
+
+      if( !this.$[page] ) return;
       $(this.$.panels).children().hide();
 
-      this.$[params[0]].style.display = 'block';
-      this.$[params[0]].onShow();
-    },
-
-    updateExample : function() {
-      window.localStorage.setItem('budget-demo', this.$.budgetSelect.value);
-      window.location.reload();
+      this.$[page].style.display = 'block';
+      this.$[page].onShow(params);
     }
   });
 </script>

@@ -1,3 +1,5 @@
+<link rel="import" href="budget-setup-authority-editor.html" />
+
 <dom-module id="budget-setup-authorities">
   <template>
     <style>
@@ -6,11 +8,15 @@
       }
     </style>
 
-    <template is="dom-repeat" items="{{authorities}}">
-      <div class="panel panel-default">
-        <div class="panel-body">{{authorities}}</div>
-      </div>
-    </template>
+    <div id="select">
+      <template is="dom-repeat" items="{{authorities}}">
+        <div class="panel panel-default">
+          <div class="panel-body"><a class="btn btn-link"><i class="fa fa-pencil"></i></a> <span>{{item}}</span></div>
+        </div>
+      </template>
+    </div>
+
+    <budget-setup-authority-editor id="editor"></budget-setup-authority-editor>
 
   </template>
   <script>
@@ -25,8 +31,17 @@
         this.authorities = ExpressAuth.user.authorities;
       },
 
-      onShow : function() {
-        this.set()
+      onShow : function(params) {
+        this.set();
+
+        if( params.length == 0 ) {
+          this.$.select.style.display = 'block';
+          this.$.editor.style.display = 'none';
+        } else {
+          this.$.select.style.display = 'none';
+          this.$.editor.style.display = 'block';
+          this.$.editor.authority = params[0];
+        }
       }
     });
   </script>

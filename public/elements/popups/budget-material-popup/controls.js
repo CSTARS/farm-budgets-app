@@ -123,7 +123,12 @@ var BudgetMaterialPopup = {
   },
 
   toggleUnique : function() {
-    $(this.$.createUniquePanel).toggle();
+    this.$.createUniqueBtn.innerHTML = 'Create';
+    $(this.$.createUniquePanel).toggle('slow');
+  },
+
+  showUnique : function() {
+    $(this.$.createUniquePanel).show('slow');
   },
 
   setComplex : function(isComplex) {
