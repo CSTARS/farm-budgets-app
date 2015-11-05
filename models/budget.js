@@ -169,9 +169,20 @@ function loadReference(budget, callback) {
     if( !budget.operations ) {
       budget.operations = [];
     }
+
+    if( !budget.farm ) {
+      budget.farm = {};
+    }
+    if( !result.farm ) {
+      budget.farm = {};
+    }
+    budget.farm.size = result.farm.size;
+    budget.farm.unit = result.farm.unit;
+
     budget.referenceInfo = {
       name : result.name,
       authority : result.authority,
+      commodity : result.farm.commodity,
       locality : result.locality
     };
 

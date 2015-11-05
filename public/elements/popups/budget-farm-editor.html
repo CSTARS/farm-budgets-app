@@ -42,6 +42,10 @@
                 <label for="sizeInput" class="col-sm-3 control-label">Size</label>
                 <div class="col-sm-9">
                   <input id="sizeInput" class="form-control" type="number" on-input="onSizeInput" />
+                  <div class="text text-warning" style="display:none" id="referenceMsg">
+                    This is a <b><i class="fa fa-code-fork"></i> reference budget</b>.  You can't edit the farm
+                    size from a reference budget.
+                  </div>
                 </div>
               </div>
 
@@ -49,7 +53,6 @@
                 <label for="unitsInput" class="col-sm-3 control-label">Units</label>
                 <div class="col-sm-9">
                     <budget-unit-selector id="unitsInput" on-units-change="editUnits"></budget-unit-selector>
-
                 </div>
               </div>
 
@@ -111,6 +114,16 @@
         this.$.locationInput.setValue(this.data.locality);
         this.$.authorityInput.value = this.data.authority;
         this.$.authorityInput.default = this.data.authority;
+
+        if( this.data.reference ) {
+          this.$.referenceMsg.style.display = 'block';
+          this.$.sizeInput.setAttribute('disabled', 'disabled');
+          this.$.unitsInput.setAttribute('disabled', 'disabled');
+        } else {
+          this.$.referenceMsg.style.display = 'none';
+          this.$.sizeInput.removeAttribute('disabled');
+          this.$.unitsInput.removeAttribute('disabled');
+        }
       },
 
       onBudgetNameInput : function() {

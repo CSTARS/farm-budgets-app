@@ -20,7 +20,7 @@
             <span class="pull-right"><a class="btn btn-primary" on-click="select" index$="{{index}}" style="margin-top:-10px">Select</a></span>
           </h4>
 
-          <table class="table">
+          <table class="table" style="margin-bottom:5px">
             <tr>
               <td>Authority</td>
               <td><i class="fa fa-shield"></i> <span>{{item.authority}}</span></td>
@@ -32,11 +32,16 @@
             <tr>
               <td>Farm Name</td>
               <td>{{item.farm.farm}}</td>
-            </tr><tr>
+            </tr>
+            <tr>
               <td>Size</td>
               <td><span>{{item.farm.size}}<span> <span>{{item.farm.unit}}</span></td>
             </tr>
           </table>
+
+          <span class="label label-warning" hidden="{{!item.isReference}}">
+            <i class="fa fa-code-fork"></i> Reference Budget
+          </span>
         </div>
       </div>
     </template>
@@ -107,6 +112,7 @@
 
         for( var i = 0; i < resp.length; i++ ) {
           resp[i].localityStr = resp[i].locality.join(', ');
+          resp[i].isReference = resp[i].reference ? true : false;
         }
 
         this.data = resp;
