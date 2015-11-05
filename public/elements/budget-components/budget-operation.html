@@ -32,7 +32,7 @@
     <div class="row">
       <div class="col-sm-8">
         <h5>
-          <budget-operation-scheduler on-schedule-update="onScheduleUpdate" id="schedule"></budget-operation-scheduler>
+          <budget-operation-scheduler on-schedule-update="onScheduleUpdate" readonly$="{{readonly}}" id="schedule"></budget-operation-scheduler>
         </h5>
       </div>
       <div class="col-sm-4">
@@ -53,7 +53,7 @@
     </div>
 
     <div id="content" style="display:none" class="animated zoomIn">
-      <div class="form-horizontal" style="margin: 25px 0 ">
+      <div class="form-horizontal" style="margin: 25px 0 " id="addMaterialForm">
         <div class="form-group">
           <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
           <div class="col-sm-9">
@@ -62,11 +62,11 @@
         </div>
       </div>
 
-      <budget-materials-table id="materialTable" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
+      <budget-materials-table id="materialTable" readonly$="{{readonly}}" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
 
 
       <a class="btn btn-link" on-click="toggleAddition" id="sourceBtn"><i class="fa fa-shield"></i> Operation Authorities</a>
-      <a class="btn btn-link" on-click="delete"><i class="fa fa-trash"></i> Delete Operation</a>
+      <a class="btn btn-link" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete Operation</a>
 
       <div class="well" id="sources" style="display:none">
         <div class="help-block">This operation is using the following authorities and locations:</div>
@@ -85,6 +85,9 @@
       operationname : {
         type : String,
         observer : 'update'
+      },
+      readonly : {
+        type : Boolean
       }
     },
 
@@ -96,6 +99,11 @@
 
     attached : function() {
       if( this.operation ) this.update();
+
+      if( this.readonly ) {
+        this.$.deleteBtn.style.display = 'none';
+        this.$.addMaterialForm.style.display = 'none';
+      }
     },
 
     toggleAddition : function() {
@@ -136,20 +144,7 @@
 
     update : function() {
       this.operation = FB.operationController.get(this.operationname);
-      this.$.schedule.set(this.operation.schedule, this.operation.name);
-
-/*
-      this.$.radioEntireFarm.setAttribute('name', this.operation.name+'Radio');
-      this.$.radioPerAcre.setAttribute('name', this.operation.name+'Radio');
-
-      if( this.operation.perAcre ) {
-        this.$.radioPerAcre.setAttribute('checked', 'checked');
-        this.$.radioEntireFarm.removeAttribute('checked');
-      } else {
-        this.$.radioEntireFarm.setAttribute('checked', 'checked');
-        this.$.radioPerAcre.removeAttribute('checked');
-      }
-*/
+      this.$.schedule.set(this.operation.schedule, this.operation.name, this.readonly);
       this.render();
     },
 
@@ -260,14 +255,17 @@
     },
 
     onMouseEnterName : function() {
+      if( this.readonly ) return;
       this.$.renameIcon.style.display = 'inline-block';
     },
 
     onMouseLeaveName : function() {
+      if( this.readonly ) return;
       this.$.renameIcon.style.display = 'none';
     },
 
     editName : function() {
+      if( this.readonly ) return;
       this.$.nameLabel.style.display = 'none';
       this.$.nameInput.style.display = 'inline-block';
       this.$.nameInput.value = this.operation.name;

@@ -1,0 +1,70 @@
+<dom-module id="budget-create-reference">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-plus-circle"></i> Create Reference Budget</h4>
+          </div>
+          <div class="modal-body" id="body">
+
+            A <span class="label label-primary"><i class="fa fa-code-fork"></i> reference budget</span>
+            will use all the <b>same operations</b> as your current budget, but
+            allow you to change out materials as needed.  Reference budgets are good for
+            creating a budget for the same crop in a different location having differently
+            priced base materials, such as labor and fuel.
+
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-primary" on-click="create">Create</a>
+            <a class="btn btn-default" data-dismiss="modal">Cancel</a>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  </template>
+</dom-modle>
+
+<script>
+  Polymer({
+    is : 'budget-create-reference',
+
+    ready : function() {
+      this.popup = $(this.$.popup).remove();
+      $('body').append(this.popup);
+      this.popup.modal({show: false});
+    },
+
+    show : function() {
+      this.popup.modal('show');
+    },
+
+    hide : function() {
+      this.popup.modal('hide');
+    },
+
+    create : function() {
+        var updated = FB.save.checkBudget(FB.getData());
+        if( updated && !confirm('Are you sure you want to continue this budget?  Your unsaved changes will be lost.') ) return;
+
+        var data = FB.getData();
+        data.name = data.name+' Reference';
+        data.reference = data.id;
+        data.referenceInfo = {
+          name : data.name,
+          authority : data.authority,
+          locality : data.locality
+        }
+        data.id = FB.utils.guid();
+
+        window.location = '#budget/overview';
+        document.querySelector('ahb-budget').load(data);
+        this.hide();
+
+        setTimeout(function(){
+          document.querySelector('budget-farm-editor').show();
+        }, 300);
+    }
+  })
+</script>

@@ -36,7 +36,7 @@
       <div class="form-horizontal">
 
         <div class="form-group" id="dates">
-          <label for="datesInput" class="col-sm-3 control-label"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
+          <label for="datesInput" class="col-sm-3 control-label" id="inputLabel"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
           <div class="col-sm-9">
             <div id="inputRoot"></div>
             <div id="selectedDates">
@@ -49,19 +49,21 @@
                     <div class="flex"><h6 style="padding-right: 20px">{{item.dateFormatted}}</h6></div>
 
                     <div class="length-label">Length:</div>
-                    <div>
+                    <div hidden$="{{readonly}}">
                       <input type="number" value="{{item.length::input}}" class="form-control" on-input="onLengthUpdate" style="max-width: 75px; margin-right: 5px" />
                     </div>
+                    <div hidden$="{{!readonly}}" style="padding: 10px">{{item.length}}</div>
 
-                    <div>
+                    <div hidden$="{{readonly}}">
                       <select value="{{item.units::input}}" class="form-control" on-change="onLengthUpdate">
                         <option value="day">Day(s)</option>
                         <option value="month">Month(s)</option>
                         <option value="year">Year(s)</option>
                       </select>
                     </div>
+                    <div hidden$="{{!readonly}}" style="padding: 10px"><span>{{item.units}}<span>(s)</div>
 
-                    <div>
+                    <div hidden$="{{readonly}}">
                       <a class="btn btn-link" index$="{{index}}" on-click="removeDate"><i class="fa fa-calendar-times-o"></i></a>
                     </div>
                   </div> <!-- end inline form -->
@@ -84,6 +86,15 @@
   Polymer({
     is : 'budget-operation-scheduler',
 
+    properties : {
+      readonly : {
+        type : Boolean,
+        value : function() {
+          return false;
+        }
+      }
+    },
+
     ready : function() {
       this.displayText = '';
       this.dateRangeText = '';
@@ -93,9 +104,11 @@
 
       $(this.$.title)
         .on('mouseover', function(){
+          if( this.readonly ) return;
           this.$.edit.style.display = 'inline';
         }.bind(this))
         .on('mouseleave', function(){
+          if( this.readonly ) return;
           this.$.edit.style.display = 'none';
         }.bind(this))
 
@@ -115,6 +128,14 @@
     set : function(data, name) {
       this.data = data;
       this.operationName = name;
+
+      if( this.readonly ) {
+        this.$.inputLabel.style.display = 'none';
+        this.$.inputRoot.style.display = 'none';
+      } else {
+        this.$.inputLabel.style.display = 'block';
+        this.$.inputRoot.style.display = 'block';
+      }
 
       this.copyDataArray();
 
@@ -137,7 +158,8 @@
           length : this.data[i].length,
           units : this.data[i].units,
           date : date,
-          dateFormatted : date.toDateString()
+          dateFormatted : date.toDateString(),
+          readonly : this.readonly
         })
       }
 
@@ -230,6 +252,7 @@
       return {
         length : d.length,
         units : d.units,
+        readonly : this.readonly,
         date : (d.date.getYear()+1900)+'-'+(d.date.getMonth()+1)+'-'+(d.date.getDate())
       }
     },
@@ -280,7 +303,8 @@
           this.dates.push({
             date : cDate,
             length : 1,
-            units : 'month'
+            units : 'month',
+            readonly : this.readonly
           });
           this.update();
           $(this.$.datesInput).datepicker('hide');

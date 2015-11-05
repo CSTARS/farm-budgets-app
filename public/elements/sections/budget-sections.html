@@ -67,6 +67,7 @@
             <li><a class="btn btn-link" on-click="find"><i class="fa fa-search"></i> Find Budget</a></li>
             <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start from Scratch</a></li>
             <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Clone Current Budget</a></li>
+            <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
             <li><a class="btn btn-link" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a></li>
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
@@ -230,6 +231,10 @@
 
     import : function() {
       document.querySelector('budget-import-material-popup').show();
+    },
+
+    reference : function() {
+      document.querySelector('budget-create-reference').show();
     },
 
     clone : function() {

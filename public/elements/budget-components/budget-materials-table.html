@@ -2,13 +2,21 @@
   Polymer({
     is : 'budget-materials-table',
 
+    properties : {
+        readonly : {
+          type : Boolean,
+          value : function() {
+            return false;
+          }
+        }
+    },
+
     ready : function() {
       this.defaultCols = ['Material', 'Notes', 'Amount', 'Units', 'Price', 'SubTotal', 'Remove'];
       this.cols = [];
       this.style.display = 'block';
       this.style.overflowX = 'auto';
       this.controllers = [];
-
     },
 
     setOptions : function(options) {
@@ -64,6 +72,7 @@
           cols : this.cols,
           material : material,
           complexMaterial : this.data,
+          readonly : this.readonly,
           isOperation : this.options.isOperation,
           materialImpl : materialImpl,
 
@@ -178,11 +187,11 @@
     var errorLabel = $('<div style="display:none" class="text text-danger"></div>');
     cols.Material.append(errorLabel);
 
-    var unitsInput = $('<budget-unit-selector '+(config.material.fixed ? 'disabled' : '')+'></budget-unit-selector>');
+    var unitsInput = $('<budget-unit-selector '+(config.material.fixed || config.readonly ? 'disabled' : '')+'></budget-unit-selector>');
     unitsInput.on('units-change', fireUnitsChange);
     cols.Units.append(unitsInput);
 
-    var amountInput = $('<input type="number" class="form-control" style="min-width: 50px" />');
+    var amountInput = $('<input type="number" class="form-control" style="min-width: 50px" '+(config.readonly ? 'disabled' : '')+' />');
     amountInput.on('input', fireAmountChange);
     cols.Amount.append(amountInput);
 
@@ -191,7 +200,7 @@
 
     var notesInput;
     if( cols.Notes ) {
-      notesInput = $('<input type="text" class="form-control" style="min-width: 100px" />');
+      notesInput = $('<input type="text" class="form-control" style="min-width: 100px" '+(config.readonly ? 'disabled' : '')+' />');
       notesInput.on('input', updateNotes);
       cols.Notes.append(notesInput);
     }
@@ -200,7 +209,7 @@
 
     var removeBtn;
     if( cols.Remove ) {
-      removeBtn = $('<a class="btn btn-link"><i class="fa fa-trash"></i></a>');
+      removeBtn = $('<a class="btn btn-link" '+(config.readonly ? 'style="display:none"' : '')+' ><i class="fa fa-trash"></i></a>');
       removeBtn.on('click', fireDelete);
       cols.Remove.append(removeBtn);
     }

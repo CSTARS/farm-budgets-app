@@ -52,6 +52,7 @@ function save(budget, username, callback) {
     if( !budget.materialIds ) {
       budget.materialIds = [];
     }
+
     validateMaterials(budget.materialIds, function(err) {
       if( err ) {
         return callback('Invalid material id(s): '+JSON.stringify(err));
@@ -115,7 +116,11 @@ function validateMaterials(ids, callback) {
 }
 
 function cleanBudget(budget) {
-  return strip(schema.budget, budget);
+  strip(schema.budget, budget);
+
+  if( budget.reference ) {
+    budget.operations = [];
+  }
 }
 
 function get(id, callback) {
@@ -140,8 +145,37 @@ function get(id, callback) {
 
         result.materials = materials;
         delete result.materialIds;
-        callback(null, result);
+
+        // now handle reference budgets
+        if( result.reference ) {
+          loadReference(result, callback);
+        } else {
+          callback(null, result);
+        }
       });
+  });
+}
+
+function loadReference(budget, callback) {
+  collection.findOne({id: budget.reference}, {_id: 0}, function(err, result){
+    if( err ) {
+      return callback(err);
+    }
+    if( !result ) {
+      return callback('Could not load reference: '+budget.reference);
+    }
+
+    budget.operations = result.operations;
+    if( !budget.operations ) {
+      budget.operations = [];
+    }
+    budget.referenceInfo = {
+      name : result.name,
+      authority : result.authority,
+      locality : result.locality
+    };
+
+    callback(null, budget);
   });
 }
 

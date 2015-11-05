@@ -82,6 +82,9 @@ BudgetMaterialPopup._savePrompt = function(noHide, options) {
 BudgetMaterialPopup._save = function(noHide, options) {
   this.setSaving(true);
 
+  // save locally
+  FB.localsave();
+
   var result = FB.materialController.add(this.data, options);
   if( result.error ) {
     this.setSaving(false);

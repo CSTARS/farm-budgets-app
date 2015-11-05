@@ -31,7 +31,10 @@
     </div>
 
     <div style="text-align: center; padding: 25px 0 15px 0">
-      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cogs"></i> Create New Operation</a>
+      <a class="btn btn-primary btn-lg" on-click="showCreate" id="createBtn"><i class="fa fa-cogs"></i> Create New Operation</a>
+      <div class="alert alert-warning" id="referenceMsg" style="display:none">
+        <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
+      </div>
     </div>
 
     <div class="row">
@@ -98,17 +101,34 @@
       this.data = data;
       this.$.root.innerHTML = '';
 
+      this.referenced = data.reference ? true : false;
+
       this.data.operations.forEach(function(operation){
         var ele = this.createPanel(operation);
         this.$.root.appendChild(ele);
       }.bind(this));
 
+      this.setReferenced();
+
       this._filter();
+    },
+
+    setReferenced : function() {
+      if( this.referenced ) {
+        this.$.referenceMsg.style.display = 'block';
+        this.$.createBtn.style.display = 'none';
+      } else {
+        this.$.referenceMsg.style.display = 'none';
+        this.$.createBtn.style.display = 'inline-block';
+      }
     },
 
     createPanel : function(operation, open) {
       var ele = document.createElement('budget-operation');
       ele.setAttribute('operation', operation.name);
+      if( this.referenced ) {
+        ele.setAttribute('readonly','true');
+      }
       ele.operationname = operation.name;
       if( open ) ele.toggleContent();
       return ele;
