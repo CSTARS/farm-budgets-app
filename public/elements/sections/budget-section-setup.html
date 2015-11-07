@@ -1,5 +1,6 @@
 <link rel="import" href="../setup/budget-setup-authorities.html" />
 <link rel="import" href="../setup/budget-setup-account.html" />
+<link rel="import" href="../setup/budget-setup-my-budgets.html" />
 
 <dom-module id="budget-section-setup">
   <style>
@@ -39,11 +40,16 @@
           <li class="list-group-item">
             <a href="#budget/setup/authorities">My Authorities</a>
           </li>
+          <li class="list-group-item">
+            <a href="#budget/setup/budgets">My Budgets</a>
+          </li>
         </ul>
       </div>
+      
       <div class="col-sm-9" id="panels" style="padding-right: 30px">
         <budget-setup-authorities id="authorities"></budget-setup-authorities>
         <budget-setup-account id="account"></budget-setup-account>
+        <budget-setup-my-budgets id="budgets"></budget-setup-my-budgets>
       </div>
     </div>
 

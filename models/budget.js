@@ -21,7 +21,8 @@ module.exports = function() {
       find: find,
       findCount : findCount,
       save: save,
-      get : get
+      get : get,
+      contributedTo : contributedTo
   };
 };
 
@@ -204,4 +205,16 @@ function find(query, callback) {
     .find(query, {operations: 0, materialIds: 0})
     .limit(20)
     .toArray(callback);
+}
+
+function contributedTo(username, callback) {
+  collection
+    .unique('id', {username: username, type: 'budget'})
+    .toArray(function(err, resp){
+      if( err ) {
+        return callback(err);
+      }
+
+      callback(null, resp);
+    });
 }

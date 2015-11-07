@@ -4,10 +4,16 @@
       :host {
         display: block;
       }
+      .item {
+        padding: 10px;
+        margin: 10px;
+        border: 1px solid #ccc;
+      }
     </style>
 
     <h4 class="page-header" style="margin-top:0"><i class="fa fa-shield"></i> <span>{{authName}}</span></h4>
     <textarea class="form-control">{{authDescription}}</textarea>
+    <a class="btn btn-primary">Save Description</a>
 
     <h5 class="page-header" ><i class="fa fa-group"></i> Authority Members</h5>
 
@@ -21,7 +27,7 @@
 
               <template is="dom-repeat" items="{{searchResults}}">
                 <div style="padding:10px 0">
-                  <a class="btn btn-primary"><i class="fa fa-user-plus"></i></a>
+                  <a class="btn btn-primary" on-click="grantAccess" index$="{{index}}"><i class="fa fa-user-plus"></i></a>
                   <span>{{item.username}}</span>
                   (<span>{{item.name}}</span>)
                 </div>
@@ -33,11 +39,24 @@
       <div class="col-sm-6">
         <ul class="list-group">
           <template is="dom-repeat" items="{{users}}">
-            <li class="list-group-item"><span>{{item}}</span> <a class="btn btn-link"><i class="fa fa-user-times"></i></a></li>
+            <li class="list-group-item">
+              <span style="font-weight:bold">{{item}}</span>
+              <a class="btn btn-link pull-right" on-click="removeAccess" index$="{{index}}"><i class="fa fa-user-times"></i></a>
+            </li>
           </template>
         </ul>
       </div>
     </div>
+
+    <div id="budgets">
+      <h4 class="page-header"><i class="fa fa-dollar"></i> Budgets</h4>
+    </div>
+
+    <template is="dom-repeat" items="{{budgets}}">
+      <div class="item">
+        <budget-list-item budget="{{item}}"></budget-list-item>
+      </div>
+    </template>
 
   </template>
   <script>
@@ -58,7 +77,19 @@
 
       authorityObserver : function() {
         if( !this.authority ) return;
+        this.update();
+        this.updateBudgets();
+      },
+
+      update : function() {
         $.get('/authority/get?name='+this.authority, this.onResponse.bind(this));
+      },
+
+      updateBudgets : function() {
+        var query = JSON.stringify({"authority": this.authority});
+        $.get('/budget/find?query='+query, function(resp){
+          this.budgets = resp;
+        }.bind(this));
       },
 
       onResponse : function(resp) {
@@ -99,6 +130,42 @@
           }
 
           this.searchResults = resp;
+        }.bind(this));
+      },
+
+      grantAccess : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('index'));
+        var user = this.searchResults[index];
+        this.searchResults = [];
+        this.$.newMemeberSearch.value = '';
+
+        $.get('/authority/grantAccess?name='+this.authority+'&username='+user.username, function(resp){
+          if( resp.error ) {
+            alert(resp.message);
+            return;
+          }
+
+          this.update();
+        }.bind(this));
+      },
+
+      removeAccess : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('index'));
+        var user = this.users[index];
+
+        if( !confirm('Are you sure you want to remove user: '+user) ) {
+          return;
+        }
+
+        this.splice('users', index);
+
+        $.get('/authority/removeAccess?name='+this.authority+'&username='+user, function(resp){
+          if( resp.error ) {
+            alert(resp.message);
+            return;
+          }
+
+          this.update();
         }.bind(this));
       }
     });

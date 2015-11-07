@@ -1,0 +1,79 @@
+<dom-module id="budget-list-item">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h4>
+      <span class="text text-success"><i class="fa fa-leaf"></i> <span id="commodityLabel"></span>
+      <small><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize" id="localityLabel"></span></small>
+      <span class="pull-right"><a class="btn btn-primary" on-click="select" style="margin-top:-10px">Select</a></span>
+    </h4>
+
+    <table class="table" style="margin-bottom:5px">
+      <tr>
+        <td>Authority</td>
+        <td><i class="fa fa-shield"></i> <span id="authorityLabel"></span></td>
+      </tr>
+      <tr>
+        <td>Budget Name</td>
+        <td id="nameLabel"></td>
+      </tr>
+      <tr>
+        <td>Farm Name</td>
+        <td id="farmLabel"></td>
+      </tr>
+      <tr>
+        <td>Size</td>
+        <td><span id="sizeLabel"><span> <span id="unitLabel"></span></td>
+      </tr>
+    </table>
+
+    <span class="label label-warning" id="referenceLabel">
+      <i class="fa fa-code-fork"></i> Reference Budget
+    </span>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-list-item',
+
+      properties : {
+        budget : {
+          type : Object,
+          observer : 'budgetObserver'
+        }
+      },
+
+      budgetObserver : function() {
+        this.render(this.budget);
+      },
+
+      render : function(budget) {
+        if( !budget ) return;
+
+        this.budget = budget;
+        this.$.commodityLabel.innerHTML = budget.farm.commodity;
+        this.$.localityLabel.innerHTML = budget.locality ? budget.locality.join(', ') : '';
+        this.$.authorityLabel.innerHTML = budget.authority;
+        this.$.nameLabel.innerHTML = budget.name;
+        this.$.farmLabel.innerHTML = budget.farm.farm;
+        this.$.sizeLabel.innerHTML = budget.farm.size;
+        this.$.unitLabel.innerHTML = budget.farm.unit;
+        
+        if( budget.reference ) {
+          this.$.referenceLabel.style.display = 'inline-block';
+        } else {
+          this.$.referenceLabel.style.display = 'none';
+        }
+      },
+
+      select : function() {
+        this.fire('budget-select', this.budget.id);
+      }
+
+    });
+  </script>
+</dom-module>

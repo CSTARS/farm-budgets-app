@@ -19,6 +19,15 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/contributedTo', authMiddleware, function (req, res) {
+      model.contributedTo(req.user.username, function(err, budget){
+        if( err ) {
+          return errorHandler(err, res);
+        }
+        res.send(budget);
+      });
+    });
+
     router.get('/find', function (req, res) {
 
       var query = req.query.query || '';

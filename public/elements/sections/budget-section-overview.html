@@ -113,8 +113,6 @@
     ready : function() {
       this.showingHistory = false;
 
-      FB.operationController.on('total-update', this.setJsonDump.bind(this));
-
       this.$.infoCard.addEventListener('mouseenter', function(){
         this.$.editBtn.style.display = 'inline-block';
       }.bind(this));
@@ -209,7 +207,6 @@
 
       if( params.length > 0 && params[0] === 'debug' ) {
         this.$.debug.style.display = 'block';
-        this.setJsonDump();
       } else {
         this.$.debug.style.display = 'none';
       }
@@ -231,23 +228,6 @@
       } else {
         window.location = '#budget/overview/debug';
       }
-    },
-
-    setJsonDump : function() {
-      if( !window.appData ) return;
-
-      // get latest data
-      var arr = [];
-
-      var materials = FB.materialController.get();
-
-      for( var key in materials.materials ) arr.push(materials.materials[key]);
-      for( var key in materials.complex ) arr.push(materials.complex[key]);
-
-      appData.materials = arr;
-      appData.operations = FB.operationController.get();
-
-      this.$.json.innerHTML = JSON.stringify(appData, '', '  ');
     },
 
     edit : function() {

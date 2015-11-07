@@ -103,9 +103,12 @@
       },
 
       getTitle : function(id) {
-        for( var i = 0; i < appData.materials.length; i++ ) {
-          if( appData.materials[i].id == id ) {
-            return appData.materials[i].name;
+        var materials = FB.materialController.get();
+        for( var type in materials ) {
+          for( var i = 0; i < materials[type].length; i++ ) {
+            if( materials[type][i].id == id ) {
+              return materials[type][i].name;
+            }
           }
         }
 
@@ -113,12 +116,12 @@
       },
 
       onShow : function() {
-        if( !window.appData  ) {
-          this.waitingToShow = true;
-          return;
-        }
+        //if( !window.appData  ) {
+        //  this.waitingToShow = true;
+        //  return;
+        //}
 
-        var state = FB.save.check(appData, ExpressAuth.user);
+        var state = FB.save.check(FB.getData(), ExpressAuth.user);
         console.log(state);
 
         var hasChanges = false;

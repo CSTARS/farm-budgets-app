@@ -1,0 +1,76 @@
+<dom-module id="budget-setup-my-budgets">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h4 class="page-header"><i class="fa fa-dollar"></i> My Budgets</h4>
+
+    <div class="btn-group">
+      <a class="btn btn-default active" id="authorityBtn" on-click="setAuthority">Owned by Me</a>
+      <a class="btn btn-default" id="contributedBtn" on-click="setContributed">Contributed To</a>
+    </div>
+
+    <template is="dom-repeat" items="{{budgets}}">
+      <budget-list-item budget="{{item}}"></budget-list-item>
+    </template>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-setup-my-budgets',
+
+      ready : function() {
+        this.type = 'authority';
+      },
+
+      update : function() {
+        if( this.type === 'authority' ) {
+          var query = JSON.stringify({authority: ExpressAuth.user.username});
+          $.get('/budget/find?query='+encodeURIComponent(query), function(resp){
+            if( resp.error ) {
+              return alert(resp.message);
+            }
+
+            this.budgets = resp;
+          }.bind(this));
+        } else {
+          var query = JSON.stringify({authority: ExpressAuth.user.username});
+          $.get('/budget/contributedTo', function(resp){
+            if( resp.error ) {
+              return alert(resp.message);
+            }
+
+            this.budgets = resp;
+          }.bind(this));
+        }
+      },
+
+      setAuthority : function() {
+        if( this.type == 'authority' ) return;
+
+        this.$.contributedBtn.classList.remove('active');
+        this.$.authorityBtn.classList.add('active');
+
+        this.type = 'authority';
+        this.update();
+      },
+
+      setContributed : function() {
+        if( this.type == 'contributed' ) return;
+
+        this.$.contributedBtn.classList.add('active');
+        this.$.authorityBtn.classList.remove('active');
+
+        this.type = 'contributed';
+        this.update();
+      },
+
+      onShow : function() {
+        this.update();
+      }
+    });
+  </script>
+</dom-module>

@@ -34,10 +34,14 @@
         if( !this.original ) return;
         if( !this.original.id ) return;
 
-        for( var i = 0; i < appData.materials.length; i++ ) {
-          if( appData.materials[i].id === this.original.id ) {
-            this.update(appData.materials[i], this.original);
-            return;
+        var materials = FB.materialController.get();
+
+        for( var type in materials ) {
+          for( var i = 0; i < materials[type].length; i++ ) {
+            if( materials[type][i].id === this.original.id ) {
+              this.update(materials[type][i], this.original);
+              return;
+            }
           }
         }
       },

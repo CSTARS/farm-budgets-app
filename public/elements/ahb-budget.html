@@ -69,17 +69,24 @@
       return false;
     },
 
-    load : function(appData) {
+    load : function(budget) {
       FB.reset();
-      window.appData = appData;
-      window.localStorage.setItem('current-budget', appData.id);
 
-      FB.load(appData);
+      if( !budget.materials ) {
+        budget.materials = [];
+      }
+      if( !budget.operations ) {
+        budget.operations = [];
+      }
 
-      this.$.sections.setData(appData);
+      window.localStorage.setItem('current-budget', budget.id);
+
+      FB.load(budget);
+
+      this.$.sections.setData(budget);
 
       if( this.saveElement ) {
-        this.saveElement.onBudgetLoad(appData);
+        this.saveElement.onBudgetLoad(budget);
       }
       FB.localsave();
 

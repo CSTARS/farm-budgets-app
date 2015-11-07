@@ -14,34 +14,7 @@
     <template is="dom-repeat" items="{{data}}">
       <div class="panel panel-default">
         <div class="panel-body">
-          <h4>
-            <span class="text text-success"><i class="fa fa-leaf"></i> <span>{{item.farm.commodity}}</span>
-            <small><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">{{item.localityStr}}</span></small>
-            <span class="pull-right"><a class="btn btn-primary" on-click="select" index$="{{index}}" style="margin-top:-10px">Select</a></span>
-          </h4>
-
-          <table class="table" style="margin-bottom:5px">
-            <tr>
-              <td>Authority</td>
-              <td><i class="fa fa-shield"></i> <span>{{item.authority}}</span></td>
-            </tr>
-            <tr>
-              <td>Budget Name</td>
-              <td>{{item.name}}</td>
-            </tr>
-            <tr>
-              <td>Farm Name</td>
-              <td>{{item.farm.farm}}</td>
-            </tr>
-            <tr>
-              <td>Size</td>
-              <td><span>{{item.farm.size}}<span> <span>{{item.farm.unit}}</span></td>
-            </tr>
-          </table>
-
-          <span class="label label-warning" hidden="{{!item.isReference}}">
-            <i class="fa fa-code-fork"></i> Reference Budget
-          </span>
+          <budget-list-item on-budget-select="select" budget="{{item}}"></budget-list-item>
         </div>
       </div>
     </template>
@@ -110,19 +83,11 @@
           this.$.noData.innerHTML = '';
         }
 
-        for( var i = 0; i < resp.length; i++ ) {
-          resp[i].localityStr = resp[i].locality.join(', ');
-          resp[i].isReference = resp[i].reference ? true : false;
-        }
-
         this.data = resp;
       },
 
       select : function(e) {
-        var index = parseInt(e.currentTarget.getAttribute('index'));
-        var id = this.data[index].id;
-
-        $.get('/budget/get?id='+id, function(resp){
+        $.get('/budget/get?id='+e.detail, function(resp){
           if( resp.error ) {
             return alert(resp.message);
           }
