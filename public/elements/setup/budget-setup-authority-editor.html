@@ -7,11 +7,37 @@
     </style>
 
     <h4 class="page-header" style="margin-top:0"><i class="fa fa-shield"></i> <span>{{authName}}</span></h4>
-    <div>{{authDescription}}</div>
+    <textarea class="form-control">{{authDescription}}</textarea>
 
-    <template is="dom-repeat" items="{{users}}">
-      <div>{{item}}</div>
-    </template>
+    <h5 class="page-header" ><i class="fa fa-group"></i> Authority Members</h5>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label for="newMemeberSearch" class="col-sm-3 control-label">Add Member</label>
+            <div class="col-sm-9">
+              <input type="text" id="newMemeberSearch" class="form-control" on-input="searchMembers"  placeholder="Search Members"/>
+
+              <template is="dom-repeat" items="{{searchResults}}">
+                <div style="padding:10px 0">
+                  <a class="btn btn-primary"><i class="fa fa-user-plus"></i></a>
+                  <span>{{item.username}}</span>
+                  (<span>{{item.name}}</span>)
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <ul class="list-group">
+          <template is="dom-repeat" items="{{users}}">
+            <li class="list-group-item"><span>{{item}}</span> <a class="btn btn-link"><i class="fa fa-user-times"></i></a></li>
+          </template>
+        </ul>
+      </div>
+    </div>
 
   </template>
   <script>
@@ -23,6 +49,11 @@
           type : String,
           observer : 'authorityObserver'
         }
+      },
+
+      ready : function() {
+        this.searchTimer = -1;
+        this.searchResults = [];
       },
 
       authorityObserver : function() {
@@ -39,6 +70,36 @@
         this.authName = resp.name;
         this.authDescription = resp.description;
         this.users = resp.users;
+      },
+
+      searchMembers : function() {
+        if( this.searchTimer !== -1 ) clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(function(){
+          this.searchTimer = -1;
+          this._searchMembers();
+        }.bind(this), 300);
+      },
+
+      _searchMembers : function() {
+        var query = this.$.newMemeberSearch.value;
+        if( query.length === 0 ) {
+          this.searchResults = [];
+          return;
+        }
+
+        $.get('/members/search/?q='+query, function(resp) {
+          if( resp.error ) {
+            alert(resp.error);
+          }
+
+          for( var i = resp.length-1; i >= 0; i-- ) {
+            if( this.users.indexOf(resp[i].username) > -1 ) {
+              resp.splice(i, 1);
+            }
+          }
+
+          this.searchResults = resp;
+        }.bind(this));
       }
     });
   </script>

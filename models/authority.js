@@ -68,6 +68,7 @@ function grantAccess(username, authority, callback) {
     if( !user ) {
       return callback('Invalid username');
     }
+    
     global.auth.acl().addUserRoles(username, authority, function(err){
       if( err ) {
         return callback(err);

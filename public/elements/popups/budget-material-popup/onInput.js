@@ -31,7 +31,7 @@ BudgetMaterialPopup.onNameInput = function() {
   }
   this.$.nameInputMessage.innerHTML = '';
 
-  this.$.nameLabel.innerHTML = newName;
+  //this.$.nameLabel.innerHTML = newName;
   this.data.name = newName;
 
   // if complex, we need to update the name of all unique materials

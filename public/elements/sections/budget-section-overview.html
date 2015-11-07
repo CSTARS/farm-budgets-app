@@ -156,7 +156,7 @@
       if( data.reference ) {
         this.$.reference.style.display = 'table-row';
         this.$.referenceLabel.innerHTML =
-          '<div><a><i class="fa fa-code-fork"></i> '+data.referenceInfo.name+'</a></div>'+
+          '<div><a href="/#link/'+data.reference+'"><i class="fa fa-code-fork"></i> '+data.referenceInfo.name+'</a></div>'+
           '<div class="help-block"><i class="fa fa-shield"></i> '+data.referenceInfo.authority+' | '+
           '<i class="fa fa-map-marker"></i> '+data.referenceInfo.commodity+' | ' +
           '<i class="fa fa-map-marker"></i> '+data.referenceInfo.locality.join(', ')+'</div>';
