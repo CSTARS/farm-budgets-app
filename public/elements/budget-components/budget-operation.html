@@ -188,15 +188,36 @@
 
     updateSources : function() {
       var hash = {};
+      var c = 0;
       for( var i = 0; i < this.operation.materials.length; i++ ) {
         var m = FB.materialController.get(this.operation.materials[i].name);
         if( m.error || !m.authority || !m.locality ) continue;
-        hash[m.authority+m.locality.join('')] = m;
+
+        var key = m.authority+m.locality.join('');
+        if( hash[key] ) {
+          hash[key].push(m);
+        } else {
+          hash[key] = [m];
+        }
+        c++;
       }
+
       var html = '<table class="table">'+
-        '<tr><th><i class="fa fa-shield"></i> Authority</th><th><i class="fa fa-map-marker"></i> Location</th></th>';
+        '<tr><th style="white-space:nowrap"><i class="fa fa-shield"></i> Authority</th><th style="white-space:nowrap"><i class="fa fa-map-marker"></i> Location</th><td><i class="fa fa-cube"></i> Materials</td></tr>';
+
       for( var key in hash ) {
-        html += '<tr><td>'+hash[key].authority+'</td><td>'+hash[key].locality.join(', ')+'</td></tr>';
+        var materials = 'All';
+        if( hash[key].length != c ) {
+          materials = [];
+          for( var i = 0; i < hash[key].length; i++ ) {
+            materials.push('<a href="'+FB.materialLink(hash[key][i].name)+'">'+FB.materialIcon(hash[key][i].type)+' '+hash[key][i].name+'</a>');
+          }
+          materials = materials.join(',&nbsp;&nbsp;');
+        }
+
+        html += '<tr><td style="white-space:nowrap">'+hash[key][0].authority+
+          '</td><td style="white-space:nowrap;text-transform:capitalize">'+hash[key][0].locality.join(', ')+
+          '</td><td>'+materials+'</td></tr>';
       }
 
       this.$.additionalTable.innerHTML = html+'</table>';

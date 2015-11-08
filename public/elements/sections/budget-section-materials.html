@@ -131,7 +131,7 @@
 
     onShow : function(params) {
       if( params.length > 0 ) {
-        this.$.filterInput.value = params.join('/');
+        this.$.filterInput.value = decodeURIComponent(params.join('/'));
       }
 
       this._filter();

@@ -28,6 +28,53 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/uses', function (req, res) {
+      var materialId = req.query.material;
+      if( !materialId ) {
+        res.send({error: true, message: 'material id required'});
+      }
+
+      model.uses(materialId, function(err, budgets){
+        if( err ) {
+          return errorHandler(err, res);
+        }
+        res.send(budgets);
+      });
+    });
+
+    router.get('/delete', authMiddleware, function (req, res) {
+      var id = req.query.id;
+
+      if( !id ) {
+        return errorHandler('budget id required', res);
+      }
+
+      model.get(id, function(err, budget){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+        if( !budget ) {
+          return res.send({error: true, message: 'Unknown budget id'});
+        }
+
+        authUtils.hasAccessObject(req.user, budget, function(err, hasRole){
+          if( err ) {
+            return res.send({error:true, message: err});
+          }
+          if( !hasRole ) {
+            return res.send({error:true, message: 'You do not have access to this authority'});
+          }
+
+          model.delete(id, req.user, function(err, resp){
+            if( err ) {
+              return res.send({error:true, message: err});
+            }
+            res.send(resp);
+          });
+        });
+      });
+    });
+
     router.get('/find', function (req, res) {
 
       var query = req.query.query || '';
@@ -78,6 +125,9 @@ module.exports = function (router) {
       authUtils.hasAccessObject(req.user, budget, function(err, hasRole){
         if( err ) {
           return res.send({error:true, message: err});
+        }
+        if( !hasRole ) {
+          return res.send({error:true, message: 'You do not have access to this authority'});
         }
 
         model.save(budget, req.user.username, function(err, result){

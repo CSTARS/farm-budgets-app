@@ -61,7 +61,7 @@ BudgetMaterialPopup.create = function(name) {
   this.$.parentMaterial.innerHTML = '';
 
   this.$.historyBtn.style.display = 'none';
-  this.$.deleteBtn.style.display = 'none';
+  this.$.removeBtn.style.display = 'none';
 
   // used by suggest
   this.currentIds = [];

@@ -42,6 +42,36 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/delete', authMiddleware, function (req, res) {
+      var id = req.query.id;
+
+      if( !id ) {
+        return errorHandler('material id required', res);
+      }
+
+      model.get(id, function(err, material){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+        if( !material ) {
+          return res.send({error: true, message: 'Unknown material id'});
+        }
+
+        authUtils.hasAccessObject(req.user, material, function(err, hasRole){
+          if( err ) {
+            return res.send({error:true, message: err});
+          }
+
+          model.delete(id, req.user, function(err, resp){
+            if( err ) {
+              return res.send({error:true, message: err});
+            }
+            res.send(resp);
+          });
+        });
+      });
+    });
+
     router.post('/save', authMiddleware, function (req, res) {
       var material = req.body;
 
@@ -96,6 +126,9 @@ function save(material, user, callback) {
   authUtils.hasAccessObject(user, material, function(err, hasRole){
     if( err ) {
       return callback(err);
+    }
+    if( !hasRole ) {
+      return callback('You do not have access to this authority');
     }
 
     model.save(material, user.username, callback);

@@ -10,6 +10,7 @@ var async = require('async');
 
 var collection = global.db.collection('budget');
 var materialCollection = global.db.collection('material');
+var historyCollection = global.db.collection('history');
 var history = require('mongo-object-history');
 
 authorityModel = new authorityModel();
@@ -22,7 +23,9 @@ module.exports = function() {
       findCount : findCount,
       save: save,
       get : get,
-      contributedTo : contributedTo
+      delete : remove,
+      contributedTo : contributedTo,
+      uses : uses
   };
 };
 
@@ -73,8 +76,45 @@ function save(budget, username, callback) {
         });
       });
     });
-
   });
+}
+
+
+function remove(id, username, callback) {
+  if( !id ) {
+    return callback('No id provided');
+  }
+
+  history.delete('budget', id, username, function(err, result){
+    if( err ) {
+      return callback(err);
+    }
+
+    collection.update(
+      {id: id},
+      { $set : { deleted : true } },
+      function(err, result) {
+        if( err ) {
+          return callback(err);
+        }
+        return callback(null, {success:true});
+      }
+    );
+  });
+}
+
+function uses(materialId, callback) {
+  collection
+    .find({
+      materialIds: materialId,
+      deleted : {$ne : true}
+    },{ _id:0, id:1, 'farm.farm':1, 'farm.commodity':1, 'name':1, 'authority':1, 'locality':1})
+    .toArray(function(err, resp){
+      if( err ) {
+        return callback(err);
+      }
+      callback(null, resp);
+    });
 }
 
 function validateMaterials(ids, callback) {
@@ -184,7 +224,8 @@ function loadReference(budget, callback) {
       name : result.name,
       authority : result.authority,
       commodity : result.farm.commodity,
-      locality : result.locality
+      locality : result.locality,
+      deleted : result.deleted ? true : false
     };
 
     callback(null, budget);
@@ -192,6 +233,7 @@ function loadReference(budget, callback) {
 }
 
 function findCount(query, callback) {
+  query.deleted = {$ne: true};
   collection.count(query, function(err, resp){
     if( err ) {
       return callback(err);
@@ -201,20 +243,26 @@ function findCount(query, callback) {
 }
 
 function find(query, callback) {
+  query.deleted = {$ne: true};
+
   collection
-    .find(query, {operations: 0, materialIds: 0})
+    .find(query, {operations: 0, materialIds: 0, _id : 0})
     .limit(20)
     .toArray(callback);
 }
 
 function contributedTo(username, callback) {
-  collection
-    .unique('id', {username: username, type: 'budget'})
-    .toArray(function(err, resp){
+  historyCollection
+    .distinct('id',
+      {user: username, type: 'budget'},
+      function(err, resp){
       if( err ) {
         return callback(err);
       }
 
-      callback(null, resp);
+      find({
+        id: {$in : resp},
+        deleted : {$ne: true}
+      }, callback);
     });
 }

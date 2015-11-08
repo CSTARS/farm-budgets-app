@@ -67,7 +67,7 @@ BudgetMaterialPopup.edit = function(material) {
   }*/
 
   this.$.historyBtn.style.display = 'inline-block';
-  this.$.deleteBtn.style.display = 'inline-block';
+  this.$.removeBtn.style.display = 'inline-block';
 
   this.recalc();
   this.show();

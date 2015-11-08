@@ -1,6 +1,7 @@
 <!-- reusable popup for complex materials -->
 <link rel="import" href="budget-material-advanced.html" />
 <link rel="import" href="budget-material-history.html" />
+<link rel="import" href="budget-material-remove.html" />
 
 <script src="controls.js"></script> <!-- always needs to be first import -->
 <script src="cancel.js"></script>
@@ -146,16 +147,18 @@
 
             </div>
 
-            <budget-material-advanced id="advancedPanel" style="display:none" on-close-advanced="hideAdvanced"></budget-material-advanced>
-            <budget-material-history id="historyPanel" style="display:none" on-close-history="hideHistory"></budget-material-history>
+            <budget-material-advanced id="advancedPanel" style="display:none" on-close-advanced="showSimple"></budget-material-advanced>
+            <budget-material-history id="historyPanel" style="display:none" on-close-history="showSimple"></budget-material-history>
+            <budget-material-remove id="removePanel" style="display:none" on-close-remove="showSimple"></budget-material-remove>
+
 
             <div id="authorityMessage"></div>
 
             <div class="horizontal layout center" id="footer">
               <div class="flex">
-                <a class="btn btn-link" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete</a>
-                <a class="btn btn-link" on-click="toggleAdvanced" id="advancedBtn"><i class="fa fa-cog"></i> Advanced</a>
-                <a class="btn btn-link" on-click="toggleHistory" id="historyBtn"><i class="fa fa-history"></i> History</a>
+                <a class="btn btn-link" on-click="showRemove" id="removeBtn"><i class="fa fa-trash"></i> Remove</a>
+                <a class="btn btn-link" on-click="showAdvanced" id="advancedBtn"><i class="fa fa-cog"></i> Advanced</a>
+                <a class="btn btn-link" on-click="showHistory" id="historyBtn"><i class="fa fa-history"></i> History</a>
               </div>
               <div style="text-align:right">
                 <a class="btn btn-primary" on-click="save" id="saveBtn">Save</a>

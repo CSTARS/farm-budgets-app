@@ -25,6 +25,7 @@ module.exports = function() {
       find : find,
       save : save,
       get : get,
+      delete : remove,
       hasRequired : hasRequired
   };
 };
@@ -78,8 +79,31 @@ function save(material, username, callback) {
   });
 }
 
+function remove(id, username, callback) {
+  if( !id ) {
+    return callback('No id provided');
+  }
+
+  history.delete('material', id, username, function(err, result){
+    if( err ) {
+      return callback(err);
+    }
+
+    collection.update(
+      {id: id},
+      { $set : { deleted : true } },
+      function(err, result) {
+        if( err ) {
+          return callback(err);
+        }
+        return callback(null, {success:true});
+      }
+    );
+  });
+}
 
 function find(query, callback) {
+  query.deleted = {$ne: true};
   var q = {
     $and : [
       {$or : [
@@ -89,17 +113,6 @@ function find(query, callback) {
       query
     ]
   };
-
-  // by default, don't search children, unless specifically asked for
-  var isChildQuery = false;
-  if( query && query.$text && query.$text.$search ) {
-    if( query.$text.$search.match(/--/) ) {
-      isChildQuery = true;
-    }
-  }
-  if( !isChildQuery ) {
-    q.$and.push({name : {'$not' : new RegExp('--')}});
-  }
 
   collection.find(
     q,

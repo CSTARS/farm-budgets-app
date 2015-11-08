@@ -61,6 +61,7 @@
 
           <div class="layout horizontal">
             <div class="flex">
+              <a class="btn btn-link" id="deleteBtn" on-click="delete" style="display:none"><i class="fa fa-trash"></i> Delete</a>
               <a class="btn btn-link" on-click="toggleHistory"><i class="fa fa-history"></i> History</a>
             </div>
             <div>
@@ -163,6 +164,14 @@
       }
 
       this.updateMaterialAuthorties();
+
+      if( ExpressAuth.user &&
+          ExpressAuth.user.authorities.indexOf(data.referenceInfo.authority) > -1) {
+
+        this.$.deleteBtn.style.display = 'inline-block';
+      } else {
+        this.$.deleteBtn.style.display = 'none';
+      }
     },
 
     updateMaterialAuthorties : function() {
@@ -204,12 +213,6 @@
     onShow : function(params) {
       this.$.timeline.onShow();
       this.$.spendingTimeline.onShow();
-
-      if( params.length > 0 && params[0] === 'debug' ) {
-        this.$.debug.style.display = 'block';
-      } else {
-        this.$.debug.style.display = 'none';
-      }
     },
 
     toggleHistory : function() {
@@ -222,12 +225,20 @@
       }
     },
 
-    toggleDebug : function() {
-      if( this.$.debug.style.display == 'block' ) {
-        window.location = '#budget/overview';
-      } else {
-        window.location = '#budget/overview/debug';
-      }
+    delete : function() {
+      // TODO: this should be a popup that also checks for reference budgets.
+      if( !confirm('Are you sure you want to delete the budget!?') ) return;
+      if( !confirm('Are you really sure!?') ) return;
+      $.get('/budgets/delete?id='+this.budgetId, function(resp){
+        if( resp.error ) {
+          alert(resp.message);
+        }
+
+        alert('Budget Deleted.');
+
+        // TODO: should proly centerialize this call
+        document.querySelector('budget-sections').startNew();
+      }.bind(this));
     },
 
     edit : function() {

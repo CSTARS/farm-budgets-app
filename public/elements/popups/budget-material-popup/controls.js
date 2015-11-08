@@ -1,7 +1,7 @@
 var BudgetMaterialPopup = {
   show : function() {
     this.showing = true;
-    this.hideAdvanced();
+    this.showSimple();
     this.popup.modal('show');
   },
 
@@ -10,53 +10,52 @@ var BudgetMaterialPopup = {
     this.popup.modal('hide');
   },
 
-  hideAdvanced : function() {
-    this.$.simplePanel.style.display = 'block';
-    this.$.footer.style.display = 'flex';
-    if( this.data.type == 'complex' ) {
-      this.$.complexPanel.style.display = 'block';
-    }
+  hidePanels : function() {
+    this.$.simplePanel.style.display = 'none';
+    this.$.complexPanel.style.display = 'none';
     this.$.advancedPanel.style.display = 'none';
-    this.$.header.style.display = 'block';
-    this.showingAdvanced = false;
+    this.$.historyPanel.style.display = 'none';
+    this.$.removePanel.style.display = 'none';
   },
 
-  toggleAdvanced : function() {
-    if( !this.showingAdvanced ) {
-      this.$.simplePanel.style.display = 'none';
-      this.$.complexPanel.style.display = 'none';
-      this.$.advancedPanel.style.display = 'block';
+  showMainHeaderFooter : function(show) {
+    if( show ) {
+      this.$.footer.style.display = 'flex';
+      this.$.header.style.display = 'block';
+    } else {
       this.$.footer.style.display = 'none';
       this.$.header.style.display = 'none';
-      this.showingAdvanced = true;
-    } else {
-      this.hideAdvanced();
     }
   },
 
-  hideHistory : function() {
+
+  showSimple : function() {
+    this.hidePanels();
+    this.showMainHeaderFooter(true);
+
     this.$.simplePanel.style.display = 'block';
-    this.$.footer.style.display = 'flex';
     if( this.data.type == 'complex' ) {
       this.$.complexPanel.style.display = 'block';
     }
-    this.$.historyPanel.style.display = 'none';
-    this.$.header.style.display = 'block';
-    this.showingHistory = false;
   },
 
-  toggleHistory : function() {
-    if( !this.showingHistory ) {
-      this.$.simplePanel.style.display = 'none';
-      this.$.complexPanel.style.display = 'none';
-      this.$.historyPanel.style.display = 'block';
-      this.$.historyPanel.show(this.data.id);
-      this.$.footer.style.display = 'none';
-      this.$.header.style.display = 'none';
-      this.showingHistory = true;
-    } else {
-      this.hideHistory();
-    }
+  showAdvanced : function() {
+    this.hidePanels();
+    this.showMainHeaderFooter(false);
+    this.$.advancedPanel.style.display = 'block';
+  },
+
+  showRemove : function() {
+    this.hidePanels();
+    this.showMainHeaderFooter(false);
+    this.$.removePanel.update(this.data);
+    this.$.removePanel.style.display = 'block';
+  },
+
+  showHistory : function() {
+    this.hidePanels();
+    this.showMainHeaderFooter(false);
+    this.$.historyPanel.style.display = 'block';
   },
 
   toggleComplex : function() {

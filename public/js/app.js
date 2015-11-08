@@ -3,6 +3,14 @@
 
 var saveTimer = -1;
 
+FB.materialLink = function(name) {
+  return '#budget/materials/'+encodeURIComponent(name);
+}
+
+FB.materialIcon = function(type) {
+  return '<i class="fa fa-cube'+(type === 'complex' ? 's' : '')+'"></i>';
+}
+
 FB.localsave = function(auto) {
   if( saveTimer !== -1 ) clearTimeout(saveTimer);
 
