@@ -10,7 +10,8 @@
           <div class="modal-body" id="body">
 
             A <span class="label label-primary"><i class="fa fa-code-fork"></i> reference budget</span>
-            will use all the <b>same operations</b> as your current budget, but
+            will use all the <b>same operations</b> as your current budget
+            <span class="label label-primary"><i class="fa fa-dollar"></i> <span id="budgetName"></span></span>, but
             allow you to change out materials as needed.  Reference budgets are good for
             creating a budget for the same crop in a different location having differently
             priced base materials, such as labor and fuel.
@@ -37,6 +38,7 @@
     },
 
     show : function() {
+      this.$.budgetName.innerHTML = FB.getData().name;
       this.popup.modal('show');
     },
 

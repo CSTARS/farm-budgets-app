@@ -46,6 +46,11 @@ var BudgetMaterialPopup = {
   },
 
   showRemove : function() {
+    if( !ExpressAuth.user ) {
+      this.remove();
+      return;
+    }
+
     this.hidePanels();
     this.showMainHeaderFooter(false);
     this.$.removePanel.update(this.data);
