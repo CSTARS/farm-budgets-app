@@ -73,6 +73,7 @@
     ready : function() {
       this.editUnitsTimer = -1;
       this.currentstate = null;
+      this.firstRender = true;
 
       this.data = {
         name : '[Not Set]',
@@ -94,13 +95,17 @@
         $(this.$.btns).toggle();
         $(this.$.otherInfo).toggle();
         $(this).toggleClass('open');
+
+        if( this.firstRender ) {
+          this.firstRender = false;
+          this.rerender();
+        }
       }.bind(this));
     },
 
     attached : function() {
       this.popup = document.querySelector('budget-complex-material-popup');
-      this.render();
-      this.updateMaterial();
+      this.updateMaterial(null, true);
     },
 
     updateMaterial : function(material) {
@@ -148,12 +153,14 @@
       this.renderType = type;
       this.$.nameLabel.innerHTML = '<b>'+this.data.name+'</b> ';
 
-      if( this.renderType == 'tree' ) {
-        this.renderTree();
-        this.$.toggleView.innerHTML = '<i class="fa fa-angle-down"></i>';
-      } else {
-        this.renderCompressed();
-        this.$.toggleView.innerHTML = '<i class="fa fa-angle-double-down"></i>';
+      if( !this.firstRender ) {
+        if( this.renderType == 'tree' ) {
+          this.renderTree();
+          this.$.toggleView.innerHTML = '<i class="fa fa-angle-down"></i>';
+        } else {
+          this.renderCompressed();
+          this.$.toggleView.innerHTML = '<i class="fa fa-angle-double-down"></i>';
+        }
       }
 
       this.checkError();
@@ -354,7 +361,8 @@
       }
 
       // rerender
-      this.render(this.renderType);
+      this.firstRender = true;
+      //this.render(this.renderType);
     }
   });
 </script>

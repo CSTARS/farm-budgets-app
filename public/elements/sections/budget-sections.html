@@ -47,8 +47,9 @@
               <span class="sr-only">Toggle Dropdown</span>
             </button>
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-save"></i> Save</a></li>
-              <li><a href="#"><i class="fa fa-plus-circle"></i> Save as New</a></li>
+              <li><a><i class="fa fa-save"></i> Save</a></li>
+              <li><a><i class="fa fa-plus-circle"></i> Save as New</a></li>
+              <li id="display:none"><a><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
             </ul>
           </div>
 
@@ -69,6 +70,7 @@
             <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Clone Current Budget</a></li>
             <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
             <li><a class="btn btn-link" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a></li>
+            <li id="signOutBtn" style="display:none"><a class="btn btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
         </div>
@@ -115,8 +117,12 @@
       FB.materialController.on('material-removed', this.checkForChanges.bind(this));
       FB.operationController.on('update', this.checkForChanges.bind(this));
 
-      this.changesTimer = -1;
+      if( ExpressAuth && ExpressAuth.user ) {
+        this.$.signOutBtn.style.display = 'block';
+        this.$.signOutBtn.firstChild.setAttribute('href', ExpressAuth.path+'/logout');
+      }
 
+      this.changesTimer = -1;
       this.setSection();
     },
 

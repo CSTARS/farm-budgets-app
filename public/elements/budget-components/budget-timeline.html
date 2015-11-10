@@ -17,7 +17,17 @@
       $(window).on('resize', this.drawChart.bind(this));
 
       this.handlerSet = false;
-      FB.operationController.on('total-update', this.drawChart.bind(this));
+
+      // only redraw if we are on the overview page
+      FB.operationController.on('total-update', function(e){
+        if( e && e.range ) this.data = e.range.all;
+
+        if( !window.location.hash.match(/budget\/overview/) ) {
+          console.log('ignoring redraw');
+          return;
+        }
+        this.drawChart();
+      }.bind(this));
 
       // make sure a total hasn't already been set
       var total = FB.operationController.getCurrentTotal();

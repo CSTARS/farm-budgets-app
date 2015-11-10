@@ -99,11 +99,7 @@
       <budget-spending-timeline id="spendingTimeline"></budget-spending-timeline>
     </div>
 
-    <a class="btn btn-link" on-click="toggleDebug">Toggle Debug</a>
-    <div class="card" id="debug" style="display:none">
-      <h4>JSON (debug)</h4>
-      <textarea id="json" class="form-control" style="height: 400px"></textarea>
-    </div>
+
   </template>
 </dom-module>
 
@@ -166,7 +162,7 @@
       this.updateMaterialAuthorties();
 
       if( ExpressAuth.user &&
-          ExpressAuth.user.authorities.indexOf(data.referenceInfo.authority) > -1) {
+          ExpressAuth.user.authorities.indexOf(data.authority) > -1) {
 
         this.$.deleteBtn.style.display = 'inline-block';
       } else {

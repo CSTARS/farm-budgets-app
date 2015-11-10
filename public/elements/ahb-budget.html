@@ -54,11 +54,14 @@
           }
         }
 
-        if( localdata &&
+        if( localdata && !ExpressAuth.user ) {
+          this.load(localdata);
+          return true;
+        } else if( localdata &&
             (FB.save.checkBudget(localdata) || FB.save.checkMaterials(materialIds)) &&
             confirm('You have a local budget with changes, would you like to load that?  If no, your '+
                     'local changes will be discarded.') ) {
-                      console.log(localdata);
+
           this.load(localdata);
           return true;
         }
