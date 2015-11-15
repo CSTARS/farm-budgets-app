@@ -165,30 +165,33 @@ function cleanBudget(budget) {
 }
 
 function get(id, callback) {
-  collection.findOne({id: id}, {_id: 0}, function(err, result){
+  collection.findOne({id: id}, {_id: 0}, function(err, budget){
     if( err ) {
       return callback(err);
     }
-    if( !result ) {
+    if( !budget ) {
       return callback('Invalid budget id');
     }
 
-    if( !result.operations ) {
-      result.operations = [];
+    if( !budget.operations ) {
+      budget.operations = [];
     }
 
     materialCollection
-      .find({id : {'$in': result.materialIds}}, {_id: 0})
+      .find({id : {'$in': budget.materialIds}}, {_id: 0})
       .toArray(function(err, materials){
         if( err ) {
           return callback(err);
         }
 
-        result.materials = materials;
-        delete result.materialIds;
+        delete budget.materialIds;
+        var result = {
+          budget : budget,
+          materials : materials
+        };
 
         // now handle reference budgets
-        if( result.reference ) {
+        if( budget.reference ) {
           loadReference(result, callback);
         } else {
           callback(null, result);
@@ -197,38 +200,38 @@ function get(id, callback) {
   });
 }
 
-function loadReference(budget, callback) {
-  collection.findOne({id: budget.reference}, {_id: 0}, function(err, result){
+function loadReference(result, callback) {
+  collection.findOne({id: result.budget.reference}, {_id: 0}, function(err, reference){
     if( err ) {
       return callback(err);
     }
     if( !result ) {
-      return callback('Could not load reference: '+budget.reference);
+      return callback('Could not load reference: '+result.budget.reference);
     }
 
-    budget.operations = result.operations;
-    if( !budget.operations ) {
-      budget.operations = [];
+    result.budget.operations = reference.operations;
+    if( !result.budget.operations ) {
+      result.budget.operations = [];
     }
 
-    if( !budget.farm ) {
-      budget.farm = {};
+    if( !result.budget.farm ) {
+      result.budget.farm = {};
     }
-    if( !result.farm ) {
-      budget.farm = {};
+    if( !reference.farm ) {
+      result.budget.farm = {};
     }
-    budget.farm.size = result.farm.size;
-    budget.farm.unit = result.farm.unit;
+    result.budget.farm.size = reference.farm.size;
+    result.budget.farm.unit = reference.farm.unit;
 
-    budget.referenceInfo = {
-      name : result.name,
-      authority : result.authority,
-      commodity : result.farm.commodity,
-      locality : result.locality,
-      deleted : result.deleted ? true : false
+    result.budget.referenceInfo = {
+      name : reference.name,
+      authority : reference.authority,
+      commodity : reference.farm.commodity,
+      locality : reference.locality,
+      deleted : reference.deleted ? true : false
     };
 
-    callback(null, budget);
+    callback(null, result);
   });
 }
 

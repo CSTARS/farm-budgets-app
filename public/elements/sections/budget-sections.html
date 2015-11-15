@@ -25,36 +25,33 @@
       right : 0;
       background-color: white;
       border-radius: 3px 0 0 0;
-      box-shadow: 0 0 5px #ccc;
+      box-shadow: 0 0 10px #333;
       cursor: pointer;
-    }
-    #unsavedMessage:hover {
-      box-shadow: 0 0 5px #aaa;
-      background-color: #eee;
     }
   </style>
 
   <template>
     <div class="layout horizontal center" style="border-bottom: 1px solid #ccc">
-      <div class="flex">
+      <div>
         <h5>
           Farm Budgets <small>Advanced Hardwood Biofuels</small>
-
-          <div class="btn-group" style="display:none" id="saveBudgetBtn">
-            <button type="button" class="btn btn-warning" on-click="save" id="saveBudgetBtnInner"><i class="fa fa-save"></i> Save Budget Changes</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a><i class="fa fa-save"></i> Save</a></li>
-              <li><a><i class="fa fa-plus-circle"></i> Save as New</a></li>
-              <li id="display:none"><a><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
-            </ul>
-          </div>
-
-          <!--<a class="btn btn-warning" style="display:none" id="saveBudgetBtn" on-click="save">Save Budget Changes</a>-->
         </h5>
+      </div>
+      <div class="flex" style="padding:5px; min-width: 92px">
+        <div class="btn-group" style="display:none; white-space:nowrap" id="saveBudgetBtn">
+          <button type="button" class="btn btn-warning" on-click="save" id="saveBudgetBtnInner">
+            <i class="fa fa-save"></i><span class="hidden-xs"> Save Budget Changes</span>
+          </button>
+          <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li id="saveBtn"><a on-click="save"><i class="fa fa-save"></i> Save</a></li>
+            <li id="saveNewBtn"><a on-click="clone"><i class="fa fa-plus-circle"></i> Save as New</a></li>
+            <li id="loginTopBtn" style="display:none"><a href="/login.html"><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
+          </ul>
+        </div>
       </div>
       <div style="padding:10px">
         <ahb-account-login></ahb-account-login>
@@ -113,9 +110,15 @@
 
       document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkForChanges.bind(this));
       document.querySelector('budget-farm-editor').addEventListener('editor-close', this.checkForChanges.bind(this));
+
+      // TODO: shouldn't we only need to check material add/remove for a budget?
       FB.materialController.on('material-update', this.checkForChanges.bind(this));
       FB.materialController.on('material-removed', this.checkForChanges.bind(this));
-      FB.operationController.on('update', this.checkForChanges.bind(this));
+
+      FB.operationController.on('operation-update', this.checkForChanges.bind(this));
+      FB.operationController.on('operation-remove', this.checkForChanges.bind(this));
+      
+      FB.changes.on('budget-diff', this.onDiffCheckComplete.bind(this));
 
       if( ExpressAuth && ExpressAuth.user ) {
         this.$.signOutBtn.style.display = 'block';
@@ -128,6 +131,12 @@
 
     attached : function() {
       this.checkForChanges();
+
+      if( !ExpressAuth.user ) {
+        this.$.saveBtn.style.display = 'none';
+        this.$.saveNewBtn.style.display = 'none';
+        this.$.loginTopBtn.style.display = 'block';
+      }
     },
 
     scrollTop : function() {
@@ -135,34 +144,29 @@
     },
 
     checkForChanges : function() {
-      if( this.changesTimer != -1 ) clearTimeout(this.changesTimer);
-      this.changesTimer = setTimeout(function(){
-        this.changesTimer = -1;
-        this._checkForChanges();
-      }.bind(this), 100);
+      FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
     },
 
-    _checkForChanges : function() {
-      var updated = FB.save.checkBudget(FB.getData());
-      if( updated ) {
+    onDiffCheckComplete : function(diff) {
+      if( diff.budget.length > 0 || diff.materialIds.length > 0 ) {
         this.$.saveBudgetBtn.style.display = 'inline-block';
         this.$.unsavedMessage.style.display = 'block';
-        return true;
-      }
-
-      var updated = FB.save.checkMaterials(FB.getMaterialIds());
-      if( updated ) {
-        this.$.saveBudgetBtn.style.display = 'inline-block';
-        this.$.unsavedMessage.style.display = 'block';
+        this.$.overview.showChangesWarning(true);
         return true;
       }
 
       this.$.saveBudgetBtn.style.display = 'none';
       this.$.unsavedMessage.style.display = 'none';
+      this.$.overview.showChangesWarning(false);
       return false;
     },
 
     save : function() {
+      if( !ExpressAuth.user ) {
+        document.querySelector('budget-login-popup').show();
+        return;
+      }
+
       var budget = $.extend(true,{}, FB.getData());
       FB.save.strip(FB.save.schema.budget, budget);
 
@@ -252,7 +256,7 @@
 
     clone : function() {
       var updated = FB.save.checkBudget(FB.getData());
-      if( updated && !confirm('Are you sure you want to clone this budget?  Any unsaved changes will be lost.') ) return;
+      if( updated && !confirm('Are you sure you want to clone this budget?  Unsaved changes on current budget will be lost.') ) return;
 
       var data = FB.getData();
       data.name = '';

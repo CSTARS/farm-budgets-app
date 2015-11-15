@@ -20,7 +20,6 @@
               try {
                 localdata = JSON.parse(localdata);
                 this.load(localdata);
-                FB.save.init({});
                 return;
               } catch(e) {}
             }
@@ -29,7 +28,7 @@
             return;
           }
 
-          FB.save.init(resp);
+          FB.changes.setOriginal(resp.budget, resp.materials);
           if( !this.checkLocal(id) ) {
             this.load(resp);
           }
@@ -43,22 +42,17 @@
       try {
         var localdata = window.localStorage.getItem(id);
         localdata = JSON.parse(localdata);
+        FB.localdata = localdata;
 
-        var materialIds = [];
-        if( localdata.materials ) {
-          for( var i = 0; i < localdata.materials.length; i++ ) {
-            if( !localdata.materials[i].id ) {
-              continue;
-            }
-            materialIds.push(localdata.materials[i].id);
-          }
+        if( !localdata.materials ) {
+          localdata.materials = [];
         }
 
         if( localdata && !ExpressAuth.user ) {
           this.load(localdata);
           return true;
         } else if( localdata &&
-            (FB.save.checkBudget(localdata) || FB.save.checkMaterials(materialIds)) &&
+            (FB.changes.forceCheckAll(localdata.budget, localdata.materials)) &&
             confirm('You have a local budget with changes, would you like to load that?  If no, your '+
                     'local changes will be discarded.') ) {
 
@@ -72,24 +66,24 @@
       return false;
     },
 
-    load : function(budget) {
+    load : function(data) {
       FB.reset();
 
-      if( !budget.materials ) {
-        budget.materials = [];
+      if( !data.budget.materials ) {
+        data.budget.materials = [];
       }
-      if( !budget.operations ) {
-        budget.operations = [];
+      if( !data.budget.operations ) {
+        data.budget.operations = [];
       }
 
-      window.localStorage.setItem('current-budget', budget.id);
+      window.localStorage.setItem('current-budget', data.budget.id);
 
-      FB.load(budget);
+      FB.load(data);
 
-      this.$.sections.setData(budget);
+      this.$.sections.setData(data);
 
       if( this.saveElement ) {
-        this.saveElement.onBudgetLoad(budget);
+        this.saveElement.onBudgetLoad(data);
       }
       FB.localsave();
 
@@ -98,7 +92,7 @@
 
     reload : function(id) {
       $.get('/budget/get?id='+id, function(resp){
-        FB.save.init(resp);
+        FB.changes.setOriginal(resp.budget, resp.materials);
 
         if( resp.error ) {
           return alert('Error reloading budget data: '+resp.message);

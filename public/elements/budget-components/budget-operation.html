@@ -93,17 +93,23 @@
 
     ready : function() {
       this.firstScheduleEvent = true;
-      FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
-      FB.materialController.on('material-update', this.onMaterialUpdate.bind(this));
     },
 
     attached : function() {
+      FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
+      FB.materialController.on('material-update', this.onMaterialUpdate.bind(this));
+
       if( this.operation ) this.update();
 
       if( this.readonly ) {
         this.$.deleteBtn.style.display = 'none';
         this.$.addMaterialForm.style.display = 'none';
       }
+    },
+
+    detached : function() {
+      FB.operationController.removeListener('operation-update', this.onOperationUpdate);
+      FB.materialController.removeListener('material-update', this.onMaterialUpdate);
     },
 
     toggleAddition : function() {

@@ -23,6 +23,10 @@
       <a class="btn btn-primary btn-lg" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a>
     </div>
 
+    <div id="warningMessage" style="display:none" class="alert alert-warning">
+      <i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.  <a>Review and Save Changes</a>
+    </div>
+
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
 
@@ -57,6 +61,8 @@
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
       }.bind(this));
+
+      FB.changes.on('material-diff', this.checkChanges.bind(this));
     },
 
     attached : function() {
@@ -67,12 +73,19 @@
       document.querySelector('budget-import-material-popup').show();
     },
 
+    checkChanges : function(diff) {
+      if( diff.length > 0 ) {
+        this.$.warningMessage.style.display = 'block';
+      } else {
+        this.$.warningMessage.style.display = 'none';
+      }
+    },
+
     onMaterialAdded : function(e) {
       this.updateMaterialPanel(e.material, false);
     },
 
     onMaterialsUpdated : function(e) {
-
       var all = FB.materialController.get();
       for( var key in all.materials ) {
         if( key === e.replaced || key === e.material.name ) {

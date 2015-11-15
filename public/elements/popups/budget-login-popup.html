@@ -1,0 +1,48 @@
+<dom-module id="budget-login-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title">You must first login!</h4>
+          </div>
+
+          <div class="modal-body">
+            <div>You have to login to save your budget and material changes.</div>
+
+            <a class="btn btn-primary btn-lg" href="/login.html"><i class="fa fa-sign-in"></i> Login</a>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-login-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+      },
+
+      show : function() {
+        this.popup.modal('show');
+      }
+    });
+  </script>
+</dom-module>

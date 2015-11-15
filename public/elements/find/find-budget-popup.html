@@ -132,7 +132,7 @@
       onBudgetSelect : function(e) {
         this.popup.modal('hide');
         setTimeout(function(){
-          FB.save.init(e.detail);
+          //FB.save.init(e.detail);
           document.querySelector('ahb-budget').reload(e.detail);
         }, 200);
       },

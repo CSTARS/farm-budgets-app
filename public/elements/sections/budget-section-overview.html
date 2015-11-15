@@ -59,6 +59,10 @@
             </tbody>
           </table>
 
+          <div id="changesWarning" class="alert alert-warning" style="display:none">
+            <i class="fa fa-warning"></i> You have unsaved changes to this budget!
+          </div>
+
           <div class="layout horizontal">
             <div class="flex">
               <a class="btn btn-link" id="deleteBtn" on-click="delete" style="display:none"><i class="fa fa-trash"></i> Delete</a>
@@ -135,6 +139,7 @@
     },
 
     setData : function(data) {
+      data = data.budget;
       if( !data.farm ) return;
 
       this.budgetId = data.id;
@@ -239,6 +244,10 @@
 
     edit : function() {
       document.querySelector('budget-farm-editor').show();
+    },
+
+    showChangesWarning : function(show) {
+      this.$.changesWarning.style.display = show ? 'block' : 'none';
     }
   });
 </script>

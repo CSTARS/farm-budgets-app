@@ -98,10 +98,10 @@
     },
 
     setData : function(data) {
-      this.data = data;
+      this.data = data.budget;
       this.$.root.innerHTML = '';
 
-      this.referenced = data.reference ? true : false;
+      this.referenced = this.data.reference ? true : false;
 
       this.data.operations.forEach(function(operation){
         var ele = this.createPanel(operation);

@@ -99,7 +99,7 @@ BudgetMaterialPopup._save = function(noHide, options) {
   }
 
   // now re-save all required materials, this time we will fire events
-  var requiredMaterials = [];
+  /*var requiredMaterials = [];
   if( this.data.type == 'complex' ) {
     for( var key in this.data.materials ) {
       if( !key.match(/--/) ) continue;
@@ -115,15 +115,21 @@ BudgetMaterialPopup._save = function(noHide, options) {
 
   if( requiredMaterials.length > 0 ) {
     FB.materialController.bulkAdd(requiredMaterials, {replace: true});
-  }
+  }*/
 
   // save remote
-  $.post('/materials/save', this.data, function(resp){
-    this._onSaveComplete(noHide, requiredMaterials, resp);
-  }.bind(this));
+  if( ExpressAuth.user ) {
+    $.post('/materials/save', this.data, function(resp){
+      this._onSaveComplete(noHide, resp);
+    }.bind(this));
+  } else {
+    this.setSaving(false);
+    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+  }
+
 }
 
-BudgetMaterialPopup._onSaveComplete = function(noHide, requiredMaterials, resp) {
+BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
   if( resp.error ) {
     console.log(resp);
     alert('Failed to save to server.  '+resp.message+'.\n\n  Your material has been saved locally.');
@@ -131,32 +137,8 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, requiredMaterials, resp) 
     return;
   }
 
-  if( this.data.type === 'simple' || requiredMaterials.length === 0 ) {
-    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
-    this.setSaving(false);
-    return;
-  }
-
-
-  $.post('/materials/saveBulk', {materials: requiredMaterials}, function(resp){
-    this.setSaving(false);
-
-    if( resp.error ) {
-      alert('Failed to save required materials :(');
-      console.log(resp);
-      return;
-    }
-
-    for( var i = 0; i < resp.results.length; i++ ) {
-      if( resp.results[i].error ) {
-        alert('Failed to save required materials :(');
-        console.log(resp);
-        return;
-      }
-    }
-
-    if( typeof noHide !== 'boolean' || !noHide ) this.hide();
-  }.bind(this));
+  if( typeof noHide !== 'boolean' || !noHide ) this.hide();
+  this.setSaving(false);
 }
 
 BudgetMaterialPopup.setSaving = function(saving) {

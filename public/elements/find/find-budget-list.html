@@ -84,15 +84,6 @@
         }
 
         this.data = resp;
-      },
-
-      select : function(e) {
-        $.get('/budget/get?id='+e.detail, function(resp){
-          if( resp.error ) {
-            return alert(resp.message);
-          }
-          this.fire('budget-select', resp);
-        }.bind(this));
       }
     });
   </script>
