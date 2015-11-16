@@ -83,7 +83,11 @@
         <a href="#budget/operations"><i class="fa fa-cogs"></i> Operations</a>
       </li>
       <li role="presentation" id="btn-materials">
-        <a href="#budget/materials"><i class="fa fa-cube"></i> Materials</a>
+        <a href="#budget/materials">
+          <i class="fa fa-warning text text-warning" id="unsavedWarning" style="display:none"></i>
+          <i class="fa fa-cube"></i>
+          Materials
+        </a>
       </li>
       <li role="presentation" id="btn-setup">
         <a href="#budget/setup"><i class="fa fa-sliders"></i> My Setup</a>
@@ -92,7 +96,7 @@
 
     <budget-section-overview id="overview" class="section"></budget-section-overview>
     <budget-section-operations id="operations" class="section"></budget-section-operations>
-    <budget-section-materials id="materials" class="section"></budget-section-materials>
+    <budget-section-materials id="materials" class="section" on-unsaved-update="onUnsavedUpdate"></budget-section-materials>
     <budget-section-setup id="setup" class="section"></budget-section-setup>
 
     <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="displayNone">
@@ -117,7 +121,7 @@
 
       FB.operationController.on('operation-update', this.checkForChanges.bind(this));
       FB.operationController.on('operation-remove', this.checkForChanges.bind(this));
-      
+
       FB.changes.on('budget-diff', this.onDiffCheckComplete.bind(this));
 
       if( ExpressAuth && ExpressAuth.user ) {
@@ -141,6 +145,14 @@
 
     scrollTop : function() {
       $('html, body').animate({ scrollTop: '0px' });
+    },
+
+    onUnsavedUpdate : function(e) {
+      if( e.detail === true ) {
+        this.$.unsavedWarning.style.display = 'inline-block';
+      } else {
+        this.$.unsavedWarning.style.display = 'none';
+      }
     },
 
     checkForChanges : function() {
@@ -213,8 +225,6 @@
         window.location = '#budget/overview';
         return;
       }
-
-      this.checkForChanges();
 
       // TODO: remove later
       if( parts.length == 1 && parts[0] == '' ) {

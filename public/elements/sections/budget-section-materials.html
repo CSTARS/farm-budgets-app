@@ -60,9 +60,12 @@
       FB.materialController.on('material-removed', function(e){
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
+        FB.changes.checkMaterials(FB.materialController.asArray());
       }.bind(this));
 
-      FB.changes.on('material-diff', this.checkChanges.bind(this));
+      document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkChanges.bind(this));
+
+      FB.changes.on('material-diff', this.onMaterialDiff.bind(this));
     },
 
     attached : function() {
@@ -73,16 +76,24 @@
       document.querySelector('budget-import-material-popup').show();
     },
 
-    checkChanges : function(diff) {
+    onMaterialDiff : function(diff) {
+      debugger;
       if( diff.length > 0 ) {
         this.$.warningMessage.style.display = 'block';
+        this.fire('unsaved-update', true);
       } else {
         this.$.warningMessage.style.display = 'none';
+        this.fire('unsaved-update', false);
       }
+    },
+
+    checkChanges : function(diff) {
+      FB.changes.checkMaterials(FB.materialController.asArray());
     },
 
     onMaterialAdded : function(e) {
       this.updateMaterialPanel(e.material, false);
+      FB.changes.checkMaterials(FB.materialController.asArray());
     },
 
     onMaterialsUpdated : function(e) {
@@ -106,6 +117,7 @@
       }
 
       this.filter();
+      FB.changes.checkMaterials(FB.materialController.asArray());
     },
 
     updateMaterialPanel : function(name, replaced) {

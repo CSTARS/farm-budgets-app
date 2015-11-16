@@ -129,7 +129,7 @@
       document
         .querySelector('budget-farm-editor')
         .addEventListener('editor-close', function(){
-          this.setData(FB.getData());
+          this.setData(FB.getBudget());
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
         }.bind(this));
     },
@@ -139,7 +139,7 @@
     },
 
     setData : function(data) {
-      data = data.budget;
+      if( data.budget ) data = data.budget;
       if( !data.farm ) return;
 
       this.budgetId = data.id;
