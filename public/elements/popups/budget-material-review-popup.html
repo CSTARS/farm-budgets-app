@@ -1,4 +1,4 @@
-<dom-module id="budget-login-popup">
+<dom-module id="budget-material-review-popup">
   <template>
     <style>
       :host {
@@ -9,21 +9,16 @@
     <div class="modal fade" id="popup">
       <div class="modal-dialog">
         <div class="modal-content">
-
           <div class="modal-header">
-            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="title">You must first login!</h4>
+            <button type="button" class="close" data-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title">Review Material Changes</h4>
           </div>
-
           <div class="modal-body">
-            <div>You have to login to save your budget and material changes.</div>
-
 
           </div>
 
           <div class="modal-footer">
-            <a class="btn btn-primary pull-left" href="/login.html"><i class="fa fa-sign-in"></i> Login</a>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
 
         </div>
@@ -33,7 +28,7 @@
   </template>
   <script>
     Polymer({
-      is: 'budget-login-popup',
+      is: 'budget-material-review-popup',
 
       ready : function() {
         this.popup = $(this.$.popup).remove();
@@ -43,7 +38,9 @@
 
       show : function() {
         this.popup.modal('show');
-      }
+      },
+
+
     });
   </script>
 </dom-module>

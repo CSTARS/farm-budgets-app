@@ -13,9 +13,21 @@
         margin: 5px 0px;
       }
     }
+
+    #warningMessage {
+      display : none;
+      border-bottom: 1px solid #ffc599;
+      padding: 25px 10px;
+      text-align: center;
+    }
   </style>
 
   <template>
+
+    <div id="warningMessage" class="text text-warning">
+      <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.</div>
+      <a class="btn btn-warning" on-click="showReviewPopup">Review and Save Material Changes</a>
+    </div>
 
     <div style="text-align: center; padding: 25px 0 15px 0">
       <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create Material</a>
@@ -23,9 +35,7 @@
       <a class="btn btn-primary btn-lg" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a>
     </div>
 
-    <div id="warningMessage" style="display:none" class="alert alert-warning">
-      <i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.  <a>Review and Save Changes</a>
-    </div>
+
 
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
@@ -77,7 +87,6 @@
     },
 
     onMaterialDiff : function(diff) {
-      debugger;
       if( diff.length > 0 ) {
         this.$.warningMessage.style.display = 'block';
         this.fire('unsaved-update', true);
@@ -87,7 +96,7 @@
       }
     },
 
-    checkChanges : function(diff) {
+    checkChanges : function() {
       FB.changes.checkMaterials(FB.materialController.asArray());
     },
 
@@ -117,7 +126,7 @@
       }
 
       this.filter();
-      FB.changes.checkMaterials(FB.materialController.asArray());
+      this.checkChanges();
     },
 
     updateMaterialPanel : function(name, replaced) {
@@ -271,6 +280,14 @@
       m.units = ele.find('budget-unit-selector')[0].getUnits();
 
       FB.materialController.add(m, {replace: true});
+    },
+
+    showReviewPopup : function() {
+      if( !ExpressAuth.user ) {
+        document.querySelector('budget-login-popup').show();
+        return;
+      }
+      document.querySelector('budget-material-review-popup').show();
     }
   });
 </script>

@@ -49,6 +49,8 @@
           <ul class="dropdown-menu">
             <li id="saveBtn"><a on-click="save"><i class="fa fa-save"></i> Save</a></li>
             <li id="saveNewBtn"><a on-click="clone"><i class="fa fa-plus-circle"></i> Save as New</a></li>
+            <li id="undoBtn"><a on-click="undo"><i class="fa fa-undo"></i> Discard All Changes</a></li>
+
             <li id="loginTopBtn" style="display:none"><a href="/login.html"><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
           </ul>
         </div>
@@ -86,7 +88,7 @@
         <a href="#budget/materials">
           <i class="fa fa-warning text text-warning" id="unsavedWarning" style="display:none"></i>
           <i class="fa fa-cube"></i>
-          Materials
+          Budget Materials
         </a>
       </li>
       <li role="presentation" id="btn-setup">
@@ -139,6 +141,7 @@
       if( !ExpressAuth.user ) {
         this.$.saveBtn.style.display = 'none';
         this.$.saveNewBtn.style.display = 'none';
+        this.$.undoBtn.style.display = 'none';
         this.$.loginTopBtn.style.display = 'block';
       }
     },
@@ -179,7 +182,7 @@
         return;
       }
 
-      var budget = $.extend(true,{}, FB.getData());
+      var budget = $.extend(true,{}, FB.getBudget());
       FB.save.strip(FB.save.schema.budget, budget);
 
       budget.materialIds = [];
@@ -264,11 +267,18 @@
       document.querySelector('budget-create-reference').show();
     },
 
+    undo : function() {
+      if( !confirm('Are you sure you want to discard your changes?') ) {
+        return;
+      }
+      document.querySelector('ahb-budget').reload(FB.getBudget().id, true);
+    },
+
     clone : function() {
-      var updated = FB.save.checkBudget(FB.getData());
+      var updated = FB.save.checkBudget(FB.getBudget());
       if( updated && !confirm('Are you sure you want to clone this budget?  Unsaved changes on current budget will be lost.') ) return;
 
-      var data = FB.getData();
+      var data = FB.getBudget();
       data.name = '';
       data.id = FB.utils.guid();
 
@@ -280,7 +290,7 @@
     },
 
     startNew : function() {
-      var updated = FB.save.checkBudget(FB.getData());
+      var updated = FB.save.checkBudget(FB.getBudget());
       if( updated && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
 
       var newData = {
