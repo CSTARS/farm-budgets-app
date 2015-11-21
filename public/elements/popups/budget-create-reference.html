@@ -10,7 +10,7 @@
           <div class="modal-body" id="body">
 
             A <span class="label label-primary"><i class="fa fa-code-fork"></i> reference budget</span>
-            will use all the <b>same operations</b> as your current budget
+            will use all the <b>same operations</b> as your current <span id="budgetPreLabel"></span></span>
             <span class="label label-primary"><i class="fa fa-dollar"></i> <span id="budgetName"></span></span>, but
             allow you to change out materials as needed.  Reference budgets are good for
             creating a budget for the same crop in a different location having differently
@@ -38,7 +38,15 @@
     },
 
     show : function() {
-      this.$.budgetName.innerHTML = FB.getBudget().name;
+      this.budget = FB.getBudget();
+      if( this.budget.reference ) {
+        this.$.budgetPreLabel.innerHTML = ' reference budget ';
+        this.$.budgetName.innerHTML = this.budget.referenceInfo.name;
+      } else {
+        this.$.budgetPreLabel.innerHTML = ' budget ';
+        this.$.budgetName.innerHTML = this.budget.name;
+      }
+
       this.popup.modal('show');
     },
 
@@ -49,7 +57,7 @@
     create : function() {
         if( FB.changes.hasChanges() && !confirm('Are you sure you want to continue this budget?  Your unsaved changes will be lost.') ) return;
 
-        var data = $.extend(true, {}, FB.getBudget());
+        var data = $.extend(true, {}, this.budget);
 
         data.name = data.name+' Reference';
 
@@ -57,12 +65,16 @@
           data.authority = ExpressAuth.user ? ExpressAuth.user.username : '';
         }
 
-        data.reference = data.id;
-        data.referenceInfo = {
-          name : data.name,
-          authority : data.authority,
-          locality : data.locality
+        // otherwise this data is already set
+        if( !this.budget.reference ) {
+          data.reference = data.id;
+          data.referenceInfo = {
+            name : data.name,
+            authority : data.authority,
+            locality : data.locality
+          }
         }
+
         data.id = FB.utils.guid();
 
         data = {

@@ -113,8 +113,16 @@ function uses(materialId, callback) {
   collection
     .find({
       materialIds: materialId,
-      deleted : {$ne : true}
-    },{ _id:0, id:1, 'farm.name':1, 'commodity':1, 'name':1, 'authority':1, 'locality':1})
+      deleted : {$ne : true},
+    },{
+      _id:0,
+      id:1,
+      'farm.name':1,
+      'commodity':1,
+      'name':1,
+      'authority':1,
+      'locality':1
+    })
     .toArray(function(err, resp){
       if( err ) {
         return callback(err);
@@ -257,7 +265,15 @@ function find(query, callback) {
   query.deleted = {$ne: true};
 
   collection
-    .find(query, {operations: 0, materialIds: 0, _id : 0})
+    .find(query, {
+      operations: 0,
+      materialIds: 0,
+      _id : 0,
+      score: {
+        $meta: 'textScore'
+      }
+    })
+    .sort({ score: { $meta: 'textScore' } })
     .limit(20)
     .toArray(callback);
 }

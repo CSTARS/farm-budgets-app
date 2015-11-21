@@ -1,16 +1,39 @@
 <dom-module id="budget-total">
   <template>
-    <h4 style="text-align:right">Duration: <span class="text text-primary" id="durationText"></span></h4>
-    <h4 style="text-align:right">
-      Crop Lifetime Total:
-      <ahb-dollar-label id="totalLabel"></ahb-dollar-label> <small>Per Acre</small>
-    </h4>
-    <h4 style="text-align:right">
-      Crop Lifetime Total:
-      <ahb-dollar-label id="completeTotalLabel"></ahb-dollar-label> <small>Total</small>
-    </h4>
-    <h4 style="text-align:right">Average Monthly Cost: <ahb-dollar-label id="average"></ahb-dollar-label> <small>Per Acre</small></h4>
-    <h4 style="text-align:right">Average Yearly Cost: <ahb-dollar-label id="averageYear"></ahb-dollar-label> <small>Per Acre</small></h4>
+    <style>
+      table {
+        font-size: 18px;
+      }
+    </style>
+
+    <table style="width:100%">
+      <tr>
+        <td>Duration</td>
+        <td class="text text-primary" id="durationText"></td>
+        <td id="durationDates"></td>
+      </tr>
+      <tr>
+        <td>Crop Lifetime Total</td>
+        <td><ahb-dollar-label id="totalLabel"></ahb-dollar-label></td>
+        <td>Per Acre</td>
+      </tr>
+      <tr>
+        <td>Crop Lifetime Total</td>
+        <td><ahb-dollar-label id="completeTotalLabel"></ahb-dollar-label></td>
+        <td>Total</td>
+      </tr>
+      <tr>
+        <td>Average Monthly Cost</td>
+        <td><ahb-dollar-label id="average"></ahb-dollar-label></td>
+        <td>Per Acre</td>
+      </tr>
+      <tr>
+        <td>Average Yearly Cost</td>
+        <td><ahb-dollar-label id="averageYear"></ahb-dollar-label></td>
+        <td>Per Acre</td>
+      </tr>
+    </table>
+
   </template>
 </dom-module>
 
@@ -44,7 +67,8 @@
       if( this.data.range.start !== null && this.data.range.stop !== null ) {
         var months = this.data.spendingByMonth.length;
 
-        this.$.durationText.innerHTML = months+' months <br /><small>('+this.toDateString(this.data.range.start)+' - '+this.toDateString(this.data.range.stop)+')</small>';
+        this.$.durationText.innerHTML = months+' months';
+        this.$.durationDates.innerHTML = this.toDateString(this.data.range.start)+' <i class="fa fa-arrow-right"></i> '+this.toDateString(this.data.range.stop);
 
         this.$.average.value = this.data.total / months / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
 
