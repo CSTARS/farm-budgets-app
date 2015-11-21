@@ -91,12 +91,20 @@
         this.popup
           .modal({show: false})
           .on('hidden.bs.modal', function(){
-            FB.localsave();
+            if( this.saveOnClose ) {
+              FB.saveBudget();
+            } else {
+              FB.localsave();
+            }
             this.fire('editor-close');
           }.bind(this));
       },
 
-      show : function() {
+      // should we save to server on close?
+      // used when cloning
+      show : function(saveOnClose) {
+        this.saveOnClose = saveOnClose === true ? true : false;
+
         var data = FB.getBudget();
         if( !data.farm ) data.farm = {};
         this.data = data;
@@ -107,10 +115,10 @@
 
       updateInputs : function() {
         this.$.budgetNameInput.value = this.data.name;
-        this.$.farmNameInput.value = this.data.farm.farm;
-        this.$.cropInput.value = this.data.farm.commodity;
+        this.$.farmNameInput.value = this.data.farm.name;
+        this.$.cropInput.value = this.data.commodity;
         this.$.sizeInput.value = this.data.farm.size;
-        this.$.unitsInput.units = this.data.farm.unit;
+        this.$.unitsInput.units = this.data.farm.units;
         this.$.locationInput.setValue(this.data.locality);
         this.$.authorityInput.value = this.data.authority;
         this.$.authorityInput.default = this.data.authority;
@@ -131,11 +139,11 @@
       },
 
       onFarmNameInput : function() {
-        this.data.farm.farm = this.$.farmNameInput.value;
+        this.data.farm.name = this.$.farmNameInput.value;
       },
 
       onCropInput : function() {
-        this.data.farm.commodity = this.$.cropInput.value;
+        this.data.commodity = this.$.cropInput.value;
       },
 
       onSizeInput : function() {
@@ -143,7 +151,7 @@
       },
 
       editUnits : function() {
-        this.data.farm.unit = this.$.unitsInput.units;
+        this.data.farm.units = this.$.unitsInput.units;
       },
 
       onLocationUpdate : function() {

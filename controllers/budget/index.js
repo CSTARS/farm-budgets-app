@@ -3,9 +3,11 @@
 var authUtils = require('../auth');
 var BudgetModel = require('../../models/budget');
 var errorHandler = require('../../lib/handleError');
+var model;
+var collection = global.db.collection('budget');
 
 module.exports = function (router) {
-    var model = new BudgetModel();
+    model = new BudgetModel();
     var authMiddleware = authUtils.middleware;
 
     router.get('/get', function (req, res) {
@@ -122,11 +124,16 @@ module.exports = function (router) {
         return errorHandler('budget required', res);
       }
 
-      authUtils.hasAccessObject(req.user, budget, function(err, hasRole){
+      checkAccess(req.user, budget, function(err, hasRole){
         if( err ) {
-          return res.send({error:true, message: err});
+          if( typeof err === 'object' ) {
+            return res.send(err);
+          } else {
+            return res.send({error:true, message: err});
+          }
         }
-        if( !hasRole ) {
+
+        if( !hasRole ) { // this shouldn't really fire
           return res.send({error:true, message: 'You do not have access to this authority'});
         }
 
@@ -140,3 +147,48 @@ module.exports = function (router) {
       });
     });
 };
+
+// the user needs to have access to both the old authority and the new authority
+function checkAccess(user, newbudget, callback) {
+  collection.findOne({id: newbudget.id}, {authority: 1}, function(err, budget){
+    if( err ) {
+      return callback(err);
+    }
+
+    if( !budget ) { // this is a new budget
+      authUtils.hasAccessObject(user, newbudget, function(err, hasRole){
+        if( err ) {
+          return callback(err);
+        }
+        if( !hasRole ) {
+          return callback('You do not have access to authority: '+newbudget.authority);
+        }
+
+        callback(null, true);
+      });
+
+      return;
+    }
+
+    authUtils.hasAccessObject(user, budget, function(err, hasRole){
+      if( err ) {
+        return callback(err);
+      }
+      if( !hasRole ) {
+        return callback({error: true, message: 'You do not have access to authority: '+budget.authority, code: 10});
+      }
+
+      authUtils.hasAccessObject(user, newbudget, function(err, hasRole){
+        if( err ) {
+          return callback(err);
+        }
+        if( !hasRole ) {
+          return callback('You do not have access to authority: '+newbudget.authority);
+        }
+
+        callback(null, true);
+      });
+
+    });
+  });
+}

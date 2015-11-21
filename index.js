@@ -57,7 +57,7 @@ options = {
             app : app,
             config : config.get('auth'),
           };
-          global.auth = authStack(authSetup);
+          global.auth = authStack.init(authSetup);
 
           next(null, config);
         });

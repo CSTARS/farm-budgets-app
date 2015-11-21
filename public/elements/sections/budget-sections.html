@@ -48,7 +48,7 @@
           </button>
           <ul class="dropdown-menu">
             <li id="saveBtn"><a on-click="save"><i class="fa fa-save"></i> Save</a></li>
-            <li id="saveNewBtn"><a on-click="clone"><i class="fa fa-plus-circle"></i> Save as New</a></li>
+            <li id="saveNewBtn"><a on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
             <li id="undoBtn"><a on-click="undo"><i class="fa fa-undo"></i> Discard All Changes</a></li>
 
             <li id="loginTopBtn" style="display:none"><a href="/login.html"><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
@@ -66,7 +66,7 @@
           <ul class="dropdown-menu dropdown-menu-right">
             <li><a class="btn btn-link" on-click="find"><i class="fa fa-search"></i> Find Budget</a></li>
             <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start from Scratch</a></li>
-            <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Clone Current Budget</a></li>
+            <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
             <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
             <li><a class="btn btn-link" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a></li>
             <li id="signOutBtn" style="display:none"><a class="btn btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
@@ -141,7 +141,6 @@
       if( !ExpressAuth.user ) {
         this.$.saveBtn.style.display = 'none';
         this.$.saveNewBtn.style.display = 'none';
-        this.$.undoBtn.style.display = 'none';
         this.$.loginTopBtn.style.display = 'block';
       }
     },
@@ -182,38 +181,17 @@
         return;
       }
 
-      var budget = $.extend(true,{}, FB.getBudget());
-      FB.save.strip(FB.save.schema.budget, budget);
-
-      budget.materialIds = [];
-
-      var materials = FB.materialController.get();
-      for( var name in materials.materials ) {
-        if( !materials.materials[name].id ) continue;
-        budget.materialIds.push(materials.materials[name].id);
-      }
-      for( var name in materials.complex ) {
-        if( !materials.complex[name].id ) continue;
-        budget.materialIds.push(materials.complex[name].id);
-      }
-
       this.$.saveBudgetBtnInner.innerHTML = 'Saving...';
       this.$.saveBudgetBtnInner.setAttribute('disabled', 'disabled');
-
-      $.post('/budget/save', budget, function(resp){
-        this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
-        this.$.saveBudgetBtnInner.removeAttribute('disabled');
-
+      FB.saveBudget(function(resp){
         if( resp.error ) {
-          return alert(resp.message);
+          this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
+          this.$.saveBudgetBtnInner.removeAttribute('disabled');
+        } else {
+          this.$.saveBudgetBtn.style.display = 'none';
+          this.$.unsavedMessage.style.display = 'none';
         }
-
-        // the server may have cleanup some stuff
-        document.querySelector('ahb-budget').reload(budget.id);
-        this.$.saveBudgetBtn.style.display = 'none';
-        this.$.unsavedMessage.style.display = 'none';
       }.bind(this));
-
     },
 
     find : function() {
@@ -275,37 +253,43 @@
     },
 
     clone : function() {
-      var updated = FB.save.checkBudget(FB.getBudget());
-      if( updated && !confirm('Are you sure you want to clone this budget?  Unsaved changes on current budget will be lost.') ) return;
+      if( FB.changes.hasChanges() && !confirm('Are you sure you want to clone this budget and save as new?') ) return;
 
-      var data = FB.getBudget();
-      data.name = '';
-      data.id = FB.utils.guid();
+      var data = {
+        budget : FB.getBudget(),
+        materials : FB.materialController.asArray()
+      }
+      data.budget.name = '';
+      data.budget.id = FB.utils.guid();
 
       window.location = '#budget/overview';
 
       document.querySelector('ahb-budget').load(data);
-      document.querySelector('budget-farm-editor').show();
+      document.querySelector('budget-farm-editor').show(true);
       this.$.overview.updateTotal();
     },
 
     startNew : function() {
-      var updated = FB.save.checkBudget(FB.getBudget());
-      if( updated && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
+      if( FB.changes.hasChanges() && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
 
       var newData = {
-        id : FB.utils.guid(),
-        authority : '',
-        locality : [],
-        farm : {
-          farm : '',
-          commodity : '',
-          unit : '[acr_us]',
-          size : 1
+        budget : {
+          id : FB.utils.guid(),
+          authority : ExpressAuth.user ? ExpressAuth.user.username : '',
+          locality : [],
+          name : '',
+          farm : {
+            farm : '',
+            commodity : '',
+            unit : '[acr_us]',
+            size : 1
+          },
+          operations : [],
         },
-        operations : [],
         materials : []
-      }
+      };
+
+      FB.changes.setOriginal(newData.budget, newData.materials);
 
       document.querySelector('ahb-budget').load(newData);
       document.querySelector('budget-farm-editor').show();

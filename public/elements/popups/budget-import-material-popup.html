@@ -4,6 +4,9 @@
       :host {
         display: block;
       }
+      .match {
+        font-style: italic
+      }
     </style>
 
     <div class="modal fade" id="popup">
@@ -24,7 +27,7 @@
                   <div class="panel-body">
                       <h4>
                         <i class$="{{item.icon}}"></i>
-                        <!--<span>{{item.name}}</span>-->
+
                         <template is="dom-repeat" items="{{item.nameParts}}">
                           <span class$="{{item.className}}">{{item.label}}</span>
                         </template>
@@ -138,7 +141,7 @@
 
         this.currentIds = FB.getMaterialIds();
 
-        var data = FB.getData();
+        var data = FB.getBudget();
         if( data && data.locality ) {
           this.$.input.value = (location ? location : data.locality.join(' '))+' '+(value ? value : '');
         }
@@ -269,13 +272,14 @@
               for( var j = 0; j < parts.length; j++ ) {
                 resp[i].nameParts.push({
                   label : parts[j].replace(/^__/,'').replace(/__$/,''),
-                  className : parts[j].match(/__.*__/) ? 'label label-success' : ''
+                  className : parts[j].match(/__.*__/) ? 'text text-success match' : ''
                 });
               }
             } else {
               resp[i].nameParts = [{
                 label : resp[i].name,
-                className : ''
+                className : '',
+                style: ''
               }];
             }
 

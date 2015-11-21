@@ -1,0 +1,936 @@
+{
+  "budget": {
+    "operations": [
+      {
+        "name": "site prep",
+        "materials": [
+          {
+            "note": "Initial Spraying",
+            "amount": 3,
+            "units": "h",
+            "name": "Tractor and sprayer",
+            "id": "76986bc8-4472-4de2-a573-fedb6299520c"
+          },
+          {
+            "note": "Initial Spraying",
+            "amount": 100,
+            "units": "[qt_us]",
+            "name": "Glyphosate",
+            "id": "9ce1e0fe-adb6-4afa-b9bc-ea406daa66c4"
+          },
+          {
+            "note": "Initial Spraying",
+            "amount": 125,
+            "units": "[qt_us]",
+            "name": "Goal 2XL",
+            "id": "e2a0bfc6-d57c-417e-9e5e-eb28b9c036d1"
+          },
+          {
+            "note": "Initial Tillage",
+            "amount": 20,
+            "units": "h",
+            "name": "Large Tractor",
+            "id": "728be0fa-19d8-4e65-aa00-615ee179f7c5"
+          },
+          {
+            "note": "Ripping",
+            "amount": 10,
+            "units": "h",
+            "name": "Large Tractor",
+            "id": "728be0fa-19d8-4e65-aa00-615ee179f7c5"
+          },
+          {
+            "note": "Row Marking",
+            "amount": 25,
+            "units": "h",
+            "name": "Large Tractor",
+            "id": "728be0fa-19d8-4e65-aa00-615ee179f7c5"
+          },
+          {
+            "note": "herbicide - preemergent",
+            "amount": 32,
+            "units": "h",
+            "name": "Challenger Tractor",
+            "id": "910b8955-ff63-498c-9d7a-72084d9e4bf8"
+          },
+          {
+            "note": "herbicide - preemergent",
+            "amount": 50,
+            "units": "[qt_us]",
+            "name": "Trifluralin",
+            "id": "df8c3573-5cb4-459f-b309-24b0a9db03e6"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "date": "2015-06-01",
+            "length": "3",
+            "units": "month"
+          }
+        ]
+      },
+      {
+        "name": "planting",
+        "materials": [
+          {
+            "note": "Transport Nursery to field",
+            "amount": 20,
+            "units": "h",
+            "name": "Semi-Tractor trailer",
+            "id": "f169d925-d252-4c93-a553-f98aa56797e0"
+          },
+          {
+            "amount": 145000,
+            "units": "1",
+            "name": "Poplar Cutting",
+            "id": "7aee1736-27f6-4e18-856c-c3d268ddb2f7"
+          },
+          {
+            "amount": 1080,
+            "units": "h",
+            "name": "Cooler/van",
+            "id": "7782c5e3-1bcc-4f35-ab30-018246996698"
+          },
+          {
+            "amount": 480,
+            "units": "h",
+            "name": "Laborer",
+            "id": "f850de4a-6f22-432a-b4bd-730fc0ed69cb"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "date": "2015-10-01",
+            "length": "1",
+            "units": "month"
+          }
+        ]
+      },
+      {
+        "name": "crop care - yr0",
+        "materials": [
+          {
+            "amount": 25,
+            "units": "[acr_us]",
+            "name": "herbicide - manual",
+            "id": "d0b3faf5-8cee-48c0-9afc-dd17fadb5a8b"
+          },
+          {
+            "note": "2 times over 70 acres each.",
+            "amount": 140,
+            "units": "[acr_us]",
+            "name": "hoeing",
+            "id": "2c68c1c9-23f6-4b1f-9edf-5cf326eec6c2"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "date": "2015-11-01",
+            "length": "1",
+            "units": "year"
+          }
+        ]
+      },
+      {
+        "name": "crop care - yr1",
+        "materials": [
+          {
+            "note": "Tillage",
+            "amount": 48,
+            "units": "h",
+            "name": "Small Tractor",
+            "id": "0082f620-778c-45f5-a4d6-e541006450bf"
+          },
+          {
+            "note": "5 times",
+            "amount": 500,
+            "units": "[acr_us]",
+            "name": "hoeing",
+            "id": "2c68c1c9-23f6-4b1f-9edf-5cf326eec6c2"
+          },
+          {
+            "note": "3 times, 1/2 field",
+            "amount": 150,
+            "units": "[acr_us]",
+            "name": "herbicide - manual",
+            "id": "d0b3faf5-8cee-48c0-9afc-dd17fadb5a8b"
+          },
+          {
+            "note": "Interplanting",
+            "amount": 96,
+            "units": "h",
+            "name": "Laborer",
+            "id": "f850de4a-6f22-432a-b4bd-730fc0ed69cb"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "date": "2016-11-01",
+            "length": "1",
+            "units": "year"
+          }
+        ]
+      },
+      {
+        "name": "harvest - yr1",
+        "materials": [
+          {
+            "note": "",
+            "amount": 26,
+            "units": "h",
+            "name": "FR 6080 FH",
+            "id": "2a59e52c-b088-43b0-bc42-e76af751acc3"
+          },
+          {
+            "amount": 104,
+            "units": "h",
+            "name": "Tandem Axle Truck",
+            "id": "582a165a-01f4-4e3c-8bbc-fce267f462f6"
+          },
+          {
+            "amount": 26,
+            "units": "h",
+            "name": "Support Truck",
+            "id": "cc7cafbf-1528-465f-8387-587dd7260301"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "length": "1",
+            "units": "month",
+            "date": "2017-10-2"
+          }
+        ]
+      },
+      {
+        "name": "crop care - post harvest",
+        "materials": [
+          {
+            "note": "Post harvest clean up",
+            "amount": 30,
+            "units": "h",
+            "name": "Mid-size Tractor",
+            "id": "cd8de79d-d5bd-491c-9afc-205dff8b2231"
+          },
+          {
+            "note": "Dormant Herbicide",
+            "amount": 8,
+            "units": "h",
+            "name": "Tractor and sprayer",
+            "id": "76986bc8-4472-4de2-a573-fedb6299520c"
+          },
+          {
+            "note": "Dormant Herbicide",
+            "amount": 200,
+            "units": "[qt_us]",
+            "name": "Glyphosate",
+            "id": "9ce1e0fe-adb6-4afa-b9bc-ea406daa66c4"
+          },
+          {
+            "note": "Dormant Herbicide",
+            "amount": 200,
+            "units": "[qt_us]",
+            "name": "Trifluralin",
+            "id": "df8c3573-5cb4-459f-b309-24b0a9db03e6"
+          },
+          {
+            "note": "post emergent",
+            "amount": 100,
+            "units": "[acr_us]",
+            "name": "herbicide - manual",
+            "id": "d0b3faf5-8cee-48c0-9afc-dd17fadb5a8b"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2017-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2020-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2023-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2026-11-1"
+          }
+        ]
+      },
+      {
+        "name": "crop care - established",
+        "materials": [
+          {
+            "amount": 150,
+            "units": "[acr_us]",
+            "name": "hoeing",
+            "id": "2c68c1c9-23f6-4b1f-9edf-5cf326eec6c2"
+          },
+          {
+            "amount": 100,
+            "units": "[acr_us]",
+            "name": "herbicide - manual",
+            "id": "d0b3faf5-8cee-48c0-9afc-dd17fadb5a8b"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2018-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2019-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2021-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2022-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2024-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2025-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2027-11-1"
+          },
+          {
+            "length": "1",
+            "units": "year",
+            "date": "2028-11-1"
+          }
+        ]
+      },
+      {
+        "name": "harvest - established",
+        "materials": [
+          {
+            "amount": 35,
+            "units": "h",
+            "name": "FR 6080 FH",
+            "id": "2a59e52c-b088-43b0-bc42-e76af751acc3"
+          },
+          {
+            "amount": 175,
+            "units": "h",
+            "name": "Tandem Axle Truck",
+            "id": "582a165a-01f4-4e3c-8bbc-fce267f462f6"
+          },
+          {
+            "amount": 35,
+            "units": "h",
+            "name": "Support Truck",
+            "id": "cc7cafbf-1528-465f-8387-587dd7260301"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "length": "1",
+            "units": "month",
+            "date": "2020-10-1"
+          },
+          {
+            "length": "1",
+            "units": "month",
+            "date": "2023-10-1"
+          },
+          {
+            "length": "1",
+            "units": "month",
+            "date": "2026-10-1"
+          },
+          {
+            "length": "1",
+            "units": "month",
+            "date": "2029-10-1"
+          }
+        ]
+      },
+      {
+        "name": "restoration",
+        "materials": [
+          {
+            "note": "disking",
+            "amount": 36,
+            "units": "h",
+            "name": "Large Tractor",
+            "id": "728be0fa-19d8-4e65-aa00-615ee179f7c5"
+          },
+          {
+            "note": "herbicide",
+            "amount": 20,
+            "units": "h",
+            "name": "Tractor and sprayer",
+            "id": "76986bc8-4472-4de2-a573-fedb6299520c"
+          },
+          {
+            "note": "herbicide",
+            "amount": 200,
+            "units": "[qt_us]",
+            "name": "Glyphosate",
+            "id": "9ce1e0fe-adb6-4afa-b9bc-ea406daa66c4"
+          },
+          {
+            "note": "herbicide",
+            "amount": 200,
+            "units": "[qt_us]",
+            "name": "2,4-D",
+            "id": "a39b9181-23df-4171-a68d-91b275c277ff"
+          }
+        ],
+        "units": "[acr_us]",
+        "schedule": [
+          {
+            "length": "3",
+            "units": "month",
+            "date": "2029-11-1"
+          }
+        ]
+      }
+    ],
+    "farm": {
+      "unit": "[acr_us]",
+      "size": "99",
+      "commodity": "poplar",
+      "farm": "clarksburg"
+    },
+    "authority": "AHB",
+    "name": "qjh/poplar",
+    "locality": [
+      "california",
+      "clarksburg",
+      "95612"
+    ],
+    "id": "97ba17c3-9b8b-4b5b-94db-60c1b4b8fcfe",
+    "materialIds": [
+      "342d6c6a-5c31-4285-bc18-1e2474cca526",
+      "7aee1736-27f6-4e18-856c-c3d268ddb2f7",
+      "9ce1e0fe-adb6-4afa-b9bc-ea406daa66c4",
+      "a39b9181-23df-4171-a68d-91b275c277ff",
+      "df8c3573-5cb4-459f-b309-24b0a9db03e6",
+      "e2a0bfc6-d57c-417e-9e5e-eb28b9c036d1",
+      "f850de4a-6f22-432a-b4bd-730fc0ed69cb",
+      "0082f620-778c-45f5-a4d6-e541006450bf",
+      "2a59e52c-b088-43b0-bc42-e76af751acc3",
+      "2c68c1c9-23f6-4b1f-9edf-5cf326eec6c2",
+      "582a165a-01f4-4e3c-8bbc-fce267f462f6",
+      "728be0fa-19d8-4e65-aa00-615ee179f7c5",
+      "76986bc8-4472-4de2-a573-fedb6299520c",
+      "7782c5e3-1bcc-4f35-ab30-018246996698",
+      "910b8955-ff63-498c-9d7a-72084d9e4bf8",
+      "924a69a6-680c-4830-b9c0-9efbe0224f36",
+      "cc7cafbf-1528-465f-8387-587dd7260301",
+      "cd8de79d-d5bd-491c-9afc-205dff8b2231",
+      "d0b3faf5-8cee-48c0-9afc-dd17fadb5a8b",
+      "f169d925-d252-4c93-a553-f98aa56797e0"
+    ]
+  },
+  "materials": [
+    {
+
+      "class": "equipment",
+      "name": "Small Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 1.98,
+          "units": "[gal_us]"
+        },
+        "Small Tractor--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 30,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "0082f620-778c-45f5-a4d6-e541006450bf"
+    },
+    {
+
+      "class": "equipment",
+      "name": "FR 6080 FH",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 13.2,
+          "units": "[gal_us]"
+        },
+        "FR 6080 FH--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 180,
+          "units": "us$"
+        },
+        "Labor": {
+          "amount": 2,
+          "units": "h"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "2a59e52c-b088-43b0-bc42-e76af751acc3",
+      "unique": {
+        "Labor": {
+          "units": "us$/h",
+          "price": 12
+        }
+      }
+    },
+    {
+
+      "class": "labor",
+      "name": "hoeing",
+      "units": "[acr_us]",
+      "type": "complex",
+      "materials": {
+        "Laborer": {
+          "amount": 1.92,
+          "units": "h"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "2c68c1c9-23f6-4b1f-9edf-5cf326eec6c2"
+    },
+    {
+
+      "name": "Equipment Fuel",
+      "price": 2,
+      "units": "us$/[gal_us]",
+      "type": "simple",
+      "authority": "jrmerz",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "342d6c6a-5c31-4285-bc18-1e2474cca526",
+      "class": "other"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Tandem Axle Truck",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 13.2,
+          "units": "[gal_us]"
+        },
+        "Lube & Repairs": {
+          "amount": 25,
+          "units": "us$"
+        },
+        "Labor": {
+          "amount": 1,
+          "units": "h"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "582a165a-01f4-4e3c-8bbc-fce267f462f6",
+      "unique": {
+        "Labor": {
+          "units": "us$/h",
+          "price": 12
+        }
+      }
+    },
+    {
+
+      "class": "equipment",
+      "name": "Large Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 13.2,
+          "units": "[gal_us]"
+        },
+        "Large Tractor--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 70,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "728be0fa-19d8-4e65-aa00-615ee179f7c5"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Tractor and sprayer",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 3.96,
+          "units": "[gal_us]"
+        },
+        "Tractor and sprayer--labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 50,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "76986bc8-4472-4de2-a573-fedb6299520c"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Cooler/van",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 0.96,
+          "units": "[gal_us]"
+        },
+        "Lube & Repairs": {
+          "amount": 1.2,
+          "units": "us$"
+        },
+        "Estimate": {
+          "amount": 0.71,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "7782c5e3-1bcc-4f35-ab30-018246996698"
+    },
+    {
+
+      "description": "Poplar cutting for planting",
+      "class": "seed",
+      "name": "Poplar Cutting",
+      "units": "us$/1",
+      "price": 2,
+      "type": "simple",
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "7aee1736-27f6-4e18-856c-c3d268ddb2f7"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Challenger Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 19.36,
+          "units": "[gal_us]"
+        },
+        "Challenger Tractor--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 90,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "910b8955-ff63-498c-9d7a-72084d9e4bf8"
+    },
+    {
+
+      "type": "complex",
+      "name": "3-Wheel Ag Sprayer",
+      "units": "h",
+      "description": "",
+      "materials": {
+        "3-Wheel Ag Sprayer--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Equipment Fuel": {
+          "amount": 3.96,
+          "units": "[gal_us]"
+        },
+        "Lube & Repairs": {
+          "amount": 50,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "924a69a6-680c-4830-b9c0-9efbe0224f36"
+    },
+    {
+
+      "class": "pesticide",
+      "name": "Glyphosate",
+      "units": "us$/[qt_us]",
+      "price": 4,
+      "type": "simple",
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "9ce1e0fe-adb6-4afa-b9bc-ea406daa66c4",
+      "description": "This is cool stuff"
+    },
+    {
+
+      "class": "fertilizer",
+      "name": "2,4-D",
+      "units": "us$/[qt_us]",
+      "price": 5,
+      "type": "simple",
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "a39b9181-23df-4171-a68d-91b275c277ff"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Support Truck",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Support Truck--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Equipment Fuel": {
+          "amount": 1.76,
+          "units": "[gal_us]"
+        },
+        "Lube & Repairs": {
+          "amount": 25,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "cc7cafbf-1528-465f-8387-587dd7260301"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Mid-size Tractor",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 3.96,
+          "units": "[gal_us]"
+        },
+        "Mid-size Tractor--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 45,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "cd8de79d-d5bd-491c-9afc-205dff8b2231"
+    },
+    {
+
+      "description": "'Manual Application of herbicide'",
+      "class": "herbicide",
+      "name": "herbicide - manual",
+      "units": "[acr_us]",
+      "type": "complex",
+      "materials": {
+        "Glyphosate": {
+          "amount": 2,
+          "units": "[qt_us]"
+        },
+        "Laborer": {
+          "amount": 0.96,
+          "units": "h"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "d0b3faf5-8cee-48c0-9afc-dd17fadb5a8b"
+    },
+    {
+
+      "class": "pesticide",
+      "name": "Trifluralin",
+      "units": "us$/[qt_us]",
+      "price": 7.5,
+      "type": "simple",
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "df8c3573-5cb4-459f-b309-24b0a9db03e6"
+    },
+    {
+
+      "class": "pesticide",
+      "name": "Goal 2XL",
+      "units": "us$/[qt_us]",
+      "price": 30,
+      "type": "simple",
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "e2a0bfc6-d57c-417e-9e5e-eb28b9c036d1"
+    },
+    {
+
+      "class": "equipment",
+      "name": "Semi-Tractor trailer",
+      "units": "h",
+      "type": "complex",
+      "materials": {
+        "Equipment Fuel": {
+          "amount": 6.5,
+          "units": "[gal_us]"
+        },
+        "Semi-Tractor trailer--Labor": {
+          "amount": 1,
+          "units": "h"
+        },
+        "Lube & Repairs": {
+          "amount": 55,
+          "units": "us$"
+        }
+      },
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "f169d925-d252-4c93-a553-f98aa56797e0"
+    },
+    {
+
+      "class": "labor",
+      "name": "Laborer",
+      "units": "us$/h",
+      "price": 17,
+      "type": "simple",
+      "authority": "AHB",
+      "locality": [
+        "california",
+        "clarksburg",
+        "95612"
+      ],
+      "id": "f850de4a-6f22-432a-b4bd-730fc0ed69cb"
+    }
+  ]
+}

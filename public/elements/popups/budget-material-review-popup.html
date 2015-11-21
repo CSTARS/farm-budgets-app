@@ -14,7 +14,7 @@
             <h4 class="modal-title" id="title">Review Material Changes</h4>
           </div>
           <div class="modal-body">
-
+            <budget-materials-diff id="diff"></budget-materials-diff>
           </div>
 
           <div class="modal-footer">
@@ -38,7 +38,8 @@
 
       show : function() {
         this.popup.modal('show');
-      },
+        this.$.diff.update();
+      }
 
 
     });

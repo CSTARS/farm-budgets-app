@@ -12,51 +12,59 @@
     </style>
 
     <h4 class="page-header" style="margin-top:0"><i class="fa fa-shield"></i> <span>{{authName}}</span></h4>
-    <textarea class="form-control">{{authDescription}}</textarea>
-    <a class="btn btn-primary">Save Description</a>
+    <textarea class="form-control" id="descriptionInput">{{authDescription}}</textarea>
+    <a class="btn btn-primary" style="margin: 15px" on-click="save" id="saveBtn">Save Description</a>
 
-    <h5 class="page-header" ><i class="fa fa-group"></i> Authority Members</h5>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <h5 class="page-header" ><i class="fa fa-group"></i> Authority Members</h5>
 
-    <div class="row">
-      <div class="col-sm-6">
-        <div class="form-horizontal">
-          <div class="form-group">
-            <label for="newMemeberSearch" class="col-sm-3 control-label">Add Member</label>
-            <div class="col-sm-9">
-              <input type="text" id="newMemeberSearch" class="form-control" on-input="searchMembers"  placeholder="Search Members"/>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label for="newMemeberSearch" class="col-sm-3 control-label">Add Member</label>
+                <div class="col-sm-9">
+                  <input type="text" id="newMemeberSearch" class="form-control" on-input="searchMembers"  placeholder="Search Members"/>
 
-              <template is="dom-repeat" items="{{searchResults}}">
-                <div style="padding:10px 0">
-                  <a class="btn btn-primary" on-click="grantAccess" index$="{{index}}"><i class="fa fa-user-plus"></i></a>
-                  <span>{{item.username}}</span>
-                  (<span>{{item.name}}</span>)
+                  <template is="dom-repeat" items="{{searchResults}}">
+                    <div style="padding:10px 0">
+                      <a class="btn btn-primary" on-click="grantAccess" index$="{{index}}"><i class="fa fa-user-plus"></i></a>
+                      <span>{{item.username}}</span>
+                      (<span>{{item.name}}</span>)
+                    </div>
+                  </template>
                 </div>
-              </template>
+              </div>
             </div>
+          </div>
+          <div class="col-sm-6">
+            <ul class="list-group">
+              <template is="dom-repeat" items="{{users}}">
+                <li class="list-group-item">
+                  <span style="font-weight:bold">{{item}}</span>
+                  <a class="btn btn-link pull-right" on-click="removeAccess" index$="{{index}}"><i class="fa fa-user-times"></i></a>
+                </li>
+              </template>
+            </ul>
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
-        <ul class="list-group">
-          <template is="dom-repeat" items="{{users}}">
-            <li class="list-group-item">
-              <span style="font-weight:bold">{{item}}</span>
-              <a class="btn btn-link pull-right" on-click="removeAccess" index$="{{index}}"><i class="fa fa-user-times"></i></a>
-            </li>
-          </template>
-        </ul>
-      </div>
     </div>
 
-    <div id="budgets">
-      <h4 class="page-header"><i class="fa fa-dollar"></i> Budgets</h4>
-    </div>
+    <div class="panel panel-default" id="budgets">
+      <div class="panel-body">
+        <div>
+          <h4 class="page-header"><i class="fa fa-dollar"></i> Authority Budgets</h4>
+        </div>
 
-    <template is="dom-repeat" items="{{budgets}}">
-      <div class="item">
-        <budget-list-item budget="{{item}}"></budget-list-item>
+        <template is="dom-repeat" items="{{budgets}}">
+          <div class="item">
+            <budget-list-item budget="{{item}}"></budget-list-item>
+          </div>
+        </template>
       </div>
-    </template>
+    </div>
 
   </template>
   <script>
@@ -89,6 +97,22 @@
         var query = JSON.stringify({"authority": this.authority});
         $.get('/budget/find?query='+query, function(resp){
           this.budgets = resp;
+        }.bind(this));
+      },
+
+      save :function() {
+        $(this.$.createBtn).attr('disabled', 'disabled').html('Updating...');
+        var authority = {
+          name : this.authName,
+          description : this.$.descriptionInput.value
+        };
+
+        $.post('/authority/save', authority, function(resp){
+          $(this.$.createBtn).removeAttr('disabled').html('Update Description');
+
+          if( resp.error ) {
+            return alert(resp.message);
+          }
         }.bind(this));
       },
 

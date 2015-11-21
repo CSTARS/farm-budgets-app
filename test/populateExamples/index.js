@@ -120,7 +120,9 @@ function setMaterialIds(budget, nameLookup) {
 function insertMaterials(budget, callback) {
   var nameLookup = {};
 
+  var materials = [];
   for( var i = 0; i < budget.materials.length; i++ ) {
+    materials.push(budget.materials);
     budget.materials[i].authority = authority;
     budget.materials[i].locality = locality;
   }

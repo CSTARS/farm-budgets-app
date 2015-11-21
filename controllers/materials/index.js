@@ -5,6 +5,7 @@ var authUtils = require('../auth');
 var errorHandler = require('../../lib/handleError');
 var MaterialModel = require('../../models/materials');
 var model;
+var collection = global.db.collection('material');
 
 module.exports = function (router) {
     model = new MaterialModel();
@@ -79,15 +80,30 @@ module.exports = function (router) {
         return errorHandler('material required', res);
       }
 
-      save(material, req.user, function(err, resp){
+      checkAccess(req.user, material, function(err, hasAccess){
         if( err ) {
-          return res.send({error:true, message: err});
+          if( typeof err === 'object' ) {
+            return res.send(err);
+          } else {
+            return res.send({error:true, message: err});
+          }
         }
-        res.send(resp);
+
+        if( !hasAccess ) { // this shouldn't really fire
+          return res.send({error:true, message: 'You do not have access to this authority'});
+        }
+
+        model.save(material, req.user.username, function(err, result){
+          if( err ) {
+            return res.send({error:true, message: err});
+          }
+
+          res.send(result);
+        });
       });
     });
 
-    router.post('/saveBulk', authMiddleware, function (req, res) {
+    /*router.post('/saveBulk', authMiddleware, function (req, res) {
       var materials = req.body.materials;
 
       if( !materials ) {
@@ -119,8 +135,54 @@ module.exports = function (router) {
         }
       );
 
-    });
+    });*/
 };
+
+// the user needs to have access to both the old authority and the new authority
+function checkAccess(user, newmaterial, callback) {
+  collection.findOne({id: newmaterial.id}, {authority: 1}, function(err, material){
+    if( err ) {
+      return callback(err);
+    }
+
+
+    if( !material ) { // this is a new material
+      authUtils.hasAccessObject(user, newmaterial, function(err, hasRole){
+        if( err ) {
+          return callback(err);
+        }
+        if( !hasRole ) {
+          return callback('You do not have access to authority: '+newmaterial.authority);
+        }
+
+        callback(null, true);
+      });
+
+      return;
+    }
+
+    authUtils.hasAccessObject(user, material, function(err, hasRole){
+      if( err ) {
+        return callback(err);
+      }
+      if( !hasRole ) {
+        return callback({error: true, message: 'You do not have access to authority: '+material.authority, code: 10});
+      }
+
+      authUtils.hasAccessObject(user, newmaterial, function(err, hasRole){
+        if( err ) {
+          return callback(err);
+        }
+        if( !hasRole ) {
+          return callback('You do not have access to authority: '+newmaterial.authority);
+        }
+
+        callback(null, true);
+      });
+
+    });
+  });
+}
 
 function save(material, user, callback) {
   authUtils.hasAccessObject(user, material, function(err, hasRole){

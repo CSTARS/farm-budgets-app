@@ -7,9 +7,11 @@
     </style>
 
     <h4>
-      <span class="text text-success"><i class="fa fa-leaf"></i> <span id="commodityLabel"></span>
-      <small><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize" id="localityLabel"></span></small>
       <span class="pull-right"><a class="btn btn-primary" on-click="select" style="margin-top:-10px">Select</a></span>
+      <span class="text text-success"><i class="fa fa-leaf"></i> <span id="commodityLabel"></span>
+      <br />
+      <small><i class="fa fa-map-marker"></i> <span style="text-transform:capitalize" id="localityLabel"></span></small>
+
     </h4>
 
     <table class="table" style="margin-bottom:5px">
@@ -27,7 +29,7 @@
       </tr>
       <tr>
         <td>Size</td>
-        <td><span id="sizeLabel"><span> <span id="unitLabel"></span></td>
+        <td><span id="sizeLabel"></span> <span id="unitLabel"></span></td>
       </tr>
     </table>
 
@@ -55,14 +57,14 @@
         if( !budget ) return;
 
         this.budget = budget;
-        this.$.commodityLabel.innerHTML = budget.farm.commodity;
+        this.$.commodityLabel.innerHTML = budget.commodity;
         this.$.localityLabel.innerHTML = budget.locality ? budget.locality.join(', ') : '';
         this.$.authorityLabel.innerHTML = budget.authority;
         this.$.nameLabel.innerHTML = budget.name;
-        this.$.farmLabel.innerHTML = budget.farm.farm;
+        this.$.farmLabel.innerHTML = budget.farm.name;
         this.$.sizeLabel.innerHTML = budget.farm.size;
-        this.$.unitLabel.innerHTML = budget.farm.unit;
-        
+        this.$.unitLabel.innerHTML = budget.farm.units;
+
         if( budget.reference ) {
           this.$.referenceLabel.style.display = 'inline-block';
         } else {

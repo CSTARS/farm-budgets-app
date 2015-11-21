@@ -41,6 +41,9 @@ function save(material, username, callback) {
 
   for( var i = 0; i < required.length; i++ ) {
     if( material[required[i]] === undefined || material[required[i]] === null ) {
+      if( material.type === 'complex' && required[i] === 'price' ) {
+        continue;
+      }
       return callback(required[i]+' is required');
     }
   }

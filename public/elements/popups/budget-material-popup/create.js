@@ -7,7 +7,7 @@ BudgetMaterialPopup.create = function(name) {
     }
   }
 
-  var budget = FB.getData();
+  var budget = FB.getBudget();
 
   var defaultAuthority = budget.authority;
   if( ExpressAuth.user && ExpressAuth.user.authorities ) {

@@ -20,7 +20,7 @@ BudgetMaterialPopup.remove = function() {
   }
   FB.operationController.bulkAdd(updates, {replace: true});
 
-  // remove this item
+  // remove this item from controller, events trigger ui updates
   FB.materialController.remove(this.data.name);
 
   this.hide();
@@ -33,5 +33,8 @@ BudgetMaterialPopup.delete = function() {
     if( resp.error ) {
       alert(resp.message);
     }
+
+    // true flag sets the material as deleted
+    FB.changes.updateMaterial(this.data, true);
   }.bind(this));
 }

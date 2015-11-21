@@ -45,12 +45,18 @@ function save(budget, username, callback) {
       budget.id = uuid.v4();
     }
 
-    if( budget.farm && budget.farm.commodity ) {
-      budget.farm.commodity = budget.farm.commodity.trim().toLowerCase();
+    if( budget.commodity ) {
+      budget.commodity = budget.commodity.trim().toLowerCase();
     }
 
     // clean app data from budget
     cleanBudget(budget);
+
+    // set the farmname for the text index
+    if( budget.farm ) {
+      budget.farmname = budget.farm.name;
+    }
+
 
     // validate material id's
     if( !budget.materialIds ) {
@@ -108,7 +114,7 @@ function uses(materialId, callback) {
     .find({
       materialIds: materialId,
       deleted : {$ne : true}
-    },{ _id:0, id:1, 'farm.farm':1, 'farm.commodity':1, 'name':1, 'authority':1, 'locality':1})
+    },{ _id:0, id:1, 'farm.name':1, 'commodity':1, 'name':1, 'authority':1, 'locality':1})
     .toArray(function(err, resp){
       if( err ) {
         return callback(err);
@@ -177,6 +183,8 @@ function get(id, callback) {
       budget.operations = [];
     }
 
+    delete budget.farmname;
+
     materialCollection
       .find({id : {'$in': budget.materialIds}}, {_id: 0})
       .toArray(function(err, materials){
@@ -226,7 +234,7 @@ function loadReference(result, callback) {
     result.budget.referenceInfo = {
       name : reference.name,
       authority : reference.authority,
-      commodity : reference.farm.commodity,
+      commodity : reference.commodity,
       locality : reference.locality,
       deleted : reference.deleted ? true : false
     };

@@ -11,6 +11,59 @@ FB.materialIcon = function(type) {
   return '<i class="fa fa-cube'+(type === 'complex' ? 's' : '')+'"></i>';
 }
 
+FB.hasAccess = function(object) {
+  var user = ExpressAuth.user;
+
+  if( !object || !user ) return false;
+
+  if( typeof object === 'string' ) {
+    object = {authority: object};
+  } else if( !object.authority ) {
+    return false;
+  }
+
+  if( user.authorities.indexOf(object.authority) === -1 &&
+      user.username !== object.authority ) {
+
+      return false;
+  }
+
+  return true;
+}
+
+FB.saveBudget = function(callback) {
+  FB.localsave();
+
+  var budget = $.extend(true,{}, FB.getBudget());
+  FB.save.strip(FB.save.schema.budget, budget);
+
+  budget.materialIds = [];
+
+  var materials = FB.materialController.get();
+  for( var name in materials.materials ) {
+    if( !materials.materials[name].id ) continue;
+    budget.materialIds.push(materials.materials[name].id);
+  }
+
+  for( var name in materials.complex ) {
+    if( !materials.complex[name].id ) continue;
+    budget.materialIds.push(materials.complex[name].id);
+  }
+
+
+  $.post('/budget/save', budget, function(resp){
+    if( callback ) callback(resp);
+
+    if( resp.error ) {
+      return alert(resp.message);
+    }
+
+    // the server may have cleanup some stuff
+    // true flag forces reload without prompt
+    document.querySelector('ahb-budget').reload(budget.id, true);
+  }.bind(this));
+}
+
 FB.localsave = function(auto) {
   if( saveTimer !== -1 ) clearTimeout(saveTimer);
 

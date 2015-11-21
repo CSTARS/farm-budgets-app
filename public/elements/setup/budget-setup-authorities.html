@@ -8,6 +8,50 @@
       }
     </style>
 
+    <h4 class="page-header" style="margin-top: 0">
+      My Authorities
+
+      <a class="btn btn-primary pull-right" style="margin-top: -5px" on-click="showCreate">
+        <i class="fa fa-plus"></i> Create New
+      </a>
+    </h4>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Create Authority</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-horizontal">
+
+              <div class="form-group">
+                <label for="authorityLabelInput" class="col-sm-3 control-label">Authority Label</label>
+                <div class="col-sm-9">
+                  <input type="text" id="authorityLabelInput" class="form-control" placeholder="Authority Label"/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="authoritydescriptionInput" class="col-sm-3 control-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea id="authorityDescriptionInput" class="form-control" ></textarea>
+                </div>
+              </div>
+
+              <div id="createMsg" class="text text-warning"></div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-primary" on-click="create" id="createBtn">Create</a>
+            <a class="btn btn-default" data-dismiss="modal">Cancel</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="select">
       <template is="dom-repeat" items="{{authorities}}">
         <div class="panel panel-default">
@@ -28,6 +72,10 @@
 
       ready : function() {
         this.authorities = [];
+
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
       },
 
       set : function() {
@@ -41,6 +89,32 @@
           });
         }
         this.authorities = arr;
+      },
+
+      showCreate : function() {
+        this.$.authorityLabelInput.value = '';
+        this.$.authorityDescriptionInput.value = '';
+        this.$.createMsg.innerHTML = '';
+        this.popup.modal('show');
+      },
+
+      create : function() {
+        $(this.$.createBtn).attr('disabled','disabled').html('Creating...');
+        var authority = {
+          name : this.$.authorityLabelInput.value,
+          description : this.$.authorityDescriptionInput.value
+        }
+
+        $.post('/authority/create', authority, function(resp){
+          $(this.$.createBtn).removeAttr('disabled').html('Create');
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+
+          ExpressAuth.user.authorities.push(authority.name);
+          this.set();
+          this.popup.modal('hide');
+        }.bind(this));
       },
 
       onShow : function(params) {

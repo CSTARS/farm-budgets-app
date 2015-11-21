@@ -38,7 +38,7 @@
     },
 
     show : function() {
-      this.$.budgetName.innerHTML = FB.getData().name;
+      this.$.budgetName.innerHTML = FB.getBudget().name;
       this.popup.modal('show');
     },
 
@@ -47,11 +47,16 @@
     },
 
     create : function() {
-        var updated = FB.save.checkBudget(FB.getData());
-        if( updated && !confirm('Are you sure you want to continue this budget?  Your unsaved changes will be lost.') ) return;
+        if( FB.changes.hasChanges() && !confirm('Are you sure you want to continue this budget?  Your unsaved changes will be lost.') ) return;
 
-        var data = FB.getData();
+        var data = $.extend(true, {}, FB.getBudget());
+
         data.name = data.name+' Reference';
+
+        if( !FB.hasAccess(data) ) {
+          data.authority = ExpressAuth.user ? ExpressAuth.user.username : '';
+        }
+
         data.reference = data.id;
         data.referenceInfo = {
           name : data.name,
@@ -60,13 +65,22 @@
         }
         data.id = FB.utils.guid();
 
+        data = {
+          budget : data,
+          materials : FB.materialController.asArray()
+        };
+
+        FB.changes.setOriginal({
+          authority: ExpressAuth.user ? ExpressAuth.user.username : ''
+        }, []);
+
         window.location = '#budget/overview';
         document.querySelector('ahb-budget').load(data);
         this.hide();
 
         setTimeout(function(){
           document.querySelector('budget-farm-editor').show();
-        }, 300);
+        }, 500);
     }
   })
 </script>

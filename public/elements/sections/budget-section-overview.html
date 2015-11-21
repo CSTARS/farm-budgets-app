@@ -15,6 +15,13 @@
         margin: 5px 0px;
       }
     }
+    #mainTable {
+      font-size: 20px;
+      margin: 15px;
+    }
+    #mainTable tr td {
+      padding: 0 5px;
+    }
   </style>
   <template>
 
@@ -22,10 +29,30 @@
       <div class="col-md-6">
 
         <div class="card" id="infoCard">
-          <h4 style="line-height:45px"><i class="fa fa-info-circle"></i> Budget Information <small id="budgetNameLabel"></small>
-            <a class="btn btn-link btn-lg" id="editBtn" style="display:none" on-click="edit"><i class="fa fa-pencil"></i></a></h4>
+          <h4 style="line-height:45px;margin-top: 0" class="page-header"><i class="fa fa-info-circle"></i> Budget Information
+          <a class="btn btn-link btn-lg" id="editBtn" style="display:none" on-click="edit"><i class="fa fa-pencil"></i></a></h4>
+
+          <table id="mainTable">
+            <tr class="text text-success" style="font-size: 22px">
+              <td><i class="fa fa-leaf"></i></td>
+              <td id="cropLabel" style="text-transform: capitalize"></td>
+            </tr>
+            <tr style="color: #888">
+              <td><i class="fa fa-map-marker"></i></td>
+              <td id="localityLabel" style="text-transform:capitalize"></td>
+            </tr>
+            <tr style="color: #888">
+              <td><i class="fa fa-shield"></i></td>
+              <td id="authorityLabel"></td>
+            </tr>
+          </table>
+
           <table class="table">
             <tbody>
+              <tr>
+                <td>Budget Name</td>
+                <td id="budgetNameLabel"></td>
+              </tr>
               <tr>
                 <td>Farm Name</td>
                 <td id="farmNameLabel"></td>
@@ -35,18 +62,6 @@
                 <td>
                   <span id="farmSizeLabel"></span>&nbsp;&nbsp;<span id="farmUnitsLabel"></span>
                 </td>
-              </tr>
-              <tr>
-                <td>Crop</td>
-                <td id="cropLabel"></td>
-              </tr>
-              <tr>
-                <td>Locality</td>
-                <td id="localityLabel" style="text-transform:capitalize"></td>
-              </tr>
-              <tr>
-                <td>Budget Authority</td>
-                <td id="authorityLabel"></td>
               </tr>
               <tr>
                 <td>Material Authorities</td>
@@ -61,6 +76,9 @@
 
           <div id="changesWarning" class="text text-warning" style="display:none">
             <i class="fa fa-warning"></i> You have unsaved changes to this budget!
+          </div>
+          <div id="noAccessWarning" class="text text-warning" style="display:none">
+            <i class="fa fa-warning"></i> You do not have access to this budgets authority.  To save, you will need to update the authority.
           </div>
 
           <div class="layout horizontal">
@@ -144,14 +162,15 @@
 
       this.budgetId = data.id;
       this.$.total.setData(data.farm);
+      this.data = data;
 
       this.$.budgetNameLabel.innerHTML = data.name;
-      this.$.farmNameLabel.innerHTML = data.farm.farm;
+      this.$.farmNameLabel.innerHTML = data.farm.name;
       this.$.farmSizeLabel.innerHTML = data.farm.size;
-      this.$.farmUnitsLabel.innerHTML = data.farm.unit;
-      this.$.cropLabel.innerHTML = '<i class="fa fa-leaf"></i> '+data.farm.commodity;
-      this.$.localityLabel.innerHTML = '<i class="fa fa-map-marker"></i> '+data.locality.join(', ');
-      this.$.authorityLabel.innerHTML = '<i class="fa fa-shield"></i> '+data.authority;
+      this.$.farmUnitsLabel.innerHTML = data.farm.units;
+      this.$.cropLabel.innerHTML = data.commodity;
+      this.$.localityLabel.innerHTML = data.locality.join(', ');
+      this.$.authorityLabel.innerHTML = data.authority;
 
       if( data.reference ) {
         this.$.reference.style.display = 'table-row';
@@ -166,9 +185,7 @@
 
       this.updateMaterialAuthorties();
 
-      if( ExpressAuth.user &&
-          ExpressAuth.user.authorities.indexOf(data.authority) > -1) {
-
+      if( ExpressAuth.user && FB.hasAccess(data) ) {
         this.$.deleteBtn.style.display = 'inline-block';
       } else {
         this.$.deleteBtn.style.display = 'none';
@@ -248,6 +265,18 @@
 
     showChangesWarning : function(show) {
       this.$.changesWarning.style.display = show ? 'block' : 'none';
+
+      var showNoAccess = false;
+      if( show && ExpressAuth.user && this.data && !FB.hasAccess(FB.changes.getOriginal().budget) ) {
+        showNoAccess = true;
+      }
+
+      this.$.noAccessWarning.style.display = showNoAccess ? 'block' : 'none';
+      if( showNoAccess ) {
+        this.$.noAccessWarning.innerHTML = '<i class="fa fa-warning"></i> You do not have access to the original authority '+
+        ' <b><i class="fa fa-shield"></i> '+FB.changes.getOriginal().budget.authority+'</b>.'+
+          '  You will need to save as new budget.';
+      }
     }
   });
 </script>

@@ -7,6 +7,8 @@
     </style>
 
     <select id="selector" class="form-control" on-input="onInput"></select>
+    <div class="help-block" id="help">Select an authority available to you.  If authority is marked
+    as (Current - No Access), this authority is the current authority, but you do not have access to it.</div>
     <div class="help-block" id="noUser" style="display:none">You must login to update an authority</div>
 
   </template>
@@ -28,6 +30,7 @@
       attached : function() {
         if( !ExpressAuth.user ) {
           this.$.selector.setAttribute('disabled', 'disabled');
+          this.$.help.style.display = 'none';
           this.$.noUser.style.display = 'block';
           return;
         }
@@ -57,12 +60,14 @@
       defaultObserver : function() {
         if( !ExpressAuth.user ) return;
 
+        var noAccess = FB.hasAccess(this.default) ? '' : ' - No Access';
+
         var ele = $(this.$.selector)
           .find('[value="'+this.default+'"]')
-          .html(this.default+' (Current)');
+          .html(this.default+' (Current'+noAccess+')');
 
         if( ele.length === 0 ) {
-          var option = $('<option value="'+this.default+'">'+this.default+' (Current)</option>');
+          var option = $('<option value="'+this.default+'">'+this.default+' (Current'+noAccess+')</option>');
           $(this.$.selector).append(option);
         }
 

@@ -116,14 +116,6 @@
       },
 
       onShow : function() {
-        //if( !window.appData  ) {
-        //  this.waitingToShow = true;
-        //  return;
-        //}
-
-        var state = FB.save.check(FB.getData(), ExpressAuth.user);
-        console.log(state);
-
         var hasChanges = false;
 
         if( state.budget.changes ) {

@@ -11,6 +11,7 @@ module.exports = function() {
       get : get,
       getAll : getAll,
       save : save,
+      create : create,
       grantAccess: grantAccess,
       removeAccess: removeAccess
   };
@@ -25,7 +26,6 @@ function get(name, callback) {
     if( !authority ) {
       return callback('Unknown authority: '+name);
     }
-
 
     global.auth.acl().roleUsers(authority.name, function(err, users){
       if( err ) {
@@ -68,7 +68,7 @@ function grantAccess(username, authority, callback) {
     if( !user ) {
       return callback('Invalid username');
     }
-    
+
     global.auth.acl().addUserRoles(username, authority, function(err){
       if( err ) {
         return callback(err);
@@ -84,6 +84,29 @@ function removeAccess(username, authority, callback) {
       return callback(err);
     }
     callback(null, {success: true});
+  });
+}
+
+function create(authority, user, callback) {
+  if( !authority.name ) {
+    return callback('Authority name required');
+  }
+
+  collection.findOne({name: authority.name}, {_id: 1, name:1}, function(err, auth){
+    if( err ) {
+      return callback(err);
+    }
+    if( auth ) {
+      return callback('Authority already exists');
+    }
+
+    save(authority, function(err, resp){
+      if( err ) {
+        return callback(err);
+      }
+
+      grantAccess(user.username, authority.name, callback);
+    });
   });
 }
 

@@ -98,25 +98,6 @@ BudgetMaterialPopup._save = function(noHide, options) {
     }
   }
 
-  // now re-save all required materials, this time we will fire events
-  /*var requiredMaterials = [];
-  if( this.data.type == 'complex' ) {
-    for( var key in this.data.materials ) {
-      if( !key.match(/--/) ) continue;
-      var m = FB.materialController.get(key);
-      if( m.error ) continue;
-
-      m.parent = this.data.id;
-      m.authority = this.data.authority;
-      m.locality = this.data.locality;
-      requiredMaterials.push(m);
-    }
-  }
-
-  if( requiredMaterials.length > 0 ) {
-    FB.materialController.bulkAdd(requiredMaterials, {replace: true});
-  }*/
-
   // save remote
   if( ExpressAuth.user ) {
     $.post('/materials/save', this.data, function(resp){
@@ -126,7 +107,6 @@ BudgetMaterialPopup._save = function(noHide, options) {
     this.setSaving(false);
     if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   }
-
 }
 
 BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
@@ -136,6 +116,9 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
     this.setSaving(false);
     return;
   }
+
+  // now update the changes object
+  FB.changes.updateMaterial(this.data);
 
   if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   this.setSaving(false);

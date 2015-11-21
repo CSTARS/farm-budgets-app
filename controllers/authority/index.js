@@ -37,12 +37,12 @@ module.exports = function (router) {
         return errorHandler('authority name required', res);
       }
 
-      authUtils.hasAccess(req.user, req.query.authority, function(err, hasAccess){
+      authUtils.hasAccess(req.user, req.query.name, function(err, hasAccess){
         if( err ) {
           return errorHandler(err, res);
         }
         if( !hasAccess ) {
-          return errorHandler('You do not have access to authority: '+req.query.authority, res);
+          return errorHandler('You do not have access to authority: '+req.query.name, res);
         }
 
         model.get(req.query.name, function(err, authority){
@@ -61,7 +61,7 @@ module.exports = function (router) {
         return errorHandler('authority required', res);
       }
 
-      model.create(authority, function(err, authority){
+      model.create(authority, req.user, function(err, authority){
         if( err ) {
           return errorHandler(err, res);
         }
