@@ -51,6 +51,11 @@ var BudgetMaterialPopup = {
       return;
     }
 
+    if( !FB.hasAccess(this.data) ) {
+      this.remove();
+      return;
+    }
+
     this.hidePanels();
     this.showMainHeaderFooter(false);
     this.$.removePanel.update(this.data);

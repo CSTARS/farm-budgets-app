@@ -15,6 +15,9 @@ BudgetMaterialPopup.create = function(name) {
       defaultAuthority = ExpressAuth.user.username;
     }
   }
+  if( !ExpressAuth.user ) {
+    defaultAuthority = '';
+  }
 
   this.data = {
     type : 'simple',

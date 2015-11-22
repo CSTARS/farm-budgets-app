@@ -1,8 +1,7 @@
 BudgetMaterialPopup.remove = function() {
 
   var usedBy = {
-    operations : [],
-//    materials : []
+    operations : []
   };
 
   var operations = FB.operationController.get();
@@ -22,6 +21,8 @@ BudgetMaterialPopup.remove = function() {
 
   // remove this item from controller, events trigger ui updates
   FB.materialController.remove(this.data.name);
+
+  FB.changes.removeMaterial(this.data);
 
   this.hide();
 };

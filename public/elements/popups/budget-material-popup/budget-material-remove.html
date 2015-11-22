@@ -16,7 +16,7 @@
     <h5><i class="fa fa-times"></i> Remove material from budget</h5>
 
     <div style="padding:15px">
-      <a class="btn btn-primary" on-click="remove"><i class="fa fa-times"></i> Remove</a>
+      <a class="btn btn-primary" on-click="fireRemove"><i class="fa fa-times"></i> Remove</a>
     </div>
 
     <h5><i class="fa fa-times"></i> Remove material from budget & <i class="fa fa-trash"></i> permanently delete material</h5>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <a class="btn btn-primary" id="deleteBtn" on-click="delete"></a>
+    <a class="btn btn-primary" id="deleteBtn" on-click="fireDelete"></a>
 
     <div class="modal-footer">
       <a class="btn btn-link pull-right" on-click="back"><i class="fa fa-arrow-left"></i> Back</a>
@@ -59,8 +59,8 @@
             html +=
               '<tr>'+
                 '<td>'+resp[i].name+'</td>'+
-                '<td>'+resp[i].farm.farm+'</td>'+
-                '<td>'+resp[i].farm.commodity+'</td>'+
+                '<td>'+resp[i].farm.name+'</td>'+
+                '<td>'+resp[i].commodity+'</td>'+
                 '<td>'+resp[i].authority+'</td>'+
                 '<td>'+resp[i].locality.join(', ')+'</td>'+
               '</div>';
@@ -75,6 +75,15 @@
           $(this.$.deleteBtn).removeClass('disabled').html('<i class="fa fa-times"></i> Remove&nbsp;&nbsp;&&nbsp;&nbsp;<i class="fa fa-trash"></i> Delete');
         }.bind(this));
       },
+
+      fireRemove : function() {
+        this.fire('remove');
+      },
+
+      fireDelete : function() {
+        this.fire('delete');
+      },
+
 
       back : function() {
         this.fire('close-remove');

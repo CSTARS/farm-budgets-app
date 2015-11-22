@@ -14,6 +14,7 @@
       if( id ) {
         $.get('/budget/get?id='+id, function(resp){
           if( resp.error ) {
+
             // check local data if error (probably new, unsaved budget)
             var localdata = window.localStorage.getItem(id);
             if( localdata ) {
@@ -48,10 +49,15 @@
           localdata.materials = [];
         }
 
+        var hasChanges = false;
+        if( localdata ) {
+          hasChanges = FB.changes.forceCheckAll(localdata.budget, localdata.materials);
+        }
+
         if( localdata && !ExpressAuth.user ) {
           this.load(localdata);
           return true;
-        } else if( localdata && FB.changes.forceCheckAll(localdata.budget, localdata.materials) ) {
+        } else if( localdata && hasChanges ) {
           this.load(localdata);
           return true;
         }

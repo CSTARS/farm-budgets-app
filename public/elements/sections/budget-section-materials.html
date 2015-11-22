@@ -17,7 +17,7 @@
     #warningMessage {
       display : none;
       border-bottom: 1px solid #ffc599;
-      padding: 25px 10px;
+      padding: 20px 10px;
       text-align: center;
     }
   </style>
@@ -26,7 +26,7 @@
 
     <div id="warningMessage" class="text text-warning">
       <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.</div>
-      <a class="btn btn-warning" on-click="showReviewPopup">Review and Save Material Changes</a>
+      <span id="unsavedFilterOuter"><input type="checkbox" id="unsavedFilter" on-click="filter" /> Only Unsaved Materials</span>
     </div>
 
     <div style="text-align: center; padding: 25px 0 15px 0">
@@ -45,7 +45,7 @@
             <label for="filterInput" class="col-sm-2 control-label">Filter</label>
             <div class="col-sm-10">
               <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
-
+              <a class="btn btn-link" on-click="showSimpleTable">Simple Material Table</a>
             </div>
           </div>
         </div>
@@ -55,6 +55,8 @@
 
       </div>
     </div>
+
+    <budget-simple-material-popup id="simpleTable"></budget-simple-material-popup>
   </template>
 </dom-module>
 
@@ -89,9 +91,11 @@
     onMaterialDiff : function(diff) {
       if( diff.length > 0 ) {
         this.$.warningMessage.style.display = 'block';
+        this.$.unsavedFilterOuter.style.display = 'inline-block';
         this.fire('unsaved-update', true);
       } else {
         this.$.warningMessage.style.display = 'none';
+        this.$.unsavedFilterOuter.style.display = 'none';
         this.fire('unsaved-update', false);
       }
     },
@@ -193,11 +197,17 @@
         matched = this.toNameArray(FB.materialController.find(txt));
       }
 
+      var onlyUnsaved = $(this.$.unsavedFilter).is(':checked');
+
       var opEles = this.querySelectorAll('budget-material-list-item');
       for( var i = 0; i < opEles.length; i++ ) {
         var ele = opEles[i];
         if( showAll || matched.indexOf(ele.getAttribute('material-name')) > -1 ) {
-          ele.style.display = 'block';
+          if( onlyUnsaved && !ele.hasAttribute('has-changes') ) {
+            ele.style.display = 'none';
+          } else {
+            ele.style.display = 'block';
+          }
         } else {
           ele.style.display = 'none';
         }
@@ -288,6 +298,10 @@
         return;
       }
       document.querySelector('budget-material-review-popup').show();
+    },
+
+    showSimpleTable : function() {
+      this.$.simpleTable.show();
     }
   });
 </script>

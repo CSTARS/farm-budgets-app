@@ -1,0 +1,73 @@
+<dom-module id="budget-simple-material-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content model-lg">
+
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title">Simple Materials Table</h4>
+          </div>
+
+          <div class="modal-body">
+            <div class="help-block">Below is a list of all of the simple/base materials used in this budget</div>
+            <div id="tableRoot"></div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-simple-material-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+      },
+
+      show : function() {
+        this.popup.modal('show');
+
+        var materials = FB.materialController.get().materials;
+        var html = '<table class="table">'+
+          '<tr><th><i class="fa fa-cube"></i> Material</th><th><i class="fa fa-dollar"></i> Price</th>'+
+            '<th><i class="fa fa-shield"></i> Authority</th><th><i class="fa fa-map-marker"></i> Location</th></tr>';
+
+        for( var key in materials ) {
+          var m = materials[key];
+          if( !m.id ) continue;
+
+          html += '<tr>'+
+            '<td><a href="#budget/materials/'+encodeURIComponent(key)+'">'+key+'</a></td>'+
+            '<td>'+m.price+' '+m.units+'</td>'+
+            '<td>'+m.authority+'</td>'+
+            '<td style="text-transform:capitalize">'+m.locality.join(', ')+'</td>'+
+            '</tr>';
+        }
+
+        this.$.tableRoot.innerHTML = html+'</table>';
+        $(this.$.tableRoot)
+          .find('a')
+          .on('click', this.hide.bind(this));
+      },
+
+      hide :function() {
+        this.popup.modal('hide');
+      }
+    });
+  </script>
+</dom-module>

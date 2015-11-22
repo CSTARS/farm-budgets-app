@@ -13,9 +13,10 @@
             <span id="icon"></span>
             <span id="name"></span>
           </div>
-          <div>
+          <div style="text-align:right">
             <span id="fixed" class="label label-warning">Fixed</span>
-            <a id="editIcon" class="btn btn-default btn-lg" on-click="edit"><i class="fa fa-pencil"></i></a>
+            <a id="editIcon" class="btn btn-default btn-lg" style="margin-bottom: 5px" on-click="edit"><i class="fa fa-pencil"></i></a>
+            <div id="changesMessage" style="font-size:12px" class="text text-warning"></div>
           </div>
         </div>
       </h5>
@@ -52,6 +53,13 @@
         material : {
           type : Object,
           observer : 'update'
+        },
+        hasChanges : {
+          type : Boolean,
+          reflectToAttribute : true,
+          value : function() {
+            return false;
+          }
         }
       },
 
@@ -71,7 +79,7 @@
           this.$.editIcon.style.display = 'none';
         } else {
           this.$.fixed.style.display = 'none';
-          this.$.editIcon.style.display = 'block';
+          this.$.editIcon.style.display = 'inline-block';
         }
 
         var otherInfo = '';
@@ -99,8 +107,35 @@
 
         this.setUsedByOps();
         this.setRequiredBy();
+        this.setChanges();
 
         this.verify();
+      },
+
+      setChanges : function() {
+        if( !this.material.id ) return;
+
+        var changes = FB.changes.hasChanges(this.material);
+        if( !changes ) {
+          this.hasChanges = false;
+          this.$.changesMessage.innerHTML = '';
+          this.$.editIcon.className = 'btn btn-default btn-lg';
+          return;
+        }
+
+        this.hasChanges = true;
+        if( ExpressAuth.user ) {
+          this.$.changesMessage.innerHTML = 'You have unsaved changes to this material.  Click <i class="fa fa-pencil"></i> to save.';
+        } else {
+          this.$.changesMessage.innerHTML = 'You have unsaved changes to this material.  You must login to save.';
+        }
+
+        if( changes.created ) {
+          this.$.editIcon.className = 'btn btn-success btn-lg';
+        } else {
+          this.$.editIcon.className = 'btn btn-warning btn-lg';
+        }
+
       },
 
       setUsedByOps : function() {

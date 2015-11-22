@@ -148,14 +148,20 @@
 
             <budget-material-advanced id="advancedPanel" style="display:none" on-close-advanced="showSimple"></budget-material-advanced>
             <budget-material-history id="historyPanel" style="display:none" on-close-history="showSimple"></budget-material-history>
-            <budget-material-remove id="removePanel" style="display:none" on-close-remove="showSimple"></budget-material-remove>
+            <budget-material-remove
+              id="removePanel"
+              style="display:none"
+              on-close-remove="showSimple"
+              on-remove="remove"
+              on-delete="delete">
+            </budget-material-remove>
 
 
             <div id="authorityMessage"></div>
 
             <div class="horizontal layout center" id="footer">
               <div class="flex">
-                <a class="btn btn-link" on-click="showRemove" id="removeBtn"><i class="fa fa-trash"></i> Remove</a>
+                <a class="btn btn-link" on-click="showRemove" id="removeBtn"><i class="fa fa-times"></i> Remove</a>
                 <a class="btn btn-link" on-click="showAdvanced" id="advancedBtn"><i class="fa fa-cog"></i> Advanced</a>
                 <a class="btn btn-link" on-click="showHistory" id="historyBtn"><i class="fa fa-history"></i> History</a>
               </div>

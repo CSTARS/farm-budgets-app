@@ -218,7 +218,11 @@
 
       addMaterial : function(id, callback) {
         $.get('/materials/get?id='+id, function(resp){
+          // add to controller
           FB.materialController.add(resp);
+          // update changes, we don't want to track this
+          FB.changes.addMaterial(resp);
+          FB.localsave();
           if( callback ) callback();
         });
       },
