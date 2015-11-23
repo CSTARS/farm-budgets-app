@@ -6,16 +6,22 @@
       }
     </style>
 
-    <h4 class="page-header"><i class="fa fa-dollar"></i> My Budgets</h4>
+    <h4 class="page-header" style="margin-top:0px"><i class="fa fa-dollar"></i> My Budgets</h4>
 
     <div class="btn-group">
       <a class="btn btn-default active" id="authorityBtn" on-click="setAuthority">Owned by Me</a>
       <a class="btn btn-default" id="contributedBtn" on-click="setContributed">Contributed To</a>
     </div>
 
-    <template is="dom-repeat" items="{{budgets}}">
-      <budget-list-item budget="{{item}}"></budget-list-item>
-    </template>
+    <div style="margin-top: 10px">
+      <template is="dom-repeat" items="{{budgets}}">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <budget-list-item budget="{{item}}"></budget-list-item>
+          </div>
+        </div>
+      </template>
+    </div>
 
   </template>
   <script>

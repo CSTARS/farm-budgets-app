@@ -121,15 +121,15 @@ module.exports = function (router) {
         return errorHandler('authority name required', res);
       }
 
-      authUtils.hasAccess(req.user, req.body.authority, function(err, hasAccess){
+      authUtils.hasAccess(req.user, req.body.name, function(err, hasAccess){
         if( err ) {
           return errorHandler(err, res);
         }
         if( !hasAccess ) {
-          return errorHandler('You do not have access to authority: '+req.query.authority, res);
+          return errorHandler('You do not have access to authority: '+req.body.name, res);
         }
 
-        model.update(req.body, function(err, authority){
+        model.save(req.body, function(err, authority){
           if( err ) {
             return errorHandler(err, res);
           }

@@ -3,7 +3,7 @@
 var collection = global.db.collection('authority');
 var accountCollection = global.db.collection('accounts');
 
-var allowedKeys = ['name', 'description'];
+var allowedKeys = ['name','description'];
 
 module.exports = function() {
   return {
@@ -90,6 +90,9 @@ function removeAccess(username, authority, callback) {
 function create(authority, user, callback) {
   if( !authority.name ) {
     return callback('Authority name required');
+  }
+  if( authority.name.length > 10 ) {
+    return callback('Authority name can be no more than 10 characters');
   }
 
   collection.findOne({name: authority.name}, {_id: 1, name:1}, function(err, auth){

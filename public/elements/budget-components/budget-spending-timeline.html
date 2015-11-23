@@ -15,8 +15,8 @@
           <button type="button" class="btn btn-default" id="cumulativeBtn" on-click="byCumlative">Cumulative</button>
         </div>
       </div>
-      <div class="flex" style="padding: 5px">
-        <input type="checkbox" id="logScale" on-click="drawChart"/> Log Scale
+      <div class="flex" style="padding: 5px" id="logScaleOuter">
+        <input type="checkbox" id="logScale" on-click="drawChart" checked /> Log Scale
       </div>
       <div id="selected" style="padding: 5px"></div>
     </div>
@@ -174,8 +174,12 @@
 
 
       var newChartType = 'LineChart';
+      // isstacked and logScale are not supported: https://github.com/google/google-visualization-issues/issues/992
       if( this.type == 'total' || this.type == 'cumulative' ) {
         newChartType = 'AreaChart';
+        $(this.$.logScaleOuter).hide();
+      } else {
+        $(this.$.logScaleOuter).show();
       }
 
       if( !this.chart || this.chartType !== newChartType ) {
@@ -190,7 +194,7 @@
 
       var options = {
         vAxis : {
-          logScale : $(this.$.logScale).is(':checked')
+          logScale : false
         },
         animation:{
           duration: 800,
@@ -200,6 +204,8 @@
 
       if( this.type == 'total' || this.type == 'cumulative' ) {
         options.isStacked = true;
+      } else {
+        options.vAxis.logScale = $(this.$.logScale).is(':checked');
       }
 
       this.chart.draw(dataTable, options);

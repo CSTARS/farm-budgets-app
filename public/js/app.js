@@ -88,7 +88,6 @@ FB._localsave = function(auto) {
     data.materials.push(materials.complex[key]);
   }
 
-  window.localStorage.clear();
   window.localStorage.setItem('current-budget', data.budget.id);
   window.localStorage.setItem(data.budget.id, JSON.stringify(data));
   FB.localdata = data;

@@ -1,6 +1,6 @@
 {
   "name": "farm-budgets-app",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "App for viewing farm budget data",
   "author": "jrmerz@gmail.com",
   "main": "index.js",

@@ -13,5 +13,5 @@ module.exports = function() {
 
 
 function findForLocality(query, callback) {
-  collection.distinct('farm.commodity', query ,callback);
+  collection.distinct('commodity', query ,callback);
 }

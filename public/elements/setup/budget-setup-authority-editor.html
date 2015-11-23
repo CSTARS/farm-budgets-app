@@ -107,7 +107,7 @@
           description : this.$.descriptionInput.value
         };
 
-        $.post('/authority/save', authority, function(resp){
+        $.post('/authority/update', authority, function(resp){
           $(this.$.createBtn).removeAttr('disabled').html('Update Description');
 
           if( resp.error ) {

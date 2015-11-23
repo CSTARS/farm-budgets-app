@@ -25,7 +25,7 @@
               } catch(e) {}
             }
 
-            document.querySelector('find-budget-popup').show();
+            this.showFindPopup();
             return;
           }
 
@@ -35,8 +35,18 @@
           }
         }.bind(this));
       } else {
-        document.querySelector('find-budget-popup').show();
+        this.showFindPopup();
       }
+    },
+
+    showFindPopup : function() {
+      document
+        .querySelector('budget-welcome-splash')
+        .addEventListener('splash-close', function(){
+          setTimeout(function(){
+            document.querySelector('find-budget-popup').show();
+          }, 300);
+        });
     },
 
     checkLocal : function(id) {
@@ -101,11 +111,15 @@
       }
 
       $.get('/budget/get?id='+id, function(resp){
-        FB.changes.setOriginal(resp.budget, resp.materials);
-
         if( resp.error ) {
           return alert('Error reloading budget data: '+resp.message);
         }
+
+        FB.changes.setOriginal(resp.budget, resp.materials);
+        FB.changes.setUnsaved({});
+        window.localStorage.setItem('unsaved-materials', '{}');
+
+        window.localStorage.clear();
 
         this.load(resp);
       }.bind(this));

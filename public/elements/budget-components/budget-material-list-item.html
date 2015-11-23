@@ -69,6 +69,7 @@
 
       update : function() {
         if( !this.material ) return;
+
         this.setAttribute('material-name', this.material.name);
 
         this.$.icon.innerHTML = '<i class="fa fa-cube'+(this.material.type === 'complex' ? 's' : '')+'"></i>';
@@ -116,7 +117,8 @@
         if( !this.material.id ) return;
 
         var changes = FB.changes.hasChanges(this.material);
-        if( !changes ) {
+        var unsaved = FB.changes.getUnsaved()[this.material.id];
+        if( !changes && !unsaved ) {
           this.hasChanges = false;
           this.$.changesMessage.innerHTML = '';
           this.$.editIcon.className = 'btn btn-default btn-lg';
@@ -130,11 +132,11 @@
           this.$.changesMessage.innerHTML = 'You have unsaved changes to this material.  You must login to save.';
         }
 
-        if( changes.created ) {
-          this.$.editIcon.className = 'btn btn-success btn-lg';
-        } else {
+        //if( changes.created ) {
+        //  this.$.editIcon.className = 'btn btn-success btn-lg';
+        //} else {
           this.$.editIcon.className = 'btn btn-warning btn-lg';
-        }
+        //}
 
       },
 

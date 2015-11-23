@@ -1,0 +1,65 @@
+<dom-module id="budget-welcome-splash">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title">Farm Budgets</h4>
+          </div>
+
+          <div class="modal-body">
+            <h5 style="margin:0">Alpha v0.3</h5>
+
+            <div style="padding-bottom: 15px">
+              Welcome to the <a href="http://hardwoodbiofuels.org/" target="_blank">Advanced Hardwood Biofuel (AHB)</a>
+              farm budget application.  This application allows you to view and create farm budgets for various crops.
+              The farm budget application breaks down budgets into operations and materials.  Materials can be shared
+              across budgets.  All budgets and materials have a specified authority and location.
+            </div>
+
+            <div class="alert alert-warning">
+              PLEASE NOTE.  This is application is still in alpha.  That means there are bugs,
+              sharp corners and aspects still in development.  If you find a bug or have a suggestion
+              for a feature, please report it <a href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank">here.</a>
+            </div>
+
+            <div>
+              While this application is in alpha, assume all data is for testing purposes only.
+            </div>
+          </div>
+
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-welcome-splash',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup
+          .modal({show:true})
+          .on('hidden.bs.modal', function(){
+            this.fire('splash-close');
+          }.bind(this));
+      }
+    });
+  </script>
+</dom-module>

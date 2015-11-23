@@ -85,6 +85,11 @@ BudgetMaterialPopup._save = function(noHide, options) {
   // save locally
   FB.localsave();
 
+  // generate a guid locally
+  if( !this.data.id ) {
+    this.data.id = FB.utils.guid();
+  }
+
   var result = FB.materialController.add(this.data, options);
   if( result.error ) {
     this.setSaving(false);
@@ -104,6 +109,18 @@ BudgetMaterialPopup._save = function(noHide, options) {
       this._onSaveComplete(noHide, resp);
     }.bind(this));
   } else {
+    // update local unsaved material list
+    var unsaved = window.localStorage.getItem('unsaved-materials');
+    if( !unsaved ) unsaved = {};
+    else unsaved = JSON.parse(unsaved);
+
+    unsaved[this.data.id] = this.data;
+    FB.changes.setUnsaved(unsaved);
+    window.localStorage.setItem('unsaved-materials', JSON.stringify(unsaved));
+
+    // re-trigger events, so panels can check unsaved array
+    FB.materialController.add(this.data, {replace: true});
+
     this.setSaving(false);
     if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   }
@@ -115,6 +132,17 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
     alert('Failed to save to server.  '+resp.message+'.\n\n  Your material has been saved locally.');
     this.setSaving(false);
     return;
+  }
+
+  // make sure the unsaved list is updated
+  var unsaved = window.localStorage.getItem('unsaved-materials');
+  if( unsaved ) {
+    unsaved = JSON.parse(unsaved);
+    if( unsaved[this.data.id] ) {
+      delete unsaved[this.data.id];
+      FB.changes.setUnsaved(unsaved);
+      window.localStorage.setItem('unsaved-materials', JSON.stringify(unsaved));
+    }
   }
 
   // now update the changes object
