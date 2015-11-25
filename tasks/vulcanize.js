@@ -13,7 +13,10 @@ module.exports = function(grunt) {
       },
       files: {
         'dist/require.html': [
-        'public/require.html'
+        	'public/require.html'
+        ],
+				'dist/login-require.html': [
+        	'public/login-require.html'
         ]
       }
     },

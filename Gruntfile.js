@@ -124,11 +124,11 @@ module.exports = function (grunt) {
         'browserify:build',
         'copyto:build',
         // start usemin
-          'useminPrepare',
-          'concat:generated',
-          'cssmin:generated',
-          'uglify:generated',
-          'usemin',
+        //  'useminPrepare',
+        //  'concat:generated',
+        //  'cssmin:generated',
+        //  'uglify:generated',
+        //  'usemin',
         // end usemin
       'vulcanize:build']);
 

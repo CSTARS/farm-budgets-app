@@ -10,28 +10,22 @@ module.exports = function copyto(grunt) {
         build: {
             files: [{
                 cwd: 'public',
-                src: ['index.html'],
+                src: ['index.html','login.html'],
                 dest: 'dist/'
             },
             {
-                cwd: 'public/bower_components/font-awesome',
-                src: ['fonts/**/*'],
-                dest: 'dist/'
+                cwd: 'public/js',
+                src: ['webcomponents.js'],
+                dest: 'dist/js/'
+            },
+            {
+                cwd: 'public/bower_components/font-awesome/',
+                src: ['fonts/*','css/font-awesome.css'],
+                dest: 'dist/font-awesome/'
             }],
             options: {
                 ignore: []
             }
-        },
-        prototype: {
-            files: [{
-                cwd: 'public',
-                src: ['prototype/**/*'],
-                dest: 'dist/'
-            },{
-                cwd: 'public/bower_components/font-awesome',
-                src: ['fonts/**/*'],
-                dest: 'dist/prototype/'
-            }]
         }
     };
 };
