@@ -3,14 +3,12 @@
 
 FROM node:5-slim
 
-# look to add this work to shell script then just add shell script
-RUN apt-get update -y && apt-get -y install git python make g++
+ADD init.sh
+ADD run.sh
 
-RUN git clone https://github.com/CSTARS/farm-budgets-app /farm-budgets-app
+RUN init.sh
 
-RUN cd /farm-budgets-app && npm install
-
-CMD cd /farm-budgets-app && npm start
+CMD run.sh
 
 # default port
 EXPOSE 3021
