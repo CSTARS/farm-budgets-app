@@ -3,12 +3,12 @@
 
 FROM node:5-slim
 
-ADD init.sh
-ADD run.sh
+ADD init.sh /
+ADD run.sh /
 
-RUN init.sh
+RUN /init.sh
 
-CMD run.sh
+CMD /run.sh
 
 # default port
 EXPOSE 3021
