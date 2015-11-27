@@ -29,7 +29,8 @@
     },
 
     "mongo" : {
-      "url" : "mongodb://localhost:27017/farmBudgets"
+      "database" : "farmBudgets",
+      "url" : "mongodb://localhost:27017/"
     },
 
     "auth" : {
