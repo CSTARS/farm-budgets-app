@@ -17,6 +17,9 @@ module.exports = function(grunt) {
         ],
 				'dist/login-require.html': [
         	'public/login-require.html'
+        ],
+				'dist/createAccount-require.html': [
+        	'public/createAccount-require.html'
         ]
       }
     },
