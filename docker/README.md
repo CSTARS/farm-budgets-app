@@ -85,3 +85,7 @@ pass: tcuser
 
 # Ubuntu / apt-get
 https://docs.docker.com/engine/installation/ubuntulinux/
+
+# Docker Hub
+
+docker push [repo org]/[repo name]:[repo tag]
