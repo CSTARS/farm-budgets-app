@@ -144,7 +144,7 @@
       if( !this.operation ) return;
 
       this.operation.schedule = e.detail;
-      FB.operationController.recalc();
+      FB.operationController.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
