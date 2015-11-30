@@ -57,7 +57,7 @@
               </div>
 
               <div class="form-group">
-                <label for="unitsInput" class="col-sm-3 control-label">Location</label>
+                <label for="locationInput" class="col-sm-3 control-label">Location</label>
                 <div class="col-sm-9">
                     <budget-location-selector id="locationInput" on-location-update="onLocationUpdate"></budget-location-selector>
                 </div>
@@ -114,14 +114,14 @@
       },
 
       updateInputs : function() {
-        this.$.budgetNameInput.value = this.data.name;
-        this.$.farmNameInput.value = this.data.farm.name;
-        this.$.cropInput.value = this.data.commodity;
-        this.$.sizeInput.value = this.data.farm.size;
-        this.$.unitsInput.units = this.data.farm.units;
+        this.$.budgetNameInput.value = this.data.name || '';
+        this.$.farmNameInput.value = this.data.farm.name || '';
+        this.$.cropInput.value = this.data.commodity || '';
+        this.$.sizeInput.value = this.data.farm.size || '';
+        this.$.unitsInput.units = this.data.farm.units || '';
         this.$.locationInput.setValue(this.data.locality);
-        this.$.authorityInput.value = this.data.authority;
-        this.$.authorityInput.default = this.data.authority;
+        this.$.authorityInput.value = this.data.authority || '';
+        this.$.authorityInput.default = this.data.authority || '';
 
         if( this.data.reference ) {
           this.$.referenceMsg.style.display = 'block';
@@ -151,7 +151,7 @@
       },
 
       editUnits : function() {
-        this.data.farm.units = this.$.unitsInput.units;
+        this.data.farm.units = this.$.unitsInput.getUnits();
       },
 
       onLocationUpdate : function() {
