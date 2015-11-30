@@ -248,7 +248,7 @@
       // TODO: this should be a popup that also checks for reference budgets.
       if( !confirm('Are you sure you want to delete the budget!?') ) return;
       if( !confirm('Are you really sure!?') ) return;
-      $.get('/budgets/delete?id='+this.budgetId, function(resp){
+      $.get('/budget/delete?id='+this.budgetId, function(resp){
         if( resp.error ) {
           alert(resp.message);
         }

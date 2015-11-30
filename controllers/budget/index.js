@@ -59,7 +59,7 @@ module.exports = function (router) {
           return res.send({error: true, message: 'Unknown budget id'});
         }
 
-        authUtils.hasAccessObject(req.user, budget, function(err, hasRole){
+        authUtils.hasAccessObject(req.user, budget.budget, function(err, hasRole){
           if( err ) {
             return res.send({error:true, message: err});
           }

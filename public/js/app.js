@@ -16,6 +16,8 @@ FB.hasAccess = function(object) {
 
   if( !object || !user ) return false;
 
+  if( user.admin ) return true;
+
   if( typeof object === 'string' ) {
     object = {authority: object};
   } else if( !object.authority ) {
