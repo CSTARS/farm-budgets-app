@@ -31089,6 +31089,8 @@ FB.hasAccess = function(object) {
 
   if( !object || !user ) return false;
 
+  if( user.admin ) return true;
+
   if( typeof object === 'string' ) {
     object = {authority: object};
   } else if( !object.authority ) {
@@ -42638,7 +42640,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
               </div>
 
               <div class="form-group">
-                <label for="unitsInput" class="col-sm-3 control-label">Location</label>
+                <label for="locationInput" class="col-sm-3 control-label">Location</label>
                 <div class="col-sm-9">
                     <budget-location-selector id="locationInput" on-location-update="onLocationUpdate"></budget-location-selector>
                 </div>
@@ -42695,14 +42697,14 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       },
 
       updateInputs : function() {
-        this.$.budgetNameInput.value = this.data.name;
-        this.$.farmNameInput.value = this.data.farm.name;
-        this.$.cropInput.value = this.data.commodity;
-        this.$.sizeInput.value = this.data.farm.size;
-        this.$.unitsInput.units = this.data.farm.units;
+        this.$.budgetNameInput.value = this.data.name || '';
+        this.$.farmNameInput.value = this.data.farm.name || '';
+        this.$.cropInput.value = this.data.commodity || '';
+        this.$.sizeInput.value = this.data.farm.size || '';
+        this.$.unitsInput.units = this.data.farm.units || '';
         this.$.locationInput.setValue(this.data.locality);
-        this.$.authorityInput.value = this.data.authority;
-        this.$.authorityInput.default = this.data.authority;
+        this.$.authorityInput.value = this.data.authority || '';
+        this.$.authorityInput.default = this.data.authority || '';
 
         if( this.data.reference ) {
           this.$.referenceMsg.style.display = 'block';
@@ -42732,7 +42734,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       },
 
       editUnits : function() {
-        this.data.farm.units = this.$.unitsInput.units;
+        this.data.farm.units = this.$.unitsInput.getUnits();
       },
 
       onLocationUpdate : function() {
@@ -44036,7 +44038,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       }
     </style>
 
-    <div class="modal fade" id="popup">
+    <div class="modal" id="popup">
       <div class="modal-dialog">
         <div class="modal-content">
 
@@ -44345,7 +44347,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       // TODO: this should be a popup that also checks for reference budgets.
       if( !confirm('Are you sure you want to delete the budget!?') ) return;
       if( !confirm('Are you really sure!?') ) return;
-      $.get('/budgets/delete?id='+this.budgetId, function(resp){
+      $.get('/budget/delete?id='+this.budgetId, function(resp){
         if( resp.error ) {
           alert(resp.message);
         }
