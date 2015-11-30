@@ -121,10 +121,7 @@
       FB.materialController.on('material-update', this.checkForChanges.bind(this));
       FB.materialController.on('material-removed', this.checkForChanges.bind(this));
 
-      FB.operationController.on('operation-update', function(){
-        debugger;
-        this.checkForChanges();
-      }.bind(this));
+      FB.operationController.on('operation-update', this.checkForChanges.bind(this));
       FB.operationController.on('operation-remove', this.checkForChanges.bind(this));
 
       FB.changes.on('budget-diff', this.onDiffCheckComplete.bind(this));
@@ -167,8 +164,6 @@
     onDiffCheckComplete : function(diff) {
 
       if( diff.budget.length > 0 || diff.materialIds.length > 0 ) {
-        debugger;
-
         this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
         this.$.saveBudgetBtnInner.removeAttribute('disabled');
         this.$.saveBudgetBtn.style.display = 'inline-block';
