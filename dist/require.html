@@ -39215,7 +39215,7 @@ BudgetMaterialPopup.onEditUnique = function(e) {
   // check access
   if( ExpressAuth.user ) {
     // check if user has access to authroity
-    if( !FB.utils.hasAccess(ExpressAuth.user, this.data.authority) ) {
+    if( !FB.hasAccess(this.data.authority) ) {
       this.$.authorityMessage.innerHTML =
         '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You do not have access to the authority '+
         '<b><i class="fa fa-shield"></i> '+this.data.authority+'</b>.  Please select a new authority in '+
@@ -44709,6 +44709,10 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
         }
       },
 
+      ready : function() {
+        this.changesTimer = -1;
+      },
+
       edit : function() {
         this.fire('edit-material');
       },
@@ -44759,7 +44763,18 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
         this.verify();
       },
 
+      // need to buffer this as we may still be in the process of tracking changes when
+      // this element is created, cause the element to think there are changes when
+      // there are none.
       setChanges : function() {
+        if( this.changesTimer == -1 ) clearTimeout(this.changesTimer);
+        this.changesTimer = setTimeout(function(){
+          this.changesTimer = -1;
+          this._setChanges();
+        }.bind(this), 500);
+      },
+
+      _setChanges : function() {
         if( !this.material.id ) return;
 
         var changes = FB.changes.hasChanges(this.material);
@@ -44778,12 +44793,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
           this.$.changesMessage.innerHTML = 'You have unsaved changes to this material.  You must login to save.';
         }
 
-        //if( changes.created ) {
-        //  this.$.editIcon.className = 'btn btn-success btn-lg';
-        //} else {
-          this.$.editIcon.className = 'btn btn-warning btn-lg';
-        //}
-
+        this.$.editIcon.className = 'btn btn-warning btn-lg';
       },
 
       setUsedByOps : function() {
@@ -45459,7 +45469,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
         for( var i = 0; i < ExpressAuth.user.authorities.length; i++ ) {
           arr.push({
             label : ExpressAuth.user.authorities[i],
-            href : '#budget/setup/authorities/'+ExpressAuth.user.authorities[i]
+            href : '#budget/setup/authorities/'+encodeURIComponent(ExpressAuth.user.authorities[i])
           });
         }
         this.authorities = arr;

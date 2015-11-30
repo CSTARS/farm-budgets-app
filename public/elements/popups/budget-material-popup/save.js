@@ -17,7 +17,7 @@ BudgetMaterialPopup.save = function(noHide) {
   // check access
   if( ExpressAuth.user ) {
     // check if user has access to authroity
-    if( !FB.utils.hasAccess(ExpressAuth.user, this.data.authority) ) {
+    if( !FB.hasAccess(this.data.authority) ) {
       this.$.authorityMessage.innerHTML =
         '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You do not have access to the authority '+
         '<b><i class="fa fa-shield"></i> '+this.data.authority+'</b>.  Please select a new authority in '+

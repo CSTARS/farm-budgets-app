@@ -63,6 +63,10 @@
         }
       },
 
+      ready : function() {
+        this.changesTimer = -1;
+      },
+
       edit : function() {
         this.fire('edit-material');
       },
@@ -113,7 +117,18 @@
         this.verify();
       },
 
+      // need to buffer this as we may still be in the process of tracking changes when
+      // this element is created, cause the element to think there are changes when
+      // there are none.
       setChanges : function() {
+        if( this.changesTimer == -1 ) clearTimeout(this.changesTimer);
+        this.changesTimer = setTimeout(function(){
+          this.changesTimer = -1;
+          this._setChanges();
+        }.bind(this), 500);
+      },
+
+      _setChanges : function() {
         if( !this.material.id ) return;
 
         var changes = FB.changes.hasChanges(this.material);
@@ -132,12 +147,7 @@
           this.$.changesMessage.innerHTML = 'You have unsaved changes to this material.  You must login to save.';
         }
 
-        //if( changes.created ) {
-        //  this.$.editIcon.className = 'btn btn-success btn-lg';
-        //} else {
-          this.$.editIcon.className = 'btn btn-warning btn-lg';
-        //}
-
+        this.$.editIcon.className = 'btn btn-warning btn-lg';
       },
 
       setUsedByOps : function() {
