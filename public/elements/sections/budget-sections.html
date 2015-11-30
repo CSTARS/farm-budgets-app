@@ -162,7 +162,12 @@
     },
 
     onDiffCheckComplete : function(diff) {
+
       if( diff.budget.length > 0 || diff.materialIds.length > 0 ) {
+        debugger;
+        
+        this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
+        this.$.saveBudgetBtnInner.removeAttribute('disabled');
         this.$.saveBudgetBtn.style.display = 'inline-block';
         this.$.unsavedMessage.style.display = 'block';
         this.$.overview.showChangesWarning(true);
@@ -184,9 +189,11 @@
       this.$.saveBudgetBtnInner.innerHTML = 'Saving...';
       this.$.saveBudgetBtnInner.setAttribute('disabled', 'disabled');
       FB.saveBudget(function(resp){
+        this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
+        this.$.saveBudgetBtnInner.removeAttribute('disabled');
+
         if( resp.error ) {
-          this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
-          this.$.saveBudgetBtnInner.removeAttribute('disabled');
+          alert(resp.message);
         } else {
           this.$.saveBudgetBtn.style.display = 'none';
           this.$.unsavedMessage.style.display = 'none';
