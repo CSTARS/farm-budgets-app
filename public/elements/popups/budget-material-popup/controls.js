@@ -65,7 +65,7 @@ var BudgetMaterialPopup = {
   showHistory : function() {
     this.hidePanels();
     this.showMainHeaderFooter(false);
-    this.$.historyPanel.style.display = 'block';
+    this.$.historyPanel.show(this.data.id);
   },
 
   toggleComplex : function() {

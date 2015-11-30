@@ -38771,7 +38771,7 @@ Any number of components can use `<google-maps-api>` elements, and the library w
   showHistory : function() {
     this.hidePanels();
     this.showMainHeaderFooter(false);
-    this.$.historyPanel.style.display = 'block';
+    this.$.historyPanel.show(this.data.id);
   },
 
   toggleComplex : function() {
@@ -43277,6 +43277,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       is: 'budget-material-history',
 
       show : function(id) {
+        this.style.display = 'block';
         this.$.history.show(id);
       },
 
