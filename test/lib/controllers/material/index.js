@@ -99,7 +99,7 @@ describe('Material Controller', function() {
     assert.equal(data.complex4.recalcErrors.length, 1);
   });
 
-  it('should let me fix last test cyclical errors', function(){
+  it('should let you fix last test cyclical errors', function(){
     var complex3 = controller.get(data.complex3.name);
     var complex4 = controller.get(data.complex4.name);
 
@@ -111,4 +111,75 @@ describe('Material Controller', function() {
     assert.equal(complex4.recalcErrors.length, 0);
     assert.equal(complex4.price, 4);
   });
-})
+
+  it('not fire update event with noEvent flag', function(){
+    controller.reset();
+
+    controller.on('material-update', function(response){
+      assert.equal(true, false);
+    });
+
+    setTimeout(function(response){
+      assert.equal(true, true);
+      done();
+    }, 100);
+
+    controller.add(data.simple1, {noEvent: true});
+  });
+
+  it('should not recalc with noRecalc flag', function(){
+    controller.reset();
+
+    controller.add(data.simple1);
+    controller.add(data.simple2);
+    controller.add(data.complex1);
+
+    // test no update
+    var newData = require('./data')().simple1;
+    newData.price = 2;
+    var resp = controller.add(newData, {noRecalc: true, replace: true});
+    assert.equal(resp.success, true);
+    assert.equal(controller.get(data.complex1.name).price, 12.25);
+
+    // now actually update
+    var resp = controller.add(newData,  {replace: true});
+    assert.equal(resp.success, true);
+    assert.equal(controller.get(data.complex1.name).price, 13.25);
+  });
+
+  it('should let you remove a material', function(){
+    controller.reset();
+
+    var resp = controller.add(data.simple1);
+    assert.equal(resp.success, true);
+
+    resp = controller.remove('foo');
+    assert.equal(resp.error, true);
+
+    resp = controller.remove(data.simple1.name);
+    assert.equal(resp.success, true);
+
+    resp = controller.get(data.simple1.name);
+    assert.equal(resp.error, true);
+  });
+
+  it('should let you rename a material', function(){
+    controller.reset();
+
+    var resp = controller.add(data.simple1);
+    assert.equal(resp.success, true);
+
+    var orgName = data.simple1.name;
+    var newName = data.simple1.name+' updated';
+    data.simple1.name = newName;
+
+    resp = controller.add(data.simple1, {rename: orgName});
+    assert.equal(resp.success, true);
+
+    resp = controller.get(newName);
+    assert.equal(resp.error, undefined);
+
+    resp = controller.get(orgName);
+    assert.equal(resp.error, true);
+  });
+});
