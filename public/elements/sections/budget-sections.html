@@ -158,6 +158,14 @@
     },
 
     checkForChanges : function() {
+      if( this.changesTimer != -1 ) clearTimeout(this.changesTimer);
+      this.changesTimer = setTimeout(function(){
+        this.changesTimer = -1;
+        this._checkForChanges();
+      }.bind(this), 100);
+    },
+
+    _checkForChanges : function() {
       FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
     },
 

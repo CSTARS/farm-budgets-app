@@ -1,5 +1,6 @@
 'use strict';
 
+var db = require('../lib/mongo').get();
 var schema = require('../lib/shared/save/schema')();
 var strip = require('../lib/shared/save/strip');
 var utils = require('../lib/modelUtils');
@@ -8,9 +9,9 @@ var materialModel = require('./materials');
 var uuid = require('node-uuid');
 var async = require('async');
 
-var collection = global.db.collection('budget');
-var materialCollection = global.db.collection('material');
-var historyCollection = global.db.collection('history');
+var collection = db.collection('budget');
+var materialCollection = db.collection('material');
+var historyCollection = db.collection('history');
 var history = require('mongo-object-history');
 
 authorityModel = new authorityModel();

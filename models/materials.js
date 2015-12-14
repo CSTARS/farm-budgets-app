@@ -3,6 +3,7 @@
 var uuid = require('node-uuid');
 var authorityModel = require('./authority');
 var utils = require('../lib/modelUtils');
+var db = require('../lib/mongo').get();
 var init = true;
 
 var schema = require('../lib/shared/save/schema')();
@@ -15,7 +16,7 @@ var required = ['price', 'units', 'type'];
 
 module.exports = function() {
   if( init ) {
-    collection = global.db.collection('material');
+    collection = db.collection('material');
     authorityModel = new authorityModel();
     init = false;
   }

@@ -115,7 +115,7 @@
       var value;
 
       try {
-        value = FB.ucum.convert(1, FB.units.math.cleanDollars(from), FB.units.math.cleanDollars(to));
+        value = FB.ucum.convert(1, FB.units.cleanDollars(from), FB.units.cleanDollars(to));
         if( value == 0 ) value = 1;
         value = 1 / value;
       } catch(e) {
@@ -223,9 +223,8 @@
 
 
       cols.Price.html(
-        (config.material.price ? config.material.price.toFixed(2) : '')+
-        (config.material.type === 'complex' ? ' $/' : ' ') +
-        FB.units.getLabel(config.material.units, true)
+        (config.material.price ? config.material.price.toFixed(2) : '') +
+        getUnits(config.material)
       );
 
       setPrice();
@@ -233,7 +232,17 @@
       if( cols.Notes ) {
         notesInput.val(config.materialImpl.note);
       }
+    }
 
+    function getUnits(material) {
+      var u = FB.units.getLabel(material.units, true);
+      if( material.type === 'complex' ) {
+        if( u === '$' ) {
+          return '';
+        }
+        return ' $/'+u;
+      }
+      return ' ' + u;
     }
 
     function setErrorStatus() {

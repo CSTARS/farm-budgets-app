@@ -1,7 +1,8 @@
 'use strict';
+var db = require('../lib/mongo').get();
 
-var collection = global.db.collection('authority');
-var accountCollection = global.db.collection('accounts');
+var collection = db.collection('authority');
+var accountCollection = db.collection('accounts');
 
 var allowedKeys = ['name','description'];
 

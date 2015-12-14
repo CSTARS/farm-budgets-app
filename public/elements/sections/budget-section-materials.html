@@ -113,16 +113,14 @@
 
     onMaterialsUpdated : function(e) {
       var all = FB.materialController.get();
-      for( var key in all.materials ) {
-        if( key === e.replaced || key === e.material.name ) {
+
+      for( var key in all ) {
+        if( all[key].type === 'simple' && key === e.replaced || key === e.material.name ) {
           this.updateMaterialPanel(e.material.name, e.replaced);
           break;
         }
-      }
 
-      // now check all complex materials
-      for( var key in all.complex ) {
-        if( FB.materialController.contains(all.complex[key], e.material.name, e.replaced) ) {
+        if( all[key].type === 'complex' && FB.materialController.contains(all[key], e.material.name, e.replaced) ) {
           var replaced = null;
           if( key === e.replaced ) {
             replaced = e.replaced;
@@ -154,14 +152,8 @@
       this.$.root.innerHTML = '';
 
       var materials = FB.materialController.get();
-      for( var name in materials.materials ) {
-        var material = materials.materials[name];
-        var div = this.createTable(material);
-        this.$.root.appendChild(div);
-      }
-
-      for( var name in materials.complex ) {
-        var material = materials.complex[name];
+      for( var name in materials ) {
+        var material = materials[name];
         var div = this.createTable(material);
         this.$.root.appendChild(div);
       }

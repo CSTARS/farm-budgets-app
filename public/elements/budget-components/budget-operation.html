@@ -93,6 +93,7 @@
 
     ready : function() {
       this.firstScheduleEvent = true;
+      this.renderTimer = -1;
     },
 
     attached : function() {
@@ -121,7 +122,11 @@
       if( !this.operation ) return;
       if( operation.name != this.operation.name ) return;
 
-      this.render();
+      if( this.renderTimer != -1 ) clearTimeout(this.renderTimer);
+      this.renderTimer = setTimeout(function(){
+        this.renderTimer = -1;
+        this.render();
+      }.bind(this), 100);
     },
 
     onMaterialUpdate : function(e) {

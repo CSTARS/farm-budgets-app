@@ -97,7 +97,7 @@
       } else {
         l = FB.units.invert(material.units);
       }
-      l = FB.units.math.cleanDollars(l);
+      l = FB.units.cleanDollars(l);
       if( l == '1' ) return '';
       return 'per '+l;
     },

@@ -2,10 +2,11 @@
 
 var async = require('async');
 var authUtils = require('../auth');
+var db = require('../../lib/mongo').get();
 var errorHandler = require('../../lib/handleError');
 var MaterialModel = require('../../models/materials');
 var model;
-var collection = global.db.collection('material');
+var collection = db.collection('material');
 
 module.exports = function (router) {
     model = new MaterialModel();

@@ -74,14 +74,10 @@
     },
 
     onOperationsUpdated : function(e) {
-
       if( e.replaced ) {
 
         var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
         current.attr('operation', operation.name);
-        /*var div = $(this.createPanel(e.operation));
-        div.insertAfter(current);
-        current.remove();*/
 
       } else {
 

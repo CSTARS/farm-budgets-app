@@ -1,9 +1,10 @@
 'use strict';
 
+var db = require('../lib/mongo').get();
 var extend = require('extend');
 
-var accountsCollection = global.db.collection('accounts');
-var usersCollection = global.db.collection('users');
+var accountsCollection = db.collection('accounts');
+var usersCollection = db.collection('users');
 
 module.exports = function() {
 

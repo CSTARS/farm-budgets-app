@@ -1,10 +1,11 @@
 'use strict';
 
+var db = require('../../lib/mongo').get();
 var authUtils = require('../auth');
 var BudgetModel = require('../../models/budget');
 var errorHandler = require('../../lib/handleError');
 var model;
-var collection = global.db.collection('budget');
+var collection = db.collection('budget');
 
 module.exports = function (router) {
     model = new BudgetModel();

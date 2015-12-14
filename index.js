@@ -24,14 +24,15 @@ options = {
 
 
         if( fs.existsSync('/etc/farm-budgets-app/config.js') ) {
-          var c = require('/etc/farm-budgets-app/config.js');
+          config.use('/etc/farm-budgets-app/config.js');
+          /*var c = require('/etc/farm-budgets-app/config.js');
 
           for( var key in c ) {
             var tmpConfig = config.get(key);
             if( tmpConfig ) {
               merge(tmpConfig, c[key]);
             }
-          }
+          }*/
         }
 
         // allow command line switch from serving /dist to /app
@@ -53,7 +54,7 @@ options = {
           setupHistoryTracking();
 
           var authSetup = {
-            db : global.db,
+            db : mongo.get(),
             app : app,
             config : config.get('auth'),
           };
@@ -65,9 +66,10 @@ options = {
 };
 
 function setupHistoryTracking() {
-  var budgetCollection = global.db.collection('budget');
-  var materialCollection = global.db.collection('material');
-  var historyCollection = global.db.collection('history');
+  var db = mongo.get();
+  var budgetCollection = db.collection('budget');
+  var materialCollection = db.collection('material');
+  var historyCollection = db.collection('history');
 
   var config = {
     get : {

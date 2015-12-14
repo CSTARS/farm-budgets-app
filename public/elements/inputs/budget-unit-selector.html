@@ -101,7 +101,7 @@
 
     checkError : function() {
       try {
-        FB.units.ucumParse(FB.units.math.cleanDollars(this.$.input.value));
+        FB.units.ucumParse(FB.units.cleanDollars(this.$.input.value));
       } catch(e) {
         $(this).addClass('has-error');
         $(this.$.input).addClass('text-danger');

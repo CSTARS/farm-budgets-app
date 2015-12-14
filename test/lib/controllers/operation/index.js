@@ -95,6 +95,7 @@ describe('Operation Controller', function() {
 
     assert.equal(op.subtotal, 5);
     assert.equal(op.total, 10);
+    assert.equal(controller.getCurrentTotal().total, 10);
   });
 
   it('does not recalc with flag', function(){
@@ -114,5 +115,31 @@ describe('Operation Controller', function() {
     assert.equal(op.subtotal, 5);
     assert.equal(op.total, 5);
   });
+
+  it('fire event on add', function(done){
+    controller.reset();
+
+    controller.on('operation-update', function(response){
+      assert.equal(response.success, true);
+      done();
+    });
+
+    assert.equal(controller.getEventsModule().listenerCount('operation-update'), 1);
+    controller.add(data.sample1);
+  });
+
+  it('fire event on total update', function(done){
+    controller.reset();
+
+    controller.on('total-update', function(response){
+      assert.equal(response.total, 10);
+      done();
+    });
+
+    assert.equal(controller.getEventsModule().listenerCount('total-update'), 1);
+    controller.add(data.sample1);
+  });
+
+
 
 });
