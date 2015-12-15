@@ -41093,7 +41093,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
 
                     <div class="length-label">Length:</div>
                     <div hidden$="{{readonly}}">
-                      <input type="number" value="{{item.length::input}}" class="form-control" on-input="onLengthUpdate" style="max-width: 75px; margin-right: 5px">
+                      <input type="number" value="{{item.length::change}}" class="form-control" on-change="onLengthUpdate" style="max-width: 75px; margin-right: 5px">
                     </div>
                     <div hidden$="{{!readonly}}" style="padding: 10px">{{item.length}}</div>
 
