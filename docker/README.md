@@ -64,6 +64,7 @@ docker run
 ## Commit Changes
 ```
 docker commit [container id] [image name]:[image tag]
+docker push ahbpnw/farm-budgets-app:[image tag]
 ```
 
 ## Docker Container Cleanup
