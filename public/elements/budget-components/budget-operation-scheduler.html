@@ -55,7 +55,7 @@
                     <div hidden$="{{!readonly}}" style="padding: 10px">{{item.length}}</div>
 
                     <div hidden$="{{readonly}}">
-                      <select value="{{item.units::input}}" class="form-control" on-change="onLengthUpdate">
+                      <select value="{{item.units::change}}" class="form-control" on-change="onLengthUpdate">
                         <option value="day">Day(s)</option>
                         <option value="month">Month(s)</option>
                         <option value="year">Year(s)</option>
