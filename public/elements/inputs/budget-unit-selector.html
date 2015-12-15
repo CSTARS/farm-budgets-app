@@ -5,14 +5,6 @@
       width: 100px;
       position: relative;
     }
-    #message {
-      position: absolute;
-      padding: 3px;
-      border: 1px solid #ccc;
-      background-color: white;
-      display: none;
-      z-index: 100;
-    }
     #input {
       display : block;
     }
@@ -24,8 +16,8 @@
   </style>
 
   <template>
-    <i id="icon" class="text text-danger fa fa-warning"></i><input id="input" type="text" class="form-control text" on-input="onChange" on-blur="onBlur" on-focus="onFocus">
-    <div id="message"></div>
+    <i id="icon" class="text text-danger fa fa-warning"></i><input id="input" type="text" class="form-control text" on-keyup="onChange" on-blur="onBlur" on-focus="onFocus">
+
   </template>
 </dom-module>
 
@@ -51,9 +43,29 @@
       }
     },
 
+    ready : function() {
+      var message = $(
+        '<div id="unitsMessage">'+
+          '<div id="unitsMessageContent"></div>'+
+          '<div style="border-top: 1px solid #eee"><a href="http://unitsofmeasure.org/ucum.html" target="_blank"><i class="fa fa-book"></i> Units Documentation</a></div>'+
+        '</div>'
+      );
+      this.message = message[0];
+      this.messageContent = message.find('#unitsMessageContent')[0];
+
+      $(window).on('resize', function(){
+        if( !this.showing ) return;
+        this.positionMessage();
+      }.bind(this));
+      $('.modal').on('scroll', function(){
+        if( !this.showing ) return;
+        this.positionMessage();
+      }.bind(this));
+    },
+
     attached : function() {
       this.checkError();
-      this.onBlur();
+      //this.onBlur();
     },
 
     setDisplayBlock : function() {
@@ -86,16 +98,21 @@
       return this.$.input.value;
     },
 
-    onChange : function(){
+    onChange : function(e){
       if( this.$.input.value == '' ) {
         this.clearError();
         return;
       }
 
+      if( typeof e === 'object' ) {
+        if( e.which === 13 ) e = true;
+      }
+
       this.checkError();
       this.fire('units-change', {
         value : this.$.input.value,
-        error : this.error
+        error : this.error,
+        onclick : typeof e === 'boolean' ? e : false
       });
     },
 
@@ -109,13 +126,13 @@
 
         this.$.icon.style.display = 'inline';
 
-        this.$.message.innerHTML = '<div class="text text-danger">Invalid Units</div>'+this.getReminders();
+        this.messageContent.innerHTML = '<div class="text text-danger">Invalid Units</div>'+this.getReminders();
 
-        $(this.$.message)
+        $(this.messageContent)
           .find('a')
           .on('click', function(e){
             this.$.input.value = e.currentTarget.innerHTML;
-            this.onChange();
+            this.onChange(true);
           }.bind(this));
         return;
       }
@@ -126,28 +143,48 @@
       this.error = false;
       $(this).removeClass('has-error');
       $(this.$.input).removeClass('text-danger');
-      this.$.message.innerHTML = '<span class="text text-success">Valid</span>';
+
+      if( this.messageContent ) {
+        this.messageContent.innerHTML = '<span class="text text-success">Valid</span>';
+      }
 
       this.$.icon.style.display = 'none';
     },
 
+    positionMessage : function() {
+      var offset = $(this).offset();
+      this.message.style.top = $(this).height()+offset.top+'px';
+      this.message.style.left = (offset.left)+'px';
+    },
+
     onFocus : function() {
-      this.$.message.style.display = 'block';
+      this.positionMessage();
+      $('body').append($(this.message));
+
+      setTimeout(function(){
+        this.positionMessage();
+      }.bind(this), 100);
 
       if( this.block ) return;
       this.style.width = '150px';
       this.$.input.style.width = '150px';
+      this.showing = true;
     },
 
     onBlur : function() {
+      this.fire('units-change', {
+        value : this.$.input.value,
+        error : this.error,
+        onblur : true
+      });
+
       setTimeout(function(){
-        this.$.message.style.display = 'none';
+        $(this.message).remove();
         if( this.block ) return;
         this.style.width = '100px';
         this.$.input.style.width = '100px';
+        this.showing = false;
       }.bind(this), 100);
-
-
     },
 
     getReminders : function() {

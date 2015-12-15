@@ -4,14 +4,19 @@
       :host {
         display: block;
       }
+      #errors {
+        margin: 20px 5px;
+      }
     </style>
 
     <div class="style-scope budget-section-materials card" material-table>
       <h5 class="material-name" style="margin-bottom: 5px">
         <div class="layout horizontal center">
           <div class="flex">
-            <span id="icon"></span>
-            <span id="name"></span>
+            <div>
+              <span id="icon"></span>
+              <span id="name"></span>
+            </div>
           </div>
           <div style="text-align:right">
             <span id="fixed" class="label label-warning">Fixed</span>
@@ -20,6 +25,9 @@
           </div>
         </div>
       </h5>
+
+      <div class="alert alert-danger" id="errors"></div>
+
       <div class="help-block" style="margin-bottom: 15px" id="otherInfo"></div>
       <div style="overflow-x:auto">
         <table class="table">
@@ -60,11 +68,19 @@
           value : function() {
             return false;
           }
+        },
+        hasErrors : {
+          type : Boolean,
+          reflectToAttribute : true,
+          value : function() {
+            return false;
+          }
         }
       },
 
       ready : function() {
         this.changesTimer = -1;
+        this.errorCount = 0;
       },
 
       edit : function() {
@@ -85,6 +101,35 @@
         } else {
           this.$.fixed.style.display = 'none';
           this.$.editIcon.style.display = 'inline-block';
+        }
+
+        this.errorCount = 0;
+        var errors = '';
+        if( this.material.recalcErrors && this.material.recalcErrors.length > 0 ) {
+          errors += '<i class="fa fa-warning"></i> This material has errors.<ul>';
+          for( var key in this.material.materials ) {
+            if( this.material.materials[key].message ) {
+              this.errorCount++;
+              errors +=
+                '<li><b>'+key+':</b> '+this.material.materials[key].message+
+                  (this.material.materials[key].code === 3 ? ' <a style="cursor:pointer" material="'+key+'"><i class="fa fa-cloud-download"></i> Import</a>' : '')+
+                '</li>';
+            }
+          }
+          errors += '</ul>';
+          this.$.errors.innerHTML = errors;
+          this.$.errors.style.display = 'block';
+          this.hasErrors = true;
+
+          $(this.$.errors)
+            .find('a')
+            .on('click', function(e){
+              var material = e.currentTarget.getAttribute('material');
+              document.querySelector('budget-import-material-popup').show(material);
+            });
+        } else {
+          this.hasErrors = false;
+          this.$.errors.style.display = 'none';
         }
 
         var otherInfo = '';
@@ -113,8 +158,6 @@
         this.setUsedByOps();
         this.setRequiredBy();
         this.setChanges();
-
-        this.verify();
       },
 
       // need to buffer this as we may still be in the process of tracking changes when
@@ -174,37 +217,6 @@
           }
         }
         this.$.requiredBy.innerHTML = requiredBy.length > 0 ? ('Required By: '+requiredBy.join(', ')) : '';
-      },
-
-      verify : function() {
-        this.$.msg.style.display = 'none';
-        if( !this.material ) return;
-        if( !this.material.materials || this.material.type !== 'complex' ) return;
-
-        var missing = '';
-        for( var key in this.material.materials ) {
-          var m = FB.materialController.get(key);
-          if( m.error ) {
-            if( this.material.unique && this.material.unique[key] ) {
-              continue;
-            }
-
-            missing += '<div><i class="fa fa-warning"></i> Missing required material: <i>'+key+
-            '</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a style="cursor:pointer" material="'+key+'"><i class="fa fa-cloud-download"></i> Import</a></div>';
-          }
-        }
-
-        if( missing.length === 0 ) return;
-        this.$.msg.style.display = 'block';
-        this.$.msg.className = 'alert alert-warning';
-        this.$.msg.innerHTML = missing;
-
-        $(this.$.msg)
-          .find('a')
-          .on('click', function(e){
-            var material = e.currentTarget.getAttribute('material');
-            document.querySelector('budget-import-material-popup').show(material);
-          });
       }
     });
   </script>

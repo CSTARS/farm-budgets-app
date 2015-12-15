@@ -158,7 +158,7 @@
       this.$.error.innerHTML = err.message;
 
       if( err.code === 3 ) {
-        var a = $('<a class="btn btn-link">Create</a>');
+        var a = $('<a class="btn btn-link"><i class="fa fa-circle-plus"></i></a>');
         a.on('click', function(){
           document.querySelector('budget-material-popup').create(err.name);
         });

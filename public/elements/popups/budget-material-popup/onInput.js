@@ -101,6 +101,11 @@ BudgetMaterialPopup.onPriceInput = function() {
   this.recalc();
 };
 
+BudgetMaterialPopup.onRequiredUnitsChange = function(e) {
+  this.data.materials[e.detail.name].units = e.detail.impl.units;
+  this.recalc();
+}
+
 BudgetMaterialPopup.onMaterialSelect = function(e) {
   var materialDef = e.detail;
 

@@ -21,6 +21,13 @@
       text-align: center;
       background-color: #f8f8f8;
     }
+    #errorMessage {
+      display : none;
+      border-bottom: 1px solid #e51c23;
+      padding: 20px 10px;
+      text-align: center;
+      background-color: #f8f8f8;
+    }
   </style>
 
   <template>
@@ -29,6 +36,11 @@
       <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.</div>
       <span id="unsavedFilterOuter"><input type="checkbox" id="unsavedFilter" on-click="filter" /> Only Show Unsaved Materials</span>
       <a class="btn btn-link" on-click="undo">Revert All Changes</a>
+    </div>
+
+    <div id="errorMessage" class="text text-danger">
+      <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of your materials have errors.</div>
+      <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filter" /> Only Show Materials With Errors</span>
     </div>
 
     <div style="text-align: center; padding: 25px 0 15px 0">
@@ -71,7 +83,7 @@
       this.updateTimer = -1;
       FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
       FB.operationController.on('material-added', this.onMaterialAdded.bind(this));
-      FB.materialController.on('material-removed', function(e){
+      FB.materialController.on('material-removed', function(e) {
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
         FB.changes.checkMaterials(FB.materialController.asArray());
@@ -192,12 +204,16 @@
       }
 
       var onlyUnsaved = $(this.$.unsavedFilter).is(':checked');
+      var onlyErrors = $(this.$.errorFilter).is(':checked');
 
       var opEles = this.querySelectorAll('budget-material-list-item');
+      var errorCount = 0;
       for( var i = 0; i < opEles.length; i++ ) {
         var ele = opEles[i];
         if( showAll || matched.indexOf(ele.getAttribute('material-name')) > -1 ) {
           if( onlyUnsaved && !ele.hasAttribute('has-changes') ) {
+            ele.style.display = 'none';
+          } else if( onlyErrors && !ele.hasAttribute('has-errors') ) {
             ele.style.display = 'none';
           } else {
             ele.style.display = 'block';
@@ -205,7 +221,16 @@
         } else {
           ele.style.display = 'none';
         }
+
+        errorCount += ele.errorCount;
       };
+
+      if( errorCount > 0 ) {
+        this.$.errorCount.innerHTML = errorCount;
+        this.$.errorMessage.style.display = 'block';
+      } else {
+        this.$.errorMessage.style.display = 'block';
+      }
 
       if( matched.length == 0 && !showAll ) {
         this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
@@ -220,6 +245,7 @@
         this.$.searchMsg.innerHTML = '';
       }
 
+      this.fire('error-update', errorCount > 0 ? true : false);
     },
 
     toNameArray : function(materials) {

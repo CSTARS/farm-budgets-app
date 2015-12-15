@@ -87,6 +87,7 @@
       <li role="presentation" id="btn-materials">
         <a href="#budget/materials">
           <i class="fa fa-warning text text-warning" id="unsavedWarning" style="display:none"></i>
+          <i class="fa fa-warning text text-danger" id="errorWarning" style="display:none"></i>
           <i class="fa fa-cube"></i>
           Materials List
         </a>
@@ -98,7 +99,12 @@
 
     <budget-section-overview id="overview" class="section"></budget-section-overview>
     <budget-section-operations id="operations" class="section"></budget-section-operations>
-    <budget-section-materials id="materials" class="section" on-unsaved-update="onUnsavedUpdate"></budget-section-materials>
+    <budget-section-materials
+      id="materials"
+      class="section"
+      on-unsaved-update="onUnsavedUpdate"
+      on-error-update="onErrorUpdate">
+    </budget-section-materials>
     <budget-section-setup id="setup" class="section"></budget-section-setup>
 
     <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="displayNone">
@@ -154,6 +160,14 @@
         this.$.unsavedWarning.style.display = 'inline-block';
       } else {
         this.$.unsavedWarning.style.display = 'none';
+      }
+    },
+
+    onErrorUpdate : function(e) {
+      if( e.detail === true ) {
+        this.$.errorWarning.style.display = 'inline-block';
+      } else {
+        this.$.errorWarning.style.display = 'none';
       }
     },
 

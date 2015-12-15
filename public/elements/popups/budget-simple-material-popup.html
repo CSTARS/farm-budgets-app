@@ -42,7 +42,7 @@
       show : function() {
         this.popup.modal('show');
 
-        var materials = FB.materialController.get().materials;
+        var materials = FB.materialController.get();
         var html = '<table class="table">'+
           '<tr><th><i class="fa fa-cube"></i> Material</th><th><i class="fa fa-dollar"></i> Price</th>'+
             '<th><i class="fa fa-shield"></i> Authority</th><th><i class="fa fa-map-marker"></i> Location</th></tr>';
@@ -50,6 +50,7 @@
         for( var key in materials ) {
           var m = materials[key];
           if( !m.id ) continue;
+          if( m.type !== 'simple' ) continue;
 
           html += '<tr>'+
             '<td><a href="#budget/materials/'+encodeURIComponent(key)+'">'+key+'</a></td>'+
