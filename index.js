@@ -25,14 +25,6 @@ options = {
 
         if( fs.existsSync('/etc/farm-budgets-app/config.js') ) {
           config.use('/etc/farm-budgets-app/config.js');
-          /*var c = require('/etc/farm-budgets-app/config.js');
-
-          for( var key in c ) {
-            var tmpConfig = config.get(key);
-            if( tmpConfig ) {
-              merge(tmpConfig, c[key]);
-            }
-          }*/
         }
 
         // allow command line switch from serving /dist to /app
@@ -58,6 +50,7 @@ options = {
             app : app,
             config : config.get('auth'),
           };
+          
           global.auth = authStack.init(authSetup);
 
           next(null, config);

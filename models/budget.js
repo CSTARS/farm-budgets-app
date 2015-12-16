@@ -58,7 +58,6 @@ function save(budget, username, callback) {
       budget.farmname = budget.farm.name;
     }
 
-
     // validate material id's
     if( !budget.materialIds ) {
       budget.materialIds = [];

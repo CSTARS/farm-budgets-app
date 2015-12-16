@@ -2,10 +2,15 @@
 var auth = global.auth;
 
 function middleware(req, res, next) {
-  if( !req.user ) {
+  if( !req.user && !req.query.key ) {
     return res.send({error:true, message: 'login required'});
   }
-  next();
+
+  //if( !req.user && req.query.key ) {
+  //  return res.send({error:true, message: 'login required'});
+  //} else {
+    next();
+  //}
 }
 
 // TODO: do we really need to error check grr.
