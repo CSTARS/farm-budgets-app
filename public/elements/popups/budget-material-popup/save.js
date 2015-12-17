@@ -145,7 +145,7 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
   }
 
   // now update the changes object
-  //FB.changes.updateMaterial(this.data);
+  FB.changes.updateMaterial(this.data);
 
   FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
 

@@ -24,6 +24,13 @@
       </div>
 
       <div class="form-group">
+        <label for="yearInput" class="col-sm-3 control-label"><i class="fa fa-hourglass-o"></i> Year</label>
+        <div class="col-sm-9">
+          <input type="number" id="yearInput" class="form-control"/>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="sourceInput" class="col-sm-3 control-label"><i class="fa fa-book"></i> Source</label>
         <div class="col-sm-9">
           <budget-markdown-input id="sourceInput"></budget-markdown-input>
@@ -60,6 +67,7 @@
         this.$.authority.value = this.data.authority;
         this.$.authority.default = this.data.authority;
         this.$.locationInput.value = this.data.locality || [];
+        this.$.yearInput.value = this.data.year || new Date().getFullYear();
 
         if( this.$.classInput.isClass(this.data.class || '') ) {
           this.$.classInput.setValue(this.data.class.toLowerCase());
@@ -74,6 +82,7 @@
         if( !this.data ) return;
         this.data.class = this.$.classInput.getValue();
         this.data.locality = this.$.locationInput.value;
+        this.data.year = parseInt(this.$.yearInput.value);
       },
 
       back : function() {

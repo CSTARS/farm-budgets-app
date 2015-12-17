@@ -10,7 +10,7 @@
     </style>
 
     <div class="style-scope budget-section-materials card" material-table>
-      <h5 class="material-name" style="margin-bottom: 5px">
+      <h5 class="material-name" style="margin-bottom: 1px">
         <div class="layout horizontal center">
           <div class="flex">
             <div>
@@ -29,6 +29,7 @@
       <div class="alert alert-danger" id="errors"></div>
 
       <div class="help-block" style="margin-bottom: 15px" id="otherInfo"></div>
+      <div class="well well-sm" style="display:none" id="description"></div>
       <div style="overflow-x:auto">
         <table class="table">
           <tr>
@@ -142,13 +143,20 @@
           }
           otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.locality.join(', ')+'</span>';
         }
-        if( this.material.description ) {
+        if( this.material.year ) {
           if( this.material.authority || this.material.locality ) {
             otherInfo += ' | ';
           }
-          otherInfo += this.material.description;
+          otherInfo += '<i class="fa fa-hourglass-o"></i> '+this.material.year;
         }
         this.$.otherInfo.innerHTML = otherInfo;
+
+        if( this.material.description ) {
+          this.$.description.innerHTML = this.material.description;
+          this.$.description.style.display = 'block';
+        } else {
+          this.$.description.style.display = 'none';
+        }
 
         this.$.class.innerHTML = this.material.type == 'complex' ? 'Complex Material' : (this.material.class || 'Other');
         this.$.price.value = this.material.price || '0';
