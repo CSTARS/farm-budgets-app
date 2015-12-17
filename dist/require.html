@@ -45064,9 +45064,13 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
         this.$.unsavedFilterOuter.style.display = 'inline-block';
         this.fire('unsaved-update', true);
       } else {
+        this.$.unsavedFilter.checked = false;
         this.$.warningMessage.style.display = 'none';
         this.$.unsavedFilterOuter.style.display = 'none';
         this.fire('unsaved-update', false);
+
+        // make sure we are not filtering to unsaved if there are no unsaved
+        this.filter();
       }
     },
 
@@ -45159,11 +45163,23 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
         matched = this.toNameArray(FB.materialController.find(txt));
       }
 
+      var opEles = this.querySelectorAll('budget-material-list-item');
+      var errorCount = 0;
+      for( var i = 0; i < opEles.length; i++ ) {
+        errorCount += opEles[i].errorCount;
+      }
+
+      if( errorCount > 0 ) {
+        this.$.errorCount.innerHTML = errorCount;
+        this.$.errorMessage.style.display = 'block';
+      } else {
+        this.$.errorFilter.checked = false;
+        this.$.errorMessage.style.display = 'none';
+      }
+
       var onlyUnsaved = $(this.$.unsavedFilter).is(':checked');
       var onlyErrors = $(this.$.errorFilter).is(':checked');
 
-      var opEles = this.querySelectorAll('budget-material-list-item');
-      var errorCount = 0;
       for( var i = 0; i < opEles.length; i++ ) {
         var ele = opEles[i];
         if( showAll || matched.indexOf(ele.getAttribute('material-name')) > -1 ) {
@@ -45177,16 +45193,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
         } else {
           ele.style.display = 'none';
         }
-
-        errorCount += ele.errorCount;
       };
-
-      if( errorCount > 0 ) {
-        this.$.errorCount.innerHTML = errorCount;
-        this.$.errorMessage.style.display = 'block';
-      } else {
-        this.$.errorMessage.style.display = 'none';
-      }
 
       if( matched.length == 0 && !showAll ) {
         this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
