@@ -24,7 +24,7 @@ options = {
 
 
         if( fs.existsSync('/etc/farm-budgets-app/config.js') ) {
-          config.use('/etc/farm-budgets-app/config.js');
+          config.use(require('/etc/farm-budgets-app/config.js'));
         }
 
         // allow command line switch from serving /dist to /app
@@ -50,7 +50,7 @@ options = {
             app : app,
             config : config.get('auth'),
           };
-          
+
           global.auth = authStack.init(authSetup);
 
           next(null, config);
