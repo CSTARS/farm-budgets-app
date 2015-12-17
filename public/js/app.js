@@ -44,7 +44,7 @@ FB.saveBudget = function(callback) {
   var materials = FB.materialController.get();
   for( var name in materials ) {
     if( !materials[name].id ) continue;
-    budget.materialIds.push(materials.materials[name].id);
+    budget.materialIds.push(materials[name].id);
   }
 
   $.post('/budget/save', budget, function(resp){
