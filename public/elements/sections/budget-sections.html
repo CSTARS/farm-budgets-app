@@ -298,27 +298,7 @@
 
     startNew : function() {
       if( FB.changes.hasChanges() && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
-
-      var newData = {
-        budget : {
-          id : FB.utils.guid(),
-          authority : ExpressAuth.user ? ExpressAuth.user.username : '',
-          locality : [],
-          name : '',
-          farm : {
-            farm : '',
-            commodity : '',
-            unit : '[acr_us]',
-            size : 1
-          },
-          operations : [],
-        },
-        materials : []
-      };
-
-      FB.changes.setOriginal(newData.budget, newData.materials);
-
-      document.querySelector('ahb-budget').load(newData);
+      document.querySelector('ahb-budget').createNew();
       document.querySelector('budget-farm-editor').show();
       this.$.overview.updateTotal();
     }

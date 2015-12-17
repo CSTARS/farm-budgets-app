@@ -6,6 +6,12 @@ BudgetMaterialPopup.onPriceChange = function() {
 };
 
 BudgetMaterialPopup.onMaterialDelete = function(e) {
+  var name = e.detail.name;
+
+  if( this.data.unique && this.data.unique[name] ) {
+    delete this.data.unique[name];
+  }
+
   this.updatePriceLabel();
 };
 /**
@@ -18,9 +24,6 @@ BudgetMaterialPopup.onMaterialDelete = function(e) {
 BudgetMaterialPopup.onNameInput = function() {
   var newName = this.$.nameInput.value;
 
-  if( this.parentMaterial ) {
-    newName = this.parentMaterial+'--'+newName;
-  }
 
   if( this.data.name == newName || newName == '' ) return;
 
@@ -31,40 +34,11 @@ BudgetMaterialPopup.onNameInput = function() {
   }
   this.$.nameInputMessage.innerHTML = '';
 
-  //this.$.nameLabel.innerHTML = newName;
   this.data.name = newName;
 
   // if complex, we need to update the name of all unique materials
   if( this.data.type == 'complex' ) {
     var updated = [];
-
-    for( var key in this.data.materials ) {
-
-      // only want to update unique stuff
-      if( key.indexOf('--') > -1 ) {
-        // first lets update impl
-        var m = this.data.materials[key];
-        delete this.data.materials[key];
-        var newName = this.data.name+'--'+m.name.replace(/.*--/, '');
-        m.name = newName;
-        updated.push(m);
-
-        // now update def
-        m = FB.materialController.get(key);
-        if( m.error ) {
-          console.log('BADNESS!');
-          continue;
-        }
-        m.name = newName;
-
-        FB.materialController.add(m, {
-          rename: key,
-          noRecalc : true,
-          noEvent : true
-        });
-
-      }
-    }
 
     for( var i = 0; i < updated.length; i++ ) {
       this.data.materials[updated[i].name] = updated[i];
@@ -84,14 +58,6 @@ BudgetMaterialPopup.onDescriptionInput = function() {
 
 BudgetMaterialPopup.onPriceInput = function() {
   var val = this.$.priceInput.value;
-
-  /* BASEPRICE
-  if( val == '' && this.data.type == 'complex' ) {
-    FB.materialController.remove(this.getBasePriceName());
-    delete this.data.materials[this.getBasePriceName()];
-    this.recalc();
-    return;
-  } */
 
   var val = parseFloat(val);
   if( isNaN(val) ) return;

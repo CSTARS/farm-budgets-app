@@ -35,6 +35,7 @@
           }
         }.bind(this));
       } else {
+        this.createNew();
         this.showFindPopup();
       }
     },
@@ -123,6 +124,28 @@
 
         this.load(resp);
       }.bind(this));
+    },
+
+    createNew : function() {
+      var newData = {
+        budget : {
+          id : FB.utils.guid(),
+          authority : ExpressAuth.user ? ExpressAuth.user.username : '',
+          locality : [],
+          name : '',
+          commodity : '',
+          farm : {
+            name : '',
+            units : '[acr_us]',
+            size : 1
+          },
+          operations : [],
+        },
+        materials : []
+      };
+
+      FB.changes.setOriginal(newData.budget, newData.materials);
+      this.load(newData);
     }
 
   });

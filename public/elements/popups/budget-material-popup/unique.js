@@ -36,27 +36,8 @@ BudgetMaterialPopup.createUnique = function() {
   if( !this.data.unique ) {
     this.data.unique = {};
   }
-  /*if( this.data.materials[data.name] || this.data.required[data.name] ) {
-    this.$.createUniqueMsg.innerHTML = 'You already have a required material with this name.';
-    return;
-  }*/
 
-  // we are almost good to go
-  // update name
-  //data.name = this.data.name+'--'+data.name;
   data.units = 'us$/'+data.units;
-
-  // add to global controller, make sure no issues
-  /*var resp = FB.materialController.add(data, {
-    replace : true,
-    noRecalc : true,
-    noEvent : true
-  });*/
-
-  /*if( resp.error ) {
-    this.$.createUniqueMsg.innerHTML = resp.message;
-    return;
-  }*/
 
   // do we need to add a simple impl?
   if( !this.data.materials[data.name] ) {
@@ -69,10 +50,10 @@ BudgetMaterialPopup.createUnique = function() {
   } else {
     this.data.materials[data.name].units = FB.units.invert(data.units);
   }
+
   this.data.unique[data.name] = data;
 
   FB.materialController.add(this.data, {replace: true});
-
   this.recalc();
 
   // this just resets and hides

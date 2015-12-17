@@ -8,10 +8,8 @@ BudgetMaterialPopup.save = function(noHide) {
   if( this.data.name == '' ) {
     this.$.nameInputMessage.innerHTML = 'A material name is required';
     return;
-  } else if( this.data.name.indexOf('--') > -1 ) {
-    this.$.nameInputMessage.innerHTML = '"--" is reserved and not allowed in the material name.';
-    return;
   }
+
   this.$.nameInputMessage.innerHTML = '';
 
   // check access
@@ -36,10 +34,10 @@ BudgetMaterialPopup.save = function(noHide) {
 
   this.$.advancedPanel.save();
 
-  var options = {};
+  var options = {
+    replace: true
+  };
   if( this.action == 'edit' ) {
-    options.replace = true;
-
     // if the name has changed, make sure we preform a rename
     if( this.originalData.name != this.data.name ) {
       options.rename = this.originalData.name;
@@ -103,6 +101,7 @@ BudgetMaterialPopup._save = function(noHide, options) {
     }
   }
 
+
   // save remote
   if( ExpressAuth.user ) {
     $.post('/materials/save', this.data, function(resp){
@@ -146,7 +145,9 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
   }
 
   // now update the changes object
-  FB.changes.updateMaterial(this.data);
+  //FB.changes.updateMaterial(this.data);
+
+  FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
 
   if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   this.setSaving(false);
