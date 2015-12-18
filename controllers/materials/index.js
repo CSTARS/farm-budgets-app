@@ -76,6 +76,30 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/mapReduceAll', authMiddleware, function (req, res) {
+      if( !req.user.admin ) {
+        return res.send({error: true, message: 'nope.'});
+      }
+
+      model.mapReduceAll(function(err, resp){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(resp);
+      });
+    });
+
+    router.get('/suggest', function (req, res) {
+      var text = req.query.q || '';
+      model.nameSuggest(text, function(err, resp){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+        res.send(resp);
+      });
+    });
+
     router.get('/delete', authMiddleware, function (req, res) {
       var id = req.query.id;
 

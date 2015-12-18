@@ -7,6 +7,7 @@ var errorHandler = require('../../lib/handleError');
 var model;
 var collection = db.collection('budget');
 
+
 module.exports = function (router) {
     model = new BudgetModel();
     var authMiddleware = authUtils.middleware;

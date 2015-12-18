@@ -196,6 +196,13 @@
 
         this.$.table.innerHTML = html+'</table>';
 
+        $(this.$.table)
+          .find('a')
+          .on('click', function(e){
+            var index = parseInt(e.currentTarget.getAttribute('index'));
+            this.fire('edit', this.results[index]);
+          }.bind(this));
+
         this.renderControls();
       },
 

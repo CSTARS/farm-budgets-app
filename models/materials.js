@@ -10,13 +10,16 @@ var schema = require('../lib/shared/save/schema')();
 var strip = require('../lib/shared/save/strip');
 var history = require('mongo-object-history');
 
-var collection;
+
+var materialGroupCollection = 'materialNameGrouping';
+var collection, suggestCollection;
 // units can be an empty string, just not undefined or null
 var required = ['price', 'units', 'type'];
 
 module.exports = function() {
   if( init ) {
     collection = db.collection('material');
+    suggestCollection = db.collection(materialGroupCollection);
     authorityModel = new authorityModel();
     init = false;
   }
@@ -28,6 +31,8 @@ module.exports = function() {
       save : save,
       get : get,
       delete : remove,
+      nameSuggest : nameSuggest,
+      mapReduceAll : mapReduceAll,
       hasRequired : hasRequired
   };
 };
@@ -79,6 +84,8 @@ function save(material, username, callback) {
           if( err ) {
             return callback(err);
           }
+          mapReduceMaterial(material.name);
+
           callback(null, result);
         }
       );
@@ -269,3 +276,89 @@ function cleanMaterial(material) {
     strip(schema.material, material);
   }
 }
+
+function nameSuggest(text, callback) {
+  var re = new RegExp('.*'+text+'.*','i');
+
+  suggestCollection
+    .find({_id: re})
+    .limit(10)
+    .toArray(function(err, result){
+      if( err ) {
+        return callback(err);
+      }
+
+      var resp = [];
+      for( var i = 0; i < result.length; i++ ) {
+        resp.push(result[i].value);
+      }
+      callback(null, resp);
+    });
+}
+
+function mapReduceMaterial(name, callback) {
+  collection.mapReduce(
+    MapReduce.map,
+    MapReduce.reduce,
+    {
+      out : materialGroupCollection,
+      query : {name: name},
+      finalize : MapReduce.finalize
+    },
+    function(err, resp){
+      if( !callback ) {
+        return;
+      }
+
+      if( err ) {
+        return callback(err);
+      }
+      callback(null, {success: true});
+    });
+}
+
+function mapReduceAll(callback) {
+  collection.mapReduce(
+    MapReduce.map,
+    MapReduce.reduce,
+    {
+      out : materialGroupCollection,
+      finalize : MapReduce.finalize
+    },
+    function(err, resp){
+      if( err ) {
+        return callback(err);
+      }
+      callback(null, {success: true});
+    });
+}
+
+var MapReduce = {
+  map : function() {
+    var item = {
+      material : this.name,
+      authorities : {}
+    };
+
+    item.authorities[this.authority] = 1;
+    emit(this.name, item);
+  },
+  reduce : function(key, values) {
+    var resp = {
+      material : key,
+      authorities : {}
+    };
+
+    for( var i = 0; i < values.length; i++ ) {
+      for( var key in values[i].authorities ) {
+        resp.authorities[key] = 1;
+      }
+    }
+
+    return resp;
+  },
+  finalize : function(key, value) {
+    value.authorities = Object.keys(value.authorities);
+    return value;
+  }
+};
