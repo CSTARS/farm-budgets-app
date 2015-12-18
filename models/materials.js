@@ -24,6 +24,7 @@ module.exports = function() {
   return {
       name: 'Material',
       find : find,
+      search : search,
       save : save,
       get : get,
       delete : remove,
@@ -68,6 +69,8 @@ function save(material, username, callback) {
         return callback(err);
       }
 
+      material.distinctId = material.name+material.authority+material.locality.join(',')+(material.year || '');
+
       collection.update(
         {id: material.id},
         material,
@@ -104,6 +107,84 @@ function remove(id, username, callback) {
       }
     );
   });
+}
+
+function search(query, start, stop, callback) {
+
+  query.deleted = {$ne: true};
+  var q = {
+    $and : [
+      {$or : [
+        {fixed : {'$exists' : false}},
+        {fixed : false},
+      ]},
+      query
+    ]
+  };
+
+  searchFilters(q, function(err, filters){
+    if( err ) {
+      return callback(err);
+    }
+
+    var cursor = collection.find(
+      q,
+      {
+        _id: 0,
+        score: {
+          $meta: 'textScore'
+        }
+      });
+    cursor.count(function(err, count){
+      cursor.sort({
+        score: { $meta: 'textScore' }
+      })
+      .skip(start)
+      .limit(start-stop)
+      .toArray(function(err, results){
+        if( err ) {
+          return callback(err);
+        }
+
+        var response = {
+          total : count,
+          start : start,
+          stop : count < stop ? count : stop,
+          results : results,
+          filters : filters,
+        };
+        callback(null, response);
+      });
+    });
+  });
+}
+
+function searchFilters(q, callback) {
+  //collection.count(q, function(err, count){
+  //  if( err ) {
+  //    return callback(err);
+  //  }
+
+    collection.distinct('locality', q, function(err, localityFilters){
+      if( err ) {
+        return callback(err);
+      }
+
+      collection.distinct('authority', q, function(err, authorityFilters){
+        if( err ) {
+          return callback(err);
+        }
+
+        callback(null,{
+          //total : count,
+          //filters : {
+            authority : authorityFilters,
+            locality : localityFilters
+          //}
+        });
+      });
+    });
+  //});
 }
 
 function find(query, callback) {
