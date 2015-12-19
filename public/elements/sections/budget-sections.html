@@ -229,7 +229,9 @@
       var parts = window.location.hash.replace(/#/,'').split('/');
 
       if( parts[0].toLowerCase() === 'link' && parts.length > 1 ) {
-        document.querySelector('ahb-budget').reload(parts[1]);
+        var budget = document.querySelector('ahb-budget');
+        budget.loadedFromLink = true;
+        budget.reload(parts[1]);
         window.location = '#budget/overview';
         return;
       }

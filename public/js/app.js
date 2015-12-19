@@ -76,6 +76,8 @@ FB._localsave = function(auto) {
     materials : []
   }
 
+  if( !data.budget.id ) return;
+
   var materials = FB.materialController.get();
   for( var key in materials ) {
     data.materials.push(materials[key]);

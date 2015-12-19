@@ -44,10 +44,11 @@
       document
         .querySelector('budget-welcome-splash')
         .addEventListener('splash-close', function(){
+          if( this.loadedFromLink ) return;
           setTimeout(function(){
             document.querySelector('find-budget-popup').show();
           }, 300);
-        });
+        }.bind(this));
     },
 
     checkLocal : function(id) {
@@ -90,7 +91,12 @@
         data.budget.operations = [];
       }
 
-      window.localStorage.setItem('current-budget', data.budget.id);
+      if( data.budget.id ) {
+        window.localStorage.setItem('current-budget', data.budget.id);
+      } else {
+        window.localStorage.setItem('current-budget', '');
+      }
+
 
       FB.load(data);
 

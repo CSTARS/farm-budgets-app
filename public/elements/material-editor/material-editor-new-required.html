@@ -55,7 +55,7 @@
                 <div class="form-group">
                   <label for="unitsInput" class="col-sm-3 control-label">Units</label>
                   <div class="col-sm-9">
-                    <budget-unit-selector id="unitsInput" on-units-change="editUnits" block></budget-unit-selector>
+                    <budget-unit-selector id="unitsInput" block></budget-unit-selector>
                   </div>
                 </div>
 
@@ -69,8 +69,8 @@
 
             </div>
             <div class="modal-footer">
-              <a class="btn btn-default">Cancel</a>
-              <a class="btn btn-primary">Add</a>
+              <a class="btn btn-default" data-dismiss="modal">Cancel</a>
+              <a class="btn btn-primary" data-dismiss="modal" on-click="add">Add</a>
             </div>
           </div>
         </div>
@@ -95,7 +95,26 @@
       reset : function() {
         this.$.isUniqueInput.checked = false;
         this.$.priceInputGroup.style.display = 'none';
-        this.$.priceInputGroup.value = 0;
+        this.$.priceInputGroup.value = '';
+        this.$.unitsInput.value = '';
+        this.$.amountInput.value = '';
+      },
+
+      add : function() {
+        this.material = {
+          name : this.$.nameInput.value,
+          units : this.$.unitsInput.getUnits(),
+          amount : parseFloat(this.$.amountInput.value)
+        }
+
+        if( this.$.isUniqueInput.checked ) {
+          this.material.price = parseFloat(this.$.priceInput.value);
+        }
+
+        this.fire('add', {
+          material : this.material,
+          isUnique : this.$.isUniqueInput.checked
+        });
       },
 
       toggleUnique : function() {

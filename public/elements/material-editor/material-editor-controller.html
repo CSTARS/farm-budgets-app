@@ -24,9 +24,8 @@
         this.$.table.style.display = 'block';
         this.$.form.style.display = 'none';
 
-        if( e.detail.updated ) {
-          this.$.table.query();
-        }
+        this.$.table.update(e.detail);
+        this.$.table.render();
       }
     });
   </script>

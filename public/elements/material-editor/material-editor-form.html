@@ -6,7 +6,30 @@
       }
     </style>
 
-    <h4 class="page-header">Edit Material</h4>
+    <div class="padding: 0 %5">
+      <h4 class="page-header">Edit Material</h4>
+
+      <div class="alert alert-warning" id="usedByMessage" style="display:none">
+        <div>
+          WARNING.  This material is used by <span id="usedCount"></span> other budget(s).  Any changes you make will affect
+          these budget(s).  <a style="cursor:pointer" on-click="toggleUses">Show Budgets.</a>
+        </div>
+
+        <div id="usesList" style="display:none">
+          <template is="dom-repeat" items="{{usesList}}">
+            <div style="border-top: 1px solid white; padding-left: 20px;">
+              <div><a id$="{{item.id}}" style="cursor: pointer" on-click="goToBudget">{{item.name}}</a></div>
+              <div class="help-block" style="color: #eee">
+                <i class="fa fa-leaf"></i> <span>{{item.commodity}}</span> |
+                <i class="fa fa-shield"></i> <span>{{item.authority}}</span> |
+                <i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">{{item.locality}}</span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
 
     <div class="form-horizontal">
       <div class="form-group">
@@ -19,14 +42,14 @@
       <div class="form-group">
         <label for="nameInput" class="col-sm-2 control-label">Description</label>
         <div class="col-sm-10">
-          <textarea id="descriptionInput" class="form-control" on-input="onDescriptionInput"></textarea>
+          <textarea id="descriptionInput" class="form-control"></textarea>
         </div>
       </div>
 
       <div class="form-group" id="priceGroup">
         <label for="priceInput" class="col-sm-2 control-label" id="priceLabel">Price</label>
         <div class="col-sm-10">
-          <input type="number" id="priceInput" class="form-control" on-input="onPriceInput"/>
+          <input type="number" id="priceInput" class="form-control" />
         </div>
       </div>
 
@@ -36,7 +59,7 @@
           <div class="layout horizontal center">
             <div>us$/</div>
             <div class="flex">
-              <budget-unit-selector id="unitsInput" on-units-change="editUnits" block></budget-unit-selector>
+              <budget-unit-selector id="unitsInput" block></budget-unit-selector>
             </div>
           </div>
 
@@ -61,9 +84,9 @@
       </div>
 
       <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
+        <label for="authorityInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
         <div class="col-sm-10">
-          <budget-authority-selector id="authority" on-authority-select="onAuthoritySelect"></budget-authority-selector>
+          <budget-authority-selector id="authorityInput" ></budget-authority-selector>
         </div>
       </div>
 
@@ -101,6 +124,18 @@
 
     </div> <!-- end form -->
 
+    <div class="well">
+      <div class="layout horizontal">
+        <div class="flex">
+          <a class="btn btn-warning" on-click="undo">Undo Changes</a>
+        </div>
+        <div>
+          <a class="btn btn-default" on-click="cancel">Cancel</a>
+          <a class="btn btn-primary" on-click="save">Save</a>
+        </div>
+      </div>
+    </div>
+
   </template>
   <script>
     Polymer({
@@ -108,16 +143,85 @@
 
       ready : function() {
         this.requirePopup = document.querySelector('material-editor-new-required');
+        this.requirePopup.addEventListener('add', this.addRequiredMaterial.bind(this));
       },
 
       edit : function(material) {
-        console.log(material);
+        this.original = $.extend(true, {}, material);
         this.material = material;
+
+        this.$.nameInput.value = material.name;
+        this.$.descriptionInput.value = material.description || '';
+        this.$.priceInput.value = material.price || '';
+
+        var units = material.units || '';
+        if( units && material.type === 'simple' ) {
+          units = FB.units.invert(units);
+        }
+
+        this.$.unitsInput.setUnits(units);
+        this.$.authorityInput.value = material.authority || '';
+        this.$.locationInput.setValue(material.locality || []);
+        this.$.yearInput.value = material.year || '';
+        this.$.sourceInput.value = material.source || '';
+        this.$.classInput.value = material.class || '';
 
         this.renderComplex();
         if( this.material.type === 'complex' ) {
           this.renderMaterials();
         }
+
+        this.getUsedBy();
+      },
+
+      undo : function() {
+        this.edit(this.original);
+      },
+
+      cancel : function() {
+        this.fire('done', this.original);
+      },
+
+      save : function() {
+        this.material.name = this.$.nameInput.value;
+        this.material.description = this.$.descriptionInput.value;
+        this.material.price = this.$.priceInput.value;
+        this.material.units = (this.material.type !== 'complex' ? 'us$/' : '') + this.$.unitsInput.getUnits();
+        this.material.authority = this.$.authorityInput.value;
+        this.material.locality = this.$.locationInput.value;
+        this.material.year = this.$.yearInput.value;
+        this.material.source = this.$.sourceInput.value;
+        this.material.class = this.$.classInput.value;
+
+        this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
+
+        this.fire('done', this.material);
+      },
+
+      addRequiredMaterial : function(e) {
+        e = e.detail;
+
+        if( e.isUnique ) {
+          if( !this.material.unique ) {
+            this.material.unique = {};
+          }
+
+          this.material.unique[e.material.name] = {
+            price : e.material.price,
+            units : 'us$/'+e.material.units
+          }
+        }
+
+        if( !this.material.materials ) {
+          this.material.materials = {};
+        }
+
+        this.material.materials[e.material.name] = {
+          amount : e.material.amount,
+          units : e.material.units
+        }
+
+        this.renderMaterials();
       },
 
       toggleComplex : function() {
@@ -154,7 +258,7 @@
             } else {
               html +=
                 '<li class="list-group-item">'+
-                    '<a class="btn btn-link"><i class="fa fa-trash"></i></a> '+
+                    '<a class="btn btn-link" trash material="'+name+'"><i class="fa fa-trash"></i></a> '+
                     '<b>'+name+'</b> '+
                     m.amount+m.units+
                 '</li>';
@@ -176,6 +280,20 @@
           .on('click', function(){
             this.requirePopup.create();
           }.bind(this));
+
+        $(this.$.materialsList)
+          .find('a[trash]')
+          .on('click', function(e){
+            var name = e.currentTarget.getAttribute('material');
+
+            if( this.material.materials && this.material.materials[name] ) {
+              delete this.material.materials[name];
+            }
+            if( this.material.unique && this.material.unique[name] ) {
+              delete this.material.unique[name];
+            }
+            this.renderMaterials();
+          }.bind(this));
       },
 
       renderComplex : function() {
@@ -188,6 +306,32 @@
           this.$.isComplexInput.checked = true;
           this.$.complexPanel.style.display = 'block';
         }
+      },
+
+      getUsedBy : function() {
+        $.get('/budget/uses', {material: this.material.id}, function(resp){
+          for( var i = 0; i < resp.length; i++ ) {
+            resp[i].locality = resp[i].locality.join(', ');
+          }
+
+          this.$.usedCount.innerHTML = resp.length;
+
+          this.usesList = resp;
+          if( resp.length > 0 ) {
+            this.$.usedByMessage.style.display = 'block';
+          } else {
+            this.$.usedByMessage.style.display = 'none';
+          }
+        }.bind(this));
+      },
+
+      toggleUses : function() {
+        $(this.$.usesList).toggle('slow');
+      },
+
+      goToBudget : function(e) {
+        if( !confirm('Are you sure you want to stop editing and go to this budget?') ) return;
+        window.location.href = '/#link/'+e.currentTarget.getAttribute('id');
       }
     });
   </script>
