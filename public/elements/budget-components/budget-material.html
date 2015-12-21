@@ -79,36 +79,12 @@
         return;
       }
 
-      var m;
-      if( this.parent ) {
-        this.$.forLabel.innerHTML = '(for '+this.parent+')';
-        // to edit this material, we need to fire an event
-        this.$.edit.removeAttribute('href');
-        this.$.edit.addEventListener('click', this.fireEditUnique.bind(this), false);
-        var complex = FB.materialController.get(this.parent);
-        if( complex.error ) return this.showError(complex);
+      this.$.forLabel.innerHTML = '';
+      this.$.edit.href = '#budget/materials/'+this.material;
+      this.$.edit.removeEventListener('click', this.fireEditUnique, false);
 
-        if( !complex.unique || !complex.unique[this.material] ) {
-          return this.showError({message: 'Error finding unique material: '+this.material});
-        }
-
-        var unique = complex.unique[this.material];
-        m = {
-          name : this.material,
-          units : unique.units,
-          price : unique.price
-        }
-
-      } else {
-        this.$.forLabel.innerHTML = '';
-        this.$.edit.href = '#budget/materials/'+this.material;
-        this.$.edit.removeEventListener('click', this.fireEditUnique, false);
-
-        m = FB.materialController.get(this.material);
-        if( m.error ) return this.showError(m);
-      }
-
-
+      m = FB.materialController.get(this.material);
+      if( m.error || m.deleted ) return this.showError(m);
 
       var otherInfo = '';
       if( m.authority ) {
@@ -153,9 +129,13 @@
         return;
       }
 
+      var msg = '<i class="fa fa-warning"></i> ';
+      if( err.deleted ) msg += err.name+'<br /> has been deleted';
+      if( err.message ) msg += '<br />'+err.message;
+
       this.$.error.style.display = 'block';
       this.$.label.style.display = 'none';
-      this.$.error.innerHTML = err.message;
+      this.$.error.innerHTML = msg;
 
       if( err.code === 3 ) {
         var a = $('<a class="btn btn-link"><i class="fa fa-circle-plus"></i></a>');

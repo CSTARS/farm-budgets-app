@@ -178,6 +178,11 @@
           this.showError(true);
           return;
         }
+
+        if (m.deleted) {
+          this.showError(true);
+          return;
+        }
       }
       this.showError(false);
     },

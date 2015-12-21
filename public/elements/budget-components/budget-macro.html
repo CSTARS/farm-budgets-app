@@ -40,6 +40,7 @@
       <tr>
         <td>
           <span id="expand"><i class="fa fa-cubes" id="icon"></i> <span id="nameLabel"></span></span>
+          <div id="deletedError" class="text text-danger"></div>
           <div id="otherInfo" class="help-block" style="display:none"></div>
         </td>
         <td>
@@ -171,18 +172,30 @@
     },
 
     checkError : function() {
+      this.$.deletedError.innerHTML = '';
+
       for( var key in this.data.materials ) {
         if( this.data.materials[key].error ) {
-          this.$.icon.className = 'fa fa-warning';
-          this.$.icon.style.color = 'red';
-          this.error = true;
+          this.setError();
           return;
         }
+      }
+
+      if( this.data.deleted ) {
+        this.setError();
+        this.$.deletedError.innerHTML = 'The material has been deleted';
+        return;
       }
 
       this.error = false;
       this.$.icon.className = 'fa fa-cubes';
       this.$.icon.style.color = '';
+    },
+
+    setError : function() {
+      this.$.icon.className = 'fa fa-warning';
+      this.$.icon.style.color = 'red';
+      this.error = true;
     },
 
     toggleView : function(e) {
