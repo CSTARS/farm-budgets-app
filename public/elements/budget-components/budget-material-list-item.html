@@ -172,6 +172,9 @@
           this.$.deleted.style.display = 'inline-block';
           this.$.name.style.fontStyle = 'italic';
           this.$.name.className = 'text text-danger';
+          
+          this.errorCount++;
+          this.hasErrors = true;
         }
 
         this.setUsedByOps();
