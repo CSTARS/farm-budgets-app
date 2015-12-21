@@ -51,6 +51,7 @@ function getAll(user, callback) {
 
       var arr = [];
       for( var i = 0; i < result.length; i++ ) {
+        if( !result[i].name ) continue;
         arr.push(result[i].name);
       }
       arr.sort();

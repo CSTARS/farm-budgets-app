@@ -76,6 +76,10 @@ function save(material, username, callback) {
 
       material.distinctId = material.name+material.authority+material.locality.join(',')+(material.year || '');
 
+      // TODO: check if item exists, if so, check rename.  if material is renamed, update budget...
+      // Since operation materials do have id's, can we just update name next time material is accessed?
+      // This will give use notification of what we are doing.
+
       collection.update(
         {id: material.id},
         material,

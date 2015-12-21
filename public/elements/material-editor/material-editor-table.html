@@ -46,6 +46,8 @@
               <a class="btn btn-default" on-click="previous"><i class="fa fa-arrow-left"></i></a>
               <a class="btn btn-default" on-click="next"><i class="fa fa-arrow-right"></i></a>
             </span>
+
+            <a class="btn btn-danger" on-click="removeSelected" id="delete" style="display:none"><i class="fa fa-trash"></i> Delete Selected</a>
           </div>
         </div>
 
@@ -53,6 +55,7 @@
       </div>
     </div>
 
+    <material-editor-delete-popup id="deletePopup" on-complete="query"></material-editor-delete-popup>
 
   </template>
   <script>
@@ -66,7 +69,8 @@
         this.itemsPerPage = 10;
         this.page = 0;
 
-        this.q = {};
+        this.setEmptyQuery();
+
         this.queryTimer = -1;
       },
 
@@ -130,7 +134,10 @@
           this.locationFilters = resp.filters.locality.sort();
           this.authorityFilters = resp.filters.authority.sort();
 
+          this.selected = [];
+
           this.render();
+          this.onSelectedUpdate();
         }.bind(this));
       },
 
@@ -153,7 +160,7 @@
         var html = '<table class="table">', m;
 
         html += '<tr>'+
-          '<th></th>'+
+          '<th><a style="cursor:pointer" all>All</a> | <a style="cursor:pointer" none>None</a></th>'+
           '<th>Type</th>'+
           '<th>Name</th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
@@ -208,18 +215,50 @@
           }
           html +='</td>';
 
-          html += '<td><a style="cursor:pointer" index="'+i+'"><i class="fa fa-pencil"></i></a></td>';
+          html += '<td><a style="cursor:pointer" index="'+i+'" edit><i class="fa fa-pencil"></i></a></td>';
 
           html += '</tr>';
         }
 
         this.$.table.innerHTML = html+'</table>';
 
+        // wire events
         $(this.$.table)
-          .find('a')
+          .find('a[edit]')
           .on('click', function(e){
             var index = parseInt(e.currentTarget.getAttribute('index'));
             this.fire('edit', this.results[index]);
+          }.bind(this));
+
+        $(this.$.table)
+          .find('input[type="checkbox"]')
+          .on('click', function(e){
+            var index = e.currentTarget.getAttribute('index');
+
+            if( e.currentTarget.checked ) {
+              this.selected.push(index);
+            } else {
+              this.selected.splice(this.selected.indexOf(index), 1);
+            }
+
+            this.onSelectedUpdate();
+          }.bind(this));
+
+        $(this.$.table)
+          .find('a[all]')
+          .on('click', function(e){
+            $(this.$.table).find('input[type="checkbox"]').prop('checked', true);
+            this.selected = [];
+            for( var i = 0; i < this.results.length; i++ ) this.selected.push(i+'');
+            this.onSelectedUpdate();
+          }.bind(this));
+
+        $(this.$.table)
+          .find('a[none]')
+          .on('click', function(e){
+            $(this.$.table).find('input[type="checkbox"]').prop('checked', false);
+            this.selected = [];
+            this.onSelectedUpdate();
           }.bind(this));
 
         this.renderControls();
@@ -300,6 +339,34 @@
       onNumPerPageChange : function(e) {
         this.itemsPerPage = parseInt(e.currentTarget.value);
         this.query();
+      },
+
+      setEmptyQuery : function() {
+        this.q = {};
+
+        if( ExpressAuth.user ) {
+          this.q.authority = {
+            $in : $.extend(true, [], ExpressAuth.user.authorities)
+          }
+          this.q.authority.$in.push(ExpressAuth.user.username);
+        };
+      },
+
+      onSelectedUpdate : function() {
+        if( this.selected.length === 0 ) {
+          this.$.delete.style.display = 'none';
+        } else {
+          this.$.delete.style.display = 'inline-block';
+        }
+      },
+
+      removeSelected : function() {
+        var materials = [];
+        for( var i = 0; i < this.selected.length; i++ ) {
+          materials.push(this.results[parseInt(this.selected[i])]);
+        }
+
+        this.$.deletePopup.show(materials);
       }
     });
   </script>

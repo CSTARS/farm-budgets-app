@@ -20,6 +20,9 @@ module.exports = function(grunt) {
         ],
 				'dist/createAccount-require.html': [
         	'public/createAccount-require.html'
+        ],
+				'dist/materialEditor-require.html': [
+        	'public/materialEditor-require.html'
         ]
       }
     },

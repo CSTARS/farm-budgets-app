@@ -8,6 +8,12 @@
   Polymer({
     is : 'ahb-budget',
 
+    ready : function() {
+      this.renameList = {};
+      this.renameTimer = -1;
+      FB.operationController.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
+    },
+
     attached : function() {
       var id = window.localStorage.getItem('current-budget');
 
@@ -54,6 +60,10 @@
     checkLocal : function(id) {
       try {
         var localdata = window.localStorage.getItem(id);
+        if( !localdata ) {
+          return false;
+        }
+        
         localdata = JSON.parse(localdata);
         FB.localdata = localdata;
 
@@ -152,6 +162,16 @@
 
       FB.changes.setOriginal(newData.budget, newData.materials);
       this.load(newData);
+    },
+
+    onMaterialAutoRename : function(e) {
+      console.log(e);
+      this.renameList[e.detail.id] = e.detail;
+      this.showRenameList();
+    },
+
+    showRenameList : function() {
+      // TODO: maybe move this to the operations section and a panel instead of a popup.
     }
 
   });

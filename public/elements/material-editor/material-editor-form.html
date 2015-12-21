@@ -185,7 +185,7 @@
       save : function() {
         this.material.name = this.$.nameInput.value;
         this.material.description = this.$.descriptionInput.value;
-        this.material.price = this.$.priceInput.value;
+        this.material.price = parseFloat(this.$.priceInput.value);
         this.material.units = (this.material.type !== 'complex' ? 'us$/' : '') + this.$.unitsInput.getUnits();
         this.material.authority = this.$.authorityInput.value;
         this.material.locality = this.$.locationInput.value;
@@ -194,6 +194,13 @@
         this.material.class = this.$.classInput.value;
 
         this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
+
+        $.post('/materials/save', this.material, function(resp){
+          if( resp.error ) {
+            alert('Error saving material: '+resp.message);
+            this.fire('error', resp);
+          }
+        }.bind(this));
 
         this.fire('done', this.material);
       },

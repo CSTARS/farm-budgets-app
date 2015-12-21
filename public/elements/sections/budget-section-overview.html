@@ -71,6 +71,10 @@
                 <td>Referenced Budget</td>
                 <td id="referenceLabel"></td>
               </tr>
+              <tr>
+                <td>Budget Link</td>
+                <td><a id="link" target="_blank">Link</a></td>
+              </tr>
             </tbody>
           </table>
 
@@ -149,6 +153,12 @@
         .addEventListener('editor-close', function(){
           this.setData(FB.getBudget());
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
+        }.bind(this));
+
+      document
+        .querySelector('ahb-budget')
+        .addEventListener('budget-loaded', function(){
+          this.$.link.setAttribute('href', '#link/'+FB.getBudget().id);
         }.bind(this));
     },
 

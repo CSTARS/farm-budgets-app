@@ -1,0 +1,113 @@
+<dom-module id="material-editor-delete-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Delete Materials</h4>
+          </div>
+          <div class="modal-body">
+
+            <div id="q1" style="text-align: center">
+              <div>
+                Are you sure you want to remove all <span id="numMaterials"></span> selected material(s)?
+              </div>
+
+              <a class="btn btn-primary btn-lg" on-click="remove">Yes</a>
+              <a class="btn btn-default btn-lg" data-dismiss="modal">No</a>
+            </div>
+
+            <div id="q2" style="text-align: center"></div>
+
+            <div id="q3" style="text-align:center">
+              <h3>Done.</h3>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'material-editor-delete-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+      },
+
+      show : function(materials) {
+        this.materials = materials;
+
+        this.$.q1.style.display = 'block';
+        this.$.q2.style.display = 'none';
+        this.$.q3.style.display = 'none';
+
+        this.popup.modal('show');
+      },
+
+      hide : function() {
+        this.popup.modal('hide');
+      },
+
+      remove : function() {
+        this.$.q1.style.display = 'none';
+
+        var table = '<table class="table">';
+        for( var i = 0; i < this.materials.length; i++ ) {
+          var m = this.materials[i];
+          table +=
+            '<tr>'+
+              '<td>'+m.name+'</td>'+
+              '<td>'+m.authority+'</td>'+
+              '<td>'+m.locality.join(', ')+'</td>'+
+              '<td id="status-'+i+'"><span class="label label-warning">Pending...</span></td>'+
+            '</tr>';
+        }
+
+        this.$.q2.innerHTML = table+'</table>';
+        this.$.q2.style.display = 'block';
+        this._remove(0);
+      },
+
+      _remove : function(index) {
+        if( this.materials.length === index ) {
+          return this.done();
+        }
+
+        $.get('/materials/delete',{id: this.materials[index].id}, function(resp){
+          var ele = this.$.q2.querySelector('#status-'+index);
+
+          if( ele ) {
+            if( resp.error ) {
+              ele.innerHTML = '<span class="label label-danger">Error</span>';
+            } else {
+              ele.innerHTML = '<span class="label label-sucess">Success</span>';
+            }
+          }
+
+          this._remove(++index);
+        }.bind(this));
+      },
+
+      done : function() {
+        this.$.q2.style.display = 'none';
+        this.$.q3.style.display = 'block';
+
+        this.fire('complete');
+        setTimeout(this.hide.bind(this), 2000);
+      }
+
+    });
+  </script>
+</dom-module>

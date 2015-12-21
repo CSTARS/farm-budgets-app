@@ -7,7 +7,7 @@
     </style>
 
     <material-editor-table id="table" on-edit="onTableEdit"></material-editor-table>
-    <material-editor-form id="form" style="display:none" on-done="onFormDone"></material-editor-form>
+    <material-editor-form id="form" style="display:none" on-done="onFormDone" on-error="onSaveError"></material-editor-form>
 
   </template>
   <script>
@@ -26,6 +26,10 @@
 
         this.$.table.update(e.detail);
         this.$.table.render();
+      },
+
+      onSaveError : function(e) {
+        this.table.query(); // refresh the table on error
       }
     });
   </script>
