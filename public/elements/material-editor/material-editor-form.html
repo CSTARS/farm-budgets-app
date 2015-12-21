@@ -195,6 +195,10 @@
 
         this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
 
+        if( !this.material.id ) {
+          this.material.id = FB.utils.guid();
+        }
+
         $.post('/materials/save', this.material, function(resp){
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
@@ -316,6 +320,10 @@
       },
 
       getUsedBy : function() {
+        if( !this.material.id ) {
+          return this.$.usedByMessage.style.display = 'none';
+        }
+
         $.get('/budget/uses', {material: this.material.id}, function(resp){
           for( var i = 0; i < resp.length; i++ ) {
             resp[i].locality = resp[i].locality.join(', ');

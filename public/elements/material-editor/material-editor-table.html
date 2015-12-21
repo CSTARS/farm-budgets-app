@@ -6,6 +6,8 @@
       }
     </style>
 
+    <a class="btn btn-default pull-right" on-click="createNew"><i class="fa fa-plus"></i> Create New Material</a>
+
     <div style="padding: 10px;">
       <input type="text" class="form-control" placeholder="Search Text" id="textInput" on-keyup="onKeyUp"/>
     </div>
@@ -142,6 +144,9 @@
       },
 
       update : function(material) {
+        if( !material ) return;
+        if( !material.id ) return;
+
         var name = material.name;
         if( material.rename ) {
           name = material.rename;
@@ -151,9 +156,11 @@
         for( var i = 0; i < this.results.length; i++ ) {
           if( this.results[i].name == name ) {
             this.results[i] = material;
-            break;
+            return;
           }
         }
+
+        this.results.push(material);
       },
 
       render : function() {
@@ -262,6 +269,15 @@
           }.bind(this));
 
         this.renderControls();
+      },
+
+      createNew : function(){
+        this.fire('edit',{
+          name : '',
+          type : 'simple',
+          authority : ExpressAuth.user.username,
+          year : new Date().getFullYear()
+        });
       },
 
       renderControls : function() {

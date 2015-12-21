@@ -35,7 +35,7 @@ module.exports = function (router) {
     router.get('/uses', function (req, res) {
       var materialId = req.query.material;
       if( !materialId ) {
-        res.send({error: true, message: 'material id required'});
+        return res.send({error: true, message: 'material id required'});
       }
 
       model.uses(materialId, function(err, budgets){

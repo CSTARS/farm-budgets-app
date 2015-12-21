@@ -38493,6 +38493,8 @@ this.fire('dom-change');
       }
     </style>
 
+    <a class="btn btn-default pull-right" on-click="createNew"><i class="fa fa-plus"></i> Create New Material</a>
+
     <div style="padding: 10px;">
       <input type="text" class="form-control" placeholder="Search Text" id="textInput" on-keyup="onKeyUp">
     </div>
@@ -38629,6 +38631,9 @@ this.fire('dom-change');
       },
 
       update : function(material) {
+        if( !material ) return;
+        if( !material.id ) return;
+
         var name = material.name;
         if( material.rename ) {
           name = material.rename;
@@ -38638,9 +38643,11 @@ this.fire('dom-change');
         for( var i = 0; i < this.results.length; i++ ) {
           if( this.results[i].name == name ) {
             this.results[i] = material;
-            break;
+            return;
           }
         }
+
+        this.results.push(material);
       },
 
       render : function() {
@@ -38749,6 +38756,15 @@ this.fire('dom-change');
           }.bind(this));
 
         this.renderControls();
+      },
+
+      createNew : function(){
+        this.fire('edit',{
+          name : '',
+          type : 'simple',
+          authority : ExpressAuth.user.username,
+          year : new Date().getFullYear()
+        });
       },
 
       renderControls : function() {
@@ -39055,6 +39071,10 @@ this.fire('dom-change');
 
         this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
 
+        if( !this.material.id ) {
+          this.material.id = FB.utils.guid();
+        }
+
         $.post('/materials/save', this.material, function(resp){
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
@@ -39176,6 +39196,10 @@ this.fire('dom-change');
       },
 
       getUsedBy : function() {
+        if( !this.material.id ) {
+          return this.$.usedByMessage.style.display = 'none';
+        }
+
         $.get('/budget/uses', {material: this.material.id}, function(resp){
           for( var i = 0; i < resp.length; i++ ) {
             resp[i].locality = resp[i].locality.join(', ');
