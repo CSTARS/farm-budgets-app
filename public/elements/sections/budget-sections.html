@@ -31,12 +31,16 @@
   </style>
 
   <template>
+    <budget-search-panel id="searchPanel" style="display:none" on-select="onBudgetSelect" on-back="onSearchBack"></budget-search-panel>
+
+    <div id="mainPanel">
     <div class="layout horizontal center" style="border-bottom: 1px solid #ccc">
       <div>
         <h5>
           Farm Budgets <small>Advanced Hardwood Biofuels</small>
         </h5>
       </div>
+
       <div class="flex" style="padding:5px; min-width: 92px">
         <div class="btn-group" style="display:none; white-space:nowrap" id="saveBudgetBtn">
           <button type="button" class="btn btn-warning" on-click="save" id="saveBudgetBtnInner">
@@ -74,9 +78,9 @@
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
         </div>
-
       </div>
     </div>
+
 
     <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
@@ -107,10 +111,12 @@
       on-error-update="onErrorUpdate">
     </budget-section-materials>
     <budget-section-setup id="setup" class="section"></budget-section-setup>
+  </div>
 
     <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="displayNone">
       <i class="fa fa-warning"></i> You have unsaved changes.
     </div>
+
   </template>
 </dom-module>
 
@@ -223,7 +229,18 @@
     },
 
     find : function() {
-      document.querySelector('find-budget-popup').show();
+      this.$.mainPanel.style.display = 'none';
+      this.$.searchPanel.style.display = 'block';
+    },
+
+    onSearchBack : function() {
+      this.$.mainPanel.style.display = 'block';
+      this.$.searchPanel.style.display = 'none';
+    },
+
+    onBudgetSelect : function(e) {
+      document.querySelector('ahb-budget').reload(e.detail.id);
+      this.onSearchBack();
     },
 
     setSection : function() {

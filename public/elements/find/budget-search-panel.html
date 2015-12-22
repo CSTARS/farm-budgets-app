@@ -1,0 +1,345 @@
+<dom-module id="budget-search-panel">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div style="border-bottom: 1px solid #ccc">
+      <h5>
+        <div class="layout horizontal center">
+          <div class="flex">
+            Farm Budgets <small><i class="fa fa-search"></i> Find Budget</small>
+          </div>
+          <div>
+            <a class="btn btn-default" on-click="back"><i class="fa fa-arrow-leaf"></i> Back</a>
+          </div>
+        </div>
+      </h5>
+    </div>
+
+    <div style="padding: 10px;">
+      <input type="text" class="form-control" placeholder="Search Text" id="textInput" on-keyup="onKeyUp"/>
+    </div>
+
+    <div id="filters" style="padding: 10px"></div>
+
+    <div class="layout horizontal" style="border-top: 1px solid #eee">
+      <div class="well">
+        <h4 class="page-header" style="margin-top:5px">Filters</h4>
+
+        <h5>Commodity</h5>
+        <template is="dom-repeat" items="{{commodityFilters}}">
+          <div><a class="btn btn-link" on-click="addFilter" filter="commodity">{{item}}</a></div>
+        </template>
+
+        <h5>Location</h5>
+        <template is="dom-repeat" items="{{locationFilters}}">
+          <div><a class="btn btn-link" on-click="addFilter" filter="locality">{{item}}</a></div>
+        </template>
+
+        <h5>Authority</h5>
+        <template is="dom-repeat" items="{{authorityFilters}}">
+          <div><a class="btn btn-link" on-click="addFilter" filter="authority">{{item}}</a></div>
+        </template>
+      </div>
+      <div class="flex" style="padding: 20px">
+
+        <div class="layout horizontal center">
+          <div class="flex" id="totalLabel">
+
+          </div>
+          <div class="flex" style="text-align: center">
+            <select class="form-control" style="display:inline-block; width: 65px" on-change="onNumPerPageChange" value="10">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select> Per Page
+          </div>
+          <div class="flex" style="text-align:right">
+            <span class="btn-group">
+              <a class="btn btn-default" on-click="previous"><i class="fa fa-arrow-left"></i></a>
+              <a class="btn btn-default" on-click="next"><i class="fa fa-arrow-right"></i></a>
+            </span>
+
+          </div>
+        </div>
+
+        <div id="table"></div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-search-panel',
+
+      ready : function() {
+        this.results = [];
+        this.locationFilters = [];
+        this.authorityFilters = [];
+        this.itemsPerPage = 10;
+        this.page = 0;
+
+        this.setEmptyQuery();
+
+        this.queryTimer = -1;
+      },
+
+      attached : function() {
+        this.query();
+      },
+
+      onKeyUp : function() {
+        var value = this.$.textInput.value;
+
+        this.page = 0;
+
+        if( value === '' ) {
+          if( this.q.$text ) {
+            delete this.q.$text;
+          }
+        } else {
+          if( !this.q.$text ) {
+            this.q.$text = {};
+          }
+          this.q.$text.$search = value;
+        }
+
+        this.bufferedQuery();
+      },
+
+      bufferedQuery : function() {
+        if( this.queryTimer !== -1 ) clearTimeout(this.queryTimer);
+
+        this.queryTimer = setTimeout(function(){
+          this.queryTimer = -1;
+          this.query();
+        }.bind(this), 200);
+      },
+
+      previous : function() {
+        if( this.page === 0 ) return;
+        this.page -= 1;
+        this.query();
+      },
+
+      next : function() {
+        if( (this.page+1) * this.itemsPerPage > this.resp.total ) return;
+        this.page += 1;
+        this.query();
+      },
+
+      query : function() {
+        var params = {
+          query : JSON.stringify(this.q),
+          start : this.itemsPerPage * this.page,
+          stop : this.itemsPerPage * (this.page+1)
+        }
+
+        $.get('/budget/search', params, function(resp){
+          this.resp = resp;
+          this.results = resp.results;
+
+          this.cleanFilters(resp.filters);
+
+          this.locationFilters = this.prepLocalityFilters(resp.filters.locality);
+          this.authorityFilters = resp.filters.authority.sort();
+          this.commodityFilters = resp.filters.commodity.sort();
+
+          this.selected = [];
+
+          this.render();
+        }.bind(this));
+      },
+
+      prepLocalityFilters : function(filters) {
+        if( this.q.$and || this.q.$text ) {
+          return filters;
+        }
+
+        var states = [];
+        for( var i = 0; i < filters.length; i++ ) {
+          if( FB.utils.states[filters[i].toLowerCase()] ) {
+            states.push(filters[i].toLowerCase());
+          }
+        }
+
+        states.sort();
+        return states;
+      },
+
+      update : function(material) {
+        if( !material ) return;
+        if( !material.id ) return;
+
+        var name = material.name;
+        if( material.rename ) {
+          name = material.rename;
+        }
+        delete material.rename;
+
+        for( var i = 0; i < this.results.length; i++ ) {
+          if( this.results[i].name == name ) {
+            this.results[i] = material;
+            return;
+          }
+        }
+
+        this.results.push(material);
+      },
+
+      render : function() {
+        var html = '<table class="table">', m;
+
+        html += '<tr>'+
+          '<th><i class="fa fa-leaf"></i> Crop</th>'+
+          '<th>Budget Name</th>'+
+          '<th><i class="fa fa-shield"></i> Authority</th>'+
+          '<th><i class="fa fa-map-marker"></i> Locality</th>'+
+          '<th>Farm Name</th>'+
+          '<th></th>'+
+        '</tr>';
+
+        for( var i = 0; i < this.results.length; i++ ) {
+          var m = this.results[i];
+          html += '<tr>';
+
+
+          html += '<td>'+m.commodity+'</td>';
+
+          // set row name
+          html += '<td>'+m.name+'</td>';
+
+          // set authority
+          html += '<td>'+m.authority+'</td>';
+
+          // set locality
+          html += '<td>'+m.locality.join(', ')+'</td>';
+
+          html += '<td>'+m.farm.name+'</td>';
+
+          html += '<td><a style="cursor:pointer" index="'+i+'" select>Select</a></td>';
+
+          html += '</tr>';
+        }
+
+        this.$.table.innerHTML = html+'</table>';
+
+        // wire events
+        $(this.$.table)
+          .find('a[select]')
+          .on('click', function(e){
+            var index = parseInt(e.currentTarget.getAttribute('index'));
+            this.fire('select', this.results[index]);
+          }.bind(this));
+
+        this.renderControls();
+      },
+
+      renderControls : function() {
+        this.$.totalLabel.innerHTML = '<h5>'+(this.resp.start+1)+' to '+(this.resp.stop)+' of '+this.resp.total+'</h5>';
+      },
+
+      renderFilters : function() {
+        if( !this.q.$and ) {
+          this.$.filters.innerHTML = '';
+          return;
+        }
+
+        var html = '';
+        for( var i = 0; i < this.q.$and.length; i++ ) {
+          var filter = this.q.$and[i];
+          html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+filter[this.getFilter(filter)]+'</a> ';
+        }
+        this.$.filters.innerHTML = html;
+
+        $(this.$.filters)
+          .find('a')
+          .on('click', function(e){
+            this.q.$and.splice(parseInt(e.currentTarget.getAttribute('index')), 1);
+            if( this.q.$and.length === 0 ) {
+              delete this.q.$and;
+            }
+
+            $(e.currentTarget).remove();
+            this.query();
+          }.bind(this));
+      },
+
+      addFilter : function(e) {
+        if( !this.q.$and ) {
+          this.q.$and = [];
+        }
+        var f = {};
+        f[e.currentTarget.getAttribute('filter')] = e.currentTarget.innerHTML;
+        this.q.$and.push(f);
+        this.page = 0;
+
+        this.renderFilters();
+        this.query();
+      },
+
+      getFilter : function(obj) {
+        return Object.keys(obj)[0];
+      },
+
+      cleanFilters : function(filters) {
+        if( !this.q.$and ) return;
+
+        for( var i = filters.locality.length-1; i >= 0; i-- ) {
+          if( this._isActive('locality', filters.locality[i]) ) {
+            filters.locality.splice(i, 1);
+          }
+        }
+
+        for( var i = filters.authority.length-1; i >= 0; i-- ) {
+          if( this._isActive('authority', filters.authority[i]) ) {
+            filters.authority.splice(i, 1);
+          }
+        }
+
+        for( var i = filters.commodity.length-1; i >= 0; i-- ) {
+          if( this._isActive('commodity', filters.commodity[i]) ) {
+            filters.commodity.splice(i, 1);
+          }
+        }
+      },
+
+      _isActive : function(type, filter) {
+        for( var i = 0; i < this.q.$and.length; i++ ) {
+          if( this.q.$and[i][type] === filter ) {
+            return true;
+          }
+        }
+        return false;
+      },
+
+      onNumPerPageChange : function(e) {
+        this.itemsPerPage = parseInt(e.currentTarget.value);
+        this.query();
+      },
+
+      setEmptyQuery : function() {
+        this.q = {};
+      },
+
+      setMyBudgets : function() {
+        if( ExpressAuth.user ) {
+          this.q.authority = {
+            $in : $.extend(true, [], ExpressAuth.user.authorities)
+          }
+          this.q.authority.$in.push(ExpressAuth.user.username);
+        };
+      },
+
+      back : function() {
+        this.fire('back');
+      }
+
+    });
+  </script>
+</dom-module>

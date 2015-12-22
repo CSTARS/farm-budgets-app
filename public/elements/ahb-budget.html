@@ -52,7 +52,7 @@
         .addEventListener('splash-close', function(){
           if( this.loadedFromLink ) return;
           setTimeout(function(){
-            document.querySelector('find-budget-popup').show();
+            document.querySelector('budget-sections').find();
           }, 300);
         }.bind(this));
     },
@@ -63,7 +63,7 @@
         if( !localdata ) {
           return false;
         }
-        
+
         localdata = JSON.parse(localdata);
         FB.localdata = localdata;
 

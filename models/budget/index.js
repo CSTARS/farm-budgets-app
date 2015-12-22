@@ -1,11 +1,11 @@
 'use strict';
 
-var db = require('../lib/mongo').get();
-var schema = require('../lib/shared/save/schema')();
-var strip = require('../lib/shared/save/strip');
-var utils = require('../lib/modelUtils');
-var authorityModel = require('./authority');
-var materialModel = require('./materials');
+var db = require('../../lib/mongo').get();
+var schema = require('../../lib/shared/save/schema')();
+var strip = require('../../lib/shared/save/strip');
+var utils = require('../../lib/modelUtils');
+var authorityModel = require('../authority');
+var materialModel = require('../materials');
 var uuid = require('node-uuid');
 var async = require('async');
 
@@ -22,6 +22,7 @@ module.exports = function() {
       name: 'Budget',
       find: find,
       findCount : findCount,
+      search : require('./search')(collection),
       save: save,
       get : get,
       delete : remove,

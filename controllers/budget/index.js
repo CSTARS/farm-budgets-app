@@ -46,6 +46,46 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/search', function (req, res) {
+      var query = {};
+      try {
+        if( req.query.query ) {
+          query = JSON.parse(req.query.query);
+        }
+      } catch(e) {
+        return res.send({error:true, message: e});
+      }
+
+      var start = 0;
+      var stop = 10;
+      var includeFilters = true;
+
+      if( req.query.start ) {
+        start = parseInt(req.query.start);
+      }
+      if( req.query.stop ) {
+        stop = parseInt(req.query.stop);
+      }
+      if( stop > 100 ) {
+        stop = 100;
+      }
+
+      if( req.query.includeFilters ) {
+        if( req.query.includeFilters.toLowerCase() === 'false' ) {
+          includeFilters = false;
+        }
+      }
+
+
+      model.search(query, start, stop, includeFilters, function(err, response){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(response);
+      });
+    });
+
     router.get('/delete', authMiddleware, function (req, res) {
       var id = req.query.id;
 
