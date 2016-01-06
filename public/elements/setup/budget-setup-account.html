@@ -36,7 +36,7 @@
       onShow : function() {
         if( !ExpressAuth.user ) return;
 
-        this.$.name.innerHTML = ExpressAuth.user.display_name;
+        this.$.name.innerHTML = ExpressAuth.user.display_name || '';
         this.$.email.innerHTML = ExpressAuth.user.email;
 
         if( ExpressAuth.user.photo_url ) {

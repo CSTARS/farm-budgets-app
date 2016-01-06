@@ -40555,6 +40555,11 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       this.renameList = {};
       this.renameTimer = -1;
       FB.operationController.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
+
+      // if user does not have a verified email, redirect them
+      if( !ExpressAuth.user.verified ) {
+        window.location = '/auth/verifyPage';
+      }
     },
 
     attached : function() {
@@ -45781,7 +45786,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
       onShow : function() {
         if( !ExpressAuth.user ) return;
 
-        this.$.name.innerHTML = ExpressAuth.user.display_name;
+        this.$.name.innerHTML = ExpressAuth.user.display_name || '';
         this.$.email.innerHTML = ExpressAuth.user.email;
 
         if( ExpressAuth.user.photo_url ) {
@@ -47165,7 +47170,7 @@ BudgetMaterialPopup.cancelCreateUnique = function() {
 
       ready : function() {
         if( ExpressAuth.user ) {
-          this.innerHTML = 'Hello, '+ExpressAuth.user.display_name;
+          this.innerHTML = 'Hello, '+(ExpressAuth.user.display_name || ExpressAuth.user.email);
         } else {
           this.innerHTML = '<a href="/auth/signin" class="btn btn-default"><i class="fa fa-sign-in"></i><span class="hidden-xs"> Login</span></a>';
         }
