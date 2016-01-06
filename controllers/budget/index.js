@@ -23,7 +23,7 @@ module.exports = function (router) {
     });
 
     router.get('/contributedTo', function (req, res) {
-      model.contributedTo(req.user.username, function(err, budget){
+      model.contributedTo(req.user.email, function(err, budget){
         if( err ) {
           return errorHandler(err, res);
         }
@@ -118,7 +118,8 @@ module.exports = function (router) {
       });
     });
 
-    /*router.get('/find', function (req, res) {
+    // TODO: remove
+    router.get('/find', function (req, res) {
 
       var query = req.query.query || '';
 
@@ -156,7 +157,7 @@ module.exports = function (router) {
         }
         res.send(budget);
       });
-    });*/
+    });
 
     router.post('/save', function (req, res) {
       var budget = req.body;
@@ -178,7 +179,7 @@ module.exports = function (router) {
           return res.send({error:true, message: 'You do not have access to this authority'});
         }
 
-        model.save(budget, req.user.username, function(err, result){
+        model.save(budget, req.user.email, function(err, result){
           if( err ) {
             return res.send({error:true, message: err});
           }

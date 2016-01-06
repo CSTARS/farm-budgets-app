@@ -15,12 +15,6 @@ module.exports = function(grunt) {
         'dist/require.html': [
         	'public/require.html'
         ],
-				'dist/login-require.html': [
-        	'public/login-require.html'
-        ],
-				'dist/createAccount-require.html': [
-        	'public/createAccount-require.html'
-        ],
 				'dist/materialEditor-require.html': [
         	'public/materialEditor-require.html'
         ]

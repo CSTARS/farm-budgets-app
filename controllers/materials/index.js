@@ -147,7 +147,7 @@ module.exports = function (router) {
           return res.send({error:true, message: 'You do not have access to this authority'});
         }
 
-        model.save(material, req.user.username, function(err, result){
+        model.save(material, req.user.email, function(err, result){
           if( err ) {
             return res.send({error:true, message: err});
           }
@@ -247,6 +247,6 @@ function save(material, user, callback) {
       return callback('You do not have access to this authority');
     }
 
-    model.save(material, user.username, callback);
+    model.save(material, user.email, callback);
   });
 }

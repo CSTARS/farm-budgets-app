@@ -29,7 +29,7 @@
         $.get('/auth/getDevToken', function(resp){
           if( resp.error || !resp.token ) return;
           var token = resp.token;
-          this.$.token.innerHTML = token.uuid+'<br />Expires '+new Date(token.expires).toLocaleString();
+          this.setTokenLabel(resp.token);
         }.bind(this));
       },
 
@@ -48,9 +48,17 @@
         $.get('/auth/newDevToken', function(resp){
           if( resp.error ) return alert(resp.message);
           if( !resp.token ) return alert('Server error requesting token :(');
-          var token = resp.token;
-          this.$.token.innerHTML = token.uuid+'<br />Expires '+new Date(token.expires).toLocaleString();
+          this.setTokenLabel(resp.token);
         }.bind(this));
+      },
+
+      setTokenLabel : function(token) {
+        var expires = new Date(token.expires);
+        if( expires.getTime() < new Date().getTime() ) {
+          this.$.token.innerHTML = token.uuid+'<br /><span class="label label-danger">Expired</span>';
+        } else {
+          this.$.token.innerHTML = token.uuid+'<br /><span class="label label-success">Expires '+new Date(token.expires).toLocaleString()+'</span>';
+        }
       }
     });
   </script>
