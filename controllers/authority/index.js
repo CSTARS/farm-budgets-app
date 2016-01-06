@@ -4,25 +4,10 @@
 var authUtils = require('../auth');
 var errorHandler = require('../../lib/handleError');
 var AuthorityModel = require('../../models/authority');
-var authMiddleware = authUtils.middleware;
 var model = new AuthorityModel();
 
-global.auth.deserialize = function(user, done) {
-  model.getAll(user, function(err, authorities){
-    if( err ) {
-      return done(err);
-    }
-
-    user.authorities = authorities;
-
-    done(null, user);
-  });
-};
-
 module.exports = function (router) {
-    var auth = global.auth;
-
-    router.get('/get/all', authMiddleware, function (req, res) {
+    router.get('/get/all', function (req, res) {
       model.getAll(req.user, function(err, authorities){
         if( err ) {
           return errorHandler(err, res);
@@ -32,7 +17,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/get', authMiddleware, function (req, res) {
+    router.get('/get', function (req, res) {
       if( !req.query.name ) {
         return errorHandler('authority name required', res);
       }
@@ -55,7 +40,7 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/create', authMiddleware, function (req, res) {
+    router.post('/create', function (req, res) {
       var authority = req.body;
       if( !authority ) {
         return errorHandler('authority required', res);
@@ -70,7 +55,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/grantAccess', authMiddleware, function (req, res) {
+    router.get('/grantAccess', function (req, res) {
       if( !req.query.name || !req.query.username ) {
         return errorHandler('authority name and username required', res);
       }
@@ -93,7 +78,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/removeAccess', authMiddleware, function (req, res) {
+    router.get('/removeAccess', function (req, res) {
       if( !req.query.name || !req.query.username ) {
         return errorHandler('authority name and username required', res);
       }
@@ -116,7 +101,7 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/update', authMiddleware, function (req, res) {
+    router.post('/update', function (req, res) {
       if( !req.body.name ) {
         return errorHandler('authority name required', res);
       }
@@ -137,5 +122,26 @@ module.exports = function (router) {
           res.send(authority);
         });
       });
+    });
+
+    // patch in user authorities to ExpressAuth namespace
+    router.get('/lib.js', function(req, res){
+      res.setHeader('Content-Type', 'application/javascript');
+      var lib = 'if(ExpressAuth && ExpressAuth.user) ExpressAuth.user.authorities=';
+
+      if( req.user ) {
+        model.getAll(req.user, function(err, authorities){
+          if( err ) {
+            lib += '[];';
+          } else {
+            lib += JSON.stringify(authorities)+';';
+          }
+
+          res.end(lib);
+        });
+      } else {
+        lib += '[];';
+        res.end(lib);
+      }
     });
 };

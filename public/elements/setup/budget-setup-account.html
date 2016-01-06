@@ -10,13 +10,13 @@
 
     <table class="table">
       <tr>
-        <td>Username</td><td id="username"></td>
+        <td>Name</td><td><span id="photo"></span><span id="name"></span></td><td></td>
       </tr>
       <tr>
-        <td>Name</td><td id="name"></td>
+        <td>Email</td><td id="email"></td><td></td>
       </tr>
       <tr>
-        <td>Email</td><td id="email"></td>
+        <td>Developer Token</td><td id="token"></td><td><a class="btn btn-default" on-click="generate">Generate New Token</a></td>
       </tr>
     </table>
 
@@ -25,12 +25,32 @@
     Polymer({
       is: 'budget-setup-account',
 
+      ready : function() {
+        $.get('/auth/getDevToken', function(resp){
+          if( resp.error || !resp.token ) return;
+          var token = resp.token;
+          this.$.token.innerHTML = token.uuid+'<br />Expires '+new Date(token.expires).toLocaleString();
+        }.bind(this));
+      },
+
       onShow : function() {
         if( !ExpressAuth.user ) return;
 
-        this.$.username.innerHTML = ExpressAuth.user.username;
-        this.$.name.innerHTML = ExpressAuth.user.name;
+        this.$.name.innerHTML = ExpressAuth.user.display_name;
         this.$.email.innerHTML = ExpressAuth.user.email;
+
+        if( ExpressAuth.user.photo_url ) {
+          this.$.photo.innerHTML = '<img src="'+ExpressAuth.user.photo_url+'" style="width:32px;height:32px" />&nbsp;'
+        }
+      },
+
+      generate : function() {
+        $.get('/auth/newDevToken', function(resp){
+          if( resp.error ) return alert(resp.message);
+          if( !resp.token ) return alert('Server error requesting token :(');
+          var token = resp.token;
+          this.$.token.innerHTML = token.uuid+'<br />Expires '+new Date(token.expires).toLocaleString();
+        }.bind(this));
       }
     });
   </script>

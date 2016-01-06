@@ -1,5 +1,5 @@
 'use strict';
-var auth = global.auth;
+var auth = require('express-auth');
 
 function middleware(req, res, next) {
   if( !req.user && !req.query.key ) {
@@ -23,7 +23,7 @@ function hasAccess(user, authority, callback) {
     return callback(null, true);
   }
 
-  auth.acl().hasRole(user.username, authority, function(err, hasRole){
+  auth.acl.hasRole(user.username, authority, function(err, hasRole){
     callback(err, hasRole);
   });
 }

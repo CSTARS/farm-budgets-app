@@ -10,9 +10,6 @@ var collection = db.collection('material');
 
 module.exports = function (router) {
     model = new MaterialModel();
-    var auth = global.auth;
-    var authMiddleware = authUtils.middleware;
-
 
     router.get('/hasRequired', function (req, res) {
       model.hasRequired(req.query.id, function(err, checklist){
@@ -76,10 +73,10 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/mapReduceAll', authMiddleware, function (req, res) {
-      if( !req.user.admin ) {
-        return res.send({error: true, message: 'nope.'});
-      }
+    router.get('/mapReduceAll', function (req, res) {
+      //if( !req.user.admin ) {
+      //  return res.send({error: true, message: 'nope.'});
+      //}
 
       model.mapReduceAll(function(err, resp){
         if( err ) {
@@ -100,7 +97,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/delete', authMiddleware, function (req, res) {
+    router.get('/delete', function (req, res) {
       var id = req.query.id;
 
       if( !id ) {
@@ -130,7 +127,7 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/save', authMiddleware, function (req, res) {
+    router.post('/save', function (req, res) {
       var material = req.body;
 
       if( !material ) {

@@ -1,6 +1,6 @@
 'use strict';
 var db = require('../lib/mongo').get();
-
+var auth = require('express-auth');
 var collection = db.collection('authority');
 var accountCollection = db.collection('accounts');
 
@@ -28,7 +28,7 @@ function get(name, callback) {
       return callback('Unknown authority: '+name);
     }
 
-    global.auth.acl().roleUsers(authority.name, function(err, users){
+    auth.acl.roleUsers(authority.name, function(err, users){
       if( err ) {
         callback(err);
       }
@@ -41,7 +41,7 @@ function get(name, callback) {
 
 // get all authorities for a user
 function getAll(user, callback) {
-  if( !user.username ) {
+  if( !user.email || !user.verified ) {
     callback(null, []);
   } else if( user.admin ) {
     collection.find({},{name: 1, _id: 0}).toArray(function(err, result){
@@ -58,7 +58,7 @@ function getAll(user, callback) {
       callback(null, arr);
     });
   } else {
-    global.auth.acl().userRoles(user.username, callback);
+    auth.acl.userRoles(user.email, callback);
   }
 }
 
@@ -71,7 +71,7 @@ function grantAccess(username, authority, callback) {
       return callback('Invalid username');
     }
 
-    global.auth.acl().addUserRoles(username, authority, function(err){
+    auth.acl.addUserRoles(username, authority, function(err){
       if( err ) {
         return callback(err);
       }
@@ -81,7 +81,7 @@ function grantAccess(username, authority, callback) {
 }
 
 function removeAccess(username, authority, callback) {
-  global.auth.acl().removeUserRoles(username, authority, function(err){
+  auth.acl.removeUserRoles(username, authority, function(err){
     if( err ) {
       return callback(err);
     }

@@ -10,7 +10,6 @@ var collection = db.collection('budget');
 
 module.exports = function (router) {
     model = new BudgetModel();
-    var authMiddleware = authUtils.middleware;
 
     router.get('/get', function (req, res) {
       var id = req.query.id;
@@ -23,7 +22,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/contributedTo', authMiddleware, function (req, res) {
+    router.get('/contributedTo', function (req, res) {
       model.contributedTo(req.user.username, function(err, budget){
         if( err ) {
           return errorHandler(err, res);
@@ -86,7 +85,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/delete', authMiddleware, function (req, res) {
+    router.get('/delete', function (req, res) {
       var id = req.query.id;
 
       if( !id ) {
@@ -119,7 +118,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/find', function (req, res) {
+    /*router.get('/find', function (req, res) {
 
       var query = req.query.query || '';
 
@@ -157,9 +156,9 @@ module.exports = function (router) {
         }
         res.send(budget);
       });
-    });
+    });*/
 
-    router.post('/save', authMiddleware, function (req, res) {
+    router.post('/save', function (req, res) {
       var budget = req.body;
 
       if( !budget ) {

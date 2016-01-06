@@ -12,9 +12,9 @@
 
       ready : function() {
         if( ExpressAuth.user ) {
-          this.innerHTML = 'Hello, '+ExpressAuth.user.username;
+          this.innerHTML = 'Hello, '+ExpressAuth.user.display_name;
         } else {
-          this.innerHTML = '<a href="/login.html" class="btn btn-default"><i class="fa fa-sign-in"></i><span class="hidden-xs"> Login</span></a>';
+          this.innerHTML = '<a href="/auth/signin" class="btn btn-default"><i class="fa fa-sign-in"></i><span class="hidden-xs"> Login</span></a>';
         }
       }
     });

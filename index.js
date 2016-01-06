@@ -6,7 +6,7 @@ var merge = require('merge-util');
 var fs = require('fs');
 var mongo = require('./lib/mongo');
 
-var authStack = require('express-auth');
+var auth = require('express-auth');
 var history = require('mongo-object-history');
 
 var options, app;
@@ -23,8 +23,8 @@ options = {
          */
 
 
-        if( fs.existsSync('/etc/farm-budgets-app/config.js') ) {
-          config.use(require('/etc/farm-budgets-app/config.js'));
+        if( fs.existsSync('/etc/farm-budgets-app/config.json') ) {
+          config.use(JSON.parse(fs.readFileSync('/etc/farm-budgets-app/config.json', 'utf-8')));
         }
 
         // allow command line switch from serving /dist to /app
@@ -34,9 +34,7 @@ options = {
           console.log('Servering ./public');
         }
 
-        global.appConfig = config;
-
-        mongo.connect(config, function(err){
+        mongo.connect(config, function(err) {
           if( err ) {
             console.log(err);
             process.exit();
@@ -45,13 +43,14 @@ options = {
           mongo.ensureIndexes();
           setupHistoryTracking();
 
-          var authSetup = {
+          var authConfig = config.get('auth');
+          authConfig.protected = require('./lib/protected');
+
+          auth.init({
             db : mongo.get(),
             app : app,
-            config : config.get('auth'),
-          };
-
-          global.auth = authStack.init(authSetup);
+            config : authConfig
+          });
 
           next(null, config);
         });
