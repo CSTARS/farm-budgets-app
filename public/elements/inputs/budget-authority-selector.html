@@ -40,7 +40,7 @@
           var auth = ExpressAuth.user.authorities[i];
           html += '<option value="'+auth+'">'+auth+'</option>';
         }
-        html += '<option value="'+ExpressAuth.user.username+'">'+ExpressAuth.user.username+'</option>';
+        html += '<option value="'+ExpressAuth.user.email+'">'+ExpressAuth.user.email+'</option>';
         this.$.selector.innerHTML = html;
       },
 

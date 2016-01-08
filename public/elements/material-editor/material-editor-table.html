@@ -275,7 +275,7 @@
         this.fire('edit',{
           name : '',
           type : 'simple',
-          authority : ExpressAuth.user.username,
+          authority : ExpressAuth.user.email,
           year : new Date().getFullYear()
         });
       },
@@ -364,7 +364,7 @@
           this.q.authority = {
             $in : $.extend(true, [], ExpressAuth.user.authorities)
           }
-          this.q.authority.$in.push(ExpressAuth.user.username);
+          this.q.authority.$in.push(ExpressAuth.user.email);
         };
       },
 

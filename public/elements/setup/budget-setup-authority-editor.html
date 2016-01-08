@@ -30,7 +30,7 @@
                   <template is="dom-repeat" items="{{searchResults}}">
                     <div style="padding:10px 0">
                       <a class="btn btn-primary" on-click="grantAccess" index$="{{index}}"><i class="fa fa-user-plus"></i></a>
-                      <span>{{item.username}}</span>
+                      <span>{{item.email}}</span>
                       (<span>{{item.name}}</span>)
                     </div>
                   </template>
@@ -148,7 +148,7 @@
           }
 
           for( var i = resp.length-1; i >= 0; i-- ) {
-            if( this.users.indexOf(resp[i].username) > -1 ) {
+            if( this.users.indexOf(resp[i].email) > -1 ) {
               resp.splice(i, 1);
             }
           }
@@ -163,7 +163,7 @@
         this.searchResults = [];
         this.$.newMemeberSearch.value = '';
 
-        $.get('/authority/grantAccess?name='+this.authority+'&username='+user.username, function(resp){
+        $.get('/authority/grantAccess',{name : this.authority, email: user.email}, function(resp){
           if( resp.error ) {
             alert(resp.message);
             return;
@@ -183,7 +183,7 @@
 
         this.splice('users', index);
 
-        $.get('/authority/removeAccess?name='+this.authority+'&username='+user, function(resp){
+        $.get('/authority/removeAccess',{name : this.authority, email: user.email}, function(resp){
           if( resp.error ) {
             alert(resp.message);
             return;

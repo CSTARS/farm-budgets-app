@@ -34,7 +34,7 @@
 
       update : function() {
         if( this.type === 'authority' ) {
-          var query = JSON.stringify({authority: ExpressAuth.user.username});
+          var query = JSON.stringify({authority: ExpressAuth.user.email});
           $.get('/budget/find?query='+encodeURIComponent(query), function(resp){
             if( resp.error ) {
               return alert(resp.message);
@@ -43,7 +43,6 @@
             this.budgets = resp;
           }.bind(this));
         } else {
-          var query = JSON.stringify({authority: ExpressAuth.user.username});
           $.get('/budget/contributedTo', function(resp){
             if( resp.error ) {
               return alert(resp.message);

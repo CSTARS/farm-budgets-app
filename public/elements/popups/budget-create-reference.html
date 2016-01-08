@@ -62,7 +62,7 @@
         data.name = data.name+' Reference';
 
         if( !FB.hasAccess(data) ) {
-          data.authority = ExpressAuth.user ? ExpressAuth.user.username : '';
+          data.authority = ExpressAuth.user ? ExpressAuth.user.email : '';
         }
 
         // otherwise this data is already set
@@ -83,7 +83,7 @@
         };
 
         FB.changes.setOriginal({
-          authority: ExpressAuth.user ? ExpressAuth.user.username : ''
+          authority: ExpressAuth.user ? ExpressAuth.user.email : ''
         }, []);
 
         window.location = '#budget/overview';

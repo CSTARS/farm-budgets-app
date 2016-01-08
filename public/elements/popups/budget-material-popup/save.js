@@ -19,7 +19,7 @@ BudgetMaterialPopup.save = function(noHide) {
       this.$.authorityMessage.innerHTML =
         '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You do not have access to the authority '+
         '<b><i class="fa fa-shield"></i> '+this.data.authority+'</b>.  Please select a new authority in '+
-        'the <b><i class="fa fa-cog"></i> advanced</b> section.  If you do not belong to an authority, select your username as the authority.</div>';
+        'the <b><i class="fa fa-cog"></i> advanced</b> section.  If you do not belong to an authority, select your email as the authority.</div>';
       return;
 
     // if the user doesn't have access to the original authority but has access to
