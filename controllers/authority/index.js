@@ -56,8 +56,8 @@ module.exports = function (router) {
     });
 
     router.get('/grantAccess', function (req, res) {
-      if( !req.query.name || !req.query.username ) {
-        return errorHandler('authority name and username required', res);
+      if( !req.query.name || !req.query.email ) {
+        return errorHandler('authority name and email required', res);
       }
 
       authUtils.hasAccess(req.user, req.query.name, function(err, hasAccess){
@@ -68,7 +68,7 @@ module.exports = function (router) {
           return errorHandler('You do not have access to authority: '+req.query.authority, res);
         }
 
-        model.grantAccess(req.query.username, req.query.name, function(err, result){
+        model.grantAccess(req.query.email, req.query.name, function(err, result){
           if( err ) {
             return errorHandler(err, res);
           }
@@ -79,8 +79,8 @@ module.exports = function (router) {
     });
 
     router.get('/removeAccess', function (req, res) {
-      if( !req.query.name || !req.query.username ) {
-        return errorHandler('authority name and username required', res);
+      if( !req.query.name || !req.query.email ) {
+        return errorHandler('authority name and email required', res);
       }
 
       authUtils.hasAccess(req.user, req.query.name, function(err, hasAccess){
@@ -91,7 +91,7 @@ module.exports = function (router) {
           return errorHandler('You do not have access to authority: '+req.query.authority, res);
         }
 
-        model.removeAccess(req.query.username, req.query.name, function(err, result){
+        model.removeAccess(req.query.email, req.query.name, function(err, result){
           if( err ) {
             return errorHandler(err, res);
           }

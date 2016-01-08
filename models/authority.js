@@ -2,7 +2,7 @@
 var db = require('../lib/mongo').get();
 var auth = require('express-auth');
 var collection = db.collection('authority');
-var accountCollection = db.collection('accounts');
+var usersCollection = db.collection('users');
 
 var allowedKeys = ['name','description'];
 
@@ -62,16 +62,16 @@ function getAll(user, callback) {
   }
 }
 
-function grantAccess(username, authority, callback) {
-  accountCollection.findOne({username: username},{_id: 1}, function(err, user){
+function grantAccess(email, authority, callback) {
+  usersCollection.findOne({'gitkit.email': email},{_id: 1}, function(err, user){
     if( err ) {
       return callback(err);
     }
     if( !user ) {
-      return callback('Invalid username');
+      return callback('Invalid email');
     }
 
-    auth.acl.addUserRoles(username, authority, function(err){
+    auth.acl.addUserRoles(email, authority, function(err){
       if( err ) {
         return callback(err);
       }
@@ -80,8 +80,8 @@ function grantAccess(username, authority, callback) {
   });
 }
 
-function removeAccess(username, authority, callback) {
-  auth.acl.removeUserRoles(username, authority, function(err){
+function removeAccess(email, authority, callback) {
+  auth.acl.removeUserRoles(email, authority, function(err){
     if( err ) {
       return callback(err);
     }
@@ -110,7 +110,7 @@ function create(authority, user, callback) {
         return callback(err);
       }
 
-      grantAccess(user.username, authority.name, callback);
+      grantAccess(user.email, authority.name, callback);
     });
   });
 }
