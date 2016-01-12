@@ -25,7 +25,7 @@ FB.hasAccess = function(object) {
   }
 
   if( user.authorities.indexOf(object.authority) === -1 &&
-      user.username !== object.authority ) {
+      user.email !== object.authority ) {
 
       return false;
   }
