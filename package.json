@@ -31,9 +31,7 @@
     "minimist": "^1.2.0",
     "mongo-object-history": "ucd-cws/mongo-object-history",
     "mongodb": "^2.0.46",
-    "mongoose": "^4.0.8",
     "node-uuid": "^1.4.3",
-    "pg": "^4.4.0",
     "ucum.js": "0.0.2"
   },
   "devDependencies": {

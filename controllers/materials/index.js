@@ -157,39 +157,6 @@ module.exports = function (router) {
       });
     });
 
-    /*router.post('/saveBulk', authMiddleware, function (req, res) {
-      var materials = req.body.materials;
-
-      if( !materials ) {
-        return errorHandler('materials required', res);
-      }
-      if( !Array.isArray(materials) ) {
-        return errorHandler('materials must be an array', res);
-      }
-
-      var results = [];
-
-      async.eachSeries(
-        materials,
-        function(material, next){
-          save(material, req.user, function(err, resp){
-            if( err ) {
-              results.push({error:true, message: err});
-            } else {
-              results.push(resp);
-            }
-            next();
-          });
-        },
-        function(err) {
-          res.send({
-            error : err,
-            results : results
-          });
-        }
-      );
-
-    });*/
 };
 
 // the user needs to have access to both the old authority and the new authority

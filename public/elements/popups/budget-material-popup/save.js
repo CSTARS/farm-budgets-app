@@ -27,6 +27,7 @@ BudgetMaterialPopup.save = function(noHide) {
     } else if( this.action == 'edit' &&
       this.data.authority != this.originalData.authority &&
       !FB.utils.hasAccess(ExpressAuth.user, this.originalData.authority)  ) {
+        
         this.data.id = FB.utils.guid();
     }
   }
