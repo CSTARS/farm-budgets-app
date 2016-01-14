@@ -1,9 +1,10 @@
 'use strict';
 
+var db = require('../lib/mongo').get();
 var utils = require('../lib/modelUtils');
 
-var budgetCollection = global.db.collection('budget');
-var materialCollection = global.db.collection('material');
+var budgetCollection = db.collection('budget');
+var materialCollection = db.collection('material');
 
 
 module.exports = function() {

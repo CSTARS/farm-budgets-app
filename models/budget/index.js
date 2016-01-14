@@ -1,16 +1,17 @@
 'use strict';
 
-var schema = require('../lib/shared/save/schema')();
-var strip = require('../lib/shared/save/strip');
-var utils = require('../lib/modelUtils');
-var authorityModel = require('./authority');
-var materialModel = require('./materials');
+var db = require('../../lib/mongo').get();
+var schema = require('../../lib/shared/save/schema')();
+var strip = require('../../lib/shared/save/strip');
+var utils = require('../../lib/modelUtils');
+var authorityModel = require('../authority');
+var materialModel = require('../materials');
 var uuid = require('node-uuid');
 var async = require('async');
 
-var collection = global.db.collection('budget');
-var materialCollection = global.db.collection('material');
-var historyCollection = global.db.collection('history');
+var collection = db.collection('budget');
+var materialCollection = db.collection('material');
+var historyCollection = db.collection('history');
 var history = require('mongo-object-history');
 
 authorityModel = new authorityModel();
@@ -21,6 +22,7 @@ module.exports = function() {
       name: 'Budget',
       find: find,
       findCount : findCount,
+      search : require('./search')(collection),
       save: save,
       get : get,
       delete : remove,
@@ -56,7 +58,6 @@ function save(budget, username, callback) {
     if( budget.farm ) {
       budget.farmname = budget.farm.name;
     }
-
 
     // validate material id's
     if( !budget.materialIds ) {

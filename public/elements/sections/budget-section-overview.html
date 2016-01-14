@@ -71,6 +71,10 @@
                 <td>Referenced Budget</td>
                 <td id="referenceLabel"></td>
               </tr>
+              <tr>
+                <td>Budget URL</td>
+                <td><a id="link" target="_blank">Link</a></td>
+              </tr>
             </tbody>
           </table>
 
@@ -150,6 +154,12 @@
           this.setData(FB.getBudget());
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
         }.bind(this));
+
+      document
+        .querySelector('ahb-budget')
+        .addEventListener('budget-loaded', function(){
+          this.$.link.setAttribute('href', '#link/'+FB.getBudget().id);
+        }.bind(this));
     },
 
     updateTotal : function() {
@@ -198,20 +208,20 @@
       var materials = FB.materialController.get();
       var m;
 
-      for( var name in materials.materials ) {
-        var m = materials.materials[name];
+      for( var name in materials ) {
+        var m = materials[name];
         if( !m.authority || !m.locality ) continue;
         if( authorities[m.authority+m.locality] ) continue;
 
         authorities[m.authority+m.locality] = this.getMaterialAuthLabel(m);
       }
-      for( var name in materials.complex ) {
+      /*for( var name in materials.complex ) {
         var m = materials.complex[name];
         if( !m.authority || !m.locality ) continue;
         if( authorities[m.authority+m.locality] ) continue;
 
         authorities[m.authority+m.locality] = this.getMaterialAuthLabel(m);
-      }
+      }*/
 
       var html = '<table style="width:100%">';
       for( var key in authorities ) {

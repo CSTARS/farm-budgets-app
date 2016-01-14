@@ -39,8 +39,7 @@
           <label for="datesInput" class="col-sm-3 control-label" id="inputLabel"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
           <div class="col-sm-9">
             <div id="inputRoot"></div>
-            <div id="selectedDates">
-
+            <div id="selectedDates" style="padding: 20px 0">
 
               <template is="dom-repeat" items="{{dates}}">
                 <div>
@@ -50,12 +49,12 @@
 
                     <div class="length-label">Length:</div>
                     <div hidden$="{{readonly}}">
-                      <input type="number" value="{{item.length::input}}" class="form-control" on-input="onLengthUpdate" style="max-width: 75px; margin-right: 5px" />
+                      <input type="number" value="{{item.length::change}}" class="form-control" on-change="onLengthUpdate" style="max-width: 75px; margin-right: 5px" />
                     </div>
                     <div hidden$="{{!readonly}}" style="padding: 10px">{{item.length}}</div>
 
                     <div hidden$="{{readonly}}">
-                      <select value="{{item.units::input}}" class="form-control" on-change="onLengthUpdate">
+                      <select value="{{item.units::change}}" class="form-control" on-change="onLengthUpdate">
                         <option value="day">Day(s)</option>
                         <option value="month">Month(s)</option>
                         <option value="year">Year(s)</option>

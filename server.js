@@ -13,8 +13,8 @@ var server;
 
 server = http.createServer(app);
 
-if( fs.existsSync('/etc/farm-budgets-app/config.js') ) {
-  var c = require('/etc/farm-budgets-app/config.js');
+if( fs.existsSync('/etc/farm-budgets-app/config.json') ) {
+  var c = JSON.parse(fs.readFileSync('/etc/farm-budgets-app/config.json', 'utf-8'));
   if( c.port ) {
     server.listen(c.port);
   } else {

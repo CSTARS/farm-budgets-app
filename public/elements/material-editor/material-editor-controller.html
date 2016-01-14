@@ -1,0 +1,36 @@
+<dom-module id="material-editor-controller">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <material-editor-table id="table" on-edit="onTableEdit"></material-editor-table>
+    <material-editor-form id="form" style="display:none" on-done="onFormDone" on-error="onSaveError"></material-editor-form>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'material-editor-controller',
+
+      onTableEdit : function(e) {
+        this.$.table.style.display = 'none';
+        this.$.form.edit(e.detail);
+        this.$.form.style.display = 'block';
+      },
+
+      onFormDone : function(e) {
+        this.$.table.style.display = 'block';
+        this.$.form.style.display = 'none';
+
+        this.$.table.update(e.detail);
+        this.$.table.render();
+      },
+
+      onSaveError : function(e) {
+        this.table.query(); // refresh the table on error
+      }
+    });
+  </script>
+</dom-module>

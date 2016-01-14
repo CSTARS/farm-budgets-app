@@ -1,7 +1,8 @@
 'use strict';
-
-var collection = global.db.collection('authority');
-var accountCollection = global.db.collection('accounts');
+var db = require('../lib/mongo').get();
+var auth = require('express-auth');
+var collection = db.collection('authority');
+var usersCollection = db.collection('users');
 
 var allowedKeys = ['name','description'];
 
@@ -27,7 +28,7 @@ function get(name, callback) {
       return callback('Unknown authority: '+name);
     }
 
-    global.auth.acl().roleUsers(authority.name, function(err, users){
+    auth.acl.roleUsers(authority.name, function(err, users){
       if( err ) {
         callback(err);
       }
@@ -40,7 +41,7 @@ function get(name, callback) {
 
 // get all authorities for a user
 function getAll(user, callback) {
-  if( !user.username ) {
+  if( !user.email || !user.verified ) {
     callback(null, []);
   } else if( user.admin ) {
     collection.find({},{name: 1, _id: 0}).toArray(function(err, result){
@@ -50,26 +51,27 @@ function getAll(user, callback) {
 
       var arr = [];
       for( var i = 0; i < result.length; i++ ) {
+        if( !result[i].name ) continue;
         arr.push(result[i].name);
       }
       arr.sort();
       callback(null, arr);
     });
   } else {
-    global.auth.acl().userRoles(user.username, callback);
+    auth.acl.userRoles(user.email, callback);
   }
 }
 
-function grantAccess(username, authority, callback) {
-  accountCollection.findOne({username: username},{_id: 1}, function(err, user){
+function grantAccess(email, authority, callback) {
+  usersCollection.findOne({'gitkit.email': email},{_id: 1}, function(err, user){
     if( err ) {
       return callback(err);
     }
     if( !user ) {
-      return callback('Invalid username');
+      return callback('Invalid email');
     }
 
-    global.auth.acl().addUserRoles(username, authority, function(err){
+    auth.acl.addUserRoles(email, authority, function(err){
       if( err ) {
         return callback(err);
       }
@@ -78,8 +80,8 @@ function grantAccess(username, authority, callback) {
   });
 }
 
-function removeAccess(username, authority, callback) {
-  global.auth.acl().removeUserRoles(username, authority, function(err){
+function removeAccess(email, authority, callback) {
+  auth.acl.removeUserRoles(email, authority, function(err){
     if( err ) {
       return callback(err);
     }
@@ -108,7 +110,7 @@ function create(authority, user, callback) {
         return callback(err);
       }
 
-      grantAccess(user.username, authority.name, callback);
+      grantAccess(user.email, authority.name, callback);
     });
   });
 }

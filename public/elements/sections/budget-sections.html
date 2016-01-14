@@ -31,12 +31,16 @@
   </style>
 
   <template>
+    <budget-search-panel id="searchPanel" style="display:none" class="animated zoomIn" on-select="onBudgetSelect" on-back="onSearchBack"></budget-search-panel>
+
+    <div id="mainPanel">
     <div class="layout horizontal center" style="border-bottom: 1px solid #ccc">
       <div>
         <h5>
           Farm Budgets <small>Advanced Hardwood Biofuels</small>
         </h5>
       </div>
+
       <div class="flex" style="padding:5px; min-width: 92px">
         <div class="btn-group" style="display:none; white-space:nowrap" id="saveBudgetBtn">
           <button type="button" class="btn btn-warning" on-click="save" id="saveBudgetBtnInner">
@@ -69,13 +73,14 @@
             <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
             <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
             <li><a class="btn btn-link" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a></li>
-            <li id="signOutBtn" style="display:none"><a class="btn btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+            <li><a class="btn btn-link" href="/materialEditor.html"><i class="fa fa-pencil"></i> Material Editor</a></li>
+            <li id="signOutBtn" style="display:none"><a class="btn btn-link" href="/auth/signoutRedirect"><i class="fa fa-sign-out"></i> Sign Out</a></li>
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
         </div>
-
       </div>
     </div>
+
 
     <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
@@ -87,6 +92,7 @@
       <li role="presentation" id="btn-materials">
         <a href="#budget/materials">
           <i class="fa fa-warning text text-warning" id="unsavedWarning" style="display:none"></i>
+          <i class="fa fa-warning text text-danger" id="errorWarning" style="display:none"></i>
           <i class="fa fa-cube"></i>
           Materials List
         </a>
@@ -98,12 +104,19 @@
 
     <budget-section-overview id="overview" class="section"></budget-section-overview>
     <budget-section-operations id="operations" class="section"></budget-section-operations>
-    <budget-section-materials id="materials" class="section" on-unsaved-update="onUnsavedUpdate"></budget-section-materials>
+    <budget-section-materials
+      id="materials"
+      class="section"
+      on-unsaved-update="onUnsavedUpdate"
+      on-error-update="onErrorUpdate">
+    </budget-section-materials>
     <budget-section-setup id="setup" class="section"></budget-section-setup>
+  </div>
 
     <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="displayNone">
       <i class="fa fa-warning"></i> You have unsaved changes.
     </div>
+
   </template>
 </dom-module>
 
@@ -128,7 +141,6 @@
 
       if( ExpressAuth && ExpressAuth.user ) {
         this.$.signOutBtn.style.display = 'block';
-        this.$.signOutBtn.firstChild.setAttribute('href', ExpressAuth.path+'/logout');
       }
 
       this.changesTimer = -1;
@@ -157,7 +169,23 @@
       }
     },
 
+    onErrorUpdate : function(e) {
+      if( e.detail === true ) {
+        this.$.errorWarning.style.display = 'inline-block';
+      } else {
+        this.$.errorWarning.style.display = 'none';
+      }
+    },
+
     checkForChanges : function() {
+      if( this.changesTimer != -1 ) clearTimeout(this.changesTimer);
+      this.changesTimer = setTimeout(function(){
+        this.changesTimer = -1;
+        this._checkForChanges();
+      }.bind(this), 100);
+    },
+
+    _checkForChanges : function() {
       FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
     },
 
@@ -200,14 +228,27 @@
     },
 
     find : function() {
-      document.querySelector('find-budget-popup').show();
+      this.$.mainPanel.style.display = 'none';
+      this.$.searchPanel.style.display = 'block';
+    },
+
+    onSearchBack : function() {
+      this.$.mainPanel.style.display = 'block';
+      this.$.searchPanel.style.display = 'none';
+    },
+
+    onBudgetSelect : function(e) {
+      document.querySelector('ahb-budget').reload(e.detail.id);
+      this.onSearchBack();
     },
 
     setSection : function() {
       var parts = window.location.hash.replace(/#/,'').split('/');
 
       if( parts[0].toLowerCase() === 'link' && parts.length > 1 ) {
-        document.querySelector('ahb-budget').reload(parts[1]);
+        var budget = document.querySelector('ahb-budget');
+        budget.loadedFromLink = true;
+        budget.reload(parts[1]);
         window.location = '#budget/overview';
         return;
       }
@@ -276,27 +317,7 @@
 
     startNew : function() {
       if( FB.changes.hasChanges() && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
-
-      var newData = {
-        budget : {
-          id : FB.utils.guid(),
-          authority : ExpressAuth.user ? ExpressAuth.user.username : '',
-          locality : [],
-          name : '',
-          farm : {
-            farm : '',
-            commodity : '',
-            unit : '[acr_us]',
-            size : 1
-          },
-          operations : [],
-        },
-        materials : []
-      };
-
-      FB.changes.setOriginal(newData.budget, newData.materials);
-
-      document.querySelector('ahb-budget').load(newData);
+      document.querySelector('ahb-budget').createNew();
       document.querySelector('budget-farm-editor').show();
       this.$.overview.updateTotal();
     }

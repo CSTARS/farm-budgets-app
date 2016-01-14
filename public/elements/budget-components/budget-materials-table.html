@@ -57,7 +57,7 @@
           } else {
             m = FB.materialController.get(material);
           }
-          var row = this.initRow(c, m, this.data.materials[material]);
+          var row = this.initRow(c, m, this.data.materials[material], material);
           this.controllers.push(row);
           c++;
         }
@@ -65,7 +65,7 @@
 
     },
 
-    initRow : function(row, material, materialImpl) {
+    initRow : function(row, material, materialImpl, implName) {
       return new FB.MaterialTableRow(
         this.querySelector('table[main] > tbody > tr:nth-child('+row+')'),
         {
@@ -75,6 +75,7 @@
           readonly : this.readonly,
           isOperation : this.options.isOperation,
           materialImpl : materialImpl,
+          implName : implName,
 
           onDelete : function(material) {
             this.recalc();
@@ -94,9 +95,13 @@
 
           }.bind(this),
 
-          onUnitsChange : function(material, units) {
+          onUnitsChange : function(materialImpl, units, implName) {
             this.recalc();
-            this.fire('price-change', this.data.price);
+            this.fire('row-units-change', {
+              name : implName,
+              impl : materialImpl,
+              units : units
+            });
           }.bind(this)
         }
       );
@@ -107,7 +112,7 @@
       if( this.data.schedule ) {
         FB.operationController.recalc();
       } else {
-        FB.materialController.recalc();
+      //  FB.materialController.recalc();
       }
     },
 
@@ -115,7 +120,7 @@
       var value;
 
       try {
-        value = FB.ucum.convert(1, FB.units.math.cleanDollars(from), FB.units.math.cleanDollars(to));
+        value = FB.ucum.convert(1, FB.units.cleanDollars(from), FB.units.cleanDollars(to));
         if( value == 0 ) value = 1;
         value = 1 / value;
       } catch(e) {
@@ -223,9 +228,8 @@
 
 
       cols.Price.html(
-        (config.material.price ? config.material.price.toFixed(2) : '')+
-        (config.material.type === 'complex' ? ' $/' : ' ') +
-        FB.units.getLabel(config.material.units, true)
+        (config.material.price ? config.material.price.toFixed(2) : '') +
+        getUnits(config.material)
       );
 
       setPrice();
@@ -233,13 +237,29 @@
       if( cols.Notes ) {
         notesInput.val(config.materialImpl.note);
       }
+    }
 
+    function getUnits(material) {
+      var u = FB.units.getLabel(material.units, true);
+      if( material.type === 'complex' ) {
+        if( u === '$' ) {
+          return '';
+        }
+        return ' $/'+u;
+      }
+      return ' ' + u;
     }
 
     function setErrorStatus() {
       if( !config.materialImpl.error ) {
         errorLabel.hide();
       } else {
+        // code 3 is
+        if( config.materialImpl.code === 3 ) {
+          errorLabel.hide();
+          return;
+        }
+        
         errorLabel.html(config.materialImpl.message);
         errorLabel.show();
       }
@@ -260,12 +280,12 @@
     }
 
     function _fireUnitsChange(e) {
-      if( e.originalEvent.detail.error ) return;
-
-      config.materialImpl.units = e.originalEvent.detail.value;
+      e = e.originalEvent.detail;
+      if( !(e.onblur || e.onclick) || e.error ) return;
+      config.materialImpl.units = e.value;
 
       setErrorStatus();
-      config.onUnitsChange(config.materialImpl, e.originalEvent.detail.value);
+      config.onUnitsChange(config.materialImpl, e.value, config.implName);
       setPrice();
     }
 

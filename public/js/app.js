@@ -25,7 +25,7 @@ FB.hasAccess = function(object) {
   }
 
   if( user.authorities.indexOf(object.authority) === -1 &&
-      user.username !== object.authority ) {
+      user.email !== object.authority ) {
 
       return false;
   }
@@ -42,16 +42,10 @@ FB.saveBudget = function(callback) {
   budget.materialIds = [];
 
   var materials = FB.materialController.get();
-  for( var name in materials.materials ) {
-    if( !materials.materials[name].id ) continue;
-    budget.materialIds.push(materials.materials[name].id);
+  for( var name in materials ) {
+    if( !materials[name].id ) continue;
+    budget.materialIds.push(materials[name].id);
   }
-
-  for( var name in materials.complex ) {
-    if( !materials.complex[name].id ) continue;
-    budget.materialIds.push(materials.complex[name].id);
-  }
-
 
   $.post('/budget/save', budget, function(resp){
     if( callback ) callback(resp);
@@ -82,12 +76,11 @@ FB._localsave = function(auto) {
     materials : []
   }
 
+  if( !data.budget.id ) return;
+
   var materials = FB.materialController.get();
-  for( var key in materials.materials ) {
-    data.materials.push(materials.materials[key]);
-  }
-  for( var key in materials.complex ) {
-    data.materials.push(materials.complex[key]);
+  for( var key in materials ) {
+    data.materials.push(materials[key]);
   }
 
   window.localStorage.setItem('current-budget', data.budget.id);

@@ -31,12 +31,5 @@
     "mongo" : {
       "database" : "farmBudgets",
       "url" : "mongodb://localhost:27017/"
-    },
-
-    "auth" : {
-      "redirect" : "/login.html",
-      "url" : "http://localhost:3021",
-      "sessionSecret" : "thisisnotasecret",
-      "google" : "/etc/farm-budgets-app/google"
     }
 }

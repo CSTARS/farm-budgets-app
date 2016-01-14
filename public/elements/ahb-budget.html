@@ -8,6 +8,17 @@
   Polymer({
     is : 'ahb-budget',
 
+    ready : function() {
+      this.renameList = {};
+      this.renameTimer = -1;
+      FB.operationController.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
+
+      // if user does not have a verified email, redirect them
+      if( !ExpressAuth.user.verified ) {
+        window.location = '/auth/verifyPage';
+      }
+    },
+
     attached : function() {
       var id = window.localStorage.getItem('current-budget');
 
@@ -35,6 +46,7 @@
           }
         }.bind(this));
       } else {
+        this.createNew();
         this.showFindPopup();
       }
     },
@@ -43,15 +55,20 @@
       document
         .querySelector('budget-welcome-splash')
         .addEventListener('splash-close', function(){
+          if( this.loadedFromLink ) return;
           setTimeout(function(){
-            document.querySelector('find-budget-popup').show();
+            document.querySelector('budget-sections').find();
           }, 300);
-        });
+        }.bind(this));
     },
 
     checkLocal : function(id) {
       try {
         var localdata = window.localStorage.getItem(id);
+        if( !localdata ) {
+          return false;
+        }
+
         localdata = JSON.parse(localdata);
         FB.localdata = localdata;
 
@@ -80,7 +97,7 @@
     },
 
     load : function(data) {
-      FB.reset();
+      FB.reset(true);
 
       if( !data.budget.materials ) {
         data.budget.materials = [];
@@ -89,7 +106,12 @@
         data.budget.operations = [];
       }
 
-      window.localStorage.setItem('current-budget', data.budget.id);
+      if( data.budget.id ) {
+        window.localStorage.setItem('current-budget', data.budget.id);
+      } else {
+        window.localStorage.setItem('current-budget', '');
+      }
+
 
       FB.load(data);
 
@@ -123,6 +145,38 @@
 
         this.load(resp);
       }.bind(this));
+    },
+
+    createNew : function() {
+      var newData = {
+        budget : {
+          id : FB.utils.guid(),
+          authority : ExpressAuth.user ? ExpressAuth.user.email : '',
+          locality : [],
+          name : '',
+          commodity : '',
+          farm : {
+            name : '',
+            units : '[acr_us]',
+            size : 1
+          },
+          operations : [],
+        },
+        materials : []
+      };
+
+      FB.changes.setOriginal(newData.budget, newData.materials);
+      this.load(newData);
+    },
+
+    onMaterialAutoRename : function(e) {
+      console.log(e);
+      this.renameList[e.detail.id] = e.detail;
+      this.showRenameList();
+    },
+
+    showRenameList : function() {
+      // TODO: maybe move this to the operations section and a panel instead of a popup.
     }
 
   });

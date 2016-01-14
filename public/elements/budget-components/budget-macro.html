@@ -40,6 +40,7 @@
       <tr>
         <td>
           <span id="expand"><i class="fa fa-cubes" id="icon"></i> <span id="nameLabel"></span></span>
+          <div id="deletedError" class="text text-danger"></div>
           <div id="otherInfo" class="help-block" style="display:none"></div>
         </td>
         <td>
@@ -171,18 +172,30 @@
     },
 
     checkError : function() {
+      this.$.deletedError.innerHTML = '';
+
       for( var key in this.data.materials ) {
         if( this.data.materials[key].error ) {
-          this.$.icon.className = 'fa fa-warning';
-          this.$.icon.style.color = 'red';
-          this.error = true;
+          this.setError();
           return;
         }
+      }
+
+      if( this.data.deleted ) {
+        this.setError();
+        this.$.deletedError.innerHTML = 'The material has been deleted';
+        return;
       }
 
       this.error = false;
       this.$.icon.className = 'fa fa-cubes';
       this.$.icon.style.color = '';
+    },
+
+    setError : function() {
+      this.$.icon.className = 'fa fa-warning';
+      this.$.icon.style.color = 'red';
+      this.error = true;
     },
 
     toggleView : function(e) {
@@ -214,9 +227,8 @@
             (list[i].type == 'complex' ?
               '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' :
               '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>'
-            )
+            )+(list[i].calcErrors || '')
             +'</td><td style="white-space: nowrap">' +
-
               list[i].amount+' '+FB.units.getLabel(list[i].units, true)+' = $'+
               list[i].price.toFixed(2)+' </span>'
           '</td></tr>';
@@ -254,7 +266,9 @@
 
         html += '<tr><td style="white-space: nowrap">' +
             list[i].count+'x ' +
-            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>' )+'</td><td style="white-space: nowrap">' +
+            (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>' )+
+            (list[i].calcErrors || '')+'</td>'+
+            '<td style="white-space: nowrap">' +
             ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+FB.units.getLabel(list[i].units, true)+'</span>'
           '</td></tr>';
       }
@@ -300,6 +314,11 @@
         var index = this.listMaterialIndex(list, m.name);
         if( index == -1 ) {
           var item = $.extend(true, {}, m);
+
+          if( complex.materials[material].error ) {
+            item.calcErrors = '<br /><i class="fa fa-warning"></i> <span class="text text-danger">'+complex.materials[material].message+'</span>';
+          }
+
           item.count = 1;
           list.push(item);
         } else {
@@ -335,6 +354,11 @@
         item.amount = complex.materials[material].amount;
         item.units = complex.materials[material].units;
         item.price = complex.materials[material].price;
+
+        if( complex.materials[material].error ) {
+          item.calcErrors = '<br /><i class="fa fa-warning"></i> <span class="text text-danger">'+complex.materials[material].message+'</span>';
+        }
+
         list.push(item);
 
         if( m.type === 'complex' &&  m.materials) {

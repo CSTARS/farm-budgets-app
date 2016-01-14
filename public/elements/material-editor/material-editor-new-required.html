@@ -1,0 +1,185 @@
+<dom-module id="material-editor-new-required">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #suggestResults {
+        display : none;
+        background-color: white;
+        box-shadow: 0 0 5px #888;
+        padding: 5px;
+        margin: 5px;
+      }
+    </style>
+
+
+      <div class="modal fade" id="popup">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <button type="button" class="close" data-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="title">Create Required Material</h4>
+            </div>
+            <div class="modal-header">
+
+              <div class="form-horizontal">
+
+                <div class="form-group" id="uniqueGroup">
+                  <label class="col-sm-3 control-label">&nbsp;</label>
+                  <div class="col-sm-9">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="isUniqueInput" on-click="toggleUnique"> Is Unique Material
+                      </label>
+                    </div>
+                    <div class="help-block">This material is unique (only used by) this material</div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="budgetNameInput" class="col-sm-3 control-label">Name</label>
+                  <div class="col-sm-9">
+                    <input type="text" id="nameInput" class="form-control" placeholder="Material Name" on-keyup="suggest" on-blur="onSuggestBlur" on-focus="suggest"/>
+                    <div id="suggestResults"></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="amountInput" class="col-sm-3 control-label">Amount</label>
+                  <div class="col-sm-9">
+                    <input type="number" id="amountInput" class="form-control" placeholder="Amount of Material"/>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="unitsInput" class="col-sm-3 control-label">Units</label>
+                  <div class="col-sm-9">
+                    <budget-unit-selector id="unitsInput" block></budget-unit-selector>
+                  </div>
+                </div>
+
+                <div class="form-group" id="priceInputGroup" style="display: none">
+                  <label for="priceInput" class="col-sm-3 control-label">Price</label>
+                  <div class="col-sm-9">
+                    <input type="number" id="priceInput" class="form-control" placeholder="Price"/>
+                  </div>
+                </div>
+              </div> <!-- end form -->
+
+            </div>
+            <div class="modal-footer">
+              <a class="btn btn-default" data-dismiss="modal">Cancel</a>
+              <a class="btn btn-primary" data-dismiss="modal" on-click="add">Add</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'material-editor-new-required',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+      },
+
+      create : function() {
+        this.popup.modal('show');
+        this.reset();
+      },
+
+      reset : function() {
+        this.$.isUniqueInput.checked = false;
+        this.$.priceInputGroup.style.display = 'none';
+        this.$.priceInputGroup.value = '';
+        this.$.unitsInput.value = '';
+        this.$.amountInput.value = '';
+      },
+
+      add : function() {
+        this.material = {
+          name : this.$.nameInput.value,
+          units : this.$.unitsInput.getUnits(),
+          amount : parseFloat(this.$.amountInput.value)
+        }
+
+        if( this.$.isUniqueInput.checked ) {
+          this.material.price = parseFloat(this.$.priceInput.value);
+        }
+
+        this.fire('add', {
+          material : this.material,
+          isUnique : this.$.isUniqueInput.checked
+        });
+      },
+
+      toggleUnique : function() {
+        if( this.$.isUniqueInput.checked ) {
+          this.$.priceInputGroup.style.display = 'block';
+        } else {
+          this.$.priceInputGroup.style.display = 'none';
+        }
+      },
+
+      suggest : function() {
+        var name = this.$.nameInput.value;
+        if( name === '' ) {
+          this.suggestResults = [];
+          this.renderSuggest();
+          return;
+        }
+
+        $.get('/materials/suggest', {q: name}, function(resp) {
+          this.suggestResults = resp;
+          this.renderSuggest();
+        }.bind(this));
+      },
+
+      renderSuggest : function() {
+        if( this.suggestResults.length === 0 ) {
+          this.$.suggestResults.style.display = 'none';
+          return;
+        }
+
+        var html = '';
+        for( var i = 0; i < this.suggestResults.length; i++ ) {
+          var suggest = this.suggestResults[i];
+
+          var authorities;
+          if( suggest.authorities.length < 3 ) {
+            authorities = 'Defined By: '+suggest.authorities.join(', ');
+          } else {
+            authorities = 'Defined By '+suggest.authorities.length+' Authorities: '+suggest.authorities.splice(0,3).join(', ')+'...';
+          }
+
+          html +=
+            '<div>'+
+              '<div><a style="cursor: pointer">'+suggest.material+'</a></div>'+
+              '<div class="help-block" style="padding-left: 5px">'+authorities+'</div>'+
+            '</div>';
+        }
+        this.$.suggestResults.innerHTML = html;
+        this.$.suggestResults.style.display = 'block';
+
+        $(this.$.suggestResults)
+          .find('a')
+          .on('click', function(e){
+            this.$.nameInput.value = e.currentTarget.innerHTML;
+            this.hideSuggest();
+          }.bind(this));
+      },
+
+      onSuggestBlur : function() {
+        setTimeout(this.hideSuggest.bind(this), 120);
+      },
+
+      hideSuggest : function() {
+        this.$.suggestResults.style.display = 'none';
+      }
+    });
+  </script>
+</dom-module>

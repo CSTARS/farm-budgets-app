@@ -1,14 +1,15 @@
 'use strict';
 
+var db = require('../../lib/mongo').get();
 var authUtils = require('../auth');
 var BudgetModel = require('../../models/budget');
 var errorHandler = require('../../lib/handleError');
 var model;
-var collection = global.db.collection('budget');
+var collection = db.collection('budget');
+
 
 module.exports = function (router) {
     model = new BudgetModel();
-    var authMiddleware = authUtils.middleware;
 
     router.get('/get', function (req, res) {
       var id = req.query.id;
@@ -21,8 +22,8 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/contributedTo', authMiddleware, function (req, res) {
-      model.contributedTo(req.user.username, function(err, budget){
+    router.get('/contributedTo', function (req, res) {
+      model.contributedTo(req.user.email, function(err, budget){
         if( err ) {
           return errorHandler(err, res);
         }
@@ -33,7 +34,7 @@ module.exports = function (router) {
     router.get('/uses', function (req, res) {
       var materialId = req.query.material;
       if( !materialId ) {
-        res.send({error: true, message: 'material id required'});
+        return res.send({error: true, message: 'material id required'});
       }
 
       model.uses(materialId, function(err, budgets){
@@ -44,7 +45,47 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/delete', authMiddleware, function (req, res) {
+    router.get('/search', function (req, res) {
+      var query = {};
+      try {
+        if( req.query.query ) {
+          query = JSON.parse(req.query.query);
+        }
+      } catch(e) {
+        return res.send({error:true, message: e});
+      }
+
+      var start = 0;
+      var stop = 10;
+      var includeFilters = true;
+
+      if( req.query.start ) {
+        start = parseInt(req.query.start);
+      }
+      if( req.query.stop ) {
+        stop = parseInt(req.query.stop);
+      }
+      if( stop > 100 ) {
+        stop = 100;
+      }
+
+      if( req.query.includeFilters ) {
+        if( req.query.includeFilters.toLowerCase() === 'false' ) {
+          includeFilters = false;
+        }
+      }
+
+
+      model.search(query, start, stop, includeFilters, function(err, response){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(response);
+      });
+    });
+
+    router.get('/delete', function (req, res) {
       var id = req.query.id;
 
       if( !id ) {
@@ -77,6 +118,7 @@ module.exports = function (router) {
       });
     });
 
+    // TODO: remove
     router.get('/find', function (req, res) {
 
       var query = req.query.query || '';
@@ -117,7 +159,7 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/save', authMiddleware, function (req, res) {
+    router.post('/save', function (req, res) {
       var budget = req.body;
 
       if( !budget ) {
@@ -137,7 +179,7 @@ module.exports = function (router) {
           return res.send({error:true, message: 'You do not have access to this authority'});
         }
 
-        model.save(budget, req.user.username, function(err, result){
+        model.save(budget, req.user.email, function(err, result){
           if( err ) {
             return res.send({error:true, message: err});
           }

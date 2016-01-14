@@ -12,7 +12,7 @@ BudgetMaterialPopup.create = function(name) {
   var defaultAuthority = budget.authority;
   if( ExpressAuth.user && ExpressAuth.user.authorities ) {
     if( ExpressAuth.user.authorities.indexOf(defaultAuthority) == -1 ) {
-      defaultAuthority = ExpressAuth.user.username;
+      defaultAuthority = ExpressAuth.user.email;
     }
   }
   if( !ExpressAuth.user ) {

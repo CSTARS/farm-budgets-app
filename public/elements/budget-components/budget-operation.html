@@ -93,6 +93,7 @@
 
     ready : function() {
       this.firstScheduleEvent = true;
+      this.renderTimer = -1;
     },
 
     attached : function() {
@@ -171,11 +172,30 @@
           this.showError(true);
           return;
         }
+
+        var m = FB.materialController.get(this.operation.materials[i].name);
+        if (m.recalcErrors && m.recalcErrors.length > 0) {
+          this.showError(true);
+          return;
+        }
+
+        if (m.deleted) {
+          this.showError(true);
+          return;
+        }
       }
       this.showError(false);
     },
 
     render : function() {
+      if( this.renderTimer != -1 ) clearTimeout(this.renderTimer);
+      this.renderTimer = setTimeout(function(){
+        this.renderTimer = -1;
+        this._render();
+      }.bind(this), 100);
+    },
+
+    _render : function() {
       if( !this.$.materialTable.setMaterials ) return;
 
       this.$.nameLabel.innerHTML = this.operation.name;

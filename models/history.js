@@ -1,6 +1,7 @@
 'use strict';
 
-var collection = global.db.collection('history');
+var db = require('../lib/mongo').get();
+var collection = db.collection('history');
 
 module.exports = function() {
   return {

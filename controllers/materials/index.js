@@ -2,16 +2,14 @@
 
 var async = require('async');
 var authUtils = require('../auth');
+var db = require('../../lib/mongo').get();
 var errorHandler = require('../../lib/handleError');
 var MaterialModel = require('../../models/materials');
 var model;
-var collection = global.db.collection('material');
+var collection = db.collection('material');
 
 module.exports = function (router) {
     model = new MaterialModel();
-    var auth = global.auth;
-    var authMiddleware = authUtils.middleware;
-
 
     router.get('/hasRequired', function (req, res) {
       model.hasRequired(req.query.id, function(err, checklist){
@@ -43,7 +41,63 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/delete', authMiddleware, function (req, res) {
+    router.get('/search', function (req, res) {
+      var query = {};
+      try {
+        if( req.query.query ) {
+          query = JSON.parse(req.query.query);
+        }
+      } catch(e) {
+        return res.send({error:true, message: e});
+      }
+
+      var start = 0;
+      var stop = 10;
+      if( req.query.start ) {
+        start = parseInt(req.query.start);
+      }
+      if( req.query.stop ) {
+        stop = parseInt(req.query.stop);
+      }
+      if( stop > 100 ) {
+        stop = 100;
+      }
+
+
+      model.search(query, start, stop, function(err, response){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(response);
+      });
+    });
+
+    router.get('/mapReduceAll', function (req, res) {
+      //if( !req.user.admin ) {
+      //  return res.send({error: true, message: 'nope.'});
+      //}
+
+      model.mapReduceAll(function(err, resp){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(resp);
+      });
+    });
+
+    router.get('/suggest', function (req, res) {
+      var text = req.query.q || '';
+      model.nameSuggest(text, function(err, resp){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+        res.send(resp);
+      });
+    });
+
+    router.get('/delete', function (req, res) {
       var id = req.query.id;
 
       if( !id ) {
@@ -73,7 +127,7 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/save', authMiddleware, function (req, res) {
+    router.post('/save', function (req, res) {
       var material = req.body;
 
       if( !material ) {
@@ -93,7 +147,7 @@ module.exports = function (router) {
           return res.send({error:true, message: 'You do not have access to this authority'});
         }
 
-        model.save(material, req.user.username, function(err, result){
+        model.save(material, req.user.email, function(err, result){
           if( err ) {
             return res.send({error:true, message: err});
           }
@@ -103,39 +157,6 @@ module.exports = function (router) {
       });
     });
 
-    /*router.post('/saveBulk', authMiddleware, function (req, res) {
-      var materials = req.body.materials;
-
-      if( !materials ) {
-        return errorHandler('materials required', res);
-      }
-      if( !Array.isArray(materials) ) {
-        return errorHandler('materials must be an array', res);
-      }
-
-      var results = [];
-
-      async.eachSeries(
-        materials,
-        function(material, next){
-          save(material, req.user, function(err, resp){
-            if( err ) {
-              results.push({error:true, message: err});
-            } else {
-              results.push(resp);
-            }
-            next();
-          });
-        },
-        function(err) {
-          res.send({
-            error : err,
-            results : results
-          });
-        }
-      );
-
-    });*/
 };
 
 // the user needs to have access to both the old authority and the new authority
@@ -193,6 +214,6 @@ function save(material, user, callback) {
       return callback('You do not have access to this authority');
     }
 
-    model.save(material, user.username, callback);
+    model.save(material, user.email, callback);
   });
 }

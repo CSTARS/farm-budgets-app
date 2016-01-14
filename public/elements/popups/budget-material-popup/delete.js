@@ -1,14 +1,16 @@
 BudgetMaterialPopup.remove = function() {
-
   var usedBy = {
     operations : []
   };
 
-  var operations = FB.operationController.get();
+  /*var operations = FB.operationController.get();
   for( var i = 0; i < operations.length; i++ ) {
     if( !operations[i].materials ) continue;
-    if( operations[i].materials[this.data.name] ) {
-      usedBy.operations.push(operations[i]);
+    for( var j = 0; j < operations[i].materials.length; j++ ) {
+      if( operations[i].materials[j].name === this.data.name ) {
+        usedBy.operations.push(operations[i]);
+        break;
+      }
     }
   }
 
@@ -17,7 +19,7 @@ BudgetMaterialPopup.remove = function() {
   for( var i = 0; i < usedBy.operations.length; i++ ) {
     delete usedBy.operations[i].materials[this.data.name];
   }
-  FB.operationController.bulkAdd(updates, {replace: true});
+  FB.operationController.bulkAdd(updates, {replace: true});*/
 
   // remove this item from controller, events trigger ui updates
   FB.materialController.remove(this.data.name);

@@ -8,10 +8,8 @@ BudgetMaterialPopup.save = function(noHide) {
   if( this.data.name == '' ) {
     this.$.nameInputMessage.innerHTML = 'A material name is required';
     return;
-  } else if( this.data.name.indexOf('--') > -1 ) {
-    this.$.nameInputMessage.innerHTML = '"--" is reserved and not allowed in the material name.';
-    return;
   }
+
   this.$.nameInputMessage.innerHTML = '';
 
   // check access
@@ -21,7 +19,7 @@ BudgetMaterialPopup.save = function(noHide) {
       this.$.authorityMessage.innerHTML =
         '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You do not have access to the authority '+
         '<b><i class="fa fa-shield"></i> '+this.data.authority+'</b>.  Please select a new authority in '+
-        'the <b><i class="fa fa-cog"></i> advanced</b> section.  If you do not belong to an authority, select your username as the authority.</div>';
+        'the <b><i class="fa fa-cog"></i> advanced</b> section.  If you do not belong to an authority, select your email as the authority.</div>';
       return;
 
     // if the user doesn't have access to the original authority but has access to
@@ -29,6 +27,7 @@ BudgetMaterialPopup.save = function(noHide) {
     } else if( this.action == 'edit' &&
       this.data.authority != this.originalData.authority &&
       !FB.utils.hasAccess(ExpressAuth.user, this.originalData.authority)  ) {
+        
         this.data.id = FB.utils.guid();
     }
   }
@@ -36,10 +35,10 @@ BudgetMaterialPopup.save = function(noHide) {
 
   this.$.advancedPanel.save();
 
-  var options = {};
+  var options = {
+    replace: true
+  };
   if( this.action == 'edit' ) {
-    options.replace = true;
-
     // if the name has changed, make sure we preform a rename
     if( this.originalData.name != this.data.name ) {
       options.rename = this.originalData.name;
@@ -103,6 +102,7 @@ BudgetMaterialPopup._save = function(noHide, options) {
     }
   }
 
+
   // save remote
   if( ExpressAuth.user ) {
     $.post('/materials/save', this.data, function(resp){
@@ -147,6 +147,8 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
 
   // now update the changes object
   FB.changes.updateMaterial(this.data);
+
+  FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
 
   if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   this.setSaving(false);

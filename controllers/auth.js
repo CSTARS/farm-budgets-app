@@ -1,11 +1,16 @@
 'use strict';
-var auth = global.auth;
+var auth = require('express-auth');
 
 function middleware(req, res, next) {
-  if( !req.user ) {
+  if( !req.user && !req.query.key ) {
     return res.send({error:true, message: 'login required'});
   }
-  next();
+
+  //if( !req.user && req.query.key ) {
+  //  return res.send({error:true, message: 'login required'});
+  //} else {
+    next();
+  //}
 }
 
 // TODO: do we really need to error check grr.
@@ -14,11 +19,11 @@ function hasAccess(user, authority, callback) {
     return callback(null, true);
   }
 
-  if( user.username === authority ) {
+  if( user.email === authority ) {
     return callback(null, true);
   }
 
-  auth.acl().hasRole(user.username, authority, function(err, hasRole){
+  auth.acl.hasRole(user.email, authority, function(err, hasRole){
     callback(err, hasRole);
   });
 }

@@ -44,3 +44,11 @@ body {
 .navbar-nav > li {
   float:left
 }
+
+#unitsMessage {
+  position: absolute;
+  padding: 5px;
+  box-shadow: 0 0 5px #888;
+  background-color: white;
+  z-index: 2000;
+}

@@ -42,6 +42,13 @@
                 </div>
               </div>
 
+              <div class="form-group" id="priceGroup">
+                <label for="priceInput" class="col-sm-3 control-label" id="priceLabel">Price</label>
+                <div class="col-sm-9">
+                  <input type="number" id="priceInput" class="form-control" on-input="onPriceInput"/>
+                </div>
+              </div>
+
               <div class="form-group" id="unitsGroup">
                 <label for="unitsInput" class="col-sm-3 control-label">Units</label>
                 <div class="col-sm-9">
@@ -53,13 +60,6 @@
                   </div>
 
                   <div id="unitsInputMsg"></div>
-                </div>
-              </div>
-
-              <div class="form-group" id="priceGroup">
-                <label for="priceInput" class="col-sm-3 control-label" id="priceLabel">Price</label>
-                <div class="col-sm-9">
-                  <input type="number" id="priceInput" class="form-control" on-input="onPriceInput"/>
                 </div>
               </div>
 
@@ -138,6 +138,7 @@
               <budget-materials-table
                 id="materialTable"
                 on-price-change="onPriceChange"
+                on-row-units-change="onRequiredUnitsChange"
                 on-delete="onMaterialDelete"
                 on-edit-unique="onEditUnique">
               </budget-materials-table>
