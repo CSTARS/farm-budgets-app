@@ -25,6 +25,7 @@
     "express": "^4.12.2",
     "express-auth": "ucd-cws/express-auth",
     "extend": "^3.0.0",
+    "farm-budgets-sdk": "0.0.1",
     "kraken-js": "^1.0.3",
     "makara": "^2.0.1",
     "merge-util": "^0.3.1",
