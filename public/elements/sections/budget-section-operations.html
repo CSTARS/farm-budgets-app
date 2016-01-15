@@ -66,8 +66,8 @@
       $('body').append(this.popup);
       this.popup.modal({show: false});
 
-      FB.operationController.on('operation-update', this.onOperationsUpdated.bind(this));
-      FB.operationController.on('operation-removed', function(e){
+      SDK.controllers.operation.on('operation-update', this.onOperationsUpdated.bind(this));
+      SDK.controllers.operation.on('operation-removed', function(e){
         $(this.$.root).find('[operation="'+e.operation.name+'"]').remove();
         this.filter();
       }.bind(this));
@@ -159,7 +159,7 @@
         return;
       }
 
-      var op = FB.operationController.get(name);
+      var op = SDK.controllers.operation.get(name);
       if( !op.error && this.operation.name !== this.$.nameInput.value ) {
         this.$.newNameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
         return;
@@ -173,7 +173,7 @@
         units : '[acr_us]'
       };
 
-      FB.operationController.add(op);
+      SDK.controllers.operation.add(op);
       this.$.filterInput.value = name;
       this.popup.modal('hide');
     },
@@ -193,7 +193,7 @@
       if( txt == '' ) {
         showAll = true;
       } else {
-        matched = this.toNameArray(FB.operationController.find(txt));
+        matched = this.toNameArray(SDK.controllers.operation.find(txt));
       }
 
       var opEles = this.querySelectorAll('budget-operation');

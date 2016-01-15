@@ -236,7 +236,7 @@
         if( hash[key].length != c ) {
           materials = [];
           for( var i = 0; i < hash[key].length; i++ ) {
-            materials.push('<a href="'+SDK.app.getMaterialLink(hash[key][i].name)+'">'+SDK.app.getMaterialIcon(hash[key][i].type)+' '+hash[key][i].name+'</a>');
+            materials.push('<a href="'+SDK.app.getMaterialLink(hash[key][i].name)+'">'+SDK.app.getMaterialIconHTML(hash[key][i].type)+' '+hash[key][i].name+'</a>');
           }
           materials = materials.join(',&nbsp;&nbsp;');
         }

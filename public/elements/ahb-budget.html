@@ -24,7 +24,7 @@
       var id = window.localStorage.getItem('current-budget');
 
       if( id ) {
-        SDK.budget.get(id, function(resp){
+        SDK.budgets.get(id, function(resp){
           if( resp.error ) {
 
             // check local data if error (probably new, unsaved budget)
@@ -113,8 +113,8 @@
         window.localStorage.setItem('current-budget', '');
       }
 
-
-      SDK.load(data);
+      // TODO: should be looking to switch to SDK.load which returns the budget class
+      SDK.setBudget(data);
 
       this.$.sections.setData(data);
 

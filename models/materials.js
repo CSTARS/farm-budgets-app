@@ -4,12 +4,12 @@ var uuid = require('node-uuid');
 var authorityModel = require('./authority');
 var utils = require('../lib/modelUtils');
 var db = require('../lib/mongo').get();
-var init = true;
-
-var schema = require('../lib/shared/save/schema')();
-var strip = require('../lib/shared/save/strip');
+var sdk = require('../lib/sdk');
 var history = require('mongo-object-history');
 
+var init = true;
+var schema = sdk.schema();
+var strip = sdk.utils.strip;
 
 var materialGroupCollection = 'materialNameGrouping';
 var collection, suggestCollection;

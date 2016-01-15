@@ -4,7 +4,7 @@ var auth = require('express-auth');
 var collection = db.collection('authority');
 var usersCollection = db.collection('users');
 
-var allowedKeys = ['name','description'];
+var allowedKeys = ['name','description','testing'];
 
 module.exports = function() {
   return {

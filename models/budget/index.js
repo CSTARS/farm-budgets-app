@@ -1,13 +1,15 @@
 'use strict';
 
 var db = require('../../lib/mongo').get();
-var schema = require('../../lib/shared/save/schema')();
-var strip = require('../../lib/shared/save/strip');
+var sdk = require('../../lib/sdk');
 var utils = require('../../lib/modelUtils');
 var authorityModel = require('../authority');
 var materialModel = require('../materials');
 var uuid = require('node-uuid');
 var async = require('async');
+
+var schema = sdk.schema();
+var strip = sdk.utils.strip;
 
 var collection = db.collection('budget');
 var materialCollection = db.collection('material');
