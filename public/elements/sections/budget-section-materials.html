@@ -81,17 +81,17 @@
     ready : function() {
       this.filterTimer = -1;
       this.updateTimer = -1;
-      FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
-      FB.operationController.on('material-added', this.onMaterialAdded.bind(this));
-      FB.materialController.on('material-removed', function(e) {
+      SDK.controllers.material.on('material-update', this.onMaterialsUpdated.bind(this));
+      SDK.controllers.operation.on('material-added', this.onMaterialAdded.bind(this));
+      SDK.controllers.material.on('material-removed', function(e) {
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
-        FB.changes.checkMaterials(FB.materialController.asArray());
+        SDK.changes.checkMaterialsBuffered(SDK.controllers.material.asArray());
       }.bind(this));
 
       document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkChanges.bind(this));
 
-      FB.changes.on('material-diff', this.onMaterialDiff.bind(this));
+      SDK.changes.on('material-diff', this.onMaterialDiff.bind(this));
     },
 
     attached : function() {
@@ -103,7 +103,7 @@
     },
 
     onMaterialDiff : function(diff) {
-      if( diff.length > 0 || Object.keys(FB.changes.getUnsaved()).length ) {
+      if( diff.length > 0 || Object.keys(SDK.changes.getUnsaved()).length ) {
         this.$.warningMessage.style.display = 'block';
         this.$.unsavedFilterOuter.style.display = 'inline-block';
         this.fire('unsaved-update', true);
@@ -119,16 +119,16 @@
     },
 
     checkChanges : function() {
-      FB.changes.checkMaterials(FB.materialController.asArray());
+      SDK.changes.checkMaterialsBuffered(SDK.controllers.material.asArray());
     },
 
     onMaterialAdded : function(e) {
       this.updateMaterialPanel(e.material, false);
-      FB.changes.checkMaterials(FB.materialController.asArray());
+      SDK.changes.checkMaterialsBuffered(SDK.controllers.material.asArray());
     },
 
     onMaterialsUpdated : function(e) {
-      var all = FB.materialController.get();
+      var all = SDK.controllers.material.get();
 
       for( var key in all ) {
         if( all[key].type === 'simple' && key === e.replaced || key === e.material.name ) {
@@ -136,7 +136,7 @@
           break;
         }
 
-        if( all[key].type === 'complex' && FB.materialController.contains(all[key], e.material.name, e.replaced) ) {
+        if( all[key].type === 'complex' && SDK.controllers.material.contains(all[key], e.material.name, e.replaced) ) {
           var replaced = null;
           if( key === e.replaced ) {
             replaced = e.replaced;
@@ -167,7 +167,7 @@
 
       this.$.root.innerHTML = '';
 
-      var materials = FB.materialController.get();
+      var materials = SDK.controllers.material.get();
       for( var name in materials ) {
         var material = materials[name];
         var div = this.createTable(material);
@@ -204,7 +204,7 @@
       if( txt == '' && !$(this.$.thisBudgetInput).is(':checked') ) {
         showAll = true;
       } else {
-        matched = this.toNameArray(FB.materialController.find(txt));
+        matched = this.toNameArray(SDK.controllers.material.find(txt));
       }
 
       var opEles = this.querySelectorAll('budget-material-list-item');
@@ -260,7 +260,7 @@
       var thisBudget = $(this.$.thisBudgetInput).is(':checked');
 
       if( thisBudget ) {
-        include = FB.utils.getActiveMaterials();
+        include = SDK.utils.getActiveMaterials();
       }
 
       materials.forEach(function(material){
@@ -278,7 +278,7 @@
 
     createTable : function(material) {
       if( typeof material === 'string' ) {
-        material = FB.materialController.get(material);
+        material = SDK.controllers.material.get(material);
 
         if( material.error ) {
           console.log('Unabled to show material in list');
@@ -306,7 +306,7 @@
     },
 
     _updateFromEvent : function(ele) {
-      var m = FB.materialController.get(ele.attr('material-name'));
+      var m = SDK.controllers.material.get(ele.attr('material-name'));
 
       if( m.error ) {
         return console.log('Error updating material');
@@ -316,7 +316,7 @@
       m.price = parseFloat(ele.find('.material-price').val());
       m.units = ele.find('budget-unit-selector')[0].getUnits();
 
-      FB.materialController.add(m, {replace: true});
+      SDK.controllers.material.add(m, {replace: true});
     },
 
     showReviewPopup : function() {
@@ -336,10 +336,10 @@
         return;
       }
 
-      var budget = FB.getBudget();
-      $.get('/budget/get?id='+budget.id, function(resp){
-        FB.changes.setOriginal(budget, resp.materials);
-        FB.changes.setUnsaved({});
+      var budget = SDK.getBudget();
+      SDK.budget.get(budget.id, function(resp){
+        SDK.changes.setOriginal(budget, resp.materials);
+        SDK.changes.setUnsaved({});
         window.localStorage.setItem('unsaved-materials', '{}');
 
         if( resp.error ) {

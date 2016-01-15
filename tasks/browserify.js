@@ -6,12 +6,12 @@ module.exports = function browserify(grunt) {
   grunt.loadNpmTasks('grunt-browserify');
 
   var files = {
-    'lib/shared_build/lib.js': ['lib/shared/index.js']
+    'public/js/lib.js': ['lib/sdk.js']
   };
 
   var browserifyOptions = {
     debug : true, // include source maps
-    standalone : 'FB'
+    standalone : 'SDK'
   };
 
   // Options

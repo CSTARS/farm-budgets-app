@@ -34,16 +34,21 @@
 
       update : function() {
         if( this.type === 'authority' ) {
-          var query = JSON.stringify({authority: ExpressAuth.user.email});
-          $.get('/budget/find?query='+encodeURIComponent(query), function(resp){
+          var query = {
+            query : {
+              authority: ExpressAuth.user.email
+            }
+          };
+
+          SDK.budgets.search(query,function(resp){
             if( resp.error ) {
               return alert(resp.message);
             }
 
-            this.budgets = resp;
+            this.budgets = resp.results;
           }.bind(this));
         } else {
-          $.get('/budget/contributedTo', function(resp){
+          SDK.budgets.contributedTo(function(resp){
             if( resp.error ) {
               return alert(resp.message);
             }

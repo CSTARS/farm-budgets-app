@@ -54,7 +54,7 @@
     },
 
     search : function() {
-      var results = FB.materialController.find(this.$.input.value);
+      var results = SDK.controllers.material.find(this.$.input.value);
 
       this.cleanResults(results);
 
@@ -95,9 +95,9 @@
       if( material.type === 'complex' ) {
         l = material.units;
       } else {
-        l = FB.units.invert(material.units);
+        l = SDK.units.invert(material.units);
       }
-      l = FB.units.cleanDollars(l);
+      l = SDK.units.cleanDollars(l);
       if( l == '1' ) return '';
       return 'per '+l;
     },

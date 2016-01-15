@@ -195,7 +195,7 @@
         this.$.authHasRequired.style.display = 'none';
         this.$.authNoRequired.style.display = 'none';
 
-        $.get('/materials/hasRequired?id='+material.id, function(resp){
+        SDK.materials.hasRequired(material.id, function(resp){
           this.$.loading.style.display = 'none';
           this.selectedMaterial.validated = {};
 
@@ -217,7 +217,7 @@
       },
 
       addMaterial : function(id, callback) {
-        $.get('/materials/get?id='+id, function(resp){
+        SDK.materials.get(id, function(resp){
           // add to controller
           FB.materialController.add(resp);
           // update changes, we don't want to track this

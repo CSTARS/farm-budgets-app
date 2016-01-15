@@ -34,7 +34,7 @@
         this.initTable(this.data.materials.length);
 
         for( var i = 0; i < this.data.materials.length; i++ ) {
-          var m = FB.materialController.get(this.data.materials[i].name);
+          var m = SDK.controllers.material.get(this.data.materials[i].name);
           var row = this.initRow(i+2, m, this.data.materials[i]);
           this.controllers.push(row);
         }
@@ -55,7 +55,7 @@
               units : this.data.unique[material].units
             };
           } else {
-            m = FB.materialController.get(material);
+            m = SDK.controllers.material.get(material);
           }
           var row = this.initRow(c, m, this.data.materials[material], material);
           this.controllers.push(row);
@@ -66,7 +66,7 @@
     },
 
     initRow : function(row, material, materialImpl, implName) {
-      return new FB.MaterialTableRow(
+      return new SDK.app.MaterialTableRow(
         this.querySelector('table[main] > tbody > tr:nth-child('+row+')'),
         {
           cols : this.cols,
@@ -110,9 +110,9 @@
     recalc : function() {
       // sniff out material or operation
       if( this.data.schedule ) {
-        FB.operationController.recalc();
+        SDK.controllers.operations.recalc();
       } else {
-      //  FB.materialController.recalc();
+      //  SDK.controllers.material.recalc();
       }
     },
 
@@ -120,7 +120,7 @@
       var value;
 
       try {
-        value = FB.ucum.convert(1, FB.units.cleanDollars(from), FB.units.cleanDollars(to));
+        value = SDK.unit.ucum.convert(1, SDK.units.cleanDollars(from), SDK.units.cleanDollars(to));
         if( value == 0 ) value = 1;
         value = 1 / value;
       } catch(e) {
@@ -165,7 +165,7 @@
   });
 
   // controller for the material table row
-  FB.MaterialTableRow = function(ele, config){
+  SDK.app.MaterialTableRow = function(ele, config){
     var $ele = $(ele), amountTimer = -1, unitTimer = -1, cols = {};
 
     /* BASEPRICE
@@ -240,7 +240,7 @@
     }
 
     function getUnits(material) {
-      var u = FB.units.getLabel(material.units, true);
+      var u = SDK.units.getLabel(material.units, true);
       if( material.type === 'complex' ) {
         if( u === '$' ) {
           return '';
@@ -259,7 +259,7 @@
           errorLabel.hide();
           return;
         }
-        
+
         errorLabel.html(config.materialImpl.message);
         errorLabel.show();
       }

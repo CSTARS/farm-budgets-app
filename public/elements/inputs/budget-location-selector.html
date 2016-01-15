@@ -43,9 +43,9 @@
         for( var i = 0; i < values.length; i++ ) {
           values[i] = values[i].toLowerCase().trim();
 
-          if( FB.utils.statesLookup[values[i].toLowerCase()] ) {
-            values[i] = FB.utils.statesLookup[values[i].toLowerCase()].toLowerCase();
-          } else if( FB.utils.states[values[i].toLowerCase()] ) {
+          if( SDK.utils.statesLookup[values[i].toLowerCase()] ) {
+            values[i] = SDK.utils.statesLookup[values[i].toLowerCase()].toLowerCase();
+          } else if( SDK.utils.states[values[i].toLowerCase()] ) {
             values[i] = values[i].toLowerCase();
           }
 

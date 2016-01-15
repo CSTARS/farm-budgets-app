@@ -42,10 +42,10 @@
     is : 'budget-total',
 
     attached : function() {
-      FB.operationController.on('total-update', this.onTotalUpdate.bind(this));
+      SDK.controllers.operation.on('total-update', this.onTotalUpdate.bind(this));
 
       // make sure a total hasn't already been set
-      var total = FB.operationController.getCurrentTotal();
+      var total = SDK.controllers.operation.getCurrentTotal();
       if( total !== null ) {
         this.onTotalUpdate(total);
       }

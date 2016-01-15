@@ -15,7 +15,7 @@ BudgetMaterialPopup.save = function(noHide) {
   // check access
   if( ExpressAuth.user ) {
     // check if user has access to authroity
-    if( !FB.hasAccess(this.data.authority) ) {
+    if( !SDK.app.hasAccess(this.data.authority) ) {
       this.$.authorityMessage.innerHTML =
         '<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You do not have access to the authority '+
         '<b><i class="fa fa-shield"></i> '+this.data.authority+'</b>.  Please select a new authority in '+
@@ -26,9 +26,9 @@ BudgetMaterialPopup.save = function(noHide) {
     // the new authority, save as a new material
     } else if( this.action == 'edit' &&
       this.data.authority != this.originalData.authority &&
-      !FB.utils.hasAccess(ExpressAuth.user, this.originalData.authority)  ) {
-        
-        this.data.id = FB.utils.guid();
+      !SDK.app.utils.hasAccess(ExpressAuth.user, this.originalData.authority)  ) {
+
+        this.data.id = SDK.utils.guid();
     }
   }
   this.$.authorityMessage.innerHTML = '';
@@ -46,7 +46,7 @@ BudgetMaterialPopup.save = function(noHide) {
 
     // if the user has access to the original authority but changed authority or
     // location, prompt to see if they really want to update or save as new.
-    if( FB.utils.hasAccess(ExpressAuth.user, this.originalData.authority) &&
+    if( SDK.utils.hasAccess(ExpressAuth.user, this.originalData.authority) &&
         (this.originalData.authority !== this.data.authority ||
         this.originalData.locality.join('') !==  this.data.locality.join('')) ) {
 
@@ -69,7 +69,7 @@ BudgetMaterialPopup._savePrompt = function(noHide, options) {
         return;
       }
       if( resp.saveAsNew ) {
-        this.data.id = FB.utils.guid();
+        this.data.id = SDK.utils.guid();
       }
 
       this._save(noHide, options);
@@ -82,14 +82,14 @@ BudgetMaterialPopup._save = function(noHide, options) {
   this.setSaving(true);
 
   // save locally
-  FB.localsave();
+  SDK.app.localsave();
 
   // generate a guid locally
   if( !this.data.id ) {
-    this.data.id = FB.utils.guid();
+    this.data.id = SDK.utils.guid();
   }
 
-  var result = FB.materialController.add(this.data, options);
+  var result = SDK.controllers.material.add(this.data, options);
   if( result.error ) {
     this.setSaving(false);
     return alert(result.message);
@@ -98,7 +98,7 @@ BudgetMaterialPopup._save = function(noHide, options) {
   // if the material is a 'save as new', update operations
   if( this.originalData && this.action === 'edit' ) {
     if( this.originalData.id !== this.data.id ) {
-      FB.operationController.replaceMaterial(this.data.name, this.data.id);
+      SDK.controllers.operation.replaceMaterial(this.data.name, this.data.id);
     }
   }
 
@@ -115,11 +115,11 @@ BudgetMaterialPopup._save = function(noHide, options) {
     else unsaved = JSON.parse(unsaved);
 
     unsaved[this.data.id] = this.data;
-    FB.changes.setUnsaved(unsaved);
+    SDK.changes.setUnsaved(unsaved);
     window.localStorage.setItem('unsaved-materials', JSON.stringify(unsaved));
 
     // re-trigger events, so panels can check unsaved array
-    FB.materialController.add(this.data, {replace: true});
+    SDK.controllers.material.add(this.data, {replace: true});
 
     this.setSaving(false);
     if( typeof noHide !== 'boolean' || !noHide ) this.hide();
@@ -140,15 +140,15 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
     unsaved = JSON.parse(unsaved);
     if( unsaved[this.data.id] ) {
       delete unsaved[this.data.id];
-      FB.changes.setUnsaved(unsaved);
+      SDK.changes.setUnsaved(unsaved);
       window.localStorage.setItem('unsaved-materials', JSON.stringify(unsaved));
     }
   }
 
   // now update the changes object
-  FB.changes.updateMaterial(this.data);
+  SDK.changes.updateMaterial(this.data);
 
-  FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
+  SDK.changes.checkBudget(SDK.getBudget(), SDK.controllers.material.asArray());
 
   if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   this.setSaving(false);

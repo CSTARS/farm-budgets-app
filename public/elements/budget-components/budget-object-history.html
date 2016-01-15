@@ -15,7 +15,7 @@
 
       show : function(id) {
         this.$.root.innerHTML = 'Loading...';
-        $.get('/history/'+id, this.onHistoryResponse.bind(this));
+        SDK.history.get(id, this.onHistoryResponse.bind(this));
       },
 
       onHistoryResponse : function(resp) {

@@ -33,7 +33,7 @@
       $(window).on('resize', this.drawChart.bind(this));
 
       this.handlerSet = false;
-      FB.operationController.on('total-update', function(e){
+      SDK.controllers.operation.on('total-update', function(e){
         if( e && e.spendingByMonth ) {
           this.months = e.spendingByMonth;
           this.updateData();
@@ -47,7 +47,7 @@
       }.bind(this));
 
       // make sure a total hasn't already been set
-      var total = FB.operationController.getCurrentTotal();
+      var total = SDK.controllers.operation.getCurrentTotal();
       if( total !== null ) {
         this.drawChart(total);
       }
@@ -90,7 +90,7 @@
     updateData  : function() {
       this.$.selected.innerHTML = '';
 
-      var operations = FB.operationController.get();
+      var operations = SDK.controllers.operation.get();
       var header = ['Month'];
 
       if( this.type == 'all' ||  this.type == 'total' ) {

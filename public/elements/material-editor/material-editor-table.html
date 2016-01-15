@@ -127,7 +127,7 @@
           stop : this.itemsPerPage * (this.page+1)
         }
 
-        $.get('/materials/search', params, function(resp){
+        SDK.materials.search(params, function(resp){
           this.resp = resp;
           this.results = resp.results;
 

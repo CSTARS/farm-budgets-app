@@ -116,7 +116,6 @@ module.exports = function (grunt) {
 
     // end usemin
 
-
     // Register group tasks
     grunt.registerTask('build', [
         //'jshint',

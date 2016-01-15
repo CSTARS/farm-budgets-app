@@ -103,14 +103,14 @@
     },
 
     attached : function() {
-      FB.materialController.on('material-update', this.onUpdate.bind(this));
+      SDK.controllers.material.on('material-update', this.onUpdate.bind(this));
 
       this.popup = document.querySelector('budget-complex-material-popup');
       this.updateMaterial(null, true);
     },
 
     detached : function() {
-      FB.materialController.removeListener('material-update', this.onUpdate);
+      SDK.controllers.material.removeListener('material-update', this.onUpdate);
     },
 
     updateMaterial : function(material) {
@@ -123,7 +123,7 @@
         this.currentstate = this.material;
       }
 
-      var m = FB.materialController.get(this.material);
+      var m = SDK.controllers.material.get(this.material);
 
       this.$.editBtn.setAttribute('href','#budget/materials/'+this.material);
 
@@ -229,7 +229,7 @@
               '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>'
             )+(list[i].calcErrors || '')
             +'</td><td style="white-space: nowrap">' +
-              list[i].amount+' '+FB.units.getLabel(list[i].units, true)+' = $'+
+              list[i].amount+' '+SDK.units.getLabel(list[i].units, true)+' = $'+
               list[i].price.toFixed(2)+' </span>'
           '</td></tr>';
       }
@@ -250,7 +250,7 @@
     getPriceLabel : function() {
       return '<div class="text text-success" style="text-align:center;padding-top:5px">$' +
             (this.data.price ? this.data.price.toFixed(2) : '0')  +
-            ' per '+FB.units.getLabel(this.data.units, true)+'</div>';
+            ' per '+SDK.units.getLabel(this.data.units, true)+'</div>';
     },
 
     renderCompressed : function() {
@@ -269,7 +269,7 @@
             (list[i].type == 'complex' ? '<b><i class="fa fa-cubes"></i>' +list[i].name + '</b>' : '<budget-material material="'+list[i].name+'" '+(list[i].unique ? 'parent="'+this.data.name+'"' : '')+'></budget-material>' )+
             (list[i].calcErrors || '')+'</td>'+
             '<td style="white-space: nowrap">' +
-            ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+FB.units.getLabel(list[i].units, true)+'</span>'
+            ' '+(list[i].price ? list[i].price.toFixed(2) : '')+' '+SDK.units.getLabel(list[i].units, true)+'</span>'
           '</td></tr>';
       }
 
@@ -295,7 +295,7 @@
 
     getCompressedMaterialList : function(complex, list) {
       for( var material in complex.materials ) {
-        var m = FB.materialController.get(material);
+        var m = SDK.controllers.material.get(material);
 
         if( m.error && complex.unique && complex.unique[material] ) {
           m = {
@@ -333,7 +333,7 @@
 
     getTreeMaterialList : function(complex, path, list) {
       for( var material in complex.materials ) {
-        var m = FB.materialController.get(material);
+        var m = SDK.controllers.material.get(material);
 
         if( m.error && complex.unique && complex.unique[material] ) {
           m = {
@@ -384,7 +384,7 @@
       }
 
       // if the material name is not in our chain, we can quit
-      if( !FB.materialController.contains(this.data, e.material.name, e.replaced) ) {
+      if( !SDK.controllers.material.contains(this.data, e.material.name, e.replaced) ) {
         return;
       }
 

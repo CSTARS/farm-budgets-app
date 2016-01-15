@@ -11,7 +11,8 @@
     ready : function() {
       this.renameList = {};
       this.renameTimer = -1;
-      FB.operationController.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
+
+      SDK.controllers.operation.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
 
       // if user does not have a verified email, redirect them
       if( !ExpressAuth.user.verified ) {
@@ -23,7 +24,7 @@
       var id = window.localStorage.getItem('current-budget');
 
       if( id ) {
-        $.get('/budget/get?id='+id, function(resp){
+        SDK.budget.get(id, function(resp){
           if( resp.error ) {
 
             // check local data if error (probably new, unsaved budget)
@@ -40,7 +41,7 @@
             return;
           }
 
-          FB.changes.setOriginal(resp.budget, resp.materials);
+          SDK.changes.setOriginal(resp.budget, resp.materials);
           if( !this.checkLocal(id) ) {
             this.load(resp);
           }
@@ -70,7 +71,7 @@
         }
 
         localdata = JSON.parse(localdata);
-        FB.localdata = localdata;
+        SDK.app.localdata = localdata;
 
         if( !localdata.materials ) {
           localdata.materials = [];
@@ -78,7 +79,7 @@
 
         var hasChanges = false;
         if( localdata ) {
-          hasChanges = FB.changes.forceCheckAll(localdata.budget, localdata.materials);
+          hasChanges = SDK.changes.checkAll(localdata.budget, localdata.materials);
         }
 
         if( localdata && !ExpressAuth.user ) {
@@ -97,7 +98,7 @@
     },
 
     load : function(data) {
-      FB.reset(true);
+      SDK.reset();
 
       if( !data.budget.materials ) {
         data.budget.materials = [];
@@ -113,32 +114,32 @@
       }
 
 
-      FB.load(data);
+      SDK.load(data);
 
       this.$.sections.setData(data);
 
       if( this.saveElement ) {
         this.saveElement.onBudgetLoad(data);
       }
-      FB.localsave();
+      SDK.app.localsave();
 
       this.fire('budget-loaded');
     },
 
     reload : function(id, force) {
-      if( FB.changes.hasChanges() && !force ) {
+      if( SDK.changes.hasChanges() && !force ) {
         if( !confirm('Are you sure you want to load this budget?  You have unsaved changes') ) {
           return;
         }
       }
 
-      $.get('/budget/get?id='+id, function(resp){
+      SDK.budget.get(id, function(resp){
         if( resp.error ) {
           return alert('Error reloading budget data: '+resp.message);
         }
 
-        FB.changes.setOriginal(resp.budget, resp.materials);
-        FB.changes.setUnsaved({});
+        SDK.changes.setOriginal(resp.budget, resp.materials);
+        SDK.changes.setUnsaved({});
         window.localStorage.setItem('unsaved-materials', '{}');
 
         window.localStorage.clear();
@@ -150,7 +151,7 @@
     createNew : function() {
       var newData = {
         budget : {
-          id : FB.utils.guid(),
+          id : SDK.utils.guid(),
           authority : ExpressAuth.user ? ExpressAuth.user.email : '',
           locality : [],
           name : '',
@@ -165,7 +166,7 @@
         materials : []
       };
 
-      FB.changes.setOriginal(newData.budget, newData.materials);
+      SDK.changes.setOriginal(newData.budget, newData.materials);
       this.load(newData);
     },
 

@@ -156,7 +156,7 @@
 
         var units = material.units || '';
         if( units && material.type === 'simple' ) {
-          units = FB.units.invert(units);
+          units = SDK.units.invert(units);
         }
 
         this.$.unitsInput.setUnits(units);
@@ -196,7 +196,7 @@
         this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
 
         if( !this.material.id ) {
-          this.material.id = FB.utils.guid();
+          this.material.id = SDK.utils.guid();
         }
 
         $.post('/materials/save', this.material, function(resp){
@@ -324,7 +324,7 @@
           return this.$.usedByMessage.style.display = 'none';
         }
 
-        $.get('/budget/uses', {material: this.material.id}, function(resp){
+        SDK.budget.uses(this.material.id, function(resp){
           for( var i = 0; i < resp.length; i++ ) {
             resp[i].locality = resp[i].locality.join(', ');
           }

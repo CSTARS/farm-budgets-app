@@ -103,7 +103,7 @@
       },
 
       getTitle : function(id) {
-        var materials = FB.materialController.get();
+        var materials = SDK.controllers.material.get();
         for( var type in materials ) {
           for( var i = 0; i < materials[type].length; i++ ) {
             if( materials[type][i].id == id ) {

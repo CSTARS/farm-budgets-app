@@ -19,7 +19,7 @@
       this.handlerSet = false;
 
       // only redraw if we are on the overview page
-      FB.operationController.on('total-update', function(e){
+      SDK.controllers.operation.on('total-update', function(e){
         if( e && e.range ) this.data = e.range.all;
 
         if( !window.location.hash.match(/budget\/overview/) ) {
@@ -30,7 +30,7 @@
       }.bind(this));
 
       // make sure a total hasn't already been set
-      var total = FB.operationController.getCurrentTotal();
+      var total = SDK.controllers.operation.getCurrentTotal();
       if( total !== null ) {
         this.drawChart(total);
       }

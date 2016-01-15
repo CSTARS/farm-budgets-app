@@ -43,7 +43,7 @@
         $(this.$.deleteBtn).addClass('disabled').html('Checking...');
         this.$.budgets.style.display = 'none';
 
-        $.get('/budget/uses?material='+material.id, function(resp){
+        SDK.budget.uses(material.id, function(resp){
           if( resp.error ) {
             return alert(resp.message);
           }

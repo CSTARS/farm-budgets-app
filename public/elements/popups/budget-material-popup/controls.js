@@ -51,7 +51,7 @@ var BudgetMaterialPopup = {
       return;
     }
 
-    if( !FB.hasAccess(this.data) ) {
+    if( !SDK.app.hasAccess(this.data) ) {
       this.remove();
       return;
     }
@@ -83,7 +83,7 @@ var BudgetMaterialPopup = {
         this.data.type = 'simple';
 
         if( this.data.units ) {
-          this.data.units = FB.units.invert(this.data.units);
+          this.data.units = SDK.units.invert(this.data.units);
         }
 
         this.setComplex(false);
@@ -95,7 +95,7 @@ var BudgetMaterialPopup = {
         delete this.data.class;
         this.data.type = 'simple';
         if( this.data.units ) {
-          this.data.units = FB.units.invert(this.data.units);
+          this.data.units = SDK.units.invert(this.data.units);
         }
 
         this.setComplex(false);
@@ -108,7 +108,7 @@ var BudgetMaterialPopup = {
       this.data.materials = {};
 
       if( this.data.units ) {
-        this.data.units = FB.units.invert(this.data.units);
+        this.data.units = SDK.units.invert(this.data.units);
       }
 
       // as there a simple price set?  make it the base price material

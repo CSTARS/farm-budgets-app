@@ -83,7 +83,7 @@
       this.$.edit.href = '#budget/materials/'+this.material;
       this.$.edit.removeEventListener('click', this.fireEditUnique, false);
 
-      m = FB.materialController.get(this.material);
+      m = SDK.controllers.material.get(this.material);
       if( m.error || m.deleted ) return this.showError(m);
 
       var otherInfo = '';
@@ -114,7 +114,7 @@
       }
 
       this.$.priceLabel.innerHTML = m.price;
-      this.$.unitLabel.innerHTML = FB.units.getLabel(m.units, true);
+      this.$.unitLabel.innerHTML = SDK.units.getLabel(m.units, true);
       //this.data.materials[material].price.toFixed(2)
     },
 

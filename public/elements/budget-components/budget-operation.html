@@ -97,8 +97,8 @@
     },
 
     attached : function() {
-      FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
-      FB.materialController.on('material-update', this.onMaterialUpdate.bind(this));
+      SDK.controllers.operation.on('operation-update', this.onOperationUpdate.bind(this));
+      SDK.controllers.material.on('material-update', this.onMaterialUpdate.bind(this));
 
       if( this.operation ) this.update();
 
@@ -109,8 +109,8 @@
     },
 
     detached : function() {
-      FB.operationController.removeListener('operation-update', this.onOperationUpdate);
-      FB.materialController.removeListener('material-update', this.onMaterialUpdate);
+      SDK.controllers.operation.removeListener('operation-update', this.onOperationUpdate);
+      SDK.controllers.material.removeListener('material-update', this.onMaterialUpdate);
     },
 
     toggleAddition : function() {
@@ -130,10 +130,10 @@
       if( !this.operation.materials ) return;
 
       for( var i = 0; i < this.operation.materials.length; i++ ) {
-        var m = FB.materialController.get(this.operation.materials[i].name);
+        var m = SDK.controllers.material.get(this.operation.materials[i].name);
         if( m.error ) continue;
 
-        if( FB.materialController.contains(m, e.material.name, e.replaced) ) {
+        if( SDK.controllers.material.contains(m, e.material.name, e.replaced) ) {
           this.render();
           return;
         }
@@ -145,20 +145,20 @@
       if( !this.operation ) return;
 
       this.operation.schedule = e.detail;
-      FB.operationController.add(this.operation, {replace: true});
+      SDK.controllers.operation.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
     update : function() {
-      this.operation = FB.operationController.get(this.operationname);
+      this.operation = SDK.controllers.operation.get(this.operationname);
       this.$.schedule.set(this.operation.schedule, this.operation.name, this.readonly);
       this.render();
     },
 
     delete : function() {
       if( !confirm('Are your sure you want to delete this operation?') ) return;
-      FB.operationController.remove(this.operation.name);
-      FB.operationController.recalc();
+      SDK.controllers.operation.remove(this.operation.name);
+      SDK.controllers.operation.recalc();
     },
 
     showError : function(show) {
@@ -173,7 +173,7 @@
           return;
         }
 
-        var m = FB.materialController.get(this.operation.materials[i].name);
+        var m = SDK.controllers.material.get(this.operation.materials[i].name);
         if (m.recalcErrors && m.recalcErrors.length > 0) {
           this.showError(true);
           return;
@@ -216,7 +216,7 @@
       var hash = {};
       var c = 0;
       for( var i = 0; i < this.operation.materials.length; i++ ) {
-        var m = FB.materialController.get(this.operation.materials[i].name);
+        var m = SDK.controllers.material.get(this.operation.materials[i].name);
         if( m.error || !m.authority || !m.locality ) continue;
 
         var key = m.authority+m.locality.join('');
@@ -236,7 +236,7 @@
         if( hash[key].length != c ) {
           materials = [];
           for( var i = 0; i < hash[key].length; i++ ) {
-            materials.push('<a href="'+FB.materialLink(hash[key][i].name)+'">'+FB.materialIcon(hash[key][i].type)+' '+hash[key][i].name+'</a>');
+            materials.push('<a href="'+SDK.app.getMaterialLink(hash[key][i].name)+'">'+SDK.app.getMaterialIcon(hash[key][i].type)+' '+hash[key][i].name+'</a>');
           }
           materials = materials.join(',&nbsp;&nbsp;');
         }
@@ -258,12 +258,12 @@
 
     updateUnit : function() {
       this.operation.perAcre = $(this.$.radioPerAcre).is(':checked') ? true : false;
-      FB.operationController.add(this.operation, {replace: true});
+      SDK.controllers.operation.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
     onMaterialDelete : function(e) {
-      FB.operationController.add(this.operation, {replace: true});
+      SDK.controllers.operation.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
@@ -274,10 +274,10 @@
       if( materialDef.type == 'complex' ) {
         units = materialDef.units;
       } else {
-        units = FB.units.invert(materialDef.units);
+        units = SDK.units.invert(materialDef.units);
       }
 
-      FB.operationController.addUpdateMaterial(
+      SDK.controllers.operation.addUpdateMaterial(
         this.operation,
         {
           id : materialDef.id,
@@ -287,7 +287,7 @@
         }
       );
 
-      FB.operationController.add(this.operation, {replace: true});
+      SDK.controllers.operation.add(this.operation, {replace: true});
       this.render();
     },
 
@@ -329,7 +329,7 @@
         return;
       }
 
-      var op = FB.operationController.get(this.$.nameInput.value);
+      var op = SDK.controllers.operation.get(this.$.nameInput.value);
       if( !op.error && this.operation.name !== this.$.nameInput.value ) {
         this.$.nameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
         return;
@@ -342,7 +342,7 @@
       this.$.nameLabel.style.display = 'inline-block';
       this.$.nameInput.style.display = 'none';
 
-      FB.operationController.add(this.operation,
+      SDK.controllers.operation.add(this.operation,
           {
             noRecalc: true,
             noEvents: true,

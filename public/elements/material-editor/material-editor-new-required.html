@@ -133,7 +133,7 @@
           return;
         }
 
-        $.get('/materials/suggest', {q: name}, function(resp) {
+        SDK.materials.suggest(name, function(resp) {
           this.suggestResults = resp;
           this.renderSuggest();
         }.bind(this));

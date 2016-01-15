@@ -222,13 +222,13 @@
     updatePriceLabel : function() {
       this.$['current-price'].innerHTML = '$'+this.data.price.toFixed(2);
 
-      var label = FB.units.getLabel(this.data.units);
+      var label = SDK.units.getLabel(this.data.units);
       if( label != '' ) label = 'per '+label;
       this.$['current-units'].innerHTML = label;
     },
 
     recalc : function() {
-      FB.materialController.materialRecalc(this.data);
+      SDK.materialController.materialRecalc(this.data);
 
       if( this.data.type == 'complex' ) {
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);
@@ -256,7 +256,7 @@
         this.data.units = newUnits;
       } else {
         this.$.unitsInputMsg.innerHTML = '';
-        this.data.units = FB.units.invert(e.detail.value);
+        this.data.units = SDK.units.invert(e.detail.value);
       }
 
       this.recalc();

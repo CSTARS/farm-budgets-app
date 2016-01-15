@@ -60,7 +60,7 @@
       defaultObserver : function() {
         if( !ExpressAuth.user ) return;
 
-        var noAccess = FB.hasAccess(this.default) ? '' : ' - No Access';
+        var noAccess = SDK.app.hasAccess(this.default) ? '' : ' - No Access';
 
         var ele = $(this.$.selector)
           .find('[value="'+this.default+'"]')

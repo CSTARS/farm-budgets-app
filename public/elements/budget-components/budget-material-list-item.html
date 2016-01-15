@@ -172,7 +172,7 @@
           this.$.deleted.style.display = 'inline-block';
           this.$.name.style.fontStyle = 'italic';
           this.$.name.className = 'text text-danger';
-          
+
           this.errorCount++;
           this.hasErrors = true;
         }
@@ -196,8 +196,8 @@
       _setChanges : function() {
         if( !this.material.id ) return;
 
-        var changes = FB.changes.hasChanges(this.material);
-        var unsaved = FB.changes.getUnsaved()[this.material.id];
+        var changes = SDK.changes.hasChanges(this.material);
+        var unsaved = SDK.changes.getUnsaved()[this.material.id];
         if( !changes && !unsaved ) {
           this.hasChanges = false;
           this.$.changesMessage.innerHTML = '';
@@ -216,7 +216,7 @@
       },
 
       setUsedByOps : function() {
-        var operations = FB.operationController.get();
+        var operations = SDK.controllers.operation.get();
         var usedBy = [];
         for( var i = 0; i < operations.length; i++ ) {
           for( var j = 0; j < operations[i].materials.length; j++ ) {
@@ -230,7 +230,7 @@
       },
 
       setRequiredBy : function() {
-        var complexMaterials = FB.materialController.get().complex;
+        var complexMaterials = SDK.controllers.material.get().complex;
         var requiredBy = [];
         for( var name in complexMaterials ) {
           if( !complexMaterials[name].materials ) continue;
