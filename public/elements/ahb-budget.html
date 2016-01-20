@@ -1,6 +1,7 @@
 <dom-module id="ahb-budget">
   <template>
     <budget-sections id="sections"></budget-sections>
+    <budget-search-panel id="searchPanel" style="display:none" class="animated fadeIn" on-select="onBudgetSelect"></budget-search-panel>
   </template>
 </dom-module>
 
@@ -98,7 +99,7 @@
     },
 
     load : function(data) {
-      SDK.reset();
+      SDK.reset(true);
 
       if( !data.budget.materials ) {
         data.budget.materials = [];
@@ -121,7 +122,11 @@
       if( this.saveElement ) {
         this.saveElement.onBudgetLoad(data);
       }
+
       SDK.app.localsave();
+      SDK.changes.setOriginal(data.budget, data.materials);
+      SDK.app.checkForChanges();
+      SDK.app.checkForMaterialChanges();
 
       this.fire('budget-loaded');
     },
@@ -133,7 +138,7 @@
         }
       }
 
-      SDK.budget.get(id, function(resp){
+      SDK.budgets.get(id, function(resp){
         if( resp.error ) {
           return alert('Error reloading budget data: '+resp.message);
         }

@@ -30,11 +30,13 @@
       </div>
     </div>
 
-    <div style="text-align: center; padding: 25px 0 15px 0">
-      <a class="btn btn-primary btn-lg" on-click="showCreate" id="createBtn"><i class="fa fa-cogs"></i> Create New Operation</a>
-      <div class="alert alert-warning" id="referenceMsg" style="display:none">
-        <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
-      </div>
+    <h4 class="page-header">
+      <a class="btn btn-primary pull-right"  style="margin-top:-10px" on-click="showCreate" id="createBtn"><i class="fa fa-plus"></i> New</a>
+      <i class="fa fa-cogs"></i> Operations
+    </h4>
+
+    <div class="alert alert-warning" id="referenceMsg" style="display:none">
+      <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
     </div>
 
     <div class="row">

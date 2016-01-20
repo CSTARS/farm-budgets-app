@@ -43,10 +43,17 @@
       <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filter" /> Only Show Materials With Errors</span>
     </div>
 
+    <h4 class="page-header">
+      <div class="btn-group pull-right" style="margin-top:-10px" role="group">
+        <a class="btn btn-primary" on-click="showCreate"><i class="fa fa-plus"></i> New</a>
+        <a class="btn btn-primary" on-click="import"><i class="fa fa-cloud-download"></i> Import</a>
+      </div>
+
+      <i class="fa fa-cube"></i> Materials
+    </h4>
+
     <div style="text-align: center; padding: 25px 0 15px 0">
-      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create Material</a>
-      &nbsp;&nbsp;
-      <a class="btn btn-primary btn-lg" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a>
+
     </div>
 
 
@@ -86,12 +93,9 @@
       SDK.controllers.material.on('material-removed', function(e) {
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
-        SDK.changes.checkMaterialsBuffered(SDK.controllers.material.asArray());
       }.bind(this));
 
-      document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkChanges.bind(this));
-
-      SDK.changes.on('material-diff', this.onMaterialDiff.bind(this));
+      SDK.changes.on('material-state-update', this.onSaveStateUpdate.bind(this));
     },
 
     attached : function() {
@@ -102,29 +106,22 @@
       document.querySelector('budget-import-material-popup').show();
     },
 
-    onMaterialDiff : function(diff) {
-      if( diff.length > 0 || Object.keys(SDK.changes.getUnsaved()).length ) {
+    onSaveStateUpdate : function(e) {
+      if( e.changes ) {
         this.$.warningMessage.style.display = 'block';
         this.$.unsavedFilterOuter.style.display = 'inline-block';
-        this.fire('unsaved-update', true);
       } else {
         this.$.unsavedFilter.checked = false;
         this.$.warningMessage.style.display = 'none';
         this.$.unsavedFilterOuter.style.display = 'none';
-        this.fire('unsaved-update', false);
 
         // make sure we are not filtering to unsaved if there are no unsaved
         this.filter();
       }
     },
 
-    checkChanges : function() {
-      SDK.changes.checkMaterialsBuffered(SDK.controllers.material.asArray());
-    },
-
     onMaterialAdded : function(e) {
       this.updateMaterialPanel(e.material, false);
-      SDK.changes.checkMaterialsBuffered(SDK.controllers.material.asArray());
     },
 
     onMaterialsUpdated : function(e) {
@@ -146,7 +143,6 @@
       }
 
       this.filter();
-      this.checkChanges();
     },
 
     updateMaterialPanel : function(name, replaced) {

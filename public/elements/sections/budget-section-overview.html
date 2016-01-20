@@ -145,6 +145,7 @@
 
       SDK.controllers.material.on('material-update', this.updateMaterialAuthorties.bind(this));
       SDK.controllers.material.on('material-removed', this.updateMaterialAuthorties.bind(this));
+      SDK.changes.on('save-state-update', this.showChangesWarning.bind(this));
     },
 
     attached : function() {
@@ -258,7 +259,7 @@
       // TODO: this should be a popup that also checks for reference budgets.
       if( !confirm('Are you sure you want to delete the budget!?') ) return;
       if( !confirm('Are you really sure!?') ) return;
-      
+
       SDK.budget.delete(this.budgetId, function(resp){
         if( resp.error ) {
           alert(resp.message);
@@ -275,7 +276,8 @@
       document.querySelector('budget-farm-editor').show();
     },
 
-    showChangesWarning : function(show) {
+    showChangesWarning : function(e) {
+      var show = e.changes;
       this.$.changesWarning.style.display = show ? 'block' : 'none';
 
       var showNoAccess = false;

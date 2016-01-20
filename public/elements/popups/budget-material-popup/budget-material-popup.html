@@ -228,7 +228,7 @@
     },
 
     recalc : function() {
-      SDK.materialController.materialRecalc(this.data);
+      SDK.controllers.material.materialRecalc(this.data);
 
       if( this.data.type == 'complex' ) {
         this.$.materialTable.setMaterials(this.data, this.materialTableOptions);

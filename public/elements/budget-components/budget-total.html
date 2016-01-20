@@ -42,10 +42,13 @@
     is : 'budget-total',
 
     attached : function() {
-      SDK.controllers.operation.on('total-update', this.onTotalUpdate.bind(this));
+
+      var buffer = new SDK.app.UiBuffer(this.onTotalUpdate, 100, this);
+      SDK.controllers.operation.on('total-update', buffer);
+      //SDK.controllers.operation.on('total-update', this.onTotalUpdate.bind(this));
 
       // make sure a total hasn't already been set
-      var total = SDK.controllers.operation.getCurrentTotal();
+      var total = SDK.getTotal();
       if( total !== null ) {
         this.onTotalUpdate(total);
       }
@@ -56,9 +59,10 @@
       this.onTotalUpdate();
     },
 
+
     onTotalUpdate : function(e) {
       if( e ) this.data = e;
-      if( !this.data ) return;
+      if( !this.data || !this.farm ) return;
 
       this.$.totalLabel.value = this.data.total / ((this.farm && this.farm.size) ? parseInt(this.farm.size) : 1);
 

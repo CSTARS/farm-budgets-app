@@ -96,6 +96,8 @@
             } else {
               FB.localsave();
             }
+
+            SDK.app.checkForChanges();
             this.fire('editor-close');
           }.bind(this));
       },

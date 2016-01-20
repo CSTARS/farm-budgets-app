@@ -1,0 +1,82 @@
+<dom-module id="budget-save-btn">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+
+      ul.dropdown-menu li a {
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="btn-group" style="white-space:nowrap">
+      <button type="button" class="btn btn-default" on-click="save" id="btnInner">
+        <i class="fa fa-save"></i>
+      </button>
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span class="caret"></span>
+        <span class="sr-only">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-right">
+        <li id="saveBtn"><a on-click="save"><i class="fa fa-save"></i> Save</a></li>
+        <li id="saveNewBtn"><a on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
+        <li id="undoBtn"><a on-click="undo"><i class="fa fa-undo"></i> Discard All Changes</a></li>
+
+        <li id="loginTopBtn" style="display:none"><a href="/login.html"><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
+      </ul>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-save-btn',
+
+      ready : function() {
+        SDK.changes.on('save-state-update', this.onStateUpdate.bind(this));
+      },
+
+      onStateUpdate : function(e) {
+        if( e.changes ) {
+          this.style.display = 'inline-block';
+          this.$.btnInner.innerHTML = '<i class="fa fa-save"></i>';
+          this.$.btnInner.removeAttribute('disabled');
+        } else {
+          this.style.display = 'none';
+        }
+      },
+
+      save : function() {
+        if( !ExpressAuth.user ) {
+          document.querySelector('budget-login-popup').show();
+          return;
+        }
+
+        this.$.btnInner.innerHTML = '<i class="fa fa-circle-o-notch fa-spin"></i>';
+        this.$.btnInner.setAttribute('disabled', 'disabled');
+
+        SDK.app.saveBudget(function(resp){
+          this.$.saveBudgetBtnInner.innerHTML = '<i class="fa fa-save"></i>';
+          this.$.saveBudgetBtnInner.removeAttribute('disabled');
+
+          if( resp.error ) {
+            alert(resp.message);
+          } else {
+            SDK.app.checkForChangesNow();
+          }
+        }.bind(this));
+      },
+
+      clone : function() {
+        SDK.app.cloneBudget();
+      },
+
+      undo : function() {
+        if( !confirm('Are you sure you want to discard your changes?') ) {
+          return;
+        }
+        document.querySelector('ahb-budget').reload(SDK.getBudget().id, true);
+      }
+    });
+  </script>
+</dom-module>
