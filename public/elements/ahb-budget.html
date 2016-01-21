@@ -13,6 +13,8 @@
       this.renameList = {};
       this.renameTimer = -1;
 
+      SDK.app.init();
+
       SDK.controllers.operation.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
 
       // if user does not have a verified email, redirect them

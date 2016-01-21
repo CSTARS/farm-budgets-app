@@ -95,14 +95,17 @@
       this.filter();
     },
 
-    setData : function(data) {
-      this.data = data.budget;
+    setData : function() {
+      var budget = SDK.getBudget();
+
       this.$.root.innerHTML = '';
 
-      this.referenced = this.data.reference ? true : false;
+      this.referenced = budget.isReference();
 
-      this.data.operations.forEach(function(operation){
-        var ele = this.createPanel(operation);
+      // empty get call returns all operations
+      var operations = budget.getOperation();
+      operations.forEach(function(operation){
+        var ele = this.createPanel(operation.data);
         this.$.root.appendChild(ele);
       }.bind(this));
 
@@ -161,21 +164,14 @@
         return;
       }
 
-      var op = SDK.controllers.operation.get(name);
-      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
+      var op = SDK.getBudget().getOperation(name);
+      if( op.length > 0 ) {
         this.$.newNameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
         return;
       }
       this.$.newNameMsg.innerHTML = '';
 
-      var op = {
-        name : name,
-        materials : [],
-        schedule : [],
-        units : '[acr_us]'
-      };
-
-      SDK.controllers.operation.add(op);
+      SDK.getBudget().addOperation(name);
       this.$.filterInput.value = name;
       this.popup.modal('hide');
     },

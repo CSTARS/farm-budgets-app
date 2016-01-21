@@ -6,7 +6,7 @@ BudgetMaterialPopup.editUnique = function(name) {
   }
 
   this.$.uniqueNameInput.value = name;
-  this.$.uniqueUnitsInput.units = FB.units.invert(this.data.unique[name].units);
+  this.$.uniqueUnitsInput.units = SDK.units.invert(this.data.unique[name].units);
   this.$.uniquePriceInput.value = this.data.unique[name].price;
   this.$.createUniqueMsg.innerHTML = '';
 
@@ -44,16 +44,16 @@ BudgetMaterialPopup.createUnique = function() {
     var impl = {
       name : data.name,
       amount : 1,
-      units : FB.units.invert(data.units)
+      units : SDK.units.invert(data.units)
     }
     this.data.materials[impl.name] = impl;
   } else {
-    this.data.materials[data.name].units = FB.units.invert(data.units);
+    this.data.materials[data.name].units = SDK.units.invert(data.units);
   }
 
   this.data.unique[data.name] = data;
 
-  FB.materialController.add(this.data, {replace: true});
+  SDK.controllers.material.add(this.data, {replace: true});
   this.recalc();
 
   // this just resets and hides

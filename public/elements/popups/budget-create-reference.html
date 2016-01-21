@@ -38,7 +38,7 @@
     },
 
     show : function() {
-      this.budget = SDK.getBudget();
+      this.budget = SDK.getBudget().getData();
       if( this.budget.reference ) {
         this.$.budgetPreLabel.innerHTML = ' reference budget ';
         this.$.budgetName.innerHTML = this.budget.referenceInfo.name;

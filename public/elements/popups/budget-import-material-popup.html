@@ -139,9 +139,9 @@
         this.$.main.style.display = 'block';
         this.$.select.style.display = 'none';
 
-        this.currentIds = FB.getMaterialIds();
+        this.currentIds = SDK.utils.getMaterialIds();
 
-        var data = FB.getBudget();
+        var data = SDK.getBudget().getData();
         if( data && data.locality ) {
           this.$.input.value = (location ? location : data.locality.join(' '))+' '+(value ? value : '');
         }
@@ -219,10 +219,10 @@
       addMaterial : function(id, callback) {
         SDK.materials.get(id, function(resp){
           // add to controller
-          FB.materialController.add(resp);
+          SDK.controller.material.add(resp);
           // update changes, we don't want to track this
-          FB.changes.addMaterial(resp);
-          FB.localsave();
+          SDK.changes.addMaterial(resp);
+          SDK.app.localsave();
           if( callback ) callback();
         });
       },

@@ -21,7 +21,7 @@
     <h4 class="page-header" style="margin-top: 5px; text-transform: capitalize">
       <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
 
-      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="saveNewName" />
+      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="rename" />
       <span id="nameLabel" style="cursor:pointer" on-mouseenter="onMouseEnterName" on-mouseleave="onMouseLeaveName" on-click="editName" ></span>
       <span id="nameMsg" class="text text-danger" style="font-size: 14px"></span>
       <i class="fa fa-pencil" style="display:none" id="renameIcon"></i>
@@ -144,21 +144,23 @@
     onScheduleUpdate : function(e) {
       if( !this.operation ) return;
 
-      this.operation.schedule = e.detail;
-      SDK.controllers.operation.add(this.operation, {replace: true});
+      // TODO: the operation scheduler should really have the operation class
+      // and interact with the classes api, no this anymore...
+      this.operation.data.schedule = e.detail;
+      this.operation.update();
+
       this.updateTotals();
     },
 
     update : function() {
-      this.operation = SDK.controllers.operation.get(this.operationname);
-      this.$.schedule.set(this.operation.schedule, this.operation.name, this.readonly);
+      this.operation = SDK.getBudget().getOperation(this.operationname);
+      this.$.schedule.set(this.operation.getSchedule(), this.operation.getName(), this.readonly);
       this.render();
     },
 
     delete : function() {
       if( !confirm('Are your sure you want to delete this operation?') ) return;
-      SDK.controllers.operation.remove(this.operation.name);
-      SDK.controllers.operation.recalc();
+      SDK.getBudget().removeOperation(this.operation.getName());
     },
 
     showError : function(show) {
@@ -167,13 +169,15 @@
     },
 
     checkError : function() {
-      for( var i = 0; i < this.operation.materials.length; i++ ) {
-        if( this.operation.materials[i].error ) {
+      var data = SDK.controllers.operation.get(this.operation.getName());
+
+      for( var i = 0; i < data.materials.length; i++ ) {
+        if( data.materials[i].error ) {
           this.showError(true);
           return;
         }
 
-        var m = SDK.controllers.material.get(this.operation.materials[i].name);
+        var m = SDK.controllers.material.get(data.materials[i].name);
         if (m.recalcErrors && m.recalcErrors.length > 0) {
           this.showError(true);
           return;
@@ -198,15 +202,16 @@
     _render : function() {
       if( !this.$.materialTable.setMaterials ) return;
 
-      this.$.nameLabel.innerHTML = this.operation.name;
+      this.$.nameLabel.innerHTML = this.operation.getName();
 
-      if( !this.operation.materials ) {
+      var materials = this.operation.getRequiredMaterials();
+      if( materials.length === 0 ) {
         this.$.sourceBtn.style.display = 'none';
         this.$.sources.style.display = 'none';
         return;
       }
 
-      this.$.materialTable.setMaterials(this.operation, {isOperation : true});
+      this.$.materialTable.setMaterials(this.operation.data, {isOperation : true});
       this.updateTotals();
       this.checkError();
       this.updateSources();
@@ -215,8 +220,10 @@
     updateSources : function() {
       var hash = {};
       var c = 0;
-      for( var i = 0; i < this.operation.materials.length; i++ ) {
-        var m = SDK.controllers.material.get(this.operation.materials[i].name);
+
+      var materials = this.operation.getRequiredMaterials();
+      for( var i = 0; i < materials.length; i++ ) {
+        var m = SDK.controllers.material.get(materials[i].name);
         if( m.error || !m.authority || !m.locality ) continue;
 
         var key = m.authority+m.locality.join('');
@@ -250,16 +257,12 @@
     },
 
     updateTotals : function() {
-      var scheduled = this.operation.schedule ? this.operation.schedule.length : 0;
-      $(this.$.total).attr('value', this.operation.total);
-      $(this.$.subtotal).attr('value', this.operation.subtotal);
-      $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
-    },
+      var scheduled = this.operation.getSchedule() ? this.operation.getSchedule().length : 0;
 
-    updateUnit : function() {
-      this.operation.perAcre = $(this.$.radioPerAcre).is(':checked') ? true : false;
-      SDK.controllers.operation.add(this.operation, {replace: true});
-      this.updateTotals();
+      var result = this.operation.getTotal();
+      $(this.$.total).attr('value', result.total);
+      $(this.$.subtotal).attr('value', result.subtotal);
+      $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
     },
 
     onMaterialDelete : function(e) {
@@ -323,32 +326,20 @@
       if( e.which == 13 ) this.$.nameInput.blur();
     },
 
-    saveNewName : function() {
-      if( this.$.nameInput.value.replace(/\s/g, '') == '' ) {
-        this.$.nameMsg.innerHTML = 'Invalid Name.';
-        return;
-      }
+    rename : function() {
+      var newname = this.$.nameInput.value.replace(/\s/g, '');
 
-      var op = SDK.controllers.operation.get(this.$.nameInput.value);
-      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
-        this.$.nameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
+      try {
+        this.operation.rename(newname);
+      } catch(e) {
+        this.$.nameMsg.innerHTML = e.message;
         return;
       }
 
       this.$.nameMsg.innerHTML = '';
-      var oldName = this.operation.name;
-      this.operation.name = this.$.nameInput.value;
-      this.$.nameLabel.innerHTML = this.operation.name;
+      this.$.nameLabel.innerHTML = newname;
       this.$.nameLabel.style.display = 'inline-block';
       this.$.nameInput.style.display = 'none';
-
-      SDK.controllers.operation.add(this.operation,
-          {
-            noRecalc: true,
-            noEvents: true,
-            rename : oldName
-          }
-      );
     }
 
   });

@@ -148,7 +148,7 @@ BudgetMaterialPopup._onSaveComplete = function(noHide, resp) {
   // now update the changes object
   SDK.changes.updateMaterial(this.data);
 
-  SDK.changes.checkBudget(SDK.getBudget(), SDK.controllers.material.asArray());
+  SDK.changes.checkBudget(SDK.getBudget().getData(), SDK.controllers.material.asArray());
 
   if( typeof noHide !== 'boolean' || !noHide ) this.hide();
   this.setSaving(false);

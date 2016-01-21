@@ -324,7 +324,7 @@
           return this.$.usedByMessage.style.display = 'none';
         }
 
-        SDK.budget.uses(this.material.id, function(resp){
+        SDK.budgets.uses(this.material.id, function(resp){
           for( var i = 0; i < resp.length; i++ ) {
             resp[i].locality = resp[i].locality.join(', ');
           }

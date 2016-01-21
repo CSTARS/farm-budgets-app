@@ -42,7 +42,7 @@
       show : function() {
         this.popup.modal('show');
 
-        var materials = FB.materialController.get();
+        var materials = SDK.controllers.material.get();
         var html = '<table class="table">'+
           '<tr><th><i class="fa fa-cube"></i> Material</th><th><i class="fa fa-dollar"></i> Price</th>'+
             '<th><i class="fa fa-shield"></i> Authority</th><th><i class="fa fa-map-marker"></i> Location</th></tr>';

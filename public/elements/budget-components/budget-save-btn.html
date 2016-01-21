@@ -56,8 +56,8 @@
         this.$.btnInner.setAttribute('disabled', 'disabled');
 
         SDK.app.saveBudget(function(resp){
-          this.$.saveBudgetBtnInner.innerHTML = '<i class="fa fa-save"></i>';
-          this.$.saveBudgetBtnInner.removeAttribute('disabled');
+          this.$.btnInner.innerHTML = '<i class="fa fa-save"></i>';
+          this.$.btnInner.removeAttribute('disabled');
 
           if( resp.error ) {
             alert(resp.message);
@@ -75,7 +75,7 @@
         if( !confirm('Are you sure you want to discard your changes?') ) {
           return;
         }
-        document.querySelector('ahb-budget').reload(SDK.getBudget().id, true);
+        document.querySelector('ahb-budget').reload(SDK.getBudget().data.id, true);
       }
     });
   </script>

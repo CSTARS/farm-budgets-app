@@ -7,7 +7,7 @@ BudgetMaterialPopup.create = function(name) {
     }
   }
 
-  var budget = FB.getBudget();
+  var budget = SDK.getBudget().getData();
 
   var defaultAuthority = budget.authority;
   if( ExpressAuth.user && ExpressAuth.user.authorities ) {
@@ -53,7 +53,7 @@ BudgetMaterialPopup.create = function(name) {
 
   // used by suggest
   this.currentIds = [];
-  var materials = FB.materialController.get();
+  var materials = SDK.controllers.material.get();
   for( var type in materials ) {
     for( var name in materials[type] ) {
         if( materials[type][name].id ) {

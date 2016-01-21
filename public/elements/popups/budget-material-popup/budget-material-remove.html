@@ -43,7 +43,7 @@
         $(this.$.deleteBtn).addClass('disabled').html('Checking...');
         this.$.budgets.style.display = 'none';
 
-        SDK.budget.uses(material.id, function(resp){
+        SDK.budgets.uses(material.id, function(resp){
           if( resp.error ) {
             return alert(resp.message);
           }
@@ -53,7 +53,7 @@
                         '<tr><th><i class="fa fa-dollar"></i> Budget Name</th><th>Farm Name</th>'+
                         '<th><i class="fa fa-leaf"></i> Crop</th><th><i class="fa fa-authority"></i> Authority</th>'+
                         '<th><i class="fa fa-map-marker"></i> Location</th></tr>';
-          var budgetId = FB.getBudget().id;
+          var budgetId = SDK.getBudget().data.id;
           for( var i = 0; i < resp.length; i++ ) {
             if( resp.id === budgetId ) continue;
             html +=

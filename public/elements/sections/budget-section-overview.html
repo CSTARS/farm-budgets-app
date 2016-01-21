@@ -152,14 +152,14 @@
       document
         .querySelector('budget-farm-editor')
         .addEventListener('editor-close', function(){
-          this.setData(SDK.getBudget());
+          this.setData(SDK.getBudget().getData());
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
         }.bind(this));
 
       document
         .querySelector('ahb-budget')
         .addEventListener('budget-loaded', function(){
-          this.$.link.setAttribute('href', '#link/'+SDK.getBudget().id);
+          this.$.link.setAttribute('href', '#link/'+SDK.getBudget().data.id);
         }.bind(this));
     },
 
@@ -260,7 +260,7 @@
       if( !confirm('Are you sure you want to delete the budget!?') ) return;
       if( !confirm('Are you really sure!?') ) return;
 
-      SDK.budget.delete(this.budgetId, function(resp){
+      SDK.budgets.delete(this.budgetId, function(resp){
         if( resp.error ) {
           alert(resp.message);
         }

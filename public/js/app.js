@@ -1,6 +1,5 @@
 'use strict';
 
-
 var saveTimer = -1;
 
 function UiBuffer(fn, timeout, bind) {
@@ -25,6 +24,17 @@ SDK.app = {
 
   // buffers function (fn) by timeout in ms.  Binds function to whatever bind is provided.
   UiBuffer : UiBuffer,
+
+  _init : false,
+  init : function() {
+    if( this._init ) return;
+    this._init = true;
+
+    // save every 30 seconds
+    setInterval(function(){
+      SDK.app.localsave(true);
+    }, 1000*30);
+  },
 
   getMaterialLink : function(name) {
     return '#budget/materials/'+encodeURIComponent(name);
@@ -60,7 +70,7 @@ SDK.app = {
     if( SDK.changes.hasChanges() && !confirm('Are you sure you want to clone this budget and save as new?') ) return;
 
     var data = {
-      budget : SDK.getBudget().data,
+      budget : SDK.getBudget().getData(),
       materials : SDK.controllers.material.asArray()
     }
     data.budget.name = '';
@@ -75,8 +85,8 @@ SDK.app = {
   saveBudget : function(callback) {
     SDK.app.localsave();
 
-    var budget = $.extend(true,{}, SDK.getBudget().data);
-    SDK.utils.strip(SDK.schema.budget, budget);
+    var budget = $.extend(true,{}, SDK.getBudget().getData());
+    SDK.utils.strip(SDK.schema().budget, budget);
 
     budget.materialIds = [];
 
@@ -86,7 +96,7 @@ SDK.app = {
       budget.materialIds.push(materials[name].id);
     }
 
-    SDK.budget.save(budget, function(resp){
+    SDK.budgets.save(budget, function(resp){
       if( callback ) callback(resp);
 
       if( resp.error ) {
@@ -111,7 +121,7 @@ SDK.app = {
   _localsave : function(auto) {
     var t = new Date().getTime();
     var data = {
-      budget : SDK.getBudget().data,
+      budget : SDK.getBudget().getData(),
       materials : []
     }
 
@@ -135,12 +145,10 @@ SDK.app = {
 
   // this we will want to buffer
   function checkForChanges() {
-    SDK.changes.checkBudget(SDK.getBudget().data, SDK.controllers.material.asArray());
+    SDK.changes.checkBudget(SDK.getBudget().getData(), SDK.controllers.material.asArray());
   }
 
   function onDiffCheckComplete(diff) {
-    console.log('budget---');
-    console.log(diff);
     // path in new event.  This one buffered and what the UI cares about.
     if( diff.budget.length > 0 || diff.materialIds.length > 0 ) {
       SDK.changes.getEventsModule().emit('save-state-update', {
@@ -166,13 +174,10 @@ SDK.app = {
   // now wire up stuff for material changes
   //
   function checkForMaterialChanges() {
-    SDK.changes.checkBudget(SDK.getBudget().data, SDK.controllers.material.asArray());
+    SDK.changes.checkBudget(SDK.getBudget().getData(), SDK.controllers.material.asArray());
   }
 
   function onMaterialDiffComplete(diff) {
-    console.log('materials---');
-    console.log(diff);
-
     // TODO: why am I checking the unsaved changes array here?
     if( diff.length > 0 || Object.keys(SDK.changes.getUnsaved()).length ) {
       SDK.changes.getEventsModule().emit('material-state-update', {changes: true});
@@ -210,8 +215,3 @@ SDK.controllers.operation.on('operation-update', function(){
   SDK.app.localsave();
   SDK.app.checkForChanges();
 });
-
-// save every 30 seconds
-setInterval(function(){
-  SDK.app.localsave(true);
-}, 1000*30);

@@ -1,5 +1,5 @@
 BudgetMaterialPopup.onPriceChange = function() {
-  FB.materialController.materialRecalc(this.data);
+  SDK.controllers.material.materialRecalc(this.data);
 
   // do not call recalc, will update material table
   this.updatePriceLabel();
@@ -27,7 +27,7 @@ BudgetMaterialPopup.onNameInput = function() {
 
   if( this.data.name == newName || newName == '' ) return;
 
-  var m = FB.materialController.get(newName);
+  var m = SDK.controllers.material.get(newName);
   if( !m.error ) {
     this.$.nameInputMessage.innerHTML = 'A material with this name already exists';
     return;
@@ -83,7 +83,7 @@ BudgetMaterialPopup.onMaterialSelect = function(e) {
   if( materialDef.type == 'complex' ) {
     materialImpl.units = materialDef.units;
   } else {
-    materialImpl.units = FB.units.invert(materialDef.units);
+    materialImpl.units = SDK.units.invert(materialDef.units);
   }
 
   this.data.materials[materialImpl.name] = materialImpl;

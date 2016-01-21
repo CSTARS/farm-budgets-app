@@ -332,8 +332,8 @@
         return;
       }
 
-      var budget = SDK.getBudget();
-      SDK.budget.get(budget.id, function(resp){
+      var budget = SDK.getBudget().getData();
+      SDK.budgets.get(budget.id, function(resp){
         SDK.changes.setOriginal(budget, resp.materials);
         SDK.changes.setUnsaved({});
         window.localStorage.setItem('unsaved-materials', '{}');
