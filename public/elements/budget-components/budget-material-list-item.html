@@ -95,12 +95,12 @@
       update : function() {
         if( !this.material ) return;
 
-        this.setAttribute('material-name', this.material.name);
+        this.setAttribute('material-name', this.material.getName());
 
-        this.$.icon.innerHTML = '<i class="fa fa-cube'+(this.material.type === 'complex' ? 's' : '')+'"></i>';
-        this.$.name.innerHTML = this.material.name;
+        this.$.icon.innerHTML = SDK.app.getMaterialIconHTML(this.material.getType());
+        this.$.name.innerHTML = this.material.getName();
 
-        if( this.material.fixed ) {
+        if( this.material.isFixed() ) {
           this.$.fixed.style.display = 'block';
           this.$.editIcon.style.display = 'none';
         } else {
@@ -108,20 +108,25 @@
           this.$.editIcon.style.display = 'inline-block';
         }
 
-        this.errorCount = 0;
-        var errors = '';
-        if( this.material.recalcErrors && this.material.recalcErrors.length > 0 ) {
-          errors += '<i class="fa fa-warning"></i> This material has errors.<ul>';
-          for( var key in this.material.materials ) {
-            if( this.material.materials[key].message ) {
-              this.errorCount++;
-              errors +=
-                '<li><b>'+key+':</b> '+this.material.materials[key].message+
-                  (this.material.materials[key].code === 3 ? ' <a style="cursor:pointer" material="'+key+'"><i class="fa fa-cloud-download"></i> Import</a>' : '')+
-                '</li>';
+
+        if( this.material.hasErrors() ) {
+          var result = this.material.getErrors();
+
+          var html = '<div><i class="fa fa-warning"></i>This material has errors.</div>';
+          html += '<ul>';
+
+          if( result.errors.length > 0 ) {
+            html += '<li>'+result.errors.join('</li><li>')+'</li>';
+          }
+
+          if( result.materials ) {
+            for( var key in result.materials ) {
+              html += '<li><b>'+key+':</b><ul>';
+              html += '<li>'+result.materials[key].join('</li><li>')+'</li>';
+              html += '</ul></li>';
             }
           }
-          errors += '</ul>';
+
           this.$.errors.innerHTML = errors;
           this.$.errors.style.display = 'block';
           this.hasErrors = true;
@@ -138,42 +143,42 @@
         }
 
         var otherInfo = '';
-        if( this.material.authority ) {
-          otherInfo +='<i class="fa fa-shield"></i> '+this.material.authority;
+        if( this.material.getAuthority() ) {
+          otherInfo +='<i class="fa fa-shield"></i> '+this.material.getAuthority();
         }
-        if( this.material.locality ) {
-          if( this.material.authority ) {
+        if( this.material.getLocality().length > 0 ) {
+          if( this.material.getAuthority() ) {
             otherInfo += ' | ';
           }
-          otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.locality.join(', ')+'</span>';
+          otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.getLocality().join(', ')+'</span>';
         }
-        if( this.material.year ) {
-          if( this.material.authority || this.material.locality ) {
+
+        if( this.material.getYear() !== undefined ) {
+          if( this.material.getAuthority() || this.material.getLocality().length > 0 ) {
             otherInfo += ' | ';
           }
-          otherInfo += '<i class="fa fa-hourglass-o"></i> '+this.material.year;
+          otherInfo += '<i class="fa fa-hourglass-o"></i> '+this.material.getYear();
         }
         this.$.otherInfo.innerHTML = otherInfo;
 
-        if( this.material.description ) {
-          this.$.description.innerHTML = this.material.description;
+        if( this.material.getDescription() ) {
+          this.$.description.innerHTML = this.material.getDescription;
           this.$.description.style.display = 'block';
         } else {
           this.$.description.style.display = 'none';
         }
 
-        this.$.class.innerHTML = this.material.type == 'complex' ? 'Complex Material' : (this.material.class || 'Other');
-        this.$.price.value = this.material.price || '0';
+        this.$.class.innerHTML = this.material.getType() == 'complex' ? 'Complex Material' : (this.material.class || 'Other');
+        this.$.price.value = this.material.getPrice();
 
-        this.$.units.innerHTML = this.material.units;
+        this.$.units.innerHTML = this.material.getUnits();
 
-        if( this.material.deleted ) {
+        if( this.material.isDeleted() ) {
           this.$.editIcon.style.display = 'none';
           this.$.deleted.style.display = 'inline-block';
           this.$.name.style.fontStyle = 'italic';
           this.$.name.className = 'text text-danger';
 
-          this.errorCount++;
           this.hasErrors = true;
         }
 
@@ -198,6 +203,7 @@
 
         var changes = SDK.changes.hasChanges(this.material);
         var unsaved = SDK.changes.getUnsaved()[this.material.id];
+
         if( !changes && !unsaved ) {
           this.hasChanges = false;
           this.$.changesMessage.innerHTML = '';
@@ -220,7 +226,7 @@
         var usedBy = [];
         for( var i = 0; i < operations.length; i++ ) {
           for( var j = 0; j < operations[i].materials.length; j++ ) {
-            if( operations[i].materials[j].name == this.material.name ) {
+            if( operations[i].materials[j].name == this.material.getName() ) {
               usedBy.push('<a href="/#budget/operations/'+operations[i].name+'">'+operations[i].name+'</a>');
               break;
             }
@@ -230,11 +236,12 @@
       },
 
       setRequiredBy : function() {
-        var complexMaterials = SDK.controllers.material.get().complex;
+        var materials = SDK.controllers.material.get();
         var requiredBy = [];
-        for( var name in complexMaterials ) {
-          if( !complexMaterials[name].materials ) continue;
-          if( complexMaterials[name].materials[this.material.name] ) {
+
+        for( var name in materials ) {
+          if( !materials[name].materials ) continue;
+          if( materials[name].materials[this.material.getName()] ) {
             requiredBy.push('<a href="/#budget/materials/'+name+'">'+name+'</a>');
           }
         }

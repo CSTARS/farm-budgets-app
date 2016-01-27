@@ -165,8 +165,7 @@
 
       var materials = SDK.controllers.material.get();
       for( var name in materials ) {
-        var material = materials[name];
-        var div = this.createTable(material);
+        var div = this.createTable(name);
         this.$.root.appendChild(div);
       }
 
@@ -273,14 +272,12 @@
     },
 
     createTable : function(material) {
-      if( typeof material === 'string' ) {
-        material = SDK.controllers.material.get(material);
+      material = SDK.getMaterial(material);
 
-        if( material.error ) {
-          console.log('Unabled to show material in list');
-          console.log(material);
-          return;
-        }
+      if( !material.exists() ) {
+        console.log('Unabled to show material in list');
+        console.log(material);
+        return;
       }
 
       var ele = document.createElement('budget-material-list-item');

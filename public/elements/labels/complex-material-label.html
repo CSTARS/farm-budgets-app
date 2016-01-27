@@ -1,0 +1,208 @@
+
+<dom-module id="complex-material-label">
+  <style>
+    :host {
+      display: inline-block;
+    }
+    :host.open {
+      background-color: white;
+      position: absolute;
+      z-index: 100;
+      box-shadow: 0 0 15px #ccc;
+      top: -10px;
+      padding: 5px
+    }
+
+    #expand {
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #expand:hover {
+      color: #2196f3;
+    }
+
+    .btn-group > .btn.btn-default {
+      transition: all 300ms linear;
+      -moz-transition: all 300ms linear;
+      -ms-transition: all 300ms linear;
+    }
+
+    .btn-group > .btn.btn-default.nohover {
+      border-top: 1px solid transparent !important;
+      border-left: 1px solid transparent !important;
+      box-shadow: none !important;
+      -moz-box-shadow: none !important;
+      -ms-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+    }
+  </style>
+
+  <template>
+
+    <table>
+      <tr>
+        <td>
+          <span id="expand"><i class="fa fa-cubes" id="icon"></i> <span id="nameLabel"></span></span>
+          <div id="deletedError" class="text text-danger"></div>
+          <div id="otherInfo" class="help-block" style="display:none"></div>
+        </td>
+        <td>
+          <div style="width: 102px;display:none;" id="btns">
+            <div class="btn-group" role="group" style="padding-left: 15px">
+              <a class="btn btn-default nohover" id="editBtn"><i class="fa fa-pencil"></i></a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2"><div id="main" style="display:none"></div></td>
+      </tr>
+    </table>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'complex-material-label',
+
+    ready : function() {
+      this.editUnitsTimer = -1;
+      this.firstRender = true;
+
+      this.data = {
+        name : '[Not Set]',
+        materials : {},
+        price : 0,
+        units : ''
+      };
+
+      $(this).hover(function(){
+        $(this).find('.nohover').removeClass('nohover');
+      },function(){
+        $(this).find('.btn-group > .btn').addClass('nohover');
+      });
+
+      $(this.$.expand).on('click',function() {
+        $(this.$.main).toggle();
+        $(this.$.btns).toggle();
+        $(this.$.otherInfo).toggle();
+        $(this).toggleClass('open');
+
+        if( this.firstRender ) {
+          this.firstRender = false;
+          this.rerender();
+        }
+      }.bind(this));
+    },
+
+    onMaterialUpdate : function(material) {
+      this.material = material;
+      if( !this.material ) return;
+
+      this.$.editBtn.setAttribute('href','#budget/materials/'+encodeURIComponent(this.material.getName()));
+
+      var otherInfo = '';
+      if( this.material.getAuthority() ) {
+        otherInfo +='<i class="fa fa-shield"></i> '+this.material.getAuthority();
+      }
+      if( this.material.getLocality() ) {
+        if( this.material.getAuthority() ) {
+          otherInfo += ' | ';
+        }
+        otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.getLocality().join(', ')+'</span>';
+      }
+      this.$.otherInfo.innerHTML = otherInfo;
+      this.render(this.renderType);
+    },
+
+    rerender : function() {
+      this.render(this.renderType);
+    },
+
+    // render display. type
+    render : function(type) {
+      this.renderType = type;
+      this.$.nameLabel.innerHTML = '<b>'+this.material.getName()+'</b> ';
+
+      var table = '<table class="table">';
+      var requireMaterials = this.material.getRequiredMaterials();
+      var materialErrors = this.material.getErrors().materials || {};
+
+
+      for( var materialName in requireMaterials ) {
+        var impl = requireMaterials[materialName];
+        var material = SDK.getMaterial(materialName);
+
+        table +=
+          '<tr>' +
+            '<td style="text-overflow:ellipsis; white-space: nowrap; overflow:hidden"><i class="fa fa-cube'+(material.getType() === 'complex' ? 's' : '')+'"> '+
+              materialName+
+              (material.hasErrors()  ? '<br /><span class="text text-danger">Has Errors</span>' : '')+
+              ( materialErrors[materialName] ? '<br /><span class="text text-danger">'+materialErrors[materialName].join('<br />')+'</span>' : '')+
+            '</td>'+
+            '<td style="white-space: nowrap">'+
+              impl.amount+this.wrapUnits(impl.units)+' x '+material.getPrice().toFixed(2)+this.wrapUnits(material.getUnits(), true)+
+            '</td>'+
+            '<td>'+
+              (impl.price !== undefined ? impl.price.toFixed(2) : 0)+
+            '</td>' +
+           '</tr>';
+      }
+
+      table += '</table>'
+      table +=
+       '<div style="text-align:right">'+
+        '<ahb-dollar-label value="'+this.material.getPrice()+'"></ahb-dollar-label> / '+this.material.getUnits();
+      '</div>';
+
+      this.$.main.innerHTML = table;
+      this.checkError();
+    },
+
+    wrapUnits : function(units, simplify) {
+      if( simplify ) {
+        units = SDK.units.cleanDollars(units || '');
+        if( units === '1' || units === '1/1' ) {
+          return '';
+        }
+      }
+
+      return '<span class="label label-default">'+units+'</span>';
+    },
+
+    checkError : function() {
+      if( !this.material ) return;
+      this.$.deletedError.innerHTML = '';
+
+
+      if( !this.material.hasErrors() ) {
+        this.error = false;
+        this.$.icon.className = 'fa fa-cubes';
+        this.$.icon.style.color = '';
+        return;
+      }
+
+      this.setError();
+    },
+
+    setError : function() {
+      this.$.icon.className = 'fa fa-warning';
+      this.$.icon.style.color = 'red';
+      this.error = true;
+    },
+
+    getPriceLabel : function() {
+      return '<div class="text text-success" style="text-align:center;padding-top:5px">$' +
+            this.material.getPrice().toFixed(2)  +
+            ' per '+SDK.units.getLabel(this.material.getUnits(), true)+'</div>';
+    },
+
+    renderError : function(err) {
+      return '<tr><td class="text text-danger">'+err.message+'</td><td style="white-space:nowrap">'+
+        (err.code === 3 ? '<a class="btn btn-link btn-find" material="'+err.name+'" location="'+this.material.getLocality().join(' ')+'"><i class="fa fa-search"></i></a> '+
+                          '<a class="btn btn-link btn-create" material="'+err.name+'"><i class="fa fa-plus-circle"></i></a>' : '')+
+        '</td></tr>';
+    }
+  });
+</script>

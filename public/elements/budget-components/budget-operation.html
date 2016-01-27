@@ -32,7 +32,11 @@
     <div class="row">
       <div class="col-sm-8">
         <h5>
-          <budget-operation-scheduler on-schedule-update="onScheduleUpdate" readonly$="{{readonly}}" id="schedule"></budget-operation-scheduler>
+          <budget-operation-scheduler
+            id="schedule"
+            on-schedule-update="onScheduleUpdate"
+            readonly$="{{readonly}}">
+          </budget-operation-scheduler>
         </h5>
       </div>
       <div class="col-sm-4">
@@ -62,7 +66,12 @@
         </div>
       </div>
 
-      <budget-materials-table id="materialTable" readonly$="{{readonly}}" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
+      <operation-materials-table
+        id="materialTable"
+        readonly$="{{readonly}}"
+        on-price-change="updateTotals"
+        on-delete="onMaterialDelete">
+      </operation-materials-table>
 
 
       <a class="btn btn-link" on-click="toggleAddition" id="sourceBtn"><i class="fa fa-shield"></i> Operation Authorities</a>
@@ -93,7 +102,9 @@
 
     ready : function() {
       this.firstScheduleEvent = true;
-      this.renderTimer = -1;
+
+      // buffer all renders
+      this.render = new SDK.app.UiBuffer(this._render, 100);
     },
 
     attached : function() {
@@ -117,21 +128,29 @@
       $(this.$.sources).toggle('show');
     },
 
-    // fired from operation controller
+    // fired from operation controller, so just raw data object passed
     onOperationUpdate : function(operation) {
       if( !this.operation ) return;
-      if( operation.name != this.operation.name ) return;
+      if( operation.name != this.operation.getName() ) return;
 
       this.render();
     },
 
+    // does the updated material effect this operation?
     onMaterialUpdate : function(e) {
       if( !this.operation ) return;
-      if( !this.operation.materials ) return;
 
-      for( var i = 0; i < this.operation.materials.length; i++ ) {
-        var m = SDK.controllers.material.get(this.operation.materials[i].name);
-        if( m.error ) continue;
+      var materials = this.operation.getRequiredMaterials();
+      if( materials.length === 0 ) return;
+
+      for( var i = 0; i < materials.length; i++ ) {
+        // using raw data access as we only care about name and type
+        var m;
+        try {
+          m = SDK.controllers.material.get(materials[i].name);
+        } catch(e) {
+          continue;
+        }
 
         if( SDK.controllers.material.contains(m, e.material.name, e.replaced) ) {
           this.render();
@@ -146,15 +165,15 @@
 
       // TODO: the operation scheduler should really have the operation class
       // and interact with the classes api, no this anymore...
-      this.operation.data.schedule = e.detail;
-      this.operation.update();
+      // this.operation.data.schedule = e.detail;
+      // this.operation.update();
 
       this.updateTotals();
     },
 
     update : function() {
-      this.operation = SDK.getBudget().getOperation(this.operationname);
-      this.$.schedule.set(this.operation.getSchedule(), this.operation.getName(), this.readonly);
+      this.operation = SDK.getBudget().getOperation(this.operation.getName());
+      this.$.schedule.set(this.operation, this.readonly);
       this.render();
     },
 
@@ -169,39 +188,10 @@
     },
 
     checkError : function() {
-      var data = SDK.controllers.operation.get(this.operation.getName());
-
-      for( var i = 0; i < data.materials.length; i++ ) {
-        if( data.materials[i].error ) {
-          this.showError(true);
-          return;
-        }
-
-        var m = SDK.controllers.material.get(data.materials[i].name);
-        if (m.recalcErrors && m.recalcErrors.length > 0) {
-          this.showError(true);
-          return;
-        }
-
-        if (m.deleted) {
-          this.showError(true);
-          return;
-        }
-      }
-      this.showError(false);
-    },
-
-    render : function() {
-      if( this.renderTimer != -1 ) clearTimeout(this.renderTimer);
-      this.renderTimer = setTimeout(function(){
-        this.renderTimer = -1;
-        this._render();
-      }.bind(this), 100);
+      this.showError(this.operation.hasErrors() || this.operation.isDeleted());
     },
 
     _render : function() {
-      if( !this.$.materialTable.setMaterials ) return;
-
       this.$.nameLabel.innerHTML = this.operation.getName();
 
       var materials = this.operation.getRequiredMaterials();
@@ -211,7 +201,8 @@
         return;
       }
 
-      this.$.materialTable.setMaterials(this.operation.data, {isOperation : true});
+      this.$.materialTable.update(this.operation);
+
       this.updateTotals();
       this.checkError();
       this.updateSources();
@@ -223,10 +214,11 @@
 
       var materials = this.operation.getRequiredMaterials();
       for( var i = 0; i < materials.length; i++ ) {
-        var m = SDK.controllers.material.get(materials[i].name);
-        if( m.error || !m.authority || !m.locality ) continue;
+        var m = SDK.getMaterial(materials[i].name);
 
-        var key = m.authority+m.locality.join('');
+        if( !m.exists() || !m.getAuthority() || !m.getLocality().length === 0 ) continue;
+
+        var key = m.getAuthority()+m.getLocality().join('');
         if( hash[key] ) {
           hash[key].push(m);
         } else {
@@ -243,13 +235,17 @@
         if( hash[key].length != c ) {
           materials = [];
           for( var i = 0; i < hash[key].length; i++ ) {
-            materials.push('<a href="'+SDK.app.getMaterialLink(hash[key][i].name)+'">'+SDK.app.getMaterialIconHTML(hash[key][i].type)+' '+hash[key][i].name+'</a>');
+            materials.push(
+              '<a href="' + SDK.app.getMaterialLink(hash[key][i].getName())+'">' +
+              SDK.app.getMaterialIconHTML(hash[key][i].getType()) +
+              ' '+hash[key][i].getName()+'</a>'
+            );
           }
           materials = materials.join(',&nbsp;&nbsp;');
         }
 
-        html += '<tr><td style="white-space:nowrap">'+hash[key][0].authority+
-          '</td><td style="white-space:nowrap;text-transform:capitalize">'+hash[key][0].locality.join(', ')+
+        html += '<tr><td style="white-space:nowrap">'+hash[key][0].getAuthority()+
+          '</td><td style="white-space:nowrap;text-transform:capitalize">'+hash[key][0].getLocality().join(', ')+
           '</td><td>'+materials+'</td></tr>';
       }
 
@@ -257,7 +253,7 @@
     },
 
     updateTotals : function() {
-      var scheduled = this.operation.getSchedule() ? this.operation.getSchedule().length : 0;
+      var scheduled = this.operation.getSchedule().length;
 
       var result = this.operation.getTotal();
       $(this.$.total).attr('value', result.total);
@@ -265,33 +261,28 @@
       $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
     },
 
+    // TODO: use API class
     onMaterialDelete : function(e) {
       SDK.controllers.operation.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
     onMaterialSelect : function(e) {
-      var materialDef = e.detail;
+      var material = new SDK.Material(e.detail);
 
       var units;
-      if( materialDef.type == 'complex' ) {
-        units = materialDef.units;
+      if( material.getType() == 'complex' ) {
+        units = material.getUnits();
       } else {
-        units = SDK.units.invert(materialDef.units);
+        units = SDK.units.invert(material.getUnits());
       }
 
-      SDK.controllers.operation.addUpdateMaterial(
-        this.operation,
-        {
-          id : materialDef.id,
-          name : materialDef.name,
-          amount : 1,
-          units : units
-        }
-      );
-
-      SDK.controllers.operation.add(this.operation, {replace: true});
-      this.render();
+      this.operation.updateRequiredMaterial({
+        id : material.id,
+        name : material.name,
+        amount : 1,
+        units : units
+      });
     },
 
     toggleContent : function() {

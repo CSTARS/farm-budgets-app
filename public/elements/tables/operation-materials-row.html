@@ -1,0 +1,64 @@
+<dom-module id="operation-materials-row">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <tr id="row">
+      <td>
+        <material-label id="label" material$="{{mname}}"></material-label>
+      </td>
+      <td style="padding: 0 3px">
+        <input type="text" class="form-control" value="{{notes}}" disabled="{{readonly}}" placeholder="Notes"/>
+      </td>
+      <td style="padding: 0 3px">
+        <input type="number" class="form-control" value="{{amount}}" disabled="{{readonly}}" placeholder="Amount"/>
+      </td>
+      <td>
+        <budget-unit-selector units="{{units}}" disabled="{{readonly}}"></budget-unit-selector>
+      </td>
+      <td>{{price}}</td>
+      <td><ahb-dollar-label value="{{total}}"></ahb-dollar-label></td>
+      <td>
+        <a class="btn btn-link"><i class="fa fa-trash"></i></a>
+      </td>
+    </tr>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'operation-materials-row',
+
+      ready : function() {
+        this.mname = '';
+        this.notes = '';
+        this.units = '';
+        this.readonly = false;
+        this.amount = 0;
+        this.price = 0;
+        this.total = 0;
+      },
+
+      create : function(options) {
+        this.removeChild(this.$.row);
+        options.table.appendChild(this.$.row);
+        this.impl = options.impl;
+        this.readonly = options.readonly;
+        this.update();
+      },
+
+      update : function() {
+        var material = SDK.getMaterial(this.impl.name);
+        this.mname = this.impl.name;
+        this.notes = this.impl.notes || '';
+        this.amount = this.impl.amount || 0;
+        this.units = this.impl.units || '';
+        this.price = (material.getPrice().toFixed(2) || 0)+' '+(material.getUnits() || '');
+        this.total = this.impl.price || 0;
+      }
+
+    });
+  </script>
+</dom-module>

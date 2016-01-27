@@ -1,0 +1,141 @@
+<dom-module id="simple-material-label">
+  <style>
+    :host {
+      display: inline-block;
+    }
+    #label {
+      white-space: nowrap;
+    }
+    #label:hover {
+      color: #2196f3;
+    }
+    :host.open {
+      background-color: white;
+      position: absolute;
+      z-index: 100;
+      box-shadow: 0 0 15px #ccc;
+      top: -10px;
+      padding: 5px
+    }
+  </style>
+
+  <template>
+    <div id="label" style="cursor:pointer" on-click="toggle">
+      <b><i class="fa fa-cube" id="icon"></i> <span id="nameLabel"></span></b>
+      <span id="forLabel"></span>
+
+
+    </div>
+    <div id="error" class="text text-danger"></div>
+    <div id="price" style="white-space: nowrap">
+      <div id="otherInfo" class="help-block"></div>
+      <span id="priceLabel"></span>
+      <span id="unitLabel"></span>
+      <a class="btn btn-link" id="edit"><i class="fa fa-edit"></i></a>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'simple-material-label',
+
+    properties : {
+      showPrice : {
+        type : Boolean,
+        observer : 'render',
+        value : false
+      }
+    },
+
+    ready : function() {
+      this.currentstate = null;
+    },
+
+    onMaterialUpdate : function(material) {
+      this.material = material;
+      this.render();
+    },
+
+    render : function() {
+      if( !this.material ) return;
+      this.updatePrice();
+      this.showError();
+
+      this.$.forLabel.innerHTML = '';
+      this.$.edit.href = '#budget/materials/'+encodeURIComponent(this.material.name);
+
+      if( this.showError() ) {
+        return;
+      }
+
+      var otherInfo = '';
+      if( this.material.getAuthority() ) {
+        otherInfo += '<i class="fa fa-shield"></i> ' + this.material.getAuthority();
+      }
+
+      if( this.material.getLocality().length > 0 ) {
+        if( this.material.getAuthority() ) {
+          otherInfo += ' | ';
+        }
+        otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.getLocality().join(', ')+'</span>';
+      }
+      this.$.otherInfo.innerHTML = otherInfo;
+
+      if( this.material.isFixed() ) {
+        this.$.edit.style.display = 'none';
+        this.$.nameLabel.innerHTML = this.material.getName()+' <span class="label label-warning">Fixed</span>';
+      } else {
+        this.$.edit.style.display = 'inline-block';
+        this.$.nameLabel.innerHTML = this.material.getName();
+      }
+
+      this.$.priceLabel.innerHTML = this.material.getPrice();
+      this.$.unitLabel.innerHTML = SDK.units.getLabel(this.material.getUnits(), true);
+    },
+
+
+    showError : function(err) {
+      var result = this.material.getErrors();
+
+      if( result.errors.length === 0 ) {
+        this.$.error.style.display = 'none';
+        this.$.label.style.display = 'block';
+        return false;
+      }
+
+      var msg = '<i class="fa fa-warning"></i> '+this.material.getName()+'<br />';
+      msg += ' - '+result.errors.join('<br /> - ');
+
+      this.$.error.style.display = 'block';
+      this.$.label.style.display = 'none';
+      this.$.error.innerHTML = msg;
+
+      /* TODO
+        if( err.code === 3 ) {
+          var a = $('<a class="btn btn-link"><i class="fa fa-circle-plus"></i></a>');
+          a.on('click', function(){
+            document.querySelector('budget-material-popup').create(err.name);
+          });
+          $(this.$.error).append(a);
+        }
+      */
+
+      return true;
+    },
+
+    toggle : function() {
+      this.showPrice = !this.showPrice;
+
+      if( this.showPrice ) this.classList.add('open');
+      else this.classList.remove('open');
+
+      this.updatePrice();
+    },
+
+    updatePrice : function() {
+      if( this.showPrice ) this.$.price.style.display = 'block';
+      else this.$.price.style.display = 'none';
+    }
+  });
+</script>
