@@ -2,7 +2,6 @@
 
 var express = require('express');
 var kraken = require('kraken-js');
-var merge = require('merge-util');
 var fs = require('fs');
 var mongo = require('./lib/mongo');
 

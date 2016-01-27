@@ -21,6 +21,7 @@
     "construx": "^1.0.0",
     "construx-copier": "^1.0.0",
     "construx-dustjs": "^1.0.0",
+    "cors": "^2.7.1",
     "deep-diff": "^0.3.3",
     "express": "^4.12.2",
     "express-auth": "ucd-cws/express-auth",

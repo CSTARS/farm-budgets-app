@@ -1,5 +1,6 @@
 'use strict';
 
+var cors = require('cors');
 var async = require('async');
 var authUtils = require('../auth');
 var db = require('../../lib/mongo').get();
@@ -11,7 +12,7 @@ var collection = db.collection('material');
 module.exports = function (router) {
     model = new MaterialModel();
 
-    router.get('/hasRequired', function (req, res) {
+    router.get('/hasRequired', cors(), function (req, res) {
       model.hasRequired(req.query.id, function(err, checklist){
         if( err ) {
           return res.send({error:true, message: err});
@@ -21,7 +22,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/get', function (req, res) {
+    router.get('/get', cors(), function (req, res) {
       model.get(req.query.id, function(err, material){
         if( err ) {
           return res.send({error:true, message: err});
@@ -41,7 +42,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/search', function (req, res) {
+    router.get('/search', cors(), function (req, res) {
       var query = {};
       try {
         if( req.query.query ) {
@@ -87,7 +88,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/suggest', function (req, res) {
+    router.get('/suggest', cors(), function (req, res) {
       var text = req.query.q || '';
       model.nameSuggest(text, function(err, resp){
         if( err ) {
