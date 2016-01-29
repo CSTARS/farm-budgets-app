@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "async": "^1.4.2",
+    "cors": "^2.7.1",
     "deep-diff": "^0.3.3",
     "express": "^4.12.2",
     "express-auth": "ucd-cws/express-auth",

@@ -104,7 +104,7 @@
       this.firstScheduleEvent = true;
 
       // buffer all renders
-      this.render = new SDK.app.UiBuffer(this._render, 100);
+      this.render = new SDK.app.UiBuffer(this._render.bind(this), 100);
     },
 
     attached : function() {
@@ -172,8 +172,16 @@
     },
 
     update : function() {
-      this.operation = SDK.getBudget().getOperation(this.operation.getName());
-      this.$.schedule.set(this.operation, this.readonly);
+      var operations = SDK.getBudget().getOperation();
+      var index = 0;
+      for( ; index < operations.length; index++ ) {
+        if( operations[index].getName() === this.operationname ) {
+          this.operation = operations[index];
+          break;
+        }
+      }
+
+      this.$.schedule.set(index);
       this.render();
     },
 
@@ -192,6 +200,8 @@
     },
 
     _render : function() {
+      if( !this.operation ) return;
+
       this.$.nameLabel.innerHTML = this.operation.getName();
 
       var materials = this.operation.getRequiredMaterials();

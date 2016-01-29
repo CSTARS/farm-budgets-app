@@ -11,18 +11,18 @@
         <material-label id="label" material$="{{mname}}"></material-label>
       </td>
       <td style="padding: 0 3px">
-        <input type="text" class="form-control" value="{{notes}}" disabled="{{readonly}}" placeholder="Notes"/>
+        <input type="text" class="form-control" value="{{note}}" disabled="{{readonly}}" placeholder="Notes" on-change="setNote"/>
       </td>
       <td style="padding: 0 3px">
-        <input type="number" class="form-control" value="{{amount}}" disabled="{{readonly}}" placeholder="Amount"/>
+        <input type="number" class="form-control" value="{{amount}}" disabled="{{readonly}}" placeholder="Amount" on-change="setAmount"/>
       </td>
       <td>
-        <budget-unit-selector units="{{units}}" disabled="{{readonly}}"></budget-unit-selector>
+        <budget-unit-selector units="{{units}}" disabled="{{readonly}}" on-units-change="setUnits"></budget-unit-selector>
       </td>
       <td>{{price}}</td>
       <td><ahb-dollar-label value="{{total}}"></ahb-dollar-label></td>
       <td>
-        <a class="btn btn-link"><i class="fa fa-trash"></i></a>
+        <a class="btn btn-link" on-click="remove"><i class="fa fa-trash"></i></a>
       </td>
     </tr>
 
@@ -45,6 +45,7 @@
         this.removeChild(this.$.row);
         options.table.appendChild(this.$.row);
         this.impl = options.impl;
+        this.operation = options.operation;
         this.readonly = options.readonly;
         this.update();
       },
@@ -52,11 +53,30 @@
       update : function() {
         var material = SDK.getMaterial(this.impl.name);
         this.mname = this.impl.name;
-        this.notes = this.impl.notes || '';
+        this.note = this.impl.note || '';
         this.amount = this.impl.amount || 0;
         this.units = this.impl.units || '';
         this.price = (material.getPrice().toFixed(2) || 0)+' '+(material.getUnits() || '');
         this.total = this.impl.price || 0;
+      },
+
+      setNote : function(e) {
+        this.impl.note = e.currentTarget.value;
+        this.operation.updateRequiredMaterial(this.impl);
+      },
+
+      setAmount : function(e) {
+        this.impl.amount = parseInt(e.currentTarget.value);
+        this.operation.updateRequiredMaterial(this.impl);
+      },
+
+      setUnits : function(e) {
+        this.impl.units = e.value;
+        this.operation.updateRequiredMaterial(this.impl);
+      },
+
+      remove : function() {
+        this.operation.removeRequiredMaterial(this.impl.id);
       }
 
     });

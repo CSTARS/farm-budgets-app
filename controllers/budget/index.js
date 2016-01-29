@@ -1,5 +1,6 @@
 'use strict';
 
+var cors = require('cors');
 var db = require('../../lib/mongo').get();
 var authUtils = require('../auth');
 var BudgetModel = require('../../models/budget');
@@ -11,7 +12,7 @@ var collection = db.collection('budget');
 module.exports = function (router) {
     model = new BudgetModel();
 
-    router.get('/get', function (req, res) {
+    router.get('/get', cors(), function (req, res) {
       var id = req.query.id;
 
       model.get(id, function(err, budget){
@@ -31,7 +32,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/uses', function (req, res) {
+    router.get('/uses', cors(), function (req, res) {
       var materialId = req.query.material;
       if( !materialId ) {
         return res.send({error: true, message: 'material id required'});
@@ -45,7 +46,7 @@ module.exports = function (router) {
       });
     });
 
-    router.get('/search', function (req, res) {
+    router.get('/search', cors(), function (req, res) {
       var query = {};
       try {
         if( req.query.query ) {
@@ -115,47 +116,6 @@ module.exports = function (router) {
             res.send(resp);
           });
         });
-      });
-    });
-
-    // TODO: remove
-    router.get('/find', function (req, res) {
-
-      var query = req.query.query || '';
-
-      if( query !== '' ) {
-        try {
-          query = JSON.parse(query);
-        } catch(e) {
-          return errorHandler('Query should by JSON formatted', res);
-        }
-      }
-
-      model.find(query, function(err, budget){
-        if( err ) {
-          return errorHandler(err, res);
-        }
-        res.send(budget);
-      });
-    });
-
-    router.get('/findCount', function (req, res) {
-
-      var query = req.query.query || '';
-
-      if( query !== '' ) {
-        try {
-          query = JSON.parse(query);
-        } catch(e) {
-          return errorHandler('Query should by JSON formatted', res);
-        }
-      }
-
-      model.findCount(query, function(err, budget){
-        if( err ) {
-          return errorHandler(err, res);
-        }
-        res.send(budget);
       });
     });
 

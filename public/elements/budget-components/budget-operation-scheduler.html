@@ -31,7 +31,16 @@
     </div>
 
     <div id="inputPanel">
-      <h5 class="page-header" style="text-align:center; margin-top: 0px" >{{operationName}}</h5>
+      <h5 class="page-header" style="margin-top: 0px" >
+        <div class="layout horizontal">
+          <div>
+            <!--<a class="btn btn-default" id="previous" on-click="previous"><i class="fa fa-arrow-left"></i></a>-->
+          </div>
+          <div class="flex" style="text-align:center">{{operationName}}</div>
+          <div>
+            <!--<a class="btn btn-default" id="next" on-click="next"><i class="fa fa-arrow-right"></i></a>-->
+          </div>
+      </h5>
 
       <div class="form-horizontal">
 
@@ -50,12 +59,17 @@
 
                     <div class="length-label">Length:</div>
                     <div hidden$="{{readonly}}">
-                      <input type="number" value="{{item.length::change}}" class="form-control" on-change="onLengthUpdate" style="max-width: 75px; margin-right: 5px" />
+                      <input type="number"
+                        value="{{item.length::change}}"
+                        class="form-control"
+                        on-change="onLengthUpdate"
+                        index$="{{index}}"
+                        style="max-width: 75px; margin-right: 5px" />
                     </div>
                     <div hidden$="{{!readonly}}" style="padding: 10px">{{item.length}}</div>
 
                     <div hidden$="{{readonly}}">
-                      <select value="{{item.units::change}}" class="form-control" on-change="onLengthUpdate">
+                      <select value="{{item.units::change}}" class="form-control" on-change="onLengthUpdate" index$="{{index}}">
                         <option value="day">Day(s)</option>
                         <option value="month">Month(s)</option>
                         <option value="year">Year(s)</option>
@@ -76,7 +90,7 @@
         </div>
       </div> <!-- end form -->
 
-      <div id="chart" style="height:100px"></div>
+      <div id="chart"></div>
 
     </div> <!-- end input panel -->
   </template>
@@ -98,7 +112,7 @@
     ready : function() {
       this.displayText = '';
       this.dateRangeText = '';
-
+      this.index = 0;
       this.data = [];
       this.dates = [];
 
@@ -125,8 +139,24 @@
       this.removeChild(this.$.inputPanel);
     },
 
-    set : function(operation) {
-      this.operation = operation;
+    previous : function() {
+      if( this.index === 0 ) return;
+      this.index--;
+      this.set(this.index);
+    },
+
+    next : function() {
+      if( this.index === this.operations.length ) return;
+      this.index++;
+      this.set(this.index);
+    },
+
+    set : function(index) {
+      this.operations = SDK.getBudget().getOperation();
+      this.index = index;
+
+      this.operation = this.operations[index];
+      this.operationName = this.operation.getName();
 
       if( this.readonly ) {
         this.$.inputLabel.style.display = 'none';
@@ -136,6 +166,13 @@
         this.$.inputRoot.style.display = 'block';
       }
 
+/*
+      if( index === 0 ) this.$.previous.setAttribute('disabled', 'disabled');
+      else this.$.previous.removeAttribute('disabled');
+
+      if( index === this.operations.length - 1 ) this.$.next.setAttribute('disabled', 'disabled');
+      else this.$.next.removeAttribute('disabled');
+*/
       this.copyDataArray();
 
       this.update(true);
@@ -172,21 +209,32 @@
       this.uiDatesArray = ui;
     },
 
-    onLengthUpdate : function() {
+    onLengthUpdate : function(e) {
+      var index = parseInt(e.currentTarget.getAttribute('index'));
+
+      this.operation.schedule({
+        index : index,
+        date : this.uiDatesArray[index].date,
+        length : parseInt(this.uiDatesArray[index].length),
+        units : this.uiDatesArray[index].units
+      });
+
       this.update();
     },
 
     update : function(noEvent) {
-      this.$.dates.style.display = 'block';
-      this.displayText = ' x'+this.dates.length;
+      if( !this.operation ) return;
 
       this.copyDataArray();
+
+      this.$.dates.style.display = 'block';
+      this.displayText = ' x'+this.uiDatesArray.length;
 
       if( this.uiDatesArray.length > 1 ) {
         this.dateRangeText =
           this.uiDatesArray[0].date.toDateString() +
           ' <i class="fa fa-long-arrow-right"></i> ' +
-          this.uiDatesArray[this.uiDatesArray.length-1].uiDatesArray.toDateString();
+          this.uiDatesArray[this.uiDatesArray.length-1].date.toDateString();
       } else if( this.dates.length == 1 ) {
         this.dateRangeText = this.toDateString(this.uiDatesArray[0]).date;
       } else {
@@ -255,7 +303,7 @@
 
     removeDate : function(e) {
       var index = parseInt(e.currentTarget.getAttribute('index'));
-      this.schedule.unschedule(index);
+      this.operation.unschedule(index);
       this.update();
     },
 
@@ -266,7 +314,7 @@
         '</div>'+
         '<div><a class="btn btn-primary" disabled><i class="fa fa-plus"></i></a></div>'+
       '</div>');
-      
+
       $(this.$.inputRoot).html('').append(input);
 
       var cDate = null;
@@ -294,13 +342,13 @@
         .on('click', function(){
           if( cDate == null ) return;
 
-          this.dates.push({
+          this.operation.schedule({
             date : cDate,
             length : 1,
-            units : 'month',
-            readonly : this.readonly
+            units : 'month'
           });
           this.update();
+
           $(this.$.datesInput).datepicker('hide');
         }.bind(this));
 
