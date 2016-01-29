@@ -49,6 +49,8 @@
       },
 
       update : function() {
+        if( this.material === '' ) return;
+
         this._material = SDK.getMaterial(this.material);
 
         if( this.type !== this._material.getType() ) {
@@ -57,8 +59,8 @@
           this.type = this._material.getType();
 
           if( !this._material.exists() ) {
-            var errors = this._material.getErrors().errors.join('<br />');
-            this.innerHTML = '<span class="text text-danger">'+errors+'</span>';
+            this.innerHTML = '<span class="text text-danger"><i class="fa fa-warning"></i> <b>' +
+              this._material.getName()+'</b> not found.</span> <i class="fa fa-search"></i>';
           } else if( this._material.getType() === 'complex' ) {
             this.ele = document.createElement('complex-material-label');
             this.appendChild(this.ele);

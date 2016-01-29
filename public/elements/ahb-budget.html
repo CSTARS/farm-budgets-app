@@ -1,7 +1,16 @@
 <dom-module id="ahb-budget">
   <template>
+    <!-- main budget panel -->
     <budget-sections id="sections"></budget-sections>
-    <budget-search-panel id="searchPanel" style="display:none" class="animated fadeIn" on-select="onBudgetSelect"></budget-search-panel>
+
+    <!-- find budget search panel -->
+    <budget-search-panel id="searchPanel"
+      style="display:none"
+      class="animated fadeIn"
+      on-select="onBudgetSelect">
+    </budget-search-panel>
+
+    <material-editor></material-editor>
   </template>
 </dom-module>
 

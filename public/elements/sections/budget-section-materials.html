@@ -46,7 +46,7 @@
     <h4 class="page-header">
       <div class="btn-group pull-right" style="margin-top:-10px" role="group">
         <a class="btn btn-primary" on-click="showCreate"><i class="fa fa-plus"></i> New</a>
-        <a class="btn btn-primary" on-click="import"><i class="fa fa-cloud-download"></i> Import</a>
+        <a class="btn btn-primary" href="#material/search"><i class="fa fa-cloud-download"></i> Import</a>
       </div>
 
       <i class="fa fa-cube"></i> Materials
@@ -100,10 +100,6 @@
 
     attached : function() {
       this.popup = document.querySelector('budget-material-popup');
-    },
-
-    import : function() {
-      document.querySelector('budget-import-material-popup').show();
     },
 
     onSaveStateUpdate : function(e) {

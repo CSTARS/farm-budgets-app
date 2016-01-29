@@ -7,7 +7,7 @@
     </style>
 
     <div class="padding: 0 %5">
-      <h4 class="page-header">Edit Material</h4>
+      <h4 class="page-header" id="title">Edit Material</h4>
 
       <div class="alert alert-warning" id="usedByMessage" style="display:none">
         <div>
@@ -127,47 +127,59 @@
     <div class="well">
       <div class="layout horizontal">
         <div class="flex">
-          <a class="btn btn-warning" on-click="undo">Undo Changes</a>
+          <a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a>
         </div>
         <div>
-          <a class="btn btn-default" on-click="cancel">Cancel</a>
+          <a class="btn btn-default" href="#material/search">Cancel</a>
           <a class="btn btn-primary" on-click="save">Save</a>
         </div>
       </div>
     </div>
+
+    <material-editor-new-required id="popup"></material-editor-new-required>
 
   </template>
   <script>
     Polymer({
       is: 'material-editor-form',
 
-      ready : function() {
-        this.requirePopup = document.querySelector('material-editor-new-required');
-        this.requirePopup.addEventListener('add', this.addRequiredMaterial.bind(this));
+      attached : function() {
+        this.$.popup.addEventListener('add', this.addRequiredMaterial.bind(this));
       },
 
-      edit : function(material) {
-        this.original = $.extend(true, {}, material);
-        this.material = material;
+      create : function() {
+        this.material = new SDK.Material();
+        this.$.title.innerHTML = 'Create Material';
+        this.$.undo.style.display = 'none';
+        this.setInputs();
+      },
 
-        this.$.nameInput.value = material.name;
-        this.$.descriptionInput.value = material.description || '';
-        this.$.priceInput.value = material.price || '';
+      edit : function(id) {
+        this.material = SDK.controllers.material.getById(id);
+        this.$.title.innerHTML = 'Edit Material';
+        this.$.undo.style.display = 'inline-block';
+        this.setInputs();
+      },
 
-        var units = material.units || '';
+      setInputs : function() {
+        this.$.nameInput.value = this.material.getName();
+        this.$.descriptionInput.value = this.material.getDescription();
+        this.$.priceInput.value = this.material.getPrice();
+
+        var units = this.material.getUnits();
         if( units && material.type === 'simple' ) {
           units = SDK.units.invert(units);
         }
 
         this.$.unitsInput.setUnits(units);
-        this.$.authorityInput.value = material.authority || '';
-        this.$.locationInput.setValue(material.locality || []);
-        this.$.yearInput.value = material.year || '';
-        this.$.sourceInput.value = material.source || '';
-        this.$.classInput.value = material.class || '';
+        this.$.authorityInput.value = this.material.getAuthority();
+        this.$.locationInput.setValue(this.material.getLocality());
+        this.$.yearInput.value = this.material.getYear() || '';
+        this.$.sourceInput.value = this.material.getSource() || '';
+        this.$.classInput.value = this.material.getClass() || '';
 
         this.renderComplex();
-        if( this.material.type === 'complex' ) {
+        if( this.material.getType() === 'complex' ) {
           this.renderMaterials();
         }
 
@@ -175,7 +187,7 @@
       },
 
       undo : function() {
-        this.edit(this.original);
+        this.edit(this.material.getId());
       },
 
       cancel : function() {
@@ -183,30 +195,24 @@
       },
 
       save : function() {
-        this.material.name = this.$.nameInput.value;
-        this.material.description = this.$.descriptionInput.value;
-        this.material.price = parseFloat(this.$.priceInput.value);
-        this.material.units = (this.material.type !== 'complex' ? 'us$/' : '') + this.$.unitsInput.getUnits();
-        this.material.authority = this.$.authorityInput.value;
-        this.material.locality = this.$.locationInput.value;
-        this.material.year = this.$.yearInput.value;
-        this.material.source = this.$.sourceInput.value;
-        this.material.class = this.$.classInput.value;
+        this.material.setName(this.$.nameInput.value);
+        this.material.setDescription(this.$.descriptionInput.value);
+        this.material.setPrice(parseFloat(this.$.priceInput.value));
+        this.material.setUnits((this.material.type !== 'complex' ? 'us$/' : '') + this.$.unitsInput.getUnits());
+        this.material.setAuthority(this.$.authorityInput.value);
+        this.material.setLocality(this.$.locationInput.value);
+        this.material.setYear(this.$.yearInput.value);
+        this.material.setSource(this.$.sourceInput.value);
+        this.material.setClass(this.$.classInput.value);
 
-        this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
-
-        if( !this.material.id ) {
-          this.material.id = SDK.utils.guid();
-        }
-
-        $.post('/materials/save', this.material, function(resp){
+        this.material.save(function(resp){
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
             this.fire('error', resp);
           }
-        }.bind(this));
 
-        this.fire('done', this.material);
+          this.fire('done', this.material);
+        }.bind(this));
       },
 
       addRequiredMaterial : function(e) {

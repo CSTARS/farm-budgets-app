@@ -60,19 +60,26 @@
         this.total = this.impl.price || 0;
       },
 
+      updateMaterial : function() {
+        try {
+          this.operation.updateRequiredMaterial(this.impl);
+        } catch(e) {}
+      },
+
       setNote : function(e) {
         this.impl.note = e.currentTarget.value;
-        this.operation.updateRequiredMaterial(this.impl);
+        this.updateMaterial();
       },
 
       setAmount : function(e) {
         this.impl.amount = parseInt(e.currentTarget.value);
-        this.operation.updateRequiredMaterial(this.impl);
+        this.updateMaterial();
       },
 
       setUnits : function(e) {
-        this.impl.units = e.value;
-        this.operation.updateRequiredMaterial(this.impl);
+        if( e.detail.value === undefined  || e.detail.error ) return;
+        this.impl.units = e.detail.value;
+        this.updateMaterial();
       },
 
       remove : function() {

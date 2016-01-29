@@ -1,0 +1,24 @@
+<link rel="import" href="material-editor-table.html">
+<link rel="import" href="material-editor-form.html">
+<link rel="import" href="material-editor-controller.html">
+<link rel="import" href="material-editor-new-required.html">
+<link rel="import" href="material-editor-delete-popup.html">
+
+<dom-module id="material-editor">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <material-editor-controller></material-editor-controller>
+    <material-editor-new-required></material-editor-new-required>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'material-editor'
+    });
+  </script>
+</dom-module>
