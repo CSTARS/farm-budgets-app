@@ -24,7 +24,7 @@
               <div><span class="label label-danger"><i class="fa fa-warning"></i> Deleted</span></div>
               <div class="text text-danger" style="font-size: 12px; line-height: 26px">This material has been deleted by it's owner.  Recommend replacing.</div>
             </div>
-            <a id="editIcon" class="btn btn-default btn-lg" style="margin-bottom: 5px" on-click="edit"><i class="fa fa-pencil"></i></a>
+            <a id="editIcon" class="btn btn-default btn-lg" style="margin-bottom: 5px"><i class="fa fa-pencil"></i></a>
             <div id="changesMessage" style="font-size:12px" class="text text-warning"></div>
           </div>
         </div>
@@ -98,6 +98,7 @@
         this.setAttribute('material-name', this.material.getName());
 
         this.$.icon.innerHTML = SDK.app.getMaterialIconHTML(this.material.getType());
+        this.$.editIcon.setAttribute('href', '#material/edit/'+this.material.getId());
         this.$.name.innerHTML = this.material.getName();
 
         if( this.material.isFixed() ) {

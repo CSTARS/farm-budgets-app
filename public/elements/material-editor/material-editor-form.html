@@ -6,9 +6,23 @@
       }
     </style>
 
-    <div class="padding: 0 %5">
-      <h4 class="page-header" id="title">Edit Material</h4>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 id="title">Edit Material</h4>
+      </div>
+      <div class="panel-body">
 
+
+
+
+    <ul class="nav nav-tabs nav-justified" style="margin-bottom: 15px" id="tabs">
+      <li class="active"><a href="#basic" data-toggle="tab">Basic Info</a></li>
+      <li><a href="#details" data-toggle="tab">Metadata</a></li>
+      <li><a href="#historytab" data-toggle="tab">History</a></li>
+    </ul>
+
+    <div class="tab-content">
+    <div id="basic" class="tab-pane fade in active">
       <div class="alert alert-warning" id="usedByMessage" style="display:none">
         <div>
           WARNING.  This material is used by <span id="usedCount"></span> other budget(s).  Any changes you make will affect
@@ -28,113 +42,124 @@
           </template>
         </div>
       </div>
-    </div>
 
-
-    <div class="form-horizontal">
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="nameInput" placeholder="Material Name">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="nameInput" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="nameInput" placeholder="Material Name">
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Description</label>
-        <div class="col-sm-10">
-          <textarea id="descriptionInput" class="form-control"></textarea>
+        <div class="form-group">
+          <label for="nameInput" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea id="descriptionInput" class="form-control"></textarea>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group" id="priceGroup">
-        <label for="priceInput" class="col-sm-2 control-label" id="priceLabel">Price</label>
-        <div class="col-sm-10">
-          <input type="number" id="priceInput" class="form-control" />
+        <div class="form-group" id="priceGroup">
+          <label for="priceInput" class="col-sm-2 control-label" id="priceLabel">Price</label>
+          <div class="col-sm-10">
+            <input type="number" id="priceInput" class="form-control" />
+          </div>
         </div>
-      </div>
 
-      <div class="form-group" id="unitsGroup">
-        <label for="unitsInput" class="col-sm-2 control-label">Units</label>
-        <div class="col-sm-10">
-          <div class="layout horizontal center">
-            <div>us$/</div>
-            <div class="flex">
-              <budget-unit-selector id="unitsInput" block></budget-unit-selector>
+        <div class="form-group" id="unitsGroup">
+          <label for="unitsInput" class="col-sm-2 control-label">Units</label>
+          <div class="col-sm-10">
+            <div class="layout horizontal center">
+              <div>us$/</div>
+              <div class="flex">
+                <budget-unit-selector id="unitsInput" block></budget-unit-selector>
+              </div>
+            </div>
+
+            <div id="unitsInputMsg"></div>
+          </div>
+        </div>
+
+        <div class="form-group" id="complexGroup">
+          <label class="col-sm-2 control-label"><i class="fa fa-cubes"></i></label>
+          <div class="col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="isComplexInput" on-click="toggleComplex"> Is complex material
+              </label>
+            </div>
+            <div class="help-block">This material requires other materials.</div>
+
+            <div id="complexPanel">
+              <div id="materialsList"></div>
             </div>
           </div>
-
-          <div id="unitsInputMsg"></div>
-        </div>
-      </div>
-
-      <div class="form-group" id="complexGroup">
-        <label class="col-sm-2 control-label"><i class="fa fa-cubes"></i></label>
-        <div class="col-sm-10">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" id="isComplexInput" on-click="toggleComplex"> Is complex material
-            </label>
-          </div>
-          <div class="help-block">This material requires other materials.</div>
-
-          <div id="complexPanel">
-            <div id="materialsList"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="authorityInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
-        <div class="col-sm-10">
-          <budget-authority-selector id="authorityInput" ></budget-authority-selector>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="locationInput" class="col-sm-2 control-label"><i class="fa fa-map-marker"></i> Location</label>
-        <div class="col-sm-10">
-          <budget-location-selector id="locationInput"></budget-location-selector>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="yearInput" class="col-sm-2 control-label"><i class="fa fa-hourglass-o"></i> Year</label>
-        <div class="col-sm-10">
-          <input type="number" id="yearInput" class="form-control"/>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="sourceInput" class="col-sm-2 control-label"><i class="fa fa-book"></i> Source</label>
-        <div class="col-sm-10">
-          <budget-markdown-input id="sourceInput"></budget-markdown-input>
-          <div class="help-block">Add any source (where the data came from) information for this material.
-            <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
-             is encouraged.  External links are encouraged.
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group" id="classGroup">
-        <label for="optionInput" class="col-sm-2 control-label">Class</label>
-        <div class="col-sm-10">
-          <budget-class-selector id="classInput"></budget-class-selector>
-        </div>
-      </div>
-
-    </div> <!-- end form -->
-
-    <div class="well">
-      <div class="layout horizontal">
-        <div class="flex">
-          <a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a>
-        </div>
-        <div>
-          <a class="btn btn-default" href="#material/search">Cancel</a>
-          <a class="btn btn-primary" on-click="save">Save</a>
         </div>
       </div>
     </div>
+
+      <div id="details" class="form-horizontal tab-pane fade in">
+
+        <div class="form-group">
+          <label for="authorityInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
+          <div class="col-sm-10">
+            <budget-authority-selector id="authorityInput" ></budget-authority-selector>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="locationInput" class="col-sm-2 control-label"><i class="fa fa-map-marker"></i> Location</label>
+          <div class="col-sm-10">
+            <budget-location-selector id="locationInput"></budget-location-selector>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="yearInput" class="col-sm-2 control-label"><i class="fa fa-hourglass-o"></i> Year</label>
+          <div class="col-sm-10">
+            <input type="number" id="yearInput" class="form-control"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="sourceInput" class="col-sm-2 control-label"><i class="fa fa-book"></i> Source</label>
+          <div class="col-sm-10">
+            <budget-markdown-input id="sourceInput"></budget-markdown-input>
+            <div class="help-block">Add any source (where the data came from) information for this material.
+              <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
+               is encouraged.  External links are encouraged.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="classGroup">
+          <label for="optionInput" class="col-sm-2 control-label">Class</label>
+          <div class="col-sm-10">
+            <budget-class-selector id="classInput"></budget-class-selector>
+          </div>
+        </div>
+
+      </div> <!-- end details -->
+
+      <div id="historytab" class="tab-pane fade in">
+        <budget-object-history id="history"></budget-object-history>
+      </div>
+    </div><!-- end tab-content -->
+
+  </div>
+
+  <div class="panel-footer">
+    <div class="layout horizontal">
+      <div class="flex">
+        <a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a>
+      </div>
+      <div>
+        <a class="btn btn-default" href="#material/search">Cancel</a>
+        <a class="btn btn-primary" on-click="save">Save</a>
+      </div>
+    </div>
+  </div>
+
+</div>
 
     <material-editor-new-required id="popup"></material-editor-new-required>
 
@@ -142,6 +167,17 @@
   <script>
     Polymer({
       is: 'material-editor-form',
+
+      ready : function() {
+        $(this).find('#tabs a').click(function (e) {
+          e.preventDefault()
+          $(this).tab('show');
+          if( e.currentTarget.getAttribute('href') === '#historytab' ) {
+            this.showHistory();
+          }
+        }.bind(this));
+      },
+
 
       attached : function() {
         this.$.popup.addEventListener('add', this.addRequiredMaterial.bind(this));
@@ -155,7 +191,22 @@
       },
 
       edit : function(id) {
-        this.material = SDK.controllers.material.getById(id);
+        try {
+          var m = SDK.controllers.material.getById(id);
+          this.material = new SDK.Material(m);
+          this.onEditReady();
+        } catch(e) {
+          SDK.materials.get(id, function(resp){
+            if( resp.error ) {
+              return alert(resp.message);
+            }
+            this.material = new SDK.Material(resp);
+            this.onEditReady();
+          }.bind(this));
+        }
+      },
+
+      onEditReady : function() {
         this.$.title.innerHTML = 'Edit Material';
         this.$.undo.style.display = 'inline-block';
         this.setInputs();
@@ -167,7 +218,7 @@
         this.$.priceInput.value = this.material.getPrice();
 
         var units = this.material.getUnits();
-        if( units && material.type === 'simple' ) {
+        if( units && this.material.getType() === 'simple' ) {
           units = SDK.units.invert(units);
         }
 
@@ -348,6 +399,10 @@
 
       toggleUses : function() {
         $(this.$.usesList).toggle('slow');
+      },
+
+      showHistory : function() {
+        this.$.history.show(this.material.getId());
       },
 
       goToBudget : function(e) {

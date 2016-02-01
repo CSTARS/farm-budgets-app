@@ -1,0 +1,174 @@
+<dom-module id="budget-material-info">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+      #loading {
+        text-align: center;
+        padding: 10px;
+        font-size: 22px;
+      }
+      #mainTable {
+        font-size: 22px;
+      }
+    </style>
+
+    <div id="loading">
+      <i class="fa fa-spinner fa-spin"></i>
+    </div>
+
+    <div id="loaded">
+      <h4 id="name" class="page-header" style="margin-top: 5px"></h4>
+
+      <div style="padding: 0 10px">
+        <div class="row">
+          <div class="col-sm-6">
+            <table id="mainTable">
+              <tr style="color: #888">
+                <td><i class="fa fa-map-marker"></i>&nbsp;</td>
+                <td id="locality" style="text-transform:capitalize"></td>
+              </tr>
+              <tr style="color: #888">
+                <td><i class="fa fa-shield"></i>&nbsp;</td>
+                <td id="authority"></td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-sm-6">
+            <div class="well" id="description"></div>
+          </div>
+        </div>
+
+        <table class="table" style="margin-top: 25px">
+          <tr id="yearRow">
+            <td><i class="fa fa-hourglass-o"></i> Year</td>
+            <td id="year"></td>
+          </tr>
+          <tr id="classRow">
+            <td>Class</td>
+            <td id="class"></td>
+          </tr>
+          <tr id="requiredRow">
+            <td>Required Materials</td>
+            <td id="required"></td>
+          </tr>
+        </table>
+
+        <div id="sourcePanel">
+          <h5 class="page-header">Source</h5>
+          <div id="sourceContent"></div>
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-info',
+
+      properties : {
+        // should be the material id
+        material : {
+          type : 'string',
+          value : function() {
+            return ''
+          },
+          observer : 'update'
+        }
+      },
+
+      ready : function() {
+        this.showing = false;
+      },
+
+      show : function() {
+        this.showing = true;
+        this.style.display = 'block';
+        this.update();
+      },
+
+      hide : function() {
+        this.style.display = 'none';
+        this.showing = false;
+      },
+
+      update : function() {
+        if( !this.material ) return;
+        if( !this.showing ) return;
+
+        //if( this._material && this.material === this._material.getId() ) {
+        //  return;
+        //}
+
+        try {
+          this._material = SDK.controllers.material.getById(this.material);
+          this.render();
+          return;
+        } catch(e) {}
+
+        this.loading(true);
+        SDK.materials.get(this.material, function(resp){
+          this.loading(false);
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+
+          this._material = new SDK.Material(resp);
+          this.render();
+        }.bind(this));
+      },
+
+      render : function() {
+        var m = this._material;
+        this.$.name.innerHTML =
+            '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +
+            m.getName()+
+            (m.getType() === 'simple' ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '');
+
+        this.$.description.innerHTML = m.getDescription();
+        this.$.description.style.display = m.getDescription() ? 'block' : 'none';
+
+        this.$.locality.innerHTML = m.getLocality().join(', ');
+        this.$.authority.innerHTML = m.getAuthority();
+        this.$.class.innerHTML = m.getClass();
+
+        if( m.getSource() ) {
+          this.$.sourcePanel.style.display = 'block';
+          this.$.sourceContent.innerHTML = marked(m.getSource());
+        } else {
+          this.$.sourcePanel.style.display = 'none';
+        }
+
+        if( m.getType() === 'simple' ) {
+          this.$.year.innerHTML = m.getYear() || '';
+          this.$.requiredRow.style.display = 'none';
+        } else {
+          this.$.yearRow.style.display = 'none';
+          this.$.requiredRow.style.display = 'table-row';
+
+          var unique = m.getUniqueMaterials();
+          var materials = m.getRequiredMaterials();
+          var list = '<ul class="list-group">';
+          for( var key in materials ) {
+            var rm = materials[key];
+            list += '<li class="list-group-item">' + rm.amount +
+                      ' <span class="label label-default">'+rm.units+'</span> of '+
+                      '<b>'+key+'</b>'+
+                      (unique[key] ? '*' : '')+'</li>';
+          }
+          list += '</ul>';
+          if( Object.keys(unique).length > 0 ) {
+            list += '<div class="help-block">*Unique Material</div>';
+          }
+          this.$.required.innerHTML = list;
+        }
+      },
+
+      loading : function(loading) {
+        this.$.loading.style.display = loading ? 'block' : 'none';
+        this.$.loaded.style.display = !loading ? 'block' : 'none';
+      }
+    });
+  </script>
+</dom-module>

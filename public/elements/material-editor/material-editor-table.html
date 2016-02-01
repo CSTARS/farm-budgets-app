@@ -68,8 +68,9 @@
         this.authorityFilters = [];
         this.itemsPerPage = 10;
         this.page = 0;
+        this.q = {};
 
-        this.setEmptyQuery();
+        //this.setEmptyQuery();
 
         this.queryTimer = -1;
       },
@@ -172,24 +173,34 @@
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
           '<th><i class="fa fa-dollar"></i> Price</th>'+
           '<th><i class="fa fa-hourglass-o"></i> Year</th>'+
-          '<th>Class</th>'+
-          '<th># Required</th>'+
-          '<th># Unique</th>'+
-          '<th>Edit</th>'+
+          '<th></th>'+
         '</tr>';
 
         for( var i = 0; i < this.results.length; i++ ) {
           var m = this.results[i];
+          var hasAccess = SDK.app.hasAccess(m);
+
+          var idInBudget = false;
+          var nameInBudget = SDK.getMaterial(m.name).exists();
+          try {
+            SDK.controllers.material.getById(m.id);
+            idInBudget = true;
+          } catch(e) {}
+
+
+
           html += '<tr>';
 
           // row selector
-          html += '<td><input type="checkbox" index="'+i+'" /></td>';
+          if( hasAccess ) {
+            html += '<td><input type="checkbox" index="'+i+'" /></td>';
+          }
 
           // set row icon
           html += '<td><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"</td>';
 
           // set row name
-          html += '<td>'+m.name+'</td>';
+          html += '<td>'+m.name+(idInBudget ? '<a class="popover-item text text-success" tabindex="0" role="button" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="Used in current budget."><i class="fa fa-check"></i></a>' : '')+'</td>';
 
           // set authority
           html += '<td>'+m.authority+'</td>';
@@ -197,43 +208,65 @@
           // set locality
           html += '<td>'+m.locality.join(', ')+'</td>';
 
-          // set authority
+          // set price
           html += '<td>'+(m.price !== undefined ? '$'+m.price.toFixed(2) : '')+'</td>';
 
           // set year
-          html += '<td>'+(m.year || '')+'</td>';
+          console.log(m.year);
+          html += '<td>'+(m.year !== undefined ? m.year : '')+'</td>';
 
-          // set class
-          html += '<td>'+(m.class || '')+'</td>';
+          html += '<td style="text-align:right">';
+          html += '<div class="btn-group">'+
+            '<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+              '<i class="fa fa-bars"></i>'+
+            '</button>'+
+            '<ul class="dropdown-menu dropdown-menu-right">';
 
-          // set num required materials
-          html += '<td>';
-          if( m.materials && m.type === 'complex') {
-            html += Object.keys(m.materials).length;
+          html += '<li><a style="cursor:pointer" info="'+i+'"><i class="fa fa-info"></i> More Info</a></li>';
+
+          if( !nameInBudget ) {
+            html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-plus"></i> Add to Current Budget</a></li>';
+          } else if( idInBudget ) {
+            html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Current Budget</a></li>';
+          } else {
+            html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-undo"></i> Replace in Current Budget</a></li>';
           }
-          html +='</td>';
 
-          // set num required materials
-          html += '<td>';
-          if( m.unique && m.type === 'complex') {
-            html += Object.keys(m.unique).length;
+          if( hasAccess ) {
+            html += '<li><a href="#material/edit/'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
+            html += '<li><a delete="'+i+'"><i class="fa fa-trash"></i> Delete</a></li>';
           }
-          html +='</td>';
 
-          html += '<td><a style="cursor:pointer" index="'+i+'" edit><i class="fa fa-pencil"></i></a></td>';
-
+          html += '</ul></div></td>';
           html += '</tr>';
+          html += '<tr id="'+i+'-info-row" style="display:none"><td colspan="8">'+
+                    '<budget-material-info-row material="'+m.id+'" index="'+i+'"></budget-material-info-row>'+
+                  '</td></tr>';
         }
 
         this.$.table.innerHTML = html+'</table>';
 
-        // wire events
         $(this.$.table)
-          .find('a[edit]')
+          .find('.popover-item')
+          .popover({});
+
+        $(this.$.table)
+          .find('a[info]')
           .on('click', function(e){
-            var index = parseInt(e.currentTarget.getAttribute('index'));
-            this.fire('edit', this.results[index]);
+            var index = e.currentTarget.getAttribute('info');
+
+            $(this.$.table)
+              .find('budget-material-info-row[index="'+index+'"]')[0]
+              .show();
           }.bind(this));
+
+        $(this.$.table)
+          .find('a[add]')
+          .on('click', this.addMaterial.bind(this));
+
+        $(this.$.table)
+          .find('a[remove]')
+          .on('click', this.removeMaterial.bind(this));
 
         $(this.$.table)
           .find('input[type="checkbox"]')
@@ -355,7 +388,7 @@
         this.query();
       },
 
-      setEmptyQuery : function() {
+      setHasAccessQuery : function() {
         this.q = {};
 
         if( ExpressAuth.user ) {
@@ -381,6 +414,28 @@
         }
 
         this.$.deletePopup.show(materials);
+      },
+
+      addMaterial : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('add'));
+
+        SDK.materials.get(this.results[index].id, function(resp){
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+
+          SDK
+            .getBudget()
+            .addMaterial(new SDK.Material(resp));
+
+          this.render();
+        }.bind(this));
+      },
+
+      removeMaterial : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('remove'));
+        SDK.getBudget().removeMaterial(this.results[index].name);
+        this.render();
       }
     });
   </script>

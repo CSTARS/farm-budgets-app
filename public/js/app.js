@@ -53,6 +53,8 @@ SDK.app = {
 
     if( typeof object === 'string' ) {
       object = {authority: object};
+    } else if( object instanceof SDK.Material || object instanceof SDK.Budget ) {
+      object = {authority: object.getAuthority()};
     } else if( !object.authority ) {
       return false;
     }
