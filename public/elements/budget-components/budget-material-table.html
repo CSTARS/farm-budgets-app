@@ -1,0 +1,192 @@
+<dom-module id="budget-material-table">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      table td[info]:hover {
+        cursor: pointer;
+        color: #2196f3;
+      }
+    </style>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-table',
+
+      ready : function() {
+        this.materials = {};
+
+        this.sort = 'name';
+        this.nameFilter = '';
+        this.onlyErrors = false;
+      },
+
+      onMaterialsUpdated : function() {
+        this.update(SDK.controllers.material.get());
+      },
+
+      update : function(materials) {
+        if( materials ) this.materials = materials;
+        if( !this.materials ) return;
+
+        this.uiArray = [];
+        for( var name in this.materials ) {
+          if( this.materials[name].fixed ) continue;
+
+          if( this.isMatch(this.materials[name]) ) {
+            this.uiArray.push(this.materials[name]);
+          }
+        }
+
+        var sortVal = this.sort;
+        this.uiArray.sort(function(a, b){
+          if( a[sortVal] > b[sortVal] ) return 1;
+          if( a[sortVal] < b[sortVal] ) return -1;
+          return 0;
+        });
+
+        this.render();
+      },
+
+      setFiltersAndSort : function(filter, sort) {
+        this.sort = sort;
+
+        if( !filter ) {
+          this.nameFilter = null;
+        } else {
+          this.nameFilter = new RegExp(filter, 'i');
+        }
+
+        this.update();
+
+        return this.uiArray.length;
+      },
+
+      isMatch : function(material) {
+        if( this.onlyErrors && !SDK.controllers.material.hasErrors(material.name) ) {
+          return false;
+        }
+
+        if( this.nameFilter ) {
+          if( !this.nameFilter.test(material.name) ) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+
+      render : function() {
+        var html = '<table class="table style-scope budget-material-table">', m;
+
+        html += '<tr>'+
+          '<th>Name</th>'+
+          '<th><i class="fa fa-shield"></i> Authority</th>'+
+          '<th><i class="fa fa-map-marker"></i> Locality</th>'+
+          '<th><i class="fa fa-hourglass-o"></i> Year</th>'+
+          '<th><i class="fa fa-dollar"></i> Price</th>'+
+          '<th></th>'+
+          '<th></th>'+
+        '</tr>';
+
+        for( var i = 0; i < this.uiArray.length; i++ ) {
+          var m = this.uiArray[i];
+          var hasAccess = SDK.app.hasAccess(m);
+          var hasErrors = SDK.controllers.material.hasErrors(m.name);
+
+          html += '<tr>';
+
+          // set row icon
+          html += '<td class="style-scope budget-material-table" info="'+i+'"><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"></i> ';
+
+          // set row name
+          html += m.name+'</td>';
+
+          // set authority
+          html += '<td>'+m.authority+'</td>';
+
+          // set locality
+          html += '<td>'+(m.locality ? m.locality.join(', ') : '')+'</td>';
+
+          // set year
+          html += '<td>'+(m.year !== undefined ? m.year : '')+'</td>';
+
+          // set price
+          html += '<td><ahb-dollar-label value="'+m.price+'"></ahb-dollar-label></td>';
+
+          if( hasErrors ) {
+            html += '<td><div class="btn-group">'+
+              '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+                '<i class="fa fa-warning text text-danger"></i>'+
+              '</button>'+
+              '<ul class="dropdown-menu dropdown-menu-right">';
+
+            var result = SDK.controllers.material.getErrors(m.name);
+
+            if( result.errors.length > 0 ) {
+              html += '<li class="dropdown-header">Material</li>';
+              html += '<li><a>'+result.errors.join('</li><li>')+'</a></li>';
+            }
+
+            if( result.materials ) {
+              for( var key in result.materials ) {
+                html += '<li class="dropdown-header">Required: '+key+'</li>';
+                html += '<li><a>&nbsp;&nbsp;'+result.materials[key].join('/li><li>')+'</a></li>';
+              }
+            }
+
+            html += '</ul></div></td>';
+          } else {
+            html += '<td></td>';
+          }
+
+          html += '<td style="text-align:right">';
+          html += '<div class="btn-group">'+
+            '<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+              '<i class="fa fa-bars"></i>'+
+            '</button>'+
+            '<ul class="dropdown-menu dropdown-menu-right">';
+
+          html += '<li><a style="cursor:pointer" info="'+i+'"><i class="fa fa-info"></i> More Info</a></li>';
+          html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Budget</a></li>';
+          if( hasAccess ) {
+            html += '<li><a href="#material/edit/'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
+          }
+
+          html += '</ul></div></td>';
+          html += '</tr>';
+          html += '<tr id="'+i+'-info-row" style="display:none"><td colspan="8" style="border:none">'+
+                    '<budget-material-info-row material="'+m.id+'" index="'+i+'" budget-view></budget-material-info-row>'+
+                  '</td></tr>';
+        }
+
+        this.innerHTML = html+'</table>';
+
+
+        $(this)
+          .find('[info]')
+          .on('click', function(e){
+            var index = e.currentTarget.getAttribute('info');
+
+            $(this)
+              .find('budget-material-info-row[index="'+index+'"]')[0]
+              .show();
+          }.bind(this));
+
+
+        $(this)
+          .find('a[remove]')
+          .on('click', this.removeMaterial.bind(this));
+      },
+
+
+      removeMaterial : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('remove'));
+        SDK.getBudget().removeMaterial(this.results[index].name);
+        this.render();
+      }
+    });
+  </script>
+</dom-module>

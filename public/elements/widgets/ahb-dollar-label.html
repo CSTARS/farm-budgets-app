@@ -55,7 +55,12 @@
     },
 
     _update : function() {
-      var val = ''+parseFloat(this.value).toFixed(this.decimal ? 2 : 0);
+      var val = parseFloat(this.value);
+      if( isNaN(val) ) {
+        val = '0';
+      } else {
+        val = val.toFixed(this.decimal ? 2 : 0);
+      }
       this.innerHTML = '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
   });

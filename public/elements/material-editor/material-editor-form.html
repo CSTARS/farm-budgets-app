@@ -150,10 +150,10 @@
   <div class="panel-footer">
     <div class="layout horizontal">
       <div class="flex">
-        <a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a>
+        <!--<a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a> -->
       </div>
       <div>
-        <a class="btn btn-default" href="#material/search">Cancel</a>
+        <a class="btn btn-default" id="cancel" href="#material/search">Cancel</a>
         <a class="btn btn-primary" on-click="save">Save</a>
       </div>
     </div>
@@ -161,7 +161,7 @@
 
 </div>
 
-    <material-editor-new-required id="popup"></material-editor-new-required>
+    <material-editor-new-required id="popup" on-add="addRequiredMaterial"></material-editor-new-required>
 
   </template>
   <script>
@@ -176,17 +176,18 @@
             this.showHistory();
           }
         }.bind(this));
-      },
 
-
-      attached : function() {
-        this.$.popup.addEventListener('add', this.addRequiredMaterial.bind(this));
+        $(window).on('hashchange', function(){
+          if( SDK.app.history ) {
+            this.$.cancel.setAttribute('href', SDK.app.history);
+          }
+        }.bind(this));
       },
 
       create : function() {
         this.material = new SDK.Material();
         this.$.title.innerHTML = 'Create Material';
-        this.$.undo.style.display = 'none';
+        //this.$.undo.style.display = 'none';
         this.setInputs();
       },
 
@@ -208,7 +209,7 @@
 
       onEditReady : function() {
         this.$.title.innerHTML = 'Edit Material';
-        this.$.undo.style.display = 'inline-block';
+        //this.$.undo.style.display = 'inline-block';
         this.setInputs();
       },
 
@@ -267,28 +268,8 @@
       },
 
       addRequiredMaterial : function(e) {
-        e = e.detail;
-
-        if( e.isUnique ) {
-          if( !this.material.unique ) {
-            this.material.unique = {};
-          }
-
-          this.material.unique[e.material.name] = {
-            price : e.material.price,
-            units : 'us$/'+e.material.units
-          }
-        }
-
-        if( !this.material.materials ) {
-          this.material.materials = {};
-        }
-
-        this.material.materials[e.material.name] = {
-          amount : e.material.amount,
-          units : e.material.units
-        }
-
+        var material = e.detail;
+        this.material.addRequiredMaterial(material);
         this.renderMaterials();
       },
 
@@ -307,38 +288,42 @@
 
         html += '<h5>Required Materials <a class="btn btn-link btn-lg" required><i class="fa fa-plus"></i></a></h5>';
 
-        if( this.material.materials ) {
-          html += '<ul class="list-group">';
-          for( var name in this.material.materials ) {
-            var m = this.material.materials[name];
+        var materials = this.material.getRequiredMaterials();
+        var unique = this.material.getUniqueMaterials();
 
-            if( this.material.unique && this.material.unique[name] ) {
-              var u = this.material.unique[name];
+        var hasUnique = Object.keys(unique).length > 0 ? true : false;
 
-              html +=
-                '<li class="list-group-item">'+
-                    '<span class="label label-warning pull-right">Unique</span>'+
-                    '<a class="btn btn-link"><i class="fa fa-trash"></i></a> '+
-                    '<b>'+name+'</b> '+
-                    m.amount+m.units+' @ <span class="text text-success">$'+u.price+'</span>';
-                '</li>';
+        if( Object.keys(materials).length > 0 ) {
+          html += '<table class="table">'+
+            '<tr>'+
+              '<th>Material</th>'+
+              '<th>Amount</th>'+
+              '<th>Units</th>'+
+              (hasUnique ? '<th>Price*</th>' : '')+
+              '<th></th>'+
+            '</tr>';
 
-            } else {
-              html +=
-                '<li class="list-group-item">'+
-                    '<a class="btn btn-link" trash material="'+name+'"><i class="fa fa-trash"></i></a> '+
-                    '<b>'+name+'</b> '+
-                    m.amount+m.units+
-                '</li>';
-            }
+          for( var name in materials ) {
+            var m = materials[name];
+
+            html +=
+              '<tr>'+
+                '<td>'+name+(unique[name] ? '*' : '')+'</td>'+
+                '<td><input type="number" class="form-control" value="'+m.amount+'" amount  material="'+name+'" /></td>'+
+                '<td><budget-unit-selector units="'+m.units+'" material="'+name+'"></budget-unit-selector></td>'+
+                (hasUnique ? '<td>'+
+                  (unique[name] ? '<input type="number" value="'+m.price+'" material="'+name+'" class="form-control" price />' : '')+
+                '</td>' : '')+
+                '<td><a class="btn btn-link" trash material="'+name+'"><i class="fa fa-trash"></i></a></td>'+
+              '</tr>';
           }
-          html += '</ul>';
-
-          if( Object.keys(this.material.materials).length === 0 ) {
-            html += 'None';
-          }
+          html += '</table>';
         } else {
           html += 'None';
+        }
+
+        if( hasUnique ) {
+          html += '*Unique material.  You can only adjust prices for materials unqiue to this material.';
         }
 
         this.$.materialsList.innerHTML = html;
@@ -346,26 +331,45 @@
         $(this.$.materialsList)
           .find('a[required]')
           .on('click', function(){
-            this.requirePopup.create();
+            this.$.popup.create();
+          }.bind(this));
+
+        $(this.$.materialsList)
+          .find('input[amount]')
+          .on('change', function(e){
+            debugger;
+            var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
+            m.amount = parseInt(e.currentTarget.value);
+            this.material.addRequiredMaterial(m);
+          }.bind(this));
+
+        $(this.$.materialsList)
+          .find('input[price]')
+          .on('change', function(e){
+            var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
+            m.price = parseInt(e.currentTarget.value);
+            this.material.addRequiredMaterial(m);
+          }.bind(this));
+
+        $(this.$.materialsList)
+          .find('budget-unit-selector')
+          .on('units-change', function(e){
+            var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
+            m.units = parseInt(e.detail.value);
+            this.material.addRequiredMaterial(m);
           }.bind(this));
 
         $(this.$.materialsList)
           .find('a[trash]')
           .on('click', function(e){
             var name = e.currentTarget.getAttribute('material');
-
-            if( this.material.materials && this.material.materials[name] ) {
-              delete this.material.materials[name];
-            }
-            if( this.material.unique && this.material.unique[name] ) {
-              delete this.material.unique[name];
-            }
+            this.material.removeRequiredMaterial(name);
             this.renderMaterials();
           }.bind(this));
       },
 
       renderComplex : function() {
-        if( this.material.type !== 'complex' ) {
+        if( this.material.getType() !== 'complex' ) {
           this.$.priceGroup.style.display = 'block';
           this.$.isComplexInput.checked = false;
           this.$.complexPanel.style.display = 'none';

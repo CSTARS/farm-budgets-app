@@ -104,17 +104,15 @@
         this.material = {
           name : this.$.nameInput.value,
           units : this.$.unitsInput.getUnits(),
-          amount : parseFloat(this.$.amountInput.value)
+          amount : parseFloat(this.$.amountInput.value),
+          unique : this.$.isUniqueInput.checked
         }
 
         if( this.$.isUniqueInput.checked ) {
           this.material.price = parseFloat(this.$.priceInput.value);
         }
 
-        this.fire('add', {
-          material : this.material,
-          isUnique : this.$.isUniqueInput.checked
-        });
+        this.fire('add', this.material);
       },
 
       toggleUnique : function() {
@@ -133,8 +131,23 @@
           return;
         }
 
+        var results = $.extend(true, [], SDK.controllers.material.find(name));
+
         SDK.materials.suggest(name, function(resp) {
-          this.suggestResults = resp;
+          for( var i = resp.length-1; i >= 0; i-- ) {
+            for( var j = 0; j < results.length; j++ ) {
+              if( resp[i].id == results[j].id ) {
+                resp.splice(i, 1);
+                break;
+              }
+            }
+          }
+
+          resp.forEach(function(item){
+            results.push(item);
+          });
+
+          this.suggestResults = results;
           this.renderSuggest();
         }.bind(this));
       },
@@ -150,15 +163,21 @@
           var suggest = this.suggestResults[i];
 
           var authorities;
-          if( suggest.authorities.length < 3 ) {
+          if( suggest.fixed ) {
+            authorities = 'Fixed Cost';
+          } else if( suggest.authority ) {
+            authorities = 'Used in budget: '+suggest.authority+' '+suggest.units;
+          } else if( suggest.authorities && suggest.authorities.length < 3 ) {
             authorities = 'Defined By: '+suggest.authorities.join(', ');
           } else {
             authorities = 'Defined By '+suggest.authorities.length+' Authorities: '+suggest.authorities.splice(0,3).join(', ')+'...';
           }
 
+          var name = suggest.material || suggest.name;
+
           html +=
             '<div>'+
-              '<div><a style="cursor: pointer">'+suggest.material+'</a></div>'+
+              '<div><a style="cursor: pointer" units="'+(suggest.units || '')+'">'+name+'</a></div>'+
               '<div class="help-block" style="padding-left: 5px">'+authorities+'</div>'+
             '</div>';
         }
@@ -169,6 +188,12 @@
           .find('a')
           .on('click', function(e){
             this.$.nameInput.value = e.currentTarget.innerHTML;
+
+            var units = e.currentTarget.getAttribute('units');
+            try {
+              units = SDK.units.invert(SDK.units.cleanDollars(units));
+            } catch(e) {}
+            this.$.unitsInput.setUnits(units);
             this.hideSuggest();
           }.bind(this));
       },

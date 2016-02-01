@@ -23,14 +23,20 @@
         type : {
           type : String,
           value : function() {
-            return '';
+            return 'unknown';
+          }
+        },
+        impl : {
+          type : Object,
+          value : function() {
+            return null;
           }
         }
       },
 
       attached : function() {
         SDK.controllers.material.on('material-update', this.onMaterialUpdateEvent.bind(this));
-        this.onUpdate();
+        this.update();
       },
 
       detached : function() {
@@ -39,13 +45,13 @@
 
       onUpdate : function() {
         if( !this.material ) return;
-        this.onMaterialUpdate();
+        this.update();
       },
 
       onMaterialUpdateEvent : function(e) {
         if( !this._material ) return;
         if( e.material.name != this._material.getName() ) return;
-        this.onMaterialUpdate();
+        this.update();
       },
 
       update : function() {
@@ -60,7 +66,7 @@
 
           if( !this._material.exists() ) {
             this.innerHTML = '<span class="text text-danger"><i class="fa fa-warning"></i> <b>' +
-              this._material.getName()+'</b> not found.</span> <i class="fa fa-search"></i>';
+              this._material.getName()+'</b> not found.</span> <a class="btn btn-link" href="#material/search"><i class="fa fa-search"></i></a>';
           } else if( this._material.getType() === 'complex' ) {
             this.ele = document.createElement('complex-material-label');
             this.appendChild(this.ele);
@@ -72,7 +78,7 @@
 
         if( !this.ele ) return;
 
-        this.ele.onMaterialUpdate(this._material);
+        this.ele.onMaterialUpdate(this._material, this.impl);
       }
 
 

@@ -59,11 +59,12 @@
       };
     },
 
-    onMaterialUpdate : function(material) {
+    onMaterialUpdate : function(material, impl) {
       this.material = material;
+      this.impl = impl;
       if( !this.material ) return;
 
-      this.$.editBtn.setAttribute('href','#budget/materials/'+encodeURIComponent(this.material.getName()));
+      this.$.editBtn.setAttribute('href','#material/edit/'+this.material.getId());
 
       var otherInfo = '';
       if( this.material.getAuthority() ) {
@@ -117,11 +118,22 @@
            '</tr>';
       }
 
-      table += '</table>'
+      table += '</table>';
       table +=
        '<div style="text-align:right">'+
         '<ahb-dollar-label value="'+this.material.getPrice()+'"></ahb-dollar-label> / '+this.material.getUnits();
       '</div>';
+
+      if( this.impl ) {
+        var conversion = '';
+        if( this.impl.conversion && this.impl.conversion !== 1 ) {
+          conversion = ' x '+this.impl.conversion.toFixed(3)+' '+this.material.getUnits()+'/'+this.impl.units+' ';
+        }
+
+        table += '<div style="text-align:right;border-top:1px solid #ccc">'+
+         conversion+'x '+this.impl.amount+' '+this.impl.units+' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+
+       '</div>';
+      }
 
       this.$.main.innerHTML = table;
       this.checkError();

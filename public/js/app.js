@@ -20,10 +20,18 @@ function UiBuffer(fn, timeout, bind) {
   return bufferFn;
 }
 
+$(window).on('hashchange', function() {
+  SDK.app.history = SDK.app._history;
+  SDK.app._history = window.location.hash;
+});
+
 SDK.app = {
 
   // buffers function (fn) by timeout in ms.  Binds function to whatever bind is provided.
   UiBuffer : UiBuffer,
+
+  history : null,
+  _history : window.location.hash,
 
   _init : false,
   init : function() {

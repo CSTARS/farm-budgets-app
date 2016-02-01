@@ -4,6 +4,10 @@
       :host {
         display: block;
       }
+      table td[info]:hover {
+        cursor: pointer;
+        color: #2196f3;
+      }
     </style>
 
     <div style="padding: 10px;">
@@ -163,12 +167,13 @@
       },
 
       render : function() {
-        var html = '<table class="table">', m;
+        var html = '<table class="table style-scope material-editor-table">', m;
 
         html += '<tr>'+
           '<th><a style="cursor:pointer" all>All</a> | <a style="cursor:pointer" none>None</a></th>'+
           '<th>Type</th>'+
           '<th>Name</th>'+
+          '<th></th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
           '<th><i class="fa fa-dollar"></i> Price</th>'+
@@ -194,13 +199,17 @@
           // row selector
           if( hasAccess ) {
             html += '<td><input type="checkbox" index="'+i+'" /></td>';
+          } else {
+            html += '<td></td>';
           }
 
           // set row icon
-          html += '<td><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"</td>';
+          html += '<td><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"></i></td>';
 
           // set row name
-          html += '<td>'+m.name+(idInBudget ? '<a class="popover-item text text-success" tabindex="0" role="button" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="Used in current budget."><i class="fa fa-check"></i></a>' : '')+'</td>';
+          html += '<td info="'+i+'" class="style-scope material-editor-table">'+m.name+'</td>';
+
+          html += '<td>'+(idInBudget ? '<a class="popover-item text text-success" tabindex="0" role="button" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="Used in current budget."><i class="fa fa-check"></i></a>' : '')+'</td>';
 
           // set authority
           html += '<td>'+m.authority+'</td>';
@@ -212,7 +221,6 @@
           html += '<td>'+(m.price !== undefined ? '$'+m.price.toFixed(2) : '')+'</td>';
 
           // set year
-          console.log(m.year);
           html += '<td>'+(m.year !== undefined ? m.year : '')+'</td>';
 
           html += '<td style="text-align:right">';
@@ -239,7 +247,7 @@
 
           html += '</ul></div></td>';
           html += '</tr>';
-          html += '<tr id="'+i+'-info-row" style="display:none"><td colspan="8">'+
+          html += '<tr id="'+i+'-info-row" style="display:none"><td colspan="9" style="border:none">'+
                     '<budget-material-info-row material="'+m.id+'" index="'+i+'"></budget-material-info-row>'+
                   '</td></tr>';
         }
@@ -251,7 +259,7 @@
           .popover({});
 
         $(this.$.table)
-          .find('a[info]')
+          .find('[info]')
           .on('click', function(e){
             var index = e.currentTarget.getAttribute('info');
 

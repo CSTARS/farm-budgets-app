@@ -45,7 +45,7 @@
 
     <h4 class="page-header">
       <div class="btn-group pull-right" style="margin-top:-10px" role="group">
-        <a class="btn btn-primary" on-click="showCreate"><i class="fa fa-plus"></i> Create</a>
+        <a class="btn btn-primary" href="#material/create"><i class="fa fa-plus"></i> Create</a>
         <a class="btn btn-primary" href="#material/search"><i class="fa fa-search"></i> Find</a>
       </div>
 
@@ -54,14 +54,9 @@
 
     <div class="help-block">
       Below is a list of all materials currently available for this budget.  You can
-      find and add materials using the 'Find' button or create a new material
+      find and add materials to this budget using the 'Find' button or create a new material
       using the 'Create' button.
     </div>
-
-    <div style="text-align: center; padding: 25px 0 15px 0">
-
-    </div>
-
 
 
     <div class="row">
@@ -71,19 +66,29 @@
           <div class="form-group">
             <label for="filterInput" class="col-sm-2 control-label">Filter</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
-              <a class="btn btn-link" on-click="showSimpleTable">Simple Material Table</a>
+              <input type="text" class="form-control" id="filterInput" placeholder="Filter By Name" on-input="filter">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sortInput" class="col-sm-2 control-label">Sort</label>
+            <div class="col-sm-10">
+              <select type="text" class="form-control" id="sortInput" on-change="filter">
+                <option value="name" selected>Name</option>
+                <option value="type">Type</option>
+                <option value="authority">Authority</option>
+                <option value="price">Price</option>
+              </select>
             </div>
           </div>
         </div>
 
+        <budget-material-table id="table"></budget-material-table>
+
         <div id="searchMsg"></div>
-        <div id="root"></div>
 
       </div>
     </div>
 
-    <budget-simple-material-popup id="simpleTable"></budget-simple-material-popup>
   </template>
 </dom-module>
 
@@ -97,15 +102,12 @@
       SDK.controllers.material.on('material-update', this.onMaterialsUpdated.bind(this));
       SDK.controllers.operation.on('material-added', this.onMaterialAdded.bind(this));
       SDK.controllers.material.on('material-removed', function(e) {
+        this.$.table.onMaterialsUpdated();
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
       }.bind(this));
 
       SDK.changes.on('material-state-update', this.onSaveStateUpdate.bind(this));
-    },
-
-    attached : function() {
-      this.popup = document.querySelector('budget-material-popup');
     },
 
     onSaveStateUpdate : function(e) {
@@ -123,54 +125,16 @@
     },
 
     onMaterialAdded : function(e) {
-      this.updateMaterialPanel(e.material, false);
+      this.$.table.onMaterialsUpdated();
     },
 
     onMaterialsUpdated : function(e) {
-      var all = SDK.controllers.material.get();
-
-      for( var key in all ) {
-        if( all[key].type === 'simple' && key === e.replaced || key === e.material.name ) {
-          this.updateMaterialPanel(e.material.name, e.replaced);
-          break;
-        }
-
-        if( all[key].type === 'complex' && SDK.controllers.material.contains(all[key], e.material.name, e.replaced) ) {
-          var replaced = null;
-          if( key === e.replaced ) {
-            replaced = e.replaced;
-          }
-          this.updateMaterialPanel(key, replaced);
-        }
-      }
-
-      this.filter();
+      this.$.table.onMaterialsUpdated();
     },
 
-    updateMaterialPanel : function(name, replaced) {
-      var current = $(this.$.root).find('[material-name="'+(replaced || name)+'"]');
-      var div = $(this.createTable(name));
-
-      if( current.length == 0 ) {
-        $(this.$.root).append(div);
-      } else {
-        div.insertAfter(current);
-        current.remove();
-      }
-    },
-
-    setData : function(data) {
-      this.$.root.innerHTML = '';
-      this.data = data;
-
-      this.$.root.innerHTML = '';
-
+    setData : function() {
       var materials = SDK.controllers.material.get();
-      for( var name in materials ) {
-        var div = this.createTable(name);
-        this.$.root.appendChild(div);
-      }
-
+      this.$.table.update(materials);
       this._filter();
     },
 
@@ -180,10 +144,6 @@
       }
 
       this._filter();
-    },
-
-    showCreate : function() {
-      this.popup.create();
     },
 
     filter : function() {
@@ -197,157 +157,15 @@
     _filter : function() {
       var txt = this.$.filterInput.value;
 
-      var matched = [], showAll = false;
-      if( txt == '' && !$(this.$.thisBudgetInput).is(':checked') ) {
-        showAll = true;
-      } else {
-        matched = this.toNameArray(SDK.controllers.material.find(txt));
-      }
+      var matched = this.$.table.setFiltersAndSort(txt, this.$.sortInput.value);
 
-      var opEles = this.querySelectorAll('budget-material-list-item');
-      var errorCount = 0;
-      for( var i = 0; i < opEles.length; i++ ) {
-        errorCount += opEles[i].errorCount;
-      }
 
-      if( errorCount > 0 ) {
-        this.$.errorCount.innerHTML = errorCount;
-        this.$.errorMessage.style.display = 'block';
-      } else {
-        this.$.errorFilter.checked = false;
-        this.$.errorMessage.style.display = 'none';
-      }
-
-      var onlyUnsaved = $(this.$.unsavedFilter).is(':checked');
-      var onlyErrors = $(this.$.errorFilter).is(':checked');
-
-      for( var i = 0; i < opEles.length; i++ ) {
-        var ele = opEles[i];
-        if( showAll || matched.indexOf(ele.getAttribute('material-name')) > -1 ) {
-          if( onlyUnsaved && !ele.hasAttribute('has-changes') ) {
-            ele.style.display = 'none';
-          } else if( onlyErrors && !ele.hasAttribute('has-errors') ) {
-            ele.style.display = 'none';
-          } else {
-            ele.style.display = 'block';
-          }
-        } else {
-          ele.style.display = 'none';
-        }
-      };
-
-      if( matched.length == 0 && !showAll ) {
+      if( matched == 0 ) {
         this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
-        '. <a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
-
-        $(this.$.searchMsg)
-          .find('a')
-          .on('click', function() {
-            document.querySelector('budget-material-popup').create(txt);
-          });
+        '. <a href="#material/create"><i class="fa fa-plus"></i> Create</a></div>';
       } else {
         this.$.searchMsg.innerHTML = '';
       }
-
-      this.fire('error-update', errorCount > 0 ? true : false);
-    },
-
-    toNameArray : function(materials) {
-      var arr = [], include;
-      var thisBudget = $(this.$.thisBudgetInput).is(':checked');
-
-      if( thisBudget ) {
-        include = SDK.utils.getActiveMaterials();
-      }
-
-      materials.forEach(function(material){
-        if( thisBudget ) {
-          if( include.indexOf(material.name) > -1 ) {
-            arr.push(material.name);
-          }
-        } else {
-          arr.push(material.name);
-        }
-
-      });
-      return arr;
-    },
-
-    createTable : function(material) {
-      material = SDK.getMaterial(material);
-
-      if( !material.exists() ) {
-        console.log('Unabled to show material in list');
-        console.log(material);
-        return;
-      }
-
-      var ele = document.createElement('budget-material-list-item');
-      ele.material = material;
-      ele.addEventListener('edit-material', function(){
-        document.querySelector('budget-material-popup').edit(material);
-      });
-
-      return ele;
-    },
-
-    updateFromEvent : function(ele) {
-      if( this.updateTimer != -1 ) clearTimeout(this.updateTimer);
-
-      this.updateTimer = setTimeout(function(){
-        this.updateTimer = -1;
-        this._updateFromEvent(ele);
-      }.bind(this), 300);
-    },
-
-    _updateFromEvent : function(ele) {
-      var m = SDK.controllers.material.get(ele.attr('material-name'));
-
-      if( m.error ) {
-        return console.log('Error updating material');
-      }
-
-
-      m.price = parseFloat(ele.find('.material-price').val());
-      m.units = ele.find('budget-unit-selector')[0].getUnits();
-
-      SDK.controllers.material.add(m, {replace: true});
-    },
-
-    showReviewPopup : function() {
-      if( !ExpressAuth.user ) {
-        document.querySelector('budget-login-popup').show();
-        return;
-      }
-      document.querySelector('budget-material-review-popup').show();
-    },
-
-    showSimpleTable : function() {
-      this.$.simpleTable.show();
-    },
-
-    undo : function() {
-      if( !confirm('Are you sure you want to discard your changes?') ) {
-        return;
-      }
-
-      var budget = SDK.getBudget().getData();
-      SDK.budgets.get(budget.id, function(resp){
-        SDK.changes.setOriginal(budget, resp.materials);
-        SDK.changes.setUnsaved({});
-        window.localStorage.setItem('unsaved-materials', '{}');
-
-        if( resp.error ) {
-          return alert('Error reloading budget data: '+resp.message);
-        }
-
-        var data = {
-          budget : budget,
-          materials : resp.materials
-        }
-
-        document.querySelector('ahb-budget').load(data);
-      }.bind(this));
-    },
+    }
   });
 </script>

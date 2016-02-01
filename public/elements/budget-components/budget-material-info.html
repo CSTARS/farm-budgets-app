@@ -5,6 +5,7 @@
         display: none;
       }
       #loading {
+        display: none;
         text-align: center;
         padding: 10px;
         font-size: 22px;
@@ -43,15 +44,16 @@
         <table class="table" style="margin-top: 25px">
           <tr id="yearRow">
             <td><i class="fa fa-hourglass-o"></i> Year</td>
-            <td id="year"></td>
+            <td id="year" colspan="2"></td>
           </tr>
           <tr id="classRow">
             <td>Class</td>
-            <td id="class"></td>
+            <td id="class" colspan="2"></td>
           </tr>
           <tr id="requiredRow">
             <td>Required Materials</td>
             <td id="required"></td>
+            <td id="chart"></td>
           </tr>
         </table>
 
@@ -59,6 +61,9 @@
           <h5 class="page-header">Source</h5>
           <div id="sourceContent"></div>
         </div>
+
+        <div id="usedBy" style="border-top: 1px solid #ccc"></div>
+        <div id="requiredBy"></div>
       </div>
     </div>
 
@@ -75,6 +80,12 @@
             return ''
           },
           observer : 'update'
+        },
+        budgetView : {
+          type : Boolean,
+          value : function() {
+            return false
+          }
         }
       },
 
@@ -102,7 +113,7 @@
         //}
 
         try {
-          this._material = SDK.controllers.material.getById(this.material);
+          this._material = new SDK.Material(SDK.controllers.material.getById(this.material));
           this.render();
           return;
         } catch(e) {}
@@ -124,7 +135,7 @@
         this.$.name.innerHTML =
             '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +
             m.getName()+
-            (m.getType() === 'simple' ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '');
+            (m.getType() === 'simple' || this.budgetView ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '');
 
         this.$.description.innerHTML = m.getDescription();
         this.$.description.style.display = m.getDescription() ? 'block' : 'none';
@@ -140,6 +151,17 @@
           this.$.sourcePanel.style.display = 'none';
         }
 
+        if( this.budgetView ) {
+          this.setUsedByOps();
+          this.setRequiredBy();
+        } else {
+          this.$.usedBy.style.display = 'none';
+          this.$.requiredBy.style.display = 'none';
+        }
+
+
+        var errors = m.getErrors();
+
         if( m.getType() === 'simple' ) {
           this.$.year.innerHTML = m.getYear() || '';
           this.$.requiredRow.style.display = 'none';
@@ -149,20 +171,91 @@
 
           var unique = m.getUniqueMaterials();
           var materials = m.getRequiredMaterials();
-          var list = '<ul class="list-group">';
+          var list = '<table class="table">'+
+            '<tr><th>Material</th>'+
+              '<th>Amount</th>'+
+              '<th>Units</th>'+
+              (this.budgetView ? '<th>Price</th>' : '')+
+            '</tr>';
+
+
+
+          var chartData = [['Material','%']];
+
           for( var key in materials ) {
             var rm = materials[key];
-            list += '<li class="list-group-item">' + rm.amount +
-                      ' <span class="label label-default">'+rm.units+'</span> of '+
-                      '<b>'+key+'</b>'+
-                      (unique[key] ? '*' : '')+'</li>';
+
+            var name;
+            if( unique[key] ) {
+              name = '*<b>'+key+'</b>';
+            } else if( this.budgetView ) {
+              name = '<material-label material="'+key+'"></material-label>';
+            } else {
+              name = key;
+            }
+
+            list += '<tr>'+
+                    '<td>'+name+'</td>'+
+                    '<td>'+rm.amount+'</td>'+
+                    '<td><span class="label label-default">'+rm.units+'</span></td>'+
+                    (this.budgetView ? '<td><ahb-dollar-label value="'+rm.price+'"></ahb-dollar-label>' : '')+
+                  '</tr>';
+
+            if( this.budgetView ) {
+              chartData.push([key, parseInt(100*(rm.price / m.getPrice())) ]);
+            }
+
+            if( errors && errors.materials && errors.materials[key] ) {
+              list += '<tr><td colspan="'+(this.budgetView ? 4 : 3)+'" style="border:none">' +
+                        '<ul class="text text-danger"><li>'+errors.materials[key].join('</li><li>')+'</li></ul>'+
+                      '</td></tr>';
+            }
           }
-          list += '</ul>';
+          list += '</table>';
           if( Object.keys(unique).length > 0 ) {
             list += '<div class="help-block">*Unique Material</div>';
           }
+
           this.$.required.innerHTML = list;
+
+          if( this.budgetView ) {
+            var chart = new google.visualization.PieChart(this.$.chart);
+            var s = $(window).width() / 8;
+            this.$.chart.style.width = s+'px';
+            this.$.chart.style.height = s+'px';
+            chart.draw(google.visualization.arrayToDataTable(chartData), {legend: 'none'});
+          }
         }
+      },
+
+      setUsedByOps : function() {
+        this.$.usedBy.style.display = 'block';
+        var operations = SDK.controllers.operation.get();
+        var usedBy = [];
+
+        for( var i = 0; i < operations.length; i++ ) {
+          for( var j = 0; j < operations[i].materials.length; j++ ) {
+            if( operations[i].materials[j].name == this._material.getName() ) {
+              usedBy.push('<a href="/#budget/operations/'+encodeURIComponent(operations[i].name)+'">'+operations[i].name+'</a>');
+              break;
+            }
+          }
+        }
+        this.$.usedBy.innerHTML = usedBy.length > 0 ? ('Used in Operation(s): '+usedBy.join(', ')) : '';
+      },
+
+      setRequiredBy : function() {
+        this.$.requiredBy.style.display = 'block';
+        var materials = SDK.controllers.material.get();
+        var requiredBy = [];
+
+        for( var name in materials ) {
+          if( !materials[name].materials ) continue;
+          if( materials[name].materials[this._material.getName()] ) {
+            requiredBy.push('<a href="/#budget/materials/'+encodeURIComponent(name)+'">'+name+'</a>');
+          }
+        }
+        this.$.requiredBy.innerHTML = requiredBy.length > 0 ? ('Required By: '+requiredBy.join(', ')) : '';
       },
 
       loading : function(loading) {
