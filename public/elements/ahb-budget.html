@@ -27,7 +27,7 @@
       SDK.controllers.operation.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
 
       // if user does not have a verified email, redirect them
-      if( !ExpressAuth.user.verified ) {
+      if( ExpressAuth.user && !ExpressAuth.user.verified ) {
         window.location = '/auth/verifyPage';
       }
     },

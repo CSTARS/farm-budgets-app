@@ -96,6 +96,11 @@
           var hasAccess = SDK.app.hasAccess(m);
           var hasErrors = SDK.controllers.material.hasErrors(m.name);
 
+          var unitLabel = SDK.units.cleanDollars(m.units);
+          if( m.type === 'simple') {
+            unitLabel = SDK.units.invert(unitLabel);
+          }
+
           html += '<tr>';
 
           // set row icon
@@ -114,7 +119,7 @@
           html += '<td>'+(m.year !== undefined ? m.year : '')+'</td>';
 
           // set price
-          html += '<td><ahb-dollar-label value="'+m.price+'"></ahb-dollar-label></td>';
+          html += '<td><ahb-dollar-label value="'+m.price+'"></ahb-dollar-label> <span style="color:#888">/ '+unitLabel+'</span></td>';
 
           if( hasErrors ) {
             html += '<td><div class="btn-group">'+

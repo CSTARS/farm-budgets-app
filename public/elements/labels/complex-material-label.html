@@ -59,9 +59,10 @@
       };
     },
 
-    onMaterialUpdate : function(material, impl) {
+    onMaterialUpdate : function(material, impl, parentUnits) {
       this.material = material;
       this.impl = impl;
+      this.parentUnits = parentUnits;
       if( !this.material ) return;
 
       this.$.editBtn.setAttribute('href','#material/edit/'+this.material.getId());
@@ -131,7 +132,9 @@
         }
 
         table += '<div style="text-align:right;border-top:1px solid #ccc">'+
-         conversion+'x '+this.impl.amount+' '+this.impl.units+' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+
+         conversion+'x '+this.impl.amount+' '+this.impl.units+(this.parentUnits ? '/'+this.parentUnits : '')+
+         ' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+
+         (this.parentUnits ? '/'+this.parentUnits : '');
        '</div>';
       }
 

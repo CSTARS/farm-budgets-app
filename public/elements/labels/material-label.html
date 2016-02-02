@@ -31,6 +31,12 @@
           value : function() {
             return null;
           }
+        },
+        parentUnits : {
+          type : String,
+          value : function() {
+            return '';
+          }
         }
       },
 
@@ -78,7 +84,7 @@
 
         if( !this.ele ) return;
 
-        this.ele.onMaterialUpdate(this._material, this.impl);
+        this.ele.onMaterialUpdate(this._material, this.impl, this.parentUnits);
       }
 
 
