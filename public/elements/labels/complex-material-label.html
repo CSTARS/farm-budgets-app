@@ -107,14 +107,16 @@
               ( materialErrors[materialName] ? '<br /><span class="text text-danger">'+materialErrors[materialName].join('<br />')+'</span>' : '')+
             '</td>'+
             '<td style="white-space: nowrap">'+
-              impl.amount+this.wrapUnits(impl.units)+
+              (impl.units === 'us$' ? '$' : '')+
+              impl.amount+' '+this.implUnits(impl.units)+
             '</td>'+
             '<td> x </td>'+
-            '<td>'+
-              material.getPrice().toFixed(2)+this.wrapUnits(material.getUnits(), true)+
+            '<td style="white-space: nowrap">'+
+              '<ahb-dollar-label value="'+material.getPrice()+'"></ahb-dollar-label>'+
+              '<span style="color:#888">'+this.perUnits(material.getUnits())+'</span>'+
             '</td>'+
             '<td>'+
-              (impl.price !== undefined ? impl.price.toFixed(2) : 0)+
+              '<ahb-dollar-label value="'+(impl.price || 0)+'"></ahb-dollar-label>'+
             '</td>' +
            '</tr>';
       }
@@ -122,19 +124,19 @@
       table += '</table>';
       table +=
        '<div style="text-align:right">'+
-        '<ahb-dollar-label value="'+this.material.getPrice()+'"></ahb-dollar-label> / '+this.material.getUnits();
+        '<ahb-dollar-label value="'+this.material.getPrice()+'"></ahb-dollar-label>/<span style="color:#888">'+SDK.units.invertAndRemoveDollars(this.material.getUnits())+'</span>';
       '</div>';
 
       if( this.impl ) {
         var conversion = '';
         if( this.impl.conversion && this.impl.conversion !== 1 ) {
-          conversion = ' x '+this.impl.conversion.toFixed(3)+' '+this.material.getUnits()+'/'+this.impl.units+' ';
+          conversion = ' x '+this.impl.conversion.toFixed(3)+' <span style="color:#888">'+SDK.units.invertAndRemoveDollars(this.material.getUnits())+'/'+this.impl.units+'</span> ';
         }
 
         table += '<div style="text-align:right;border-top:1px solid #ccc">'+
-         conversion+'x '+this.impl.amount+' '+this.impl.units+(this.parentUnits ? '/'+this.parentUnits : '')+
+         conversion+'x '+this.impl.amount+' <span style="color:#888">'+this.impl.units+(this.parentUnits ? '/'+this.parentUnits : '')+'</span>'+
          ' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+
-         (this.parentUnits ? '/'+this.parentUnits : '');
+         (this.parentUnits ? '<span style="color:#888">/'+this.parentUnits+'</span>' : '');
        '</div>';
       }
 
@@ -142,15 +144,15 @@
       this.checkError();
     },
 
-    wrapUnits : function(units, simplify) {
-      if( simplify ) {
-        units = SDK.units.cleanDollars(units || '');
-        if( units === '1' || units === '1/1' ) {
-          return '';
-        }
-      }
+    implUnits : function(units) {
+      if( units === 'us$' || units === '$' ) return '';
+      return '<span style="color:#888">'+units+'</span>';
+    },
 
-      return '<span class="label label-default">'+units+'</span>';
+    perUnits : function(units) {
+      units = SDK.units.invertAndRemoveDollars(units);
+      if( units === '' || units === 'us$' ) return '';
+      return '/'+units;
     },
 
     checkError : function() {

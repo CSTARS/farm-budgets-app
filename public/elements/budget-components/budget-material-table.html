@@ -96,10 +96,7 @@
           var hasAccess = SDK.app.hasAccess(m);
           var hasErrors = SDK.controllers.material.hasErrors(m.name);
 
-          var unitLabel = SDK.units.cleanDollars(m.units);
-          if( m.type === 'simple') {
-            unitLabel = SDK.units.invert(unitLabel);
-          }
+          var unitLabel = SDK.units.invertAndRemoveDollars(m.units);
 
           html += '<tr>';
 

@@ -41,11 +41,11 @@
       </div>
 
       <div style="padding:10px">
-        <ahb-account-login></ahb-account-login>
+        <ahb-account-login id="loginBtn"></ahb-account-login>
       </div>
 
       <div style="padding:5px">
-        <budget-save-btn></budget-save-btn>
+        <budget-save-btn id="saveBtn"></budget-save-btn>
       </div>
 
       <div>
@@ -123,14 +123,12 @@
       $(window).on('hashchange', this.setSection.bind(this));
       SDK.changes.on('save-state-update', this.onSaveStateUpdate.bind(this));
       SDK.changes.on('material-state-update', this.onMaterialSaveStateUpdate.bind(this));
-
     },
 
     attached : function() {
       if( !ExpressAuth.user ) {
         this.$.saveBtn.style.display = 'none';
-        this.$.saveNewBtn.style.display = 'none';
-        this.$.loginTopBtn.style.display = 'block';
+        this.$.loginBtn.style.display = 'block';
       }
     },
 

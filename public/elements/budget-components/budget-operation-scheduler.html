@@ -184,7 +184,7 @@
       var schedule = this.operation.getSchedule();
 
       if( schedule.length === 0 ) {
-        this.uiDatesArray = tmp;
+        this.uiDatesArray = ui;
         return;
       }
 
@@ -347,6 +347,7 @@
             length : 1,
             units : 'month'
           });
+          this.operation.update();
           this.update();
 
           $(this.$.datesInput).datepicker('hide');

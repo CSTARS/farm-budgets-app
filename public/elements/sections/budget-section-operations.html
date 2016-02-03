@@ -79,7 +79,7 @@
       if( e.replaced ) {
 
         var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
-        current.attr('operation', operation.name);
+        current.attr('operation', e.operation.name);
 
       } else {
 
@@ -164,8 +164,7 @@
         return;
       }
 
-      var op = SDK.getBudget().getOperation(name);
-      if( op.length > 0 ) {
+      if( SDK.getBudget().hasOperation(name) ) {
         this.$.newNameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
         return;
       }

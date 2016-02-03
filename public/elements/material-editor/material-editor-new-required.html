@@ -191,7 +191,7 @@
 
             var units = e.currentTarget.getAttribute('units');
             try {
-              units = SDK.units.invert(SDK.units.cleanDollars(units));
+              units = SDK.units.invertAndRemoveDollars(units);
             } catch(e) {}
             this.$.unitsInput.setUnits(units);
             this.hideSuggest();

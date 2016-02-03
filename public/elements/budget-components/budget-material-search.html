@@ -91,14 +91,7 @@
     },
 
     getUnitsLabel : function(material) {
-      var l = '';
-      if( material.type === 'complex' ) {
-        l = material.units;
-      } else {
-        l = SDK.units.invert(material.units);
-      }
-      l = SDK.units.cleanDollars(l);
-      if( l == '1' ) return '';
+      var l = SDK.units.invertAndRemoveDollars(material.units);
       return 'per '+l;
     },
 

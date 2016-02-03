@@ -143,10 +143,7 @@
       render : function() {
         var m = this._material;
 
-        var unitLabel = SDK.units.cleanDollars(m.getUnits());
-        if( m.getType() === 'simple' ) {
-          unitLabel = SDK.units.invert(unitLabel);
-        }
+        var unitLabel =  SDK.units.invertAndRemoveDollars(m.getUnits());
 
         this.$.name.innerHTML =
             '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +

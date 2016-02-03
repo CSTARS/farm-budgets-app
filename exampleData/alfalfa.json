@@ -590,7 +590,7 @@
 
       "class": "irrigation",
       "name": "Irrigation-Ditch/Tail Levee",
-      "units": "[acr_us]",
+      "units": "us$/[acr_us]",
       "type": "complex",
       "materials": {
         "150HP4WD Tractor": {
@@ -629,10 +629,10 @@
       "description": "Preplanting",
       "class": "cultural",
       "name": "Tri-Plane 2X",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 20.83,
           "units": "us$"
         },
@@ -657,10 +657,10 @@
       "description": "Preplanting",
       "class": "cultural",
       "name": "Finish Disc & Roll 2X",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 31.58,
           "units": "us$"
         },
@@ -711,10 +711,10 @@
     {
 
       "name": "ATV",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 1.2,
           "units": "us$"
         },
@@ -739,10 +739,10 @@
       "description": "Pre Planting Discing",
       "class": "cultural",
       "name": "Stubble Disc",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 30.77,
           "units": "us$"
         },
@@ -765,7 +765,7 @@
     {
 
       "name": "Baling",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "150HP4WD Tractor": {
@@ -793,7 +793,7 @@
       "description": "Well supplied Alfalfa",
       "class": "other",
       "name": "Water-Alfalfa-Pumped",
-      "units": "us$/[acr_us].[in_us]",
+      "units": "us$/([acr_us].[in_us])",
       "price": 8,
       "type": "simple",
       "authority": "UCD Ext",
@@ -822,10 +822,10 @@
       "description": "Preplanting",
       "class": "cultural",
       "name": "Pull Border/Checks",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 14.29,
           "units": "us$"
         },
@@ -864,10 +864,10 @@
       "description": "Pre Planting Preparation",
       "class": "cultural",
       "name": "Chisel/Rip & Roll",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 33.33,
           "units": "us$"
         },
@@ -905,10 +905,10 @@
 
       "type": "complex",
       "name": "37HP 4WD Tractor",
-      "units": "h",
+      "units": "us$/h",
       "description": "Small Tractor",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 1.58,
           "units": "us$"
         },
@@ -931,10 +931,10 @@
     {
 
       "name": "Sprinkler Irrigate 2X",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 1.5,
           "units": "us$"
         },
@@ -962,10 +962,10 @@
 
       "type": "complex",
       "name": "205HP Crawler",
-      "units": "h",
+      "units": "us$/h",
       "description": "",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 13.13,
           "units": "us$"
         },
@@ -989,10 +989,10 @@
 
       "class": "other",
       "name": "Service Truck",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 4,
           "units": "us$"
         },
@@ -1039,10 +1039,10 @@
 
       "class": "capital",
       "name": "Bale Wagon 1300# Attm",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 38.68,
           "units": "us$"
         },
@@ -1065,7 +1065,7 @@
     {
 
       "name": "Raking",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Rake 20'": {
@@ -1088,10 +1088,10 @@
 
       "type": "complex",
       "name": "Rake 20'",
-      "units": "h",
+      "units": "us$/h",
       "description": "",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 4.61,
           "units": "us$"
         }
@@ -1121,10 +1121,10 @@
 
       "type": "complex",
       "name": "150HP4WD Tractor",
-      "units": "h",
+      "units": "us$/h",
       "description": "Large Tractor",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 9.43,
           "units": "us$"
         },
@@ -1147,10 +1147,10 @@
     {
 
       "name": "Roll-Cover Seed",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 10,
           "units": "us$"
         },
@@ -1174,10 +1174,10 @@
 
       "type": "complex",
       "name": " Baler1300# PTO",
-      "units": "h",
+      "units": "us$/h",
       "description": "",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 31.85,
           "units": "us$"
         }
@@ -1206,10 +1206,10 @@
 
       "class": "capital",
       "name": "1/2 Ton Pickup",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 5.41,
           "units": "us$"
         },
@@ -1246,10 +1246,10 @@
 
       "class": "capital",
       "name": "3/4 Ton Pickup (Farm use)",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 5,
           "units": "us$"
         },
@@ -1272,10 +1272,10 @@
     {
 
       "name": "Plant-Roundup Ready Seed",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 9.09,
           "units": "us$"
         },
@@ -1298,10 +1298,10 @@
     {
 
       "name": "Swather 16'",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Lube&Repair": {
+        "Lube & Repair": {
           "amount": 19.42,
           "units": "us$"
         },
@@ -1323,9 +1323,9 @@
     },
     {
 
-      "name": "Lube&Repair",
+      "name": "Lube & Repair",
       "price": 1,
-      "units": "us$/us$",
+      "units": "us$",
       "type": "simple",
       "authority": "UCD Ext",
       "locality": [

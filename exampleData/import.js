@@ -1,6 +1,7 @@
 'use strict';
 
-var connect = require('../lib/cmd/connect');
+
+var mongo = require('../lib/mongo');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
@@ -9,32 +10,25 @@ var budgets = ['alfalfa.json', 'poplar.json'];
 var materialModel, budgetModel;
 var fileData = [];
 var user = 'jrmerz';
-var database;
 
-connect(function(err, db){
-  if( err ) {
-    console.log(err);
-    return;
-  }
-  global.db = db;
-  database = db;
-  budgetCollection = db.collection('budget');
-  materialCollection = db.collection('material');
-  historyCollection = db.collection('history');
+var db = mongo.get();
+budgetCollection = db.collection('budget');
+materialCollection = db.collection('material');
+historyCollection = db.collection('history');
 
-  materialModel = require('../models/materials')();
-  budgetModel = require('../models/budget')();
+materialModel = require('../models/materials')();
+budgetModel = require('../models/budget')();
 
-  run();
-});
 
-function run() {
+
+module.exports = function(callback) {
   async.eachSeries(budgets, function(file, next){
     importData(file, next);
   }, function(){
-    database.close();
+    db.close();
+    callback();
   });
-}
+};
 
 function importData(file, next) {
   var data = require('./'+file);

@@ -51,7 +51,16 @@ options = {
             config : authConfig
           });
 
-          next(null, config);
+          if( config.get('import') ) {
+            var sampleImporter = require('./exampleData/import');
+            sampleImporter(function(){
+              console.log('Done');
+            });
+          } else {
+            next(null, config);
+          }
+
+
         });
     }
 };

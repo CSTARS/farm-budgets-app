@@ -1,6 +1,6 @@
 'use strict';
 
-var connect = require('../lib/cmd/connect');
+var connect = require('../lib/mongo');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');

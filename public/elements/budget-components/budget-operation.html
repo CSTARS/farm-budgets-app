@@ -307,12 +307,7 @@
     onMaterialSelect : function(e) {
       var material = new SDK.Material(e.detail);
 
-      var units;
-      if( material.getType() == 'complex' ) {
-        units = material.getUnits();
-      } else {
-        units = SDK.units.invert(material.getUnits());
-      }
+      var units = SDK.units.invertAndRemoveDollars(material.getUnits());
 
       this.operation.addRequiredMaterial({
         name : material.getName(),
@@ -347,7 +342,7 @@
       if( this.readonly ) return;
       this.$.nameLabel.style.display = 'none';
       this.$.nameInput.style.display = 'inline-block';
-      this.$.nameInput.value = this.operation.name;
+      this.$.nameInput.value = this.operation.getName();
       this.$.nameInput.focus();
     },
 
@@ -358,11 +353,13 @@
     rename : function() {
       var newname = this.$.nameInput.value.replace(/\s/g, '');
 
-      try {
-        this.operation.rename(newname);
-      } catch(e) {
-        this.$.nameMsg.innerHTML = e.message;
-        return;
+      if( newname !== this.operation.getName() ) {
+        try {
+          this.operation.rename(newname);
+        } catch(e) {
+          this.$.nameMsg.innerHTML = e.message;
+          return;
+        }
       }
 
       this.$.nameMsg.innerHTML = '';
