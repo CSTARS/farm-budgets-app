@@ -151,10 +151,11 @@
     <div class="layout horizontal">
       <div class="flex">
         <!--<a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a> -->
+        <span class="label label-success" id="savedMsg" style="display:none" >Saved.</span>
       </div>
       <div>
         <a class="btn btn-default" id="cancel" href="#material/search">Cancel</a>
-        <a class="btn btn-primary" on-click="save">Save</a>
+        <a class="btn btn-primary" on-click="save" id="saveBtn">Save</a>
       </div>
     </div>
   </div>
@@ -185,7 +186,12 @@
       },
 
       create : function() {
-        this.material = new SDK.Material();
+        this.material = new SDK.Material({
+          name : '',
+          type : 'simple',
+          authority : ExpressAuth.user ? ExpressAuth.user.email : '',
+          year : new Date().getFullYear()
+        });
         this.$.title.innerHTML = 'Create Material';
         //this.$.undo.style.display = 'none';
         this.setInputs();
@@ -218,7 +224,7 @@
         this.$.descriptionInput.value = this.material.getDescription();
         this.$.priceInput.value = this.material.getPrice();
 
-        var units = SDK.invertAndRemoveDollars(this.material.getUnits());
+        var units = SDK.units.invertAndRemoveDollars(this.material.getUnits());
 
         this.$.unitsInput.setUnits(units);
         this.$.authorityInput.value = this.material.getAuthority();
@@ -244,6 +250,9 @@
       },
 
       save : function() {
+        this.$.saveBtn.innerHTML = 'Saving...';
+        this.$.saveBtn.setAttribute('disabled', 'disabled');
+
         this.material.setName(this.$.nameInput.value);
         this.material.setDescription(this.$.descriptionInput.value);
         this.material.setPrice(parseFloat(this.$.priceInput.value));
@@ -260,12 +269,21 @@
         this.material.setClass(this.$.classInput.value);
 
         this.material.save(function(resp){
+          this.$.saveBtn.innerHTML = 'Save';
+          this.$.saveBtn.removeAttribute('disabled');
+
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
             this.fire('error', resp);
+          } else {
+            this.$.savedMsg.style.display = 'inline-block';
+            setTimeout(function() {
+              this.$.savedMsg.style.display = 'none';
+            }.bind(this), 2000);
           }
 
           this.fire('done', this.material);
+          window.location = '#material/edit/'+this.material.getId();
         }.bind(this));
       },
 
@@ -357,7 +375,7 @@
           .find('budget-unit-selector')
           .on('units-change', function(e){
             var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
-            m.units = parseInt(e.detail.value);
+            m.units = parseInt(e.originalEvent.detail.value);
             this.material.addRequiredMaterial(m);
           }.bind(this));
 

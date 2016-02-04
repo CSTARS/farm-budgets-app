@@ -100,7 +100,7 @@ module.exports = function (router) {
           return res.send({error:true, message: err});
         }
         if( !material ) {
-          return res.send({error: true, message: 'Unknown material id'});
+          return res.send({error: true, message: 'Unknown material id: '+id});
         }
 
         authUtils.hasAccessObject(req.user, material, function(err, hasRole){

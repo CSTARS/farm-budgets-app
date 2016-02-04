@@ -149,7 +149,7 @@
             '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +
             m.getName()+
             (m.getType() === 'simple' || this.budgetView ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '')
-            + ' <small>/ '+unitLabel+'</small>';
+            + '<small>/'+unitLabel+'</small>';
 
         this.$.description.innerHTML = m.getDescription();
         this.$.description.style.display = m.getDescription() ? 'block' : 'none';
@@ -218,7 +218,7 @@
                     '<td>'+name+'</td>'+
                     '<td>'+rm.amount+'</td>'+
                     '<td><span class="label label-default">'+rm.units+'</span></td>'+
-                    (this.budgetView ? '<td><ahb-dollar-label value="'+rm.price+'"></ahb-dollar-label> <span style="color:#888">/ '+unitLabel+'</span>' : '')+
+                    (this.budgetView ? '<td><ahb-dollar-label value="'+rm.price+'"></ahb-dollar-label> <span style="color:#888">/'+unitLabel+'</span>' : '')+
                   '</tr>';
 
             if( this.budgetView ) {
