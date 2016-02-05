@@ -22,14 +22,22 @@
     },
 
     ready : function() {
+      this.currentValue = '';
       this.style.color = '#5cb85c';
       this.style.display = 'inline-block';
+      this.values = [];
     },
 
     update : function() {
+      var newValue = this._getTextValue();
+
       if( this.first ) {
-        this._update();
+        this.innerHTML = newValue;
         this.first = false;
+        return;
+      }
+
+      if( this.currentValue === newValue ) {
         return;
       }
 
@@ -39,7 +47,7 @@
       this.timer = setTimeout(function(){
         this.timer = -1;
 
-        this._update();
+        this.innerHTML = newValue;
         this.style.visibility = 'hidden';
         this.className = 'animated zoomIn'
 
@@ -54,14 +62,14 @@
       }.bind(this), 500);
     },
 
-    _update : function() {
+    _getTextValue : function() {
       var val = parseFloat(this.value);
       if( isNaN(val) ) {
         val = '0';
       } else {
         val = val.toFixed(this.decimal ? 2 : 0);
       }
-      this.innerHTML = '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+      return '$'+val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
     }
   });
 </script>

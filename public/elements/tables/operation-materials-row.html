@@ -19,7 +19,7 @@
       <td>
         <budget-unit-selector units="{{units}}" disabled="{{readonly}}" on-units-change="setUnits"></budget-unit-selector>
       </td>
-      <td><ahb-dollar-label value="{{total}}"></ahb-dollar-label></td>
+      <td><ahb-dollar-label id="total"></ahb-dollar-label></td>
       <td>
         <a class="btn btn-link" on-click="remove"><i class="fa fa-trash"></i></a>
       </td>
@@ -37,7 +37,6 @@
         this.units = '';
         this.readonly = false;
         this.amount = 0;
-        this.total = 0;
       },
 
       create : function(options) {
@@ -49,19 +48,29 @@
         this.update();
       },
 
+      applyUpdate : function(impl, operation) {
+        this.operation = operation;
+        this.impl = impl;
+        this.update();
+      },
+
       update : function() {
         var material = SDK.getMaterial(this.impl.name);
         this.mname = this.impl.name;
         this.note = this.impl.note || '';
         this.amount = this.impl.amount || 0;
         this.units = this.impl.units || '';
-        this.total = this.impl.price || 0;
+        this.$.total.value = this.impl.price || 0;
+
       },
 
       updateMaterial : function() {
         try {
           this.operation.updateRequiredMaterial(this.impl);
-        } catch(e) {}
+        } catch(e) {
+          debugger;
+          console.log(e);
+        }
       },
 
       setNote : function(e) {

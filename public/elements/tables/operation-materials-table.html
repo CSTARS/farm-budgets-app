@@ -24,9 +24,18 @@
         }
       },
 
+      ready : function() {
+        this.rows = [];
+      },
+
       update : function(operation) {
         if( operation ) {
+          if( this.valueChanges(operation) ) {
+            this.applyValueChanges(operation);
+            return;
+          }
           this.operation = operation;
+          this.currentMaterials = $.extend(true, [], this.operation.getRequiredMaterials());
         }
 
         this.$.table.innerHTML = '<tr>'+
@@ -37,6 +46,7 @@
           '<th>Sub Total</th>'+
           '<th></th></tr>';
 
+        this.rows = [];
         var body = this.$.table.querySelector('tbody');
 
 
@@ -51,8 +61,38 @@
             operation : this.operation,
             readonly : this.readonly
           });
+          this.rows.push(rowController);
         }
+      },
+
+      valueChanges : function(operation) {
+        if( !this.operation ) return false;
+
+
+        var newMaterials = operation.getRequiredMaterials();
+
+        if( this.currentMaterials.length != newMaterials.length ) {
+          return false;
+        }
+
+        for( var i = 0; i < this.currentMaterials.length; i++ ) {
+          if( this.currentMaterials[i].name != newMaterials[i].name ) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+
+      applyValueChanges : function(operation) {
+        var newMaterials = operation.getRequiredMaterials();
+        for( var i = 0; i < this.rows.length; i++ ) {
+          this.rows[i].applyUpdate(newMaterials[i], this.operation);
+        }
+        this.operation = operation;
+        this.currentMaterials = $.extend(true, [], this.operation.getRequiredMaterials());
       }
+
 
 
     });

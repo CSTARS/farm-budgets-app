@@ -135,9 +135,9 @@
     },
 
     // fired from operation controller, so just raw data object passed
-    onOperationUpdate : function(operation) {
+    onOperationUpdate : function(e) {
       if( !this.operation ) return;
-      if( operation.name != this.operation.getName() ) return;
+      if( e.operation.name != this.operation.getName() ) return;
 
       this.render();
     },
