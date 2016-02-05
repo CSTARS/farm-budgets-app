@@ -31,7 +31,7 @@
                     <div style="padding:10px 0">
                       <a class="btn btn-primary" on-click="grantAccess" index$="{{index}}"><i class="fa fa-user-plus"></i></a>
                       <span>{{item.email}}</span>
-                      (<span>{{item.name}}</span>)
+                      (<span>{{item.display_name}}</span>)
                     </div>
                   </template>
                 </div>
@@ -90,7 +90,7 @@
       },
 
       update : function() {
-        SDK.authority.get(this.authority, this.onResponse.bind(this));
+        SDK.authorities.get(this.authority, this.onResponse.bind(this));
       },
 
       updateBudgets : function() {
@@ -181,14 +181,14 @@
       removeAccess : function(e) {
         var index = parseInt(e.currentTarget.getAttribute('index'));
         var user = this.users[index];
-
+        
         if( !confirm('Are you sure you want to remove user: '+user) ) {
           return;
         }
 
         this.splice('users', index);
 
-        SDK.authorities.removeAccess(this.authority, user.email, function(resp){
+        SDK.authorities.removeAccess(this.authority, user, function(resp){
           if( resp.error ) {
             alert(resp.message);
             return;

@@ -206,7 +206,14 @@
       }
 
       section.style.display = 'block';
-      if( section.onShow ) section.onShow(parts.splice(2, parts.length-1));
+
+      var params = parts
+        .splice(2, parts.length-1)
+        .map(function(param){
+          return decodeURIComponent(param);
+        });
+
+      if( section.onShow ) section.onShow(params);
     },
 
     setData : function(data) {

@@ -40,7 +40,7 @@
 
     <div id="errorMessage" class="text text-danger">
       <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of your materials have errors.</div>
-      <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filter" /> Only Show Materials With Errors</span>
+      <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors" /> Only Show Materials With Errors</span>
     </div>
 
     <h4 class="page-header">
@@ -82,7 +82,7 @@
           </div>
         </div>
 
-        <budget-material-table id="table"></budget-material-table>
+        <budget-material-table id="table" on-error-update="onErrorUpdate"></budget-material-table>
 
         <div id="searchMsg"></div>
 
@@ -160,12 +160,29 @@
       var matched = this.$.table.setFiltersAndSort(txt, this.$.sortInput.value);
 
 
-      if( matched == 0 ) {
+      if( matched == 0 && txt.length > 0 ) {
         this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
-        '. <a href="#material/create"><i class="fa fa-plus"></i> Create</a></div>';
+        '.<div style="text-align:center"><a href="#material/create/'+encodeURIComponent(txt)+'"><i class="fa fa-plus"></i> Create "'+txt+'"</a>&nbsp;&nbsp;|&nbsp;&nbsp;'+
+        '<a href="#material/search/'+encodeURIComponent(txt)+'"><i class="fa fa-search"></i> Find "'+txt+'"</a>'+
+        '</div></div>';
       } else {
         this.$.searchMsg.innerHTML = '';
       }
+    },
+
+    onErrorUpdate : function(e) {
+      var errors = e.detail;
+      if( errors === 0 ) {
+        this.$.errorMessage.style.display = 'none';
+      } else {
+        this.$.errorMessage.style.display = 'block';
+      }
+      this.$.errorCount.innerHTML = errors;
+    },
+
+    filterErrors : function(e) {
+      this.$.filterInput.value = '';
+      this.$.table.filterErrors($(e.currentTarget).is(':checked'));
     }
   });
 </script>

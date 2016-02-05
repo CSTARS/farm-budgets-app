@@ -72,7 +72,7 @@
 
           if( !this._material.exists() ) {
             this.innerHTML = '<span class="text text-danger"><i class="fa fa-warning"></i> <b>' +
-              this._material.getName()+'</b> not found.</span> <a class="btn btn-link" href="#material/search"><i class="fa fa-search"></i></a>';
+              this._material.getName()+'</b> not found.</span> <a class="btn btn-link" href="#material/search/'+encodeURIComponent(this.material)+'"><i class="fa fa-search"></i></a>';
           } else if( this._material.getType() === 'complex' ) {
             this.ele = document.createElement('complex-material-label');
             this.appendChild(this.ele);

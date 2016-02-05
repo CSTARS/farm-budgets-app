@@ -212,18 +212,19 @@
         var html = '<table class="table">', m;
 
         html += '<tr>'+
+          '<th></th>'+
           '<th><i class="fa fa-leaf"></i> Crop</th>'+
           '<th>Budget Name</th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
           '<th>Farm Name</th>'+
-          '<th></th>'+
         '</tr>';
 
         for( var i = 0; i < this.results.length; i++ ) {
           var m = this.results[i];
           html += '<tr>';
 
+          html += '<td><a style="cursor:pointer" index="'+i+'" select>Load</a></td>';
 
           html += '<td>'+m.commodity+'</td>';
 
@@ -237,8 +238,6 @@
           html += '<td>'+m.locality.join(', ')+'</td>';
 
           html += '<td>'+m.farm.name+'</td>';
-
-          html += '<td><a style="cursor:pointer" index="'+i+'" select>Select</a></td>';
 
           html += '</tr>';
         }

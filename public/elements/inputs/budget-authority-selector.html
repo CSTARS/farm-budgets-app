@@ -60,16 +60,20 @@
       defaultObserver : function() {
         if( !ExpressAuth.user ) return;
 
-        var noAccess = SDK.app.hasAccess(this.default) ? '' : ' - No Access';
+        if( this.default ) {
+          var noAccess = SDK.app.hasAccess(this.default) ? '' : ' - No Access';
 
-        var ele = $(this.$.selector)
-          .find('[value="'+this.default+'"]')
-          .html(this.default+' (Current'+noAccess+')');
+          var ele = $(this.$.selector)
+            .find('[value="'+this.default+'"]')
+            .html(this.default+' (Current'+noAccess+')');
 
-        if( ele.length === 0 ) {
-          var option = $('<option value="'+this.default+'">'+this.default+' (Current'+noAccess+')</option>');
-          $(this.$.selector).append(option);
+          if( ele.length === 0 ) {
+            var option = $('<option value="'+this.default+'">'+this.default+' (Current'+noAccess+')</option>');
+            $(this.$.selector).append(option);
+          }
         }
+
+
 
         this.$.selector.value = this.default;
         this.value = this.default;

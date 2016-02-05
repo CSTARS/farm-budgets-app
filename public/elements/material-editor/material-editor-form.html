@@ -150,7 +150,10 @@
   <div class="panel-footer">
     <div class="layout horizontal">
       <div class="flex">
-        <!--<a class="btn btn-warning" on-click="undo" id="undo">Undo Changes</a> -->
+        <span>
+          <a class="btn btn-link" id="addBtn" on-click="addMaterial"><i class="fa fa-plus"></i> Add to current Budget</a>
+          <a class="btn btn-link" id="removeBtn" on-click="removeMaterial"><i class="fa fa-times"></i> Remove from current Budget</a>
+        </span>
         <span class="label label-success" id="savedMsg" style="display:none" >Saved.</span>
       </div>
       <div>
@@ -185,19 +188,22 @@
         }.bind(this));
       },
 
-      create : function() {
+      create : function(name) {
+        this.creating = true;
         this.material = new SDK.Material({
-          name : '',
+          name : name || '',
           type : 'simple',
+          price : 1,
           authority : ExpressAuth.user ? ExpressAuth.user.email : '',
           year : new Date().getFullYear()
         });
         this.$.title.innerHTML = 'Create Material';
-        //this.$.undo.style.display = 'none';
         this.setInputs();
+        this.renderAddRemoveBtn();
       },
 
       edit : function(id) {
+        this.creating = false;
         try {
           var m = SDK.controllers.material.getById(id);
           this.material = new SDK.Material(m);
@@ -215,8 +221,9 @@
 
       onEditReady : function() {
         this.$.title.innerHTML = 'Edit Material';
-        //this.$.undo.style.display = 'inline-block';
+
         this.setInputs();
+        this.renderAddRemoveBtn();
       },
 
       setInputs : function() {
@@ -268,7 +275,11 @@
         this.material.setSource(this.$.sourceInput.value);
         this.material.setClass(this.$.classInput.value);
 
-        this.material.save(function(resp){
+        // only update the material controller if the material is already
+        // in the controller
+        var update = SDK.getBudget().hasMaterial(this.material.getName());
+        debugger;
+        this.material.save(update, function(resp){
           this.$.saveBtn.innerHTML = 'Save';
           this.$.saveBtn.removeAttribute('disabled');
 
@@ -419,6 +430,33 @@
             this.$.usedByMessage.style.display = 'none';
           }
         }.bind(this));
+      },
+
+      renderAddRemoveBtn : function() {
+        this.$.addBtn.style.display = 'none';
+        this.$.removeBtn.style.display = 'none';
+        if( this.creating ) {
+          return;
+        }
+
+        if( SDK.getBudget().hasMaterial(this.material.getName()) ) {
+          this.$.removeBtn.style.display = 'inline-block';
+        } else {
+          this.$.addBtn.style.display = 'inline-block';
+        }
+      },
+
+      addMaterial : function(e) {
+        SDK
+          .getBudget()
+          .addMaterial(this.material);
+
+        this.renderAddRemoveBtn();
+      },
+
+      removeMaterial : function() {
+        SDK.getBudget().removeMaterial(this.material.getName());
+        this.renderAddRemoveBtn();
       },
 
       toggleUses : function() {

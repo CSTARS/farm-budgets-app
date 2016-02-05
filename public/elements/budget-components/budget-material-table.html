@@ -78,7 +78,24 @@
         return true;
       },
 
+      filterErrors : function(show) {
+        this.showingErrors = show;
+        if( show ) {
+          $(this).find('tr[label-row]').hide();
+          $(this).find('tr[error-row]').show();
+        } else {
+          $(this).find('tr[label-row]').show();
+        }
+      },
+
       render : function() {
+        var errors = 0;
+
+        if( this.uiArray.length === 0 ) {
+          this.innerHTML = '';
+          return;
+        }
+
         var html = '<table class="table style-scope budget-material-table">', m;
 
         html += '<tr>'+
@@ -98,7 +115,7 @@
 
           var unitLabel = SDK.units.invertAndRemoveDollars(m.units);
 
-          html += '<tr>';
+          html += '<tr label-row '+(hasErrors ? 'error-row' : '')+'>';
 
           // set row icon
           html += '<td class="style-scope budget-material-table" info="'+i+'"><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"></i> ';
@@ -116,7 +133,7 @@
           html += '<td>'+(m.year !== undefined ? m.year : '')+'</td>';
 
           // set price
-          html += '<td><ahb-dollar-label value="'+m.price+'"></ahb-dollar-label> <span style="color:#888">/ '+unitLabel+'</span></td>';
+          html += '<td><ahb-dollar-label value="'+m.price+'"></ahb-dollar-label><span style="color:#888">/'+unitLabel+'</span></td>';
 
           if( hasErrors ) {
             html += '<td><div class="btn-group">'+
@@ -140,6 +157,7 @@
             }
 
             html += '</ul></div></td>';
+            errors++;
           } else {
             html += '<td></td>';
           }
@@ -181,12 +199,18 @@
         $(this)
           .find('a[remove]')
           .on('click', this.removeMaterial.bind(this));
+
+        this.fire('error-update', errors);
+
+        if( this.showingErrors ) {
+          this.filterErrors(true);
+        }
       },
 
 
       removeMaterial : function(e) {
         var index = parseInt(e.currentTarget.getAttribute('remove'));
-        SDK.getBudget().removeMaterial(this.results[index].name);
+        SDK.getBudget().removeMaterial(this.uiArray[index].name);
         this.render();
       }
     });

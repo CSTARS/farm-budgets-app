@@ -32,6 +32,16 @@ module.exports = function (router) {
       });
     });
 
+    router.get('/getWithRequired', cors(), function (req, res) {
+      model.getWithRequired(req.query.id, function(err, materials){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(materials);
+      });
+    });
+
     router.get('/search', cors(), function (req, res) {
       var query = {};
       try {

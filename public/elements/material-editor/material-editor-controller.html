@@ -34,6 +34,7 @@
       ready : function() {
         this.allowed = ['search', 'edit', 'create'];
         $(window).on('hashchange', this.setPage.bind(this));
+        SDK.on('budget-load', this.setPage.bind(this))
       },
 
       attached : function() {
@@ -75,6 +76,11 @@
           this.$.search.style.display = 'block';
           this.$.form.style.display = 'none';
           this.$.find.style.display = 'none';
+
+          if( parts.length > 2 ) {
+            this.$.search.setText(decodeURIComponent(parts[2]));
+          }
+
         } else {
           this.$.form.style.display = 'block';
           this.$.search.style.display = 'none';
@@ -82,8 +88,13 @@
           if( page === 'edit' ) {
             this.$.form.edit(parts[2]);
           } else {
+            var name = '';
+            if( parts.length > 2 ) {
+              name = decodeURIComponent(parts[2]);
+            }
+
             this.$.create.style.display = 'none';
-            this.$.form.create();
+            this.$.form.create(name);
           }
         }
       },

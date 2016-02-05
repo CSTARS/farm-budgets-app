@@ -11,7 +11,13 @@
     <div class="panel panel-default">
       <div class="panel-body">
         <button type="button" class="close" aria-hidden="true" on-click="hide">×</button>
-        <budget-material-info material="{{material}}" id="info" budget-view$="{{budgetView}}"></budget-material-info>
+        <budget-material-info
+          material="{{material}}"
+          errors="{{errors}}"
+          notUsed="{{notUsed}}"
+          id="info"
+          budget-view$="{{budgetView}}">
+        </budget-material-info>
       </div>
     </div>
 
@@ -33,6 +39,35 @@
           value : function() {
             return false
           }
+        },
+        errors : {
+          type : Boolean,
+          value : function() {
+            return false
+          },
+          observer : 'updateFilterAttributes'
+        },
+        notUsed : {
+          type : Boolean,
+          value : function() {
+            return false
+          },
+          observer : 'updateFilterAttributes'
+        }
+      },
+
+      updateFilterAttributes : function() {
+        if( this.errors ) {
+          $(this).parent().parent()[0].setAttribute('errors','true')
+        } else {
+          $(this).parent().parent()[0].removeAttribute('errors');
+        }
+
+        if( this.notUsed ) {
+          debugger;
+          $(this).parent().parent()[0].setAttribute('notUsed','true')
+        } else {
+          $(this).parent().parent()[0].removeAttribute('notUsed');
         }
       },
 

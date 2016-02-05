@@ -29,6 +29,8 @@
         <template is="dom-repeat" items="{{locationFilters}}">
           <div><a class="btn btn-link" on-click="addFilter" filter="locality">{{item}}</a></div>
         </template>
+
+        <a class="btn btn-default" on-click="setHasAccessQuery">Edit Permissions</a>
       </div>
       <div class="flex" style="padding: 20px">
 
@@ -83,9 +85,12 @@
         this.query();
       },
 
-      onKeyUp : function() {
-        var value = this.$.textInput.value;
+      setText : function(value) {
+        this.$.textInput.value = value;
+        this.updateTextFilter(value);
+      },
 
+      updateTextFilter : function(value) {
         this.page = 0;
 
         if( value === '' ) {
@@ -100,6 +105,11 @@
         }
 
         this.bufferedQuery();
+      },
+
+      onKeyUp : function() {
+        var value = this.$.textInput.value;
+        this.setText(value);
       },
 
       bufferedQuery : function() {
@@ -191,7 +201,6 @@
             SDK.controllers.material.getById(m.id);
             idInBudget = true;
           } catch(e) {}
-
 
 
           html += '<tr>';
@@ -318,38 +327,44 @@
         this.renderControls();
       },
 
-      createNew : function(){
-        this.fire('edit',{
-          name : '',
-          type : 'simple',
-          authority : ExpressAuth.user.email,
-          year : new Date().getFullYear()
-        });
-      },
-
       renderControls : function() {
         this.$.totalLabel.innerHTML = '<h5>'+(this.resp.start+1)+' to '+(this.resp.stop)+' of '+this.resp.total+'</h5>';
       },
 
       renderFilters : function() {
-        if( !this.q.$and ) {
+        if( !this.q.$and && !this.q.authority ) {
           this.$.filters.innerHTML = '';
           return;
         }
 
+
         var html = '';
-        for( var i = 0; i < this.q.$and.length; i++ ) {
-          var filter = this.q.$and[i];
-          html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+filter[this.getFilter(filter)]+'</a> ';
+        if( this.q.$and ) {
+          for( var i = 0; i < this.q.$and.length; i++ ) {
+            var filter = this.q.$and[i];
+            html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+filter[this.getFilter(filter)]+'</a> ';
+          }
         }
+
+        if( this.q.authority ) {
+          html += ' <a index="access" class="btn btn-primary"><i class="fa fa-times"></i> Edit Permissions</a> ';
+        }
+
         this.$.filters.innerHTML = html;
 
         $(this.$.filters)
           .find('a')
           .on('click', function(e){
-            this.q.$and.splice(parseInt(e.currentTarget.getAttribute('index')), 1);
-            if( this.q.$and.length === 0 ) {
-              delete this.q.$and;
+            var index = e.currentTarget.getAttribute('index');
+
+            if( index === 'access' ) {
+              delete this.q.authority;
+            } else {
+              this.q.$and.splice(parseInt(index), 1);
+
+              if( this.q.$and.length === 0 ) {
+                delete this.q.$and;
+              }
             }
 
             $(e.currentTarget).remove();
@@ -405,7 +420,11 @@
       },
 
       setHasAccessQuery : function() {
-        this.q = {};
+        if( !this.q ) this.q = {};
+
+        if( !ExpressAuth.user ) {
+          return alert('You must login first');
+        }
 
         if( ExpressAuth.user ) {
           this.q.authority = {
@@ -413,6 +432,9 @@
           }
           this.q.authority.$in.push(ExpressAuth.user.email);
         };
+
+        this.renderFilters();
+        this.query();
       },
 
       onSelectedUpdate : function() {
@@ -434,6 +456,7 @@
 
       addMaterial : function(e) {
         var index = parseInt(e.currentTarget.getAttribute('add'));
+
 
         SDK.materials.get(this.results[index].id, function(resp){
           if( resp.error ) {
