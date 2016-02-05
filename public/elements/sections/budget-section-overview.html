@@ -73,7 +73,7 @@
               </tr>
               <tr>
                 <td>Budget URL</td>
-                <td><a id="link" target="_blank">Link</a></td>
+                <td><a id="link" target="_blank"><i class="fa fa-globe"></i> Link</a></td>
               </tr>
             </tbody>
           </table>
@@ -143,22 +143,23 @@
         this.$.editBtn.style.display = 'none';
       }.bind(this));
 
-      FB.materialController.on('material-update', this.updateMaterialAuthorties.bind(this));
-      FB.materialController.on('material-removed', this.updateMaterialAuthorties.bind(this));
+      SDK.controllers.material.on('material-update', this.updateMaterialAuthorties.bind(this));
+      SDK.controllers.material.on('material-removed', this.updateMaterialAuthorties.bind(this));
+      SDK.changes.on('save-state-update', this.showChangesWarning.bind(this));
     },
 
     attached : function() {
       document
         .querySelector('budget-farm-editor')
         .addEventListener('editor-close', function(){
-          this.setData(FB.getBudget());
+          this.setData(SDK.getBudget().getData());
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
         }.bind(this));
 
       document
         .querySelector('ahb-budget')
         .addEventListener('budget-loaded', function(){
-          this.$.link.setAttribute('href', '#link/'+FB.getBudget().id);
+          this.$.link.setAttribute('href', '#link/'+SDK.getBudget().data.id);
         }.bind(this));
     },
 
@@ -196,7 +197,7 @@
 
       this.updateMaterialAuthorties();
 
-      if( ExpressAuth.user && FB.hasAccess(data) ) {
+      if( ExpressAuth.user && SDK.app.hasAccess(data) ) {
         this.$.deleteBtn.style.display = 'inline-block';
       } else {
         this.$.deleteBtn.style.display = 'none';
@@ -205,7 +206,7 @@
 
     updateMaterialAuthorties : function() {
       var authorities = {};
-      var materials = FB.materialController.get();
+      var materials = SDK.controllers.material.get();
       var m;
 
       for( var name in materials ) {
@@ -258,7 +259,8 @@
       // TODO: this should be a popup that also checks for reference budgets.
       if( !confirm('Are you sure you want to delete the budget!?') ) return;
       if( !confirm('Are you really sure!?') ) return;
-      $.get('/budget/delete?id='+this.budgetId, function(resp){
+
+      SDK.budgets.delete(this.budgetId, function(resp){
         if( resp.error ) {
           alert(resp.message);
         }
@@ -274,18 +276,19 @@
       document.querySelector('budget-farm-editor').show();
     },
 
-    showChangesWarning : function(show) {
+    showChangesWarning : function(e) {
+      var show = e.changes;
       this.$.changesWarning.style.display = show ? 'block' : 'none';
 
       var showNoAccess = false;
-      if( show && ExpressAuth.user && this.data && !FB.hasAccess(FB.changes.getOriginal().budget) ) {
+      if( show && ExpressAuth.user && this.data && !SDK.app.hasAccess(SDK.changes.getOriginal().budget) ) {
         showNoAccess = true;
       }
 
       this.$.noAccessWarning.style.display = showNoAccess ? 'block' : 'none';
       if( showNoAccess ) {
         this.$.noAccessWarning.innerHTML = '<i class="fa fa-warning"></i> You do not have access to the original authority '+
-        ' <b><i class="fa fa-shield"></i> '+FB.changes.getOriginal().budget.authority+'</b>.'+
+        ' <b><i class="fa fa-shield"></i> '+SDK.changes.getOriginal().budget.authority+'</b>.'+
           '  You will need to save as new budget.';
       }
     }

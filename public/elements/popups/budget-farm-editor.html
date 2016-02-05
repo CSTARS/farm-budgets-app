@@ -92,10 +92,12 @@
           .modal({show: false})
           .on('hidden.bs.modal', function(){
             if( this.saveOnClose ) {
-              FB.saveBudget();
+              SDK.app.saveBudget();
             } else {
-              FB.localsave();
+              SDK.app.localsave();
             }
+
+            SDK.app.checkForChanges();
             this.fire('editor-close');
           }.bind(this));
       },
@@ -105,7 +107,7 @@
       show : function(saveOnClose) {
         this.saveOnClose = saveOnClose === true ? true : false;
 
-        var data = FB.getBudget();
+        var data = SDK.getBudget().getData();
         if( !data.farm ) data.farm = {};
         this.data = data;
 

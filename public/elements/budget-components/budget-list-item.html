@@ -56,7 +56,6 @@
       render : function(budget) {
         if( !budget ) return;
 
-        this.budget = budget;
         this.$.commodityLabel.innerHTML = budget.commodity;
         this.$.localityLabel.innerHTML = budget.locality ? budget.locality.join(', ') : '';
         this.$.authorityLabel.innerHTML = budget.authority;

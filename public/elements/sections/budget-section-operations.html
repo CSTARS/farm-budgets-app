@@ -30,11 +30,13 @@
       </div>
     </div>
 
-    <div style="text-align: center; padding: 25px 0 15px 0">
-      <a class="btn btn-primary btn-lg" on-click="showCreate" id="createBtn"><i class="fa fa-cogs"></i> Create New Operation</a>
-      <div class="alert alert-warning" id="referenceMsg" style="display:none">
-        <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
-      </div>
+    <h4 class="page-header">
+      <a class="btn btn-primary pull-right"  style="margin-top:-10px" on-click="showCreate" id="createBtn"><i class="fa fa-plus"></i> New</a>
+      <i class="fa fa-cogs"></i> Operations
+    </h4>
+
+    <div class="alert alert-warning" id="referenceMsg" style="display:none">
+      <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
     </div>
 
     <div class="row">
@@ -66,8 +68,8 @@
       $('body').append(this.popup);
       this.popup.modal({show: false});
 
-      FB.operationController.on('operation-update', this.onOperationsUpdated.bind(this));
-      FB.operationController.on('operation-removed', function(e){
+      SDK.controllers.operation.on('operation-update', this.onOperationsUpdated.bind(this));
+      SDK.controllers.operation.on('operation-removed', function(e){
         $(this.$.root).find('[operation="'+e.operation.name+'"]').remove();
         this.filter();
       }.bind(this));
@@ -77,7 +79,7 @@
       if( e.replaced ) {
 
         var current = $(this.$.root).find('[operation="'+e.replaced +'"]');
-        current.attr('operation', operation.name);
+        current.attr('operation', e.operation.name);
 
       } else {
 
@@ -93,14 +95,17 @@
       this.filter();
     },
 
-    setData : function(data) {
-      this.data = data.budget;
+    setData : function() {
+      var budget = SDK.getBudget();
+
       this.$.root.innerHTML = '';
 
-      this.referenced = this.data.reference ? true : false;
+      this.referenced = budget.isReference();
 
-      this.data.operations.forEach(function(operation){
-        var ele = this.createPanel(operation);
+      // empty get call returns all operations
+      var operations = budget.getOperation();
+      operations.forEach(function(operation){
+        var ele = this.createPanel(operation.data);
         this.$.root.appendChild(ele);
       }.bind(this));
 
@@ -159,21 +164,13 @@
         return;
       }
 
-      var op = FB.operationController.get(name);
-      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
+      if( SDK.getBudget().hasOperation(name) ) {
         this.$.newNameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
         return;
       }
       this.$.newNameMsg.innerHTML = '';
 
-      var op = {
-        name : name,
-        materials : [],
-        schedule : [],
-        units : '[acr_us]'
-      };
-
-      FB.operationController.add(op);
+      SDK.getBudget().addOperation(name);
       this.$.filterInput.value = name;
       this.popup.modal('hide');
     },
@@ -193,7 +190,7 @@
       if( txt == '' ) {
         showAll = true;
       } else {
-        matched = this.toNameArray(FB.operationController.find(txt));
+        matched = this.toNameArray(SDK.controllers.operation.find(txt));
       }
 
       var opEles = this.querySelectorAll('budget-operation');

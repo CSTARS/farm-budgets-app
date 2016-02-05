@@ -26,7 +26,7 @@
       is: 'budget-setup-account',
 
       ready : function() {
-        $.get('/auth/getDevToken', function(resp){
+        SDK.auth.getDevToken(function(resp){
           if( resp.error || !resp.token ) return;
           var token = resp.token;
           this.setTokenLabel(resp.token);
@@ -45,7 +45,7 @@
       },
 
       generate : function() {
-        $.get('/auth/newDevToken', function(resp){
+        SDK.auth.newDevToken(function(resp){
           if( resp.error ) return alert(resp.message);
           if( !resp.token ) return alert('Server error requesting token :(');
           this.setTokenLabel(resp.token);

@@ -1,0 +1,98 @@
+<dom-module id="operation-materials-row">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <tr id="row">
+      <td>
+        <material-label id="label" material$="{{mname}}" impl="{{impl}}"></material-label>
+      </td>
+      <td style="padding: 0 3px">
+        <input type="text" class="form-control" value="{{note}}" disabled="{{readonly}}" placeholder="Notes" on-change="setNote"/>
+      </td>
+      <td style="padding: 0 3px">
+        <input type="number" class="form-control" value="{{amount}}" style="max-width: 100px" disabled="{{readonly}}" placeholder="Amount" on-change="setAmount"/>
+      </td>
+      <td>
+        <budget-unit-selector units="{{units}}" disabled="{{readonly}}" on-units-change="setUnits"></budget-unit-selector>
+      </td>
+      <td><ahb-dollar-label id="total"></ahb-dollar-label></td>
+      <td>
+        <a class="btn btn-link" on-click="remove"><i class="fa fa-trash"></i></a>
+      </td>
+    </tr>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'operation-materials-row',
+
+      ready : function() {
+        this.impl = null;
+        this.mname = '';
+        this.notes = '';
+        this.units = '';
+        this.readonly = false;
+        this.amount = 0;
+      },
+
+      create : function(options) {
+        this.removeChild(this.$.row);
+        options.table.appendChild(this.$.row);
+        this.impl = options.impl;
+        this.operation = options.operation;
+        this.readonly = options.readonly;
+        this.update();
+      },
+
+      applyUpdate : function(impl, operation) {
+        this.operation = operation;
+        this.impl = impl;
+        this.update();
+      },
+
+      update : function() {
+        var material = SDK.getMaterial(this.impl.name);
+        this.mname = this.impl.name;
+        this.note = this.impl.note || '';
+        this.amount = this.impl.amount || 0;
+        this.units = this.impl.units || '';
+        this.$.total.value = this.impl.price || 0;
+
+      },
+
+      updateMaterial : function() {
+        try {
+          this.operation.updateRequiredMaterial(this.impl);
+        } catch(e) {
+          debugger;
+          console.log(e);
+        }
+      },
+
+      setNote : function(e) {
+        this.impl.note = e.currentTarget.value;
+        this.updateMaterial();
+      },
+
+      setAmount : function(e) {
+        this.impl.amount = parseInt(e.currentTarget.value);
+        this.updateMaterial();
+      },
+
+      setUnits : function(e) {
+        if( e.detail.value === undefined  || e.detail.error ) return;
+        this.impl.units = e.detail.value;
+        this.updateMaterial();
+      },
+
+      remove : function() {
+        this.operation.removeRequiredMaterial(this.impl.id);
+      }
+
+    });
+  </script>
+</dom-module>

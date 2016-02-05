@@ -32,8 +32,8 @@ module.exports = function (router) {
       });
     });
 
-    router.post('/find', function (req, res) {
-      model.find(req.body.query, function(err, materials){
+    router.get('/getWithRequired', cors(), function (req, res) {
+      model.getWithRequired(req.query.id, function(err, materials){
         if( err ) {
           return res.send({error:true, message: err});
         }
@@ -110,7 +110,7 @@ module.exports = function (router) {
           return res.send({error:true, message: err});
         }
         if( !material ) {
-          return res.send({error: true, message: 'Unknown material id'});
+          return res.send({error: true, message: 'Unknown material id: '+id});
         }
 
         authUtils.hasAccessObject(req.user, material, function(err, hasRole){

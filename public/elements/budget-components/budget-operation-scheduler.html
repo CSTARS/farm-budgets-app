@@ -31,17 +31,27 @@
     </div>
 
     <div id="inputPanel">
-      <h5 class="page-header" style="text-align:center; margin-top: 0px" >{{operationName}}</h5>
+      <h5 class="page-header" style="margin-top: 0px" >
+        <div class="layout horizontal">
+          <div>
+            <!--<a class="btn btn-default" id="previous" on-click="previous"><i class="fa fa-arrow-left"></i></a>-->
+          </div>
+          <div class="flex" style="text-align:center">{{operationName}}</div>
+          <div>
+            <!--<a class="btn btn-default" id="next" on-click="next"><i class="fa fa-arrow-right"></i></a>-->
+          </div>
+      </h5>
 
       <div class="form-horizontal">
 
         <div class="form-group" id="dates">
           <label for="datesInput" class="col-sm-3 control-label" id="inputLabel"><i class="fa fa-calendar-plus-o"></i> Add Dates</label>
+
           <div class="col-sm-9">
             <div id="inputRoot"></div>
             <div id="selectedDates" style="padding: 20px 0">
 
-              <template is="dom-repeat" items="{{dates}}">
+              <template is="dom-repeat" items="{{uiDatesArray}}">
                 <div>
 
                   <div class="layout horizontal" style="margin-top:15px">
@@ -49,12 +59,17 @@
 
                     <div class="length-label">Length:</div>
                     <div hidden$="{{readonly}}">
-                      <input type="number" value="{{item.length::change}}" class="form-control" on-change="onLengthUpdate" style="max-width: 75px; margin-right: 5px" />
+                      <input type="number"
+                        value="{{item.length::change}}"
+                        class="form-control"
+                        on-change="onLengthUpdate"
+                        index$="{{index}}"
+                        style="max-width: 75px; margin-right: 5px" />
                     </div>
                     <div hidden$="{{!readonly}}" style="padding: 10px">{{item.length}}</div>
 
                     <div hidden$="{{readonly}}">
-                      <select value="{{item.units::change}}" class="form-control" on-change="onLengthUpdate">
+                      <select value="{{item.units::change}}" class="form-control" on-change="onLengthUpdate" index$="{{index}}">
                         <option value="day">Day(s)</option>
                         <option value="month">Month(s)</option>
                         <option value="year">Year(s)</option>
@@ -75,7 +90,7 @@
         </div>
       </div> <!-- end form -->
 
-      <div id="chart" style="height:100px"></div>
+      <div id="chart"></div>
 
     </div> <!-- end input panel -->
   </template>
@@ -97,7 +112,7 @@
     ready : function() {
       this.displayText = '';
       this.dateRangeText = '';
-
+      this.index = 0;
       this.data = [];
       this.dates = [];
 
@@ -124,9 +139,24 @@
       this.removeChild(this.$.inputPanel);
     },
 
-    set : function(data, name) {
-      this.data = data;
-      this.operationName = name;
+    previous : function() {
+      if( this.index === 0 ) return;
+      this.index--;
+      this.set(this.index);
+    },
+
+    next : function() {
+      if( this.index === this.operations.length ) return;
+      this.index++;
+      this.set(this.index);
+    },
+
+    set : function(index) {
+      this.operations = SDK.getBudget().getOperation();
+      this.index = index;
+
+      this.operation = this.operations[index];
+      this.operationName = this.operation.getName();
 
       if( this.readonly ) {
         this.$.inputLabel.style.display = 'none';
@@ -136,62 +166,77 @@
         this.$.inputRoot.style.display = 'block';
       }
 
+/*
+      if( index === 0 ) this.$.previous.setAttribute('disabled', 'disabled');
+      else this.$.previous.removeAttribute('disabled');
+
+      if( index === this.operations.length - 1 ) this.$.next.setAttribute('disabled', 'disabled');
+      else this.$.next.removeAttribute('disabled');
+*/
       this.copyDataArray();
 
       this.update(true);
     },
 
-    // Polymer hack and keeping UI code out of data
+    // Keeping UI code out of data object
     copyDataArray : function() {
-      var tmp = [];
+      var ui = [];
+      var schedule = this.operation.getSchedule();
 
-      if( !this.data ) {
-        this.dates = tmp;
+      if( schedule.length === 0 ) {
+        this.uiDatesArray = ui;
         return;
       }
 
-      for( var i = 0; i < this.data.length; i++ ) {
-        var date = this.toDate(this.data[i].date);
+      for( var i = 0; i < schedule.length; i++ ) {
+        var date = this.toDate(schedule[i].date);
 
-        tmp.push({
-          length : this.data[i].length,
-          units : this.data[i].units,
+        ui.push({
+          length : schedule[i].length,
+          units : schedule[i].units,
           date : date,
           dateFormatted : date.toDateString(),
           readonly : this.readonly
         })
       }
 
-      this.dates = tmp;
-    },
-
-    onLengthUpdate : function() {
-      this.update();
-    },
-
-    update : function(noEvent) {
-      this.$.dates.style.display = 'block';
-      this.displayText = ' x'+this.dates.length;
-
-      this.dates.sort(function(a, b){
+      ui.sort(function(a, b){
         if( a.date.getTime() > b.date.getTime() ) return 1;
         else if( a.date.getTime() < b.date.getTime() ) return -1;
         return 0;
       });
 
-      var tmp = [];
-      for( var i = 0; i < this.dates.length; i++ ) {
-        tmp.push(this.toDateString(this.dates[i]));
-      }
+      this.uiDatesArray = ui;
+    },
 
-      this.data = tmp;
+    onLengthUpdate : function(e) {
+      var index = parseInt(e.currentTarget.getAttribute('index'));
+
+      this.operation.schedule({
+        index : index,
+        date : this.uiDatesArray[index].date,
+        length : parseInt(this.uiDatesArray[index].length),
+        units : this.uiDatesArray[index].units
+      });
+
+      this.update();
+    },
+
+    update : function(noEvent) {
+      if( !this.operation ) return;
+
       this.copyDataArray();
 
-      if( this.dates.length > 1 ) {
-        this.dateRangeText = this.dates[0].date.toDateString() + ' <i class="fa fa-long-arrow-right"></i> ' +
-                            this.dates[this.dates.length-1].date.toDateString();
+      this.$.dates.style.display = 'block';
+      this.displayText = ' x'+this.uiDatesArray.length;
+
+      if( this.uiDatesArray.length > 1 ) {
+        this.dateRangeText =
+          this.uiDatesArray[0].date.toDateString() +
+          ' <i class="fa fa-long-arrow-right"></i> ' +
+          this.uiDatesArray[this.uiDatesArray.length-1].date.toDateString();
       } else if( this.dates.length == 1 ) {
-        this.dateRangeText = this.toDateString(this.dates[0]).date;
+        this.dateRangeText = this.toDateString(this.uiDatesArray[0]).date;
       } else {
         this.dateRangeText = '';
       }
@@ -214,9 +259,9 @@
       dataTable.addColumn({ type: 'date', id: 'End' });
 
       var arr = [];
-      this.dates.forEach(function(d){
+      this.uiDatesArray.forEach(function(d){
         var end = new Date(d.date.getTime()+this.getIntervalTime(d));
-        arr.push([this.operationName, d.date, end]);
+        arr.push([this.operation.getName(), d.date, end]);
       }.bind(this));
 
       if( arr.length == 0 ) {
@@ -258,10 +303,7 @@
 
     removeDate : function(e) {
       var index = parseInt(e.currentTarget.getAttribute('index'));
-
-      this.data.splice(index, 1);
-      this.dates.splice(index, 1);
-
+      this.operation.unschedule(index);
       this.update();
     },
 
@@ -272,6 +314,7 @@
         '</div>'+
         '<div><a class="btn btn-primary" disabled><i class="fa fa-plus"></i></a></div>'+
       '</div>');
+
       $(this.$.inputRoot).html('').append(input);
 
       var cDate = null;
@@ -299,13 +342,14 @@
         .on('click', function(){
           if( cDate == null ) return;
 
-          this.dates.push({
+          this.operation.schedule({
             date : cDate,
             length : 1,
-            units : 'month',
-            readonly : this.readonly
+            units : 'month'
           });
+          this.operation.update();
           this.update();
+
           $(this.$.datesInput).datepicker('hide');
         }.bind(this));
 

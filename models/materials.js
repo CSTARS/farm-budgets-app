@@ -4,12 +4,14 @@ var uuid = require('node-uuid');
 var authorityModel = require('./authority');
 var utils = require('../lib/modelUtils');
 var db = require('../lib/mongo').get();
-var init = true;
-
-var schema = require('../lib/shared/save/schema')();
-var strip = require('../lib/shared/save/strip');
+var sdk = require('../lib/sdk');
 var history = require('mongo-object-history');
+var async = require('async');
+var extend = require('extend');
 
+var init = true;
+var schema = sdk.schema();
+var strip = sdk.utils.strip;
 
 var materialGroupCollection = 'materialNameGrouping';
 var collection, suggestCollection;
@@ -33,12 +35,89 @@ module.exports = function() {
       delete : remove,
       nameSuggest : nameSuggest,
       mapReduceAll : mapReduceAll,
-      hasRequired : hasRequired
+      hasRequired : hasRequired,
+      getWithRequired : getWithRequired
   };
 };
 
 function get(id, callback){
   collection.findOne({id: id}, {_id: 0}, callback);
+}
+
+/*
+  Returns material with required materials if they can be found with same
+  authority and location.
+*/
+function getWithRequired(id, callback) {
+  get(id,function(err, material){
+    if( err ) {
+      return callback(err);
+    }
+
+    var result = {
+      material : material,
+      required : []
+    };
+
+    if( material.type === 'simple' || !material.materials ) {
+      return callback(null, result);
+    }
+
+    getRequired(material, {}, function(required){
+      for( var name in required ) {
+        result.required.push(required[name]);
+      }
+      callback(null, result);
+    });
+  });
+}
+
+function getRequired(material, found, callback) {
+  var baseQuery = {
+    $and : [{
+        authority : material.authority
+    }]
+  };
+
+  for( var i = 0; i < material.locality.length; i++ ) {
+    baseQuery.$and.push({locality: material.locality[i]});
+  }
+
+  var materials = [];
+  for( var name in material.materials ) {
+    if( material.unique && material.unique[name] ) {
+      continue;
+    }
+    if( found[name] ) {
+      continue;
+    }
+    materials.push(name);
+  }
+
+  async.eachSeries(
+    materials,
+    function(material, next) {
+      var query = extend(true, {}, baseQuery);
+      query.$and.push({name : material});
+
+      collection.findOne(query, {_id: 0}, function(err, resp){
+        if( !err && resp ) {
+          found[resp.name] = resp;
+
+          if( resp.type === 'complex' ) {
+            getRequired(resp, found, function(){
+              next();
+            });
+            return;
+          }
+        }
+        next();
+      });
+    },
+    function(err) {
+      callback(found);
+    }
+  );
 }
 
 function save(material, username, callback) {
@@ -63,7 +142,7 @@ function save(material, username, callback) {
     // remove common attachments from app
     cleanMaterial(material);
 
-    // set guid, might be useful, we will see
+
     if( !material.id ) {
       material.id = uuid.v4();
     }

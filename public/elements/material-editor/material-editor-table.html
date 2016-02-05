@@ -4,9 +4,11 @@
       :host {
         display: block;
       }
+      table td[info]:hover {
+        cursor: pointer;
+        color: #2196f3;
+      }
     </style>
-
-    <a class="btn btn-default pull-right" on-click="createNew"><i class="fa fa-plus"></i> Create New Material</a>
 
     <div style="padding: 10px;">
       <input type="text" class="form-control" placeholder="Search Text" id="textInput" on-keyup="onKeyUp"/>
@@ -27,6 +29,8 @@
         <template is="dom-repeat" items="{{locationFilters}}">
           <div><a class="btn btn-link" on-click="addFilter" filter="locality">{{item}}</a></div>
         </template>
+
+        <a class="btn btn-default" on-click="setHasAccessQuery">Edit Permissions</a>
       </div>
       <div class="flex" style="padding: 20px">
 
@@ -70,8 +74,9 @@
         this.authorityFilters = [];
         this.itemsPerPage = 10;
         this.page = 0;
+        this.q = {};
 
-        this.setEmptyQuery();
+        //this.setEmptyQuery();
 
         this.queryTimer = -1;
       },
@@ -80,9 +85,12 @@
         this.query();
       },
 
-      onKeyUp : function() {
-        var value = this.$.textInput.value;
+      setText : function(value) {
+        this.$.textInput.value = value;
+        this.updateTextFilter(value);
+      },
 
+      updateTextFilter : function(value) {
         this.page = 0;
 
         if( value === '' ) {
@@ -97,6 +105,11 @@
         }
 
         this.bufferedQuery();
+      },
+
+      onKeyUp : function() {
+        var value = this.$.textInput.value;
+        this.setText(value);
       },
 
       bufferedQuery : function() {
@@ -122,12 +135,12 @@
 
       query : function() {
         var params = {
-          query : JSON.stringify(this.q),
+          query : this.q,
           start : this.itemsPerPage * this.page,
           stop : this.itemsPerPage * (this.page+1)
         }
 
-        $.get('/materials/search', params, function(resp){
+        SDK.materials.search(params, function(resp){
           this.resp = resp;
           this.results = resp.results;
 
@@ -164,34 +177,48 @@
       },
 
       render : function() {
-        var html = '<table class="table">', m;
+        var html = '<table class="table style-scope material-editor-table">', m;
 
         html += '<tr>'+
           '<th><a style="cursor:pointer" all>All</a> | <a style="cursor:pointer" none>None</a></th>'+
           '<th>Type</th>'+
           '<th>Name</th>'+
+          '<th></th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
           '<th><i class="fa fa-dollar"></i> Price</th>'+
           '<th><i class="fa fa-hourglass-o"></i> Year</th>'+
-          '<th>Class</th>'+
-          '<th># Required</th>'+
-          '<th># Unique</th>'+
-          '<th>Edit</th>'+
+          '<th></th>'+
         '</tr>';
 
         for( var i = 0; i < this.results.length; i++ ) {
           var m = this.results[i];
+          var hasAccess = SDK.app.hasAccess(m);
+
+          var idInBudget = false;
+          var nameInBudget = SDK.getMaterial(m.name).exists();
+          try {
+            SDK.controllers.material.getById(m.id);
+            idInBudget = true;
+          } catch(e) {}
+
+
           html += '<tr>';
 
           // row selector
-          html += '<td><input type="checkbox" index="'+i+'" /></td>';
+          if( hasAccess ) {
+            html += '<td><input type="checkbox" index="'+i+'" /></td>';
+          } else {
+            html += '<td></td>';
+          }
 
           // set row icon
-          html += '<td><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"</td>';
+          html += '<td><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"></i></td>';
 
           // set row name
-          html += '<td>'+m.name+'</td>';
+          html += '<td info="'+i+'" class="style-scope material-editor-table">'+m.name+'</td>';
+
+          html += '<td>'+(idInBudget ? '<a class="popover-item text text-success" tabindex="0" role="button" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="Used in current budget."><i class="fa fa-check"></i></a>' : '')+'</td>';
 
           // set authority
           html += '<td>'+m.authority+'</td>';
@@ -199,43 +226,72 @@
           // set locality
           html += '<td>'+m.locality.join(', ')+'</td>';
 
-          // set authority
-          html += '<td>'+(m.price !== undefined ? '$'+m.price.toFixed(2) : '')+'</td>';
+          // set price
+          html += '<td style="white-space:nowrap">'+(m.price !== undefined ? '<ahb-dollar-label value="'+m.price+'"></ahb-dollar-label>' : '') +
+                  '<span style="color:#888">'+(m.price !== undefined ? '/' : 'per ')+SDK.units.invertAndRemoveDollars(m.units)+'</span></td>';
 
           // set year
-          html += '<td>'+(m.year || '')+'</td>';
+          html += '<td>'+(m.year !== undefined ? m.year : '')+'</td>';
 
-          // set class
-          html += '<td>'+(m.class || '')+'</td>';
+          html += '<td style="text-align:right">';
+          html += '<div class="btn-group">'+
+            '<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+              '<i class="fa fa-bars"></i>'+
+            '</button>'+
+            '<ul class="dropdown-menu dropdown-menu-right">';
 
-          // set num required materials
-          html += '<td>';
-          if( m.materials && m.type === 'complex') {
-            html += Object.keys(m.materials).length;
+          html += '<li><a style="cursor:pointer" info="'+i+'"><i class="fa fa-info"></i> More Info</a></li>';
+
+          if( hasAccess ) {
+            html += '<li><a href="#material/edit/'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
           }
-          html +='</td>';
 
-          // set num required materials
-          html += '<td>';
-          if( m.unique && m.type === 'complex') {
-            html += Object.keys(m.unique).length;
+          if( !nameInBudget ) {
+            html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-plus"></i> Add to Current Budget</a></li>';
+          } else if( idInBudget ) {
+            html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Current Budget</a></li>';
+          } else {
+            html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-undo"></i> Replace in Current Budget</a></li>';
           }
-          html +='</td>';
 
-          html += '<td><a style="cursor:pointer" index="'+i+'" edit><i class="fa fa-pencil"></i></a></td>';
+          if( hasAccess ) {
+            html += '<li><a delete="'+i+'"><i class="fa fa-trash"></i> Delete</a></li>';
+          }
 
+          html += '</ul></div></td>';
           html += '</tr>';
+          html += '<tr id="'+i+'-info-row" style="display:none"><td colspan="9" style="border:none">'+
+                    '<budget-material-info-row material="'+m.id+'" index="'+i+'"></budget-material-info-row>'+
+                  '</td></tr>';
         }
 
         this.$.table.innerHTML = html+'</table>';
 
-        // wire events
         $(this.$.table)
-          .find('a[edit]')
+          .find('.popover-item')
+          .popover({});
+
+        $(this.$.table)
+          .find('[info]')
           .on('click', function(e){
-            var index = parseInt(e.currentTarget.getAttribute('index'));
-            this.fire('edit', this.results[index]);
+            var index = e.currentTarget.getAttribute('info');
+
+            $(this.$.table)
+              .find('budget-material-info-row[index="'+index+'"]')[0]
+              .show();
           }.bind(this));
+
+        $(this.$.table)
+          .find('a[add]')
+          .on('click', this.addMaterial.bind(this));
+
+        $(this.$.table)
+          .find('a[remove]')
+          .on('click', this.removeMaterial.bind(this));
+
+        $(this.$.table)
+          .find('a[delete]')
+          .on('click', this.deleteMaterial.bind(this));
 
         $(this.$.table)
           .find('input[type="checkbox"]')
@@ -271,38 +327,44 @@
         this.renderControls();
       },
 
-      createNew : function(){
-        this.fire('edit',{
-          name : '',
-          type : 'simple',
-          authority : ExpressAuth.user.email,
-          year : new Date().getFullYear()
-        });
-      },
-
       renderControls : function() {
         this.$.totalLabel.innerHTML = '<h5>'+(this.resp.start+1)+' to '+(this.resp.stop)+' of '+this.resp.total+'</h5>';
       },
 
       renderFilters : function() {
-        if( !this.q.$and ) {
+        if( !this.q.$and && !this.q.authority ) {
           this.$.filters.innerHTML = '';
           return;
         }
 
+
         var html = '';
-        for( var i = 0; i < this.q.$and.length; i++ ) {
-          var filter = this.q.$and[i];
-          html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+filter[this.getFilter(filter)]+'</a> ';
+        if( this.q.$and ) {
+          for( var i = 0; i < this.q.$and.length; i++ ) {
+            var filter = this.q.$and[i];
+            html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+filter[this.getFilter(filter)]+'</a> ';
+          }
         }
+
+        if( this.q.authority ) {
+          html += ' <a index="access" class="btn btn-primary"><i class="fa fa-times"></i> Edit Permissions</a> ';
+        }
+
         this.$.filters.innerHTML = html;
 
         $(this.$.filters)
           .find('a')
           .on('click', function(e){
-            this.q.$and.splice(parseInt(e.currentTarget.getAttribute('index')), 1);
-            if( this.q.$and.length === 0 ) {
-              delete this.q.$and;
+            var index = e.currentTarget.getAttribute('index');
+
+            if( index === 'access' ) {
+              delete this.q.authority;
+            } else {
+              this.q.$and.splice(parseInt(index), 1);
+
+              if( this.q.$and.length === 0 ) {
+                delete this.q.$and;
+              }
             }
 
             $(e.currentTarget).remove();
@@ -357,8 +419,12 @@
         this.query();
       },
 
-      setEmptyQuery : function() {
-        this.q = {};
+      setHasAccessQuery : function() {
+        if( !this.q ) this.q = {};
+
+        if( !ExpressAuth.user ) {
+          return alert('You must login first');
+        }
 
         if( ExpressAuth.user ) {
           this.q.authority = {
@@ -366,6 +432,9 @@
           }
           this.q.authority.$in.push(ExpressAuth.user.email);
         };
+
+        this.renderFilters();
+        this.query();
       },
 
       onSelectedUpdate : function() {
@@ -383,6 +452,43 @@
         }
 
         this.$.deletePopup.show(materials);
+      },
+
+      addMaterial : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('add'));
+
+
+        SDK.materials.get(this.results[index].id, function(resp){
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+
+          SDK
+            .getBudget()
+            .addMaterial(new SDK.Material(resp));
+
+          this.render();
+        }.bind(this));
+      },
+
+      removeMaterial : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('remove'));
+        SDK.getBudget().removeMaterial(this.results[index].name);
+        this.render();
+      },
+
+      deleteMaterial : function(e) {
+        var index = parseInt(e.currentTarget.getAttribute('delete'));
+        var name = this.results[index].name;
+        if( !confirm('Are you sure you want to complete delete this material: '+name+'?') ) return;
+
+        SDK.materials.delete(this.results[index].id, function(resp){
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+          this.results.splice(index, 1);
+          this.render();
+        }.bind(this));
       }
     });
   </script>

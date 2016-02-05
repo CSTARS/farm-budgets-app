@@ -119,47 +119,6 @@ module.exports = function (router) {
       });
     });
 
-    // TODO: remove
-    router.get('/find', function (req, res) {
-
-      var query = req.query.query || '';
-
-      if( query !== '' ) {
-        try {
-          query = JSON.parse(query);
-        } catch(e) {
-          return errorHandler('Query should by JSON formatted', res);
-        }
-      }
-
-      model.find(query, function(err, budget){
-        if( err ) {
-          return errorHandler(err, res);
-        }
-        res.send(budget);
-      });
-    });
-
-    router.get('/findCount', function (req, res) {
-
-      var query = req.query.query || '';
-
-      if( query !== '' ) {
-        try {
-          query = JSON.parse(query);
-        } catch(e) {
-          return errorHandler('Query should by JSON formatted', res);
-        }
-      }
-
-      model.findCount(query, function(err, budget){
-        if( err ) {
-          return errorHandler(err, res);
-        }
-        res.send(budget);
-      });
-    });
-
     router.post('/save', function (req, res) {
       var budget = req.body;
 

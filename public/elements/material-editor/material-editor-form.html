@@ -6,9 +6,23 @@
       }
     </style>
 
-    <div class="padding: 0 %5">
-      <h4 class="page-header">Edit Material</h4>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 id="title">Edit Material</h4>
+      </div>
+      <div class="panel-body">
 
+
+
+
+    <ul class="nav nav-tabs nav-justified" style="margin-bottom: 15px" id="tabs">
+      <li class="active"><a href="#basic" data-toggle="tab">Basic Info</a></li>
+      <li><a href="#details" data-toggle="tab">Metadata</a></li>
+      <li><a href="#historytab" data-toggle="tab">History</a></li>
+    </ul>
+
+    <div class="tab-content">
+    <div id="basic" class="tab-pane fade in active">
       <div class="alert alert-warning" id="usedByMessage" style="display:none">
         <div>
           WARNING.  This material is used by <span id="usedCount"></span> other budget(s).  Any changes you make will affect
@@ -28,113 +42,130 @@
           </template>
         </div>
       </div>
-    </div>
 
-
-    <div class="form-horizontal">
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="nameInput" placeholder="Material Name">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="nameInput" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="nameInput" placeholder="Material Name">
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="nameInput" class="col-sm-2 control-label">Description</label>
-        <div class="col-sm-10">
-          <textarea id="descriptionInput" class="form-control"></textarea>
+        <div class="form-group">
+          <label for="nameInput" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea id="descriptionInput" class="form-control"></textarea>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group" id="priceGroup">
-        <label for="priceInput" class="col-sm-2 control-label" id="priceLabel">Price</label>
-        <div class="col-sm-10">
-          <input type="number" id="priceInput" class="form-control" />
+        <div class="form-group" id="priceGroup">
+          <label for="priceInput" class="col-sm-2 control-label" id="priceLabel">Price</label>
+          <div class="col-sm-10">
+            <input type="number" id="priceInput" class="form-control" />
+          </div>
         </div>
-      </div>
 
-      <div class="form-group" id="unitsGroup">
-        <label for="unitsInput" class="col-sm-2 control-label">Units</label>
-        <div class="col-sm-10">
-          <div class="layout horizontal center">
-            <div>us$/</div>
-            <div class="flex">
-              <budget-unit-selector id="unitsInput" block></budget-unit-selector>
+        <div class="form-group" id="unitsGroup">
+          <label for="unitsInput" class="col-sm-2 control-label">Units</label>
+          <div class="col-sm-10">
+            <div class="layout horizontal center">
+              <div>us$/</div>
+              <div class="flex">
+                <budget-unit-selector id="unitsInput" block></budget-unit-selector>
+              </div>
+            </div>
+
+            <div id="unitsInputMsg"></div>
+          </div>
+        </div>
+
+        <div class="form-group" id="complexGroup">
+          <label class="col-sm-2 control-label"><i class="fa fa-cubes"></i></label>
+          <div class="col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="isComplexInput" on-click="toggleComplex"> Is complex material
+              </label>
+            </div>
+            <div class="help-block">This material requires other materials.</div>
+
+            <div id="complexPanel">
+              <div id="materialsList"></div>
             </div>
           </div>
-
-          <div id="unitsInputMsg"></div>
-        </div>
-      </div>
-
-      <div class="form-group" id="complexGroup">
-        <label class="col-sm-2 control-label"><i class="fa fa-cubes"></i></label>
-        <div class="col-sm-10">
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" id="isComplexInput" on-click="toggleComplex"> Is complex material
-            </label>
-          </div>
-          <div class="help-block">This material requires other materials.</div>
-
-          <div id="complexPanel">
-            <div id="materialsList"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="authorityInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
-        <div class="col-sm-10">
-          <budget-authority-selector id="authorityInput" ></budget-authority-selector>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="locationInput" class="col-sm-2 control-label"><i class="fa fa-map-marker"></i> Location</label>
-        <div class="col-sm-10">
-          <budget-location-selector id="locationInput"></budget-location-selector>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="yearInput" class="col-sm-2 control-label"><i class="fa fa-hourglass-o"></i> Year</label>
-        <div class="col-sm-10">
-          <input type="number" id="yearInput" class="form-control"/>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="sourceInput" class="col-sm-2 control-label"><i class="fa fa-book"></i> Source</label>
-        <div class="col-sm-10">
-          <budget-markdown-input id="sourceInput"></budget-markdown-input>
-          <div class="help-block">Add any source (where the data came from) information for this material.
-            <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
-             is encouraged.  External links are encouraged.
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group" id="classGroup">
-        <label for="optionInput" class="col-sm-2 control-label">Class</label>
-        <div class="col-sm-10">
-          <budget-class-selector id="classInput"></budget-class-selector>
-        </div>
-      </div>
-
-    </div> <!-- end form -->
-
-    <div class="well">
-      <div class="layout horizontal">
-        <div class="flex">
-          <a class="btn btn-warning" on-click="undo">Undo Changes</a>
-        </div>
-        <div>
-          <a class="btn btn-default" on-click="cancel">Cancel</a>
-          <a class="btn btn-primary" on-click="save">Save</a>
         </div>
       </div>
     </div>
+
+      <div id="details" class="form-horizontal tab-pane fade in">
+
+        <div class="form-group">
+          <label for="authorityInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
+          <div class="col-sm-10">
+            <budget-authority-selector id="authorityInput" ></budget-authority-selector>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="locationInput" class="col-sm-2 control-label"><i class="fa fa-map-marker"></i> Location</label>
+          <div class="col-sm-10">
+            <budget-location-selector id="locationInput"></budget-location-selector>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="yearInput" class="col-sm-2 control-label"><i class="fa fa-hourglass-o"></i> Year</label>
+          <div class="col-sm-10">
+            <input type="number" id="yearInput" class="form-control"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="sourceInput" class="col-sm-2 control-label"><i class="fa fa-book"></i> Source</label>
+          <div class="col-sm-10">
+            <budget-markdown-input id="sourceInput"></budget-markdown-input>
+            <div class="help-block">Add any source (where the data came from) information for this material.
+              <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
+               is encouraged.  External links are encouraged.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="classGroup">
+          <label for="optionInput" class="col-sm-2 control-label">Class</label>
+          <div class="col-sm-10">
+            <budget-class-selector id="classInput"></budget-class-selector>
+          </div>
+        </div>
+
+      </div> <!-- end details -->
+
+      <div id="historytab" class="tab-pane fade in">
+        <budget-object-history id="history"></budget-object-history>
+      </div>
+    </div><!-- end tab-content -->
+
+  </div>
+
+  <div class="panel-footer">
+    <div class="layout horizontal">
+      <div class="flex">
+        <span>
+          <a class="btn btn-link" id="addBtn" on-click="addMaterial"><i class="fa fa-plus"></i> Add to current Budget</a>
+          <a class="btn btn-link" id="removeBtn" on-click="removeMaterial"><i class="fa fa-times"></i> Remove from current Budget</a>
+        </span>
+        <span class="label label-success" id="savedMsg" style="display:none" >Saved.</span>
+      </div>
+      <div>
+        <a class="btn btn-default" id="cancel" href="#material/search">Cancel</a>
+        <a class="btn btn-primary" on-click="save" id="saveBtn">Save</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+    <material-editor-new-required id="popup" on-add="addRequiredMaterial"></material-editor-new-required>
 
   </template>
   <script>
@@ -142,32 +173,75 @@
       is: 'material-editor-form',
 
       ready : function() {
-        this.requirePopup = document.querySelector('material-editor-new-required');
-        this.requirePopup.addEventListener('add', this.addRequiredMaterial.bind(this));
+        $(this).find('#tabs a').click(function (e) {
+          e.preventDefault()
+          $(this).tab('show');
+          if( e.currentTarget.getAttribute('href') === '#historytab' ) {
+            this.showHistory();
+          }
+        }.bind(this));
+
+        $(window).on('hashchange', function(){
+          if( SDK.app.history ) {
+            this.$.cancel.setAttribute('href', SDK.app.history);
+          }
+        }.bind(this));
       },
 
-      edit : function(material) {
-        this.original = $.extend(true, {}, material);
-        this.material = material;
+      create : function(name) {
+        this.creating = true;
+        this.material = new SDK.Material({
+          name : name || '',
+          type : 'simple',
+          price : 1,
+          authority : ExpressAuth.user ? ExpressAuth.user.email : '',
+          year : new Date().getFullYear()
+        });
+        this.$.title.innerHTML = 'Create Material';
+        this.setInputs();
+        this.renderAddRemoveBtn();
+      },
 
-        this.$.nameInput.value = material.name;
-        this.$.descriptionInput.value = material.description || '';
-        this.$.priceInput.value = material.price || '';
-
-        var units = material.units || '';
-        if( units && material.type === 'simple' ) {
-          units = FB.units.invert(units);
+      edit : function(id) {
+        this.creating = false;
+        try {
+          var m = SDK.controllers.material.getById(id);
+          this.material = new SDK.Material(m);
+          this.onEditReady();
+        } catch(e) {
+          SDK.materials.get(id, function(resp){
+            if( resp.error ) {
+              return alert(resp.message);
+            }
+            this.material = new SDK.Material(resp);
+            this.onEditReady();
+          }.bind(this));
         }
+      },
+
+      onEditReady : function() {
+        this.$.title.innerHTML = 'Edit Material';
+
+        this.setInputs();
+        this.renderAddRemoveBtn();
+      },
+
+      setInputs : function() {
+        this.$.nameInput.value = this.material.getName();
+        this.$.descriptionInput.value = this.material.getDescription();
+        this.$.priceInput.value = this.material.getPrice();
+
+        var units = SDK.units.invertAndRemoveDollars(this.material.getUnits());
 
         this.$.unitsInput.setUnits(units);
-        this.$.authorityInput.value = material.authority || '';
-        this.$.locationInput.setValue(material.locality || []);
-        this.$.yearInput.value = material.year || '';
-        this.$.sourceInput.value = material.source || '';
-        this.$.classInput.value = material.class || '';
+        this.$.authorityInput.value = this.material.getAuthority();
+        this.$.locationInput.setValue(this.material.getLocality());
+        this.$.yearInput.value = this.material.getYear() || '';
+        this.$.sourceInput.value = this.material.getSource() || '';
+        this.$.classInput.value = this.material.getClass() || '';
 
         this.renderComplex();
-        if( this.material.type === 'complex' ) {
+        if( this.material.getType() === 'complex' ) {
           this.renderMaterials();
         }
 
@@ -175,7 +249,7 @@
       },
 
       undo : function() {
-        this.edit(this.original);
+        this.edit(this.material.getId());
       },
 
       cancel : function() {
@@ -183,55 +257,50 @@
       },
 
       save : function() {
-        this.material.name = this.$.nameInput.value;
-        this.material.description = this.$.descriptionInput.value;
-        this.material.price = parseFloat(this.$.priceInput.value);
-        this.material.units = (this.material.type !== 'complex' ? 'us$/' : '') + this.$.unitsInput.getUnits();
-        this.material.authority = this.$.authorityInput.value;
-        this.material.locality = this.$.locationInput.value;
-        this.material.year = this.$.yearInput.value;
-        this.material.source = this.$.sourceInput.value;
-        this.material.class = this.$.classInput.value;
+        this.$.saveBtn.innerHTML = 'Saving...';
+        this.$.saveBtn.setAttribute('disabled', 'disabled');
 
-        this.material.renamed = this.material.name === this.original.name ? false : this.original.name;
+        this.material.setName(this.$.nameInput.value);
+        this.material.setDescription(this.$.descriptionInput.value);
+        this.material.setPrice(parseFloat(this.$.priceInput.value));
 
-        if( !this.material.id ) {
-          this.material.id = FB.utils.guid();
-        }
+        var units = this.$.unitsInput.getUnits();
+        if( units.length > 0 ) units = 'us$/('+units+')';
+        else units = 'us$';
 
-        $.post('/materials/save', this.material, function(resp){
+        this.material.setUnits(units);
+        this.material.setAuthority(this.$.authorityInput.value);
+        this.material.setLocality(this.$.locationInput.value);
+        this.material.setYear(this.$.yearInput.value);
+        this.material.setSource(this.$.sourceInput.value);
+        this.material.setClass(this.$.classInput.value);
+
+        // only update the material controller if the material is already
+        // in the controller
+        var update = SDK.getBudget().hasMaterial(this.material.getName());
+        debugger;
+        this.material.save(update, function(resp){
+          this.$.saveBtn.innerHTML = 'Save';
+          this.$.saveBtn.removeAttribute('disabled');
+
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
             this.fire('error', resp);
+          } else {
+            this.$.savedMsg.style.display = 'inline-block';
+            setTimeout(function() {
+              this.$.savedMsg.style.display = 'none';
+            }.bind(this), 2000);
           }
-        }.bind(this));
 
-        this.fire('done', this.material);
+          this.fire('done', this.material);
+          window.location = '#material/edit/'+this.material.getId();
+        }.bind(this));
       },
 
       addRequiredMaterial : function(e) {
-        e = e.detail;
-
-        if( e.isUnique ) {
-          if( !this.material.unique ) {
-            this.material.unique = {};
-          }
-
-          this.material.unique[e.material.name] = {
-            price : e.material.price,
-            units : 'us$/'+e.material.units
-          }
-        }
-
-        if( !this.material.materials ) {
-          this.material.materials = {};
-        }
-
-        this.material.materials[e.material.name] = {
-          amount : e.material.amount,
-          units : e.material.units
-        }
-
+        var material = e.detail;
+        this.material.addRequiredMaterial(material);
         this.renderMaterials();
       },
 
@@ -250,38 +319,42 @@
 
         html += '<h5>Required Materials <a class="btn btn-link btn-lg" required><i class="fa fa-plus"></i></a></h5>';
 
-        if( this.material.materials ) {
-          html += '<ul class="list-group">';
-          for( var name in this.material.materials ) {
-            var m = this.material.materials[name];
+        var materials = this.material.getRequiredMaterials();
+        var unique = this.material.getUniqueMaterials();
 
-            if( this.material.unique && this.material.unique[name] ) {
-              var u = this.material.unique[name];
+        var hasUnique = Object.keys(unique).length > 0 ? true : false;
 
-              html +=
-                '<li class="list-group-item">'+
-                    '<span class="label label-warning pull-right">Unique</span>'+
-                    '<a class="btn btn-link"><i class="fa fa-trash"></i></a> '+
-                    '<b>'+name+'</b> '+
-                    m.amount+m.units+' @ <span class="text text-success">$'+u.price+'</span>';
-                '</li>';
+        if( Object.keys(materials).length > 0 ) {
+          html += '<table class="table">'+
+            '<tr>'+
+              '<th>Material</th>'+
+              '<th>Amount</th>'+
+              '<th>Units</th>'+
+              (hasUnique ? '<th>Price*</th>' : '')+
+              '<th></th>'+
+            '</tr>';
 
-            } else {
-              html +=
-                '<li class="list-group-item">'+
-                    '<a class="btn btn-link" trash material="'+name+'"><i class="fa fa-trash"></i></a> '+
-                    '<b>'+name+'</b> '+
-                    m.amount+m.units+
-                '</li>';
-            }
+          for( var name in materials ) {
+            var m = materials[name];
+
+            html +=
+              '<tr>'+
+                '<td>'+name+(unique[name] ? '*' : '')+'</td>'+
+                '<td><input type="number" class="form-control" value="'+m.amount+'" amount  material="'+name+'" /></td>'+
+                '<td><budget-unit-selector units="'+m.units+'" material="'+name+'"></budget-unit-selector></td>'+
+                (hasUnique ? '<td>'+
+                  (unique[name] ? '<input type="number" value="'+m.price+'" material="'+name+'" class="form-control" price />' : '')+
+                '</td>' : '')+
+                '<td><a class="btn btn-link" trash material="'+name+'"><i class="fa fa-trash"></i></a></td>'+
+              '</tr>';
           }
-          html += '</ul>';
-
-          if( Object.keys(this.material.materials).length === 0 ) {
-            html += 'None';
-          }
+          html += '</table>';
         } else {
           html += 'None';
+        }
+
+        if( hasUnique ) {
+          html += '*Unique material.  You can only adjust prices for materials unqiue to this material.';
         }
 
         this.$.materialsList.innerHTML = html;
@@ -289,26 +362,45 @@
         $(this.$.materialsList)
           .find('a[required]')
           .on('click', function(){
-            this.requirePopup.create();
+            this.$.popup.create();
+          }.bind(this));
+
+        $(this.$.materialsList)
+          .find('input[amount]')
+          .on('change', function(e){
+            debugger;
+            var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
+            m.amount = parseInt(e.currentTarget.value);
+            this.material.addRequiredMaterial(m);
+          }.bind(this));
+
+        $(this.$.materialsList)
+          .find('input[price]')
+          .on('change', function(e){
+            var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
+            m.price = parseInt(e.currentTarget.value);
+            this.material.addRequiredMaterial(m);
+          }.bind(this));
+
+        $(this.$.materialsList)
+          .find('budget-unit-selector')
+          .on('units-change', function(e){
+            var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
+            m.units = parseInt(e.originalEvent.detail.value);
+            this.material.addRequiredMaterial(m);
           }.bind(this));
 
         $(this.$.materialsList)
           .find('a[trash]')
           .on('click', function(e){
             var name = e.currentTarget.getAttribute('material');
-
-            if( this.material.materials && this.material.materials[name] ) {
-              delete this.material.materials[name];
-            }
-            if( this.material.unique && this.material.unique[name] ) {
-              delete this.material.unique[name];
-            }
+            this.material.removeRequiredMaterial(name);
             this.renderMaterials();
           }.bind(this));
       },
 
       renderComplex : function() {
-        if( this.material.type !== 'complex' ) {
+        if( this.material.getType() !== 'complex' ) {
           this.$.priceGroup.style.display = 'block';
           this.$.isComplexInput.checked = false;
           this.$.complexPanel.style.display = 'none';
@@ -324,7 +416,7 @@
           return this.$.usedByMessage.style.display = 'none';
         }
 
-        $.get('/budget/uses', {material: this.material.id}, function(resp){
+        SDK.budgets.uses(this.material.id, function(resp){
           for( var i = 0; i < resp.length; i++ ) {
             resp[i].locality = resp[i].locality.join(', ');
           }
@@ -340,8 +432,39 @@
         }.bind(this));
       },
 
+      renderAddRemoveBtn : function() {
+        this.$.addBtn.style.display = 'none';
+        this.$.removeBtn.style.display = 'none';
+        if( this.creating ) {
+          return;
+        }
+
+        if( SDK.getBudget().hasMaterial(this.material.getName()) ) {
+          this.$.removeBtn.style.display = 'inline-block';
+        } else {
+          this.$.addBtn.style.display = 'inline-block';
+        }
+      },
+
+      addMaterial : function(e) {
+        SDK
+          .getBudget()
+          .addMaterial(this.material);
+
+        this.renderAddRemoveBtn();
+      },
+
+      removeMaterial : function() {
+        SDK.getBudget().removeMaterial(this.material.getName());
+        this.renderAddRemoveBtn();
+      },
+
       toggleUses : function() {
         $(this.$.usesList).toggle('slow');
+      },
+
+      showHistory : function() {
+        this.$.history.show(this.material.getId());
       },
 
       goToBudget : function(e) {

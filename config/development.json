@@ -1,8 +1,4 @@
 {
-
-    "express": {
-        "view cache": false,
-        "view engine": "dust",
-        "views": "path:./public/templates"
+    "middleware": {
     }
 }

@@ -1,0 +1,124 @@
+<dom-module id="simple-material-label">
+  <style>
+    :host {
+      display: inline-block;
+    }
+
+    .btn-group.open .dropdown-toggle {
+      -webkit-box-shadow: none;
+      box-shadow: none;
+    }
+
+    .dropdown-toggle:hover {
+      cursor: pointer;
+      color: #2196f3;
+    }
+  </style>
+  <template>
+
+  <div class="btn-group">
+    <span class="dropdown-toggle" data-toggle="dropdown">
+      <i class="fa fa-cube" id="icon"></i>
+      <span id="nameLabel"></span>
+    </span>
+
+    <div class="dropdown-menu" style="padding: 15px">
+      <div class="layout horizontal">
+        <div class="flex">
+          <div id="error" class="text text-danger"></div>
+          <div id="otherInfo" class="help-block" style="white-space: nowrap"></div>
+        </div>
+        <div>
+          <a class="btn btn-default" id="edit" style="margin:-3px 0 0 10px"><i class="fa fa-pencil"></i></a>
+        </div>
+      </div>
+
+      <div id="info"></div>
+    </div>
+  </div>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is : 'simple-material-label',
+
+    ready : function() {
+      this.currentstate = null;
+    },
+
+    onMaterialUpdate : function(material, impl, parentUnits) {
+      this.material = material;
+      this.impl = impl;
+      this.parentUnits = parentUnits;
+      this.render();
+    },
+
+    render : function() {
+      if( !this.material ) return;
+
+
+      this.$.edit.setAttribute('href', '#material/edit/'+this.material.getId());
+
+      var otherInfo = '';
+      if( this.material.getAuthority() ) {
+        otherInfo += '<i class="fa fa-shield"></i> ' + this.material.getAuthority();
+      }
+
+      if( this.material.getLocality().length > 0 ) {
+        if( this.material.getAuthority() ) {
+          otherInfo += ' | ';
+        }
+        otherInfo += '<i class="fa fa-map-marker"></i> <span style="text-transform:capitalize">'+this.material.getLocality().join(', ')+'</span>';
+      }
+      this.$.otherInfo.innerHTML = otherInfo;
+
+      if( this.material.isFixed() ) {
+        this.$.edit.style.display = 'none';
+        this.$.nameLabel.innerHTML = this.material.getName()+' <span class="label label-warning">Fixed</span>';
+      } else {
+        this.$.edit.style.display = 'inline-block';
+        this.$.nameLabel.innerHTML = this.material.getName();
+      }
+
+      var html = '<div>'+
+       '<ahb-dollar-label value="'+this.material.getPrice()+'"></ahb-dollar-label><span style="color:#888">/' +
+          SDK.units.invertAndRemoveDollars(this.material.getUnits())+'</span>';
+     '</div>';
+
+     if( this.impl ) {
+       var conversion = '';
+       if( this.impl.conversion && this.impl.conversion !== 1 ) {
+         conversion = ' x '+this.impl.conversion.toFixed(3)+' '+this.material.getUnits()+'/'+this.impl.units+' ';
+       }
+
+       html += '<div style="border-top:1px solid #ccc">'+
+        conversion+'x '+this.impl.amount+' '+this.impl.units+
+        (this.parentUnits ? '/'+this.parentUnits : '')+
+        ' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+(this.parentUnits ? '/'+this.parentUnits : '')+
+      '</div>';
+     }
+     this.$.info.innerHTML = html;
+
+      this.showError();
+    },
+
+
+    showError : function() {
+      var html = '';
+      if( this.material.hasErrors() ) {
+        var result = this.material.getErrors();
+        html += '<ul><li>'+result.errors.join('</li><li>')+'</li></ul>';
+
+        this.$.icon.className = 'fa fa-warning';
+        this.$.icon.style.color = 'red';
+      } else {
+        this.$.icon.className = 'fa fa-cubes';
+        this.$.icon.style.color = '';
+      }
+
+      this.$.error.innerHTML = html;
+    }
+  });
+</script>

@@ -1,0 +1,100 @@
+<link rel="import" href="operation-materials-row.html">
+
+<dom-module id="operation-materials-table">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <table class="table" id="table"></table>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'operation-materials-table',
+
+      properties : {
+        readonly : {
+          type : Boolean,
+          value : function() {
+            return false
+          }
+        }
+      },
+
+      ready : function() {
+        this.rows = [];
+      },
+
+      update : function(operation) {
+        if( operation ) {
+          if( this.valueChanges(operation) ) {
+            this.applyValueChanges(operation);
+            return;
+          }
+          this.operation = operation;
+          this.currentMaterials = $.extend(true, [], this.operation.getRequiredMaterials());
+        }
+
+        this.$.table.innerHTML = '<tr>'+
+          '<th>Material</th>'+
+          '<th>Notes</th>'+
+          '<th>Amount</th>'+
+          '<th>Units</th>'+
+          '<th>Sub Total</th>'+
+          '<th></th></tr>';
+
+        this.rows = [];
+        var body = this.$.table.querySelector('tbody');
+
+
+        var materials = this.operation.getRequiredMaterials();
+        for( var i = 0; i < materials.length; i++ ) {
+          var impl = materials[i];
+
+          var rowController = document.createElement('operation-materials-row');
+          rowController.create({
+            table : body ? body : this.$.table,
+            impl : impl,
+            operation : this.operation,
+            readonly : this.readonly
+          });
+          this.rows.push(rowController);
+        }
+      },
+
+      valueChanges : function(operation) {
+        if( !this.operation ) return false;
+
+
+        var newMaterials = operation.getRequiredMaterials();
+
+        if( this.currentMaterials.length != newMaterials.length ) {
+          return false;
+        }
+
+        for( var i = 0; i < this.currentMaterials.length; i++ ) {
+          if( this.currentMaterials[i].name != newMaterials[i].name ) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+
+      applyValueChanges : function(operation) {
+        var newMaterials = operation.getRequiredMaterials();
+        for( var i = 0; i < this.rows.length; i++ ) {
+          this.rows[i].applyUpdate(newMaterials[i], this.operation);
+        }
+        this.operation = operation;
+        this.currentMaterials = $.extend(true, [], this.operation.getRequiredMaterials());
+      }
+
+
+
+    });
+  </script>
+</dom-module>

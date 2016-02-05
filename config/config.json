@@ -11,6 +11,11 @@
             "module": {
                 "arguments": [{ "directory": "path:./controllers" }]
             }
+        },
+        "appsec": {
+            "module": {
+                "arguments": [{ "csrf":false }]
+            }
         }
     },
 

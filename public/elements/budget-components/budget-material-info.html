@@ -1,0 +1,303 @@
+<dom-module id="budget-material-info">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+      #loading {
+        display: none;
+        text-align: center;
+        padding: 10px;
+        font-size: 22px;
+      }
+      #mainTable {
+        font-size: 22px;
+      }
+      .row-label {
+        font-weight: bold;
+      }
+    </style>
+
+    <div id="loading">
+      <i class="fa fa-spinner fa-spin"></i>
+    </div>
+
+    <div id="loaded">
+      <h4 id="name" class="page-header" style="margin-top: 5px"></h4>
+
+      <div style="padding: 0 10px">
+
+        <div id="mainTable" class="row" style="margin-bottom: 25px; color: #888">
+          <i class="fa fa-map-marker"></i>
+          <span id="locality" style="text-transform:capitalize"></span> |
+          <i class="fa fa-shield"></i>
+          <span id="authority"></span>
+        </div>
+
+        <div class="row" id="descriptionRow" style="margin-bottom: 15px">
+          <div class="col-sm-3"><i class="fa fa-warning"></i> Description</div>
+          <div class="col-sm-9" id="description"></div>
+        </div>
+
+        <div class="row text text-danger" id="errorsRow" style="margin-bottom: 15px">
+          <div class="col-sm-3"><i class="fa fa-warning"></i> Errors</div>
+          <div class="col-sm-9" id="errors"></div>
+        </div>
+
+        <div class="row" id="yearRow" style="margin-bottom: 15px">
+          <div class="col-sm-3 row-label">
+            <i class="fa fa-hourglass-o"></i> Year
+          </div>
+          <div class="col-sm-9" id="year"></div>
+        </div>
+
+        <div class="row" id="classRow" style="margin-bottom: 15px">
+          <div class="col-sm-3 row-label">Class</div>
+          <div class="col-sm-9" id="class"></div>
+        </div>
+
+        <div class="row" id="requiredRow" style="margin-bottom: 15px">
+          <div class="col-sm-3 row-label">
+            Required Materials
+          </div>
+          <div class="col-sm-9">
+            <div class="layout horizontal center">
+              <div class="flex">
+                <div id="required"></div>
+              </div>
+              <div>
+                <div id="chart"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="sourcePanel">
+          <h5 class="page-header">Source</h5>
+          <div id="sourceContent"></div>
+        </div>
+
+        <div id="usedBy" style="border-top: 1px solid #ccc"></div>
+        <div id="requiredBy"></div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-info',
+
+      properties : {
+        // should be the material id
+        material : {
+          type : 'string',
+          value : function() {
+            return ''
+          },
+          observer : 'update'
+        },
+        budgetView : {
+          type : Boolean,
+          value : function() {
+            return false
+          }
+        }
+      },
+
+      ready : function() {
+        this.showing = false;
+      },
+
+      show : function() {
+        this.showing = true;
+        this.style.display = 'block';
+        this.update();
+      },
+
+      hide : function() {
+        this.style.display = 'none';
+        this.showing = false;
+      },
+
+      update : function() {
+        if( !this.material ) return;
+        if( !this.showing ) return;
+
+        try {
+          this._material = new SDK.Material(SDK.controllers.material.getById(this.material));
+          this.render();
+          return;
+        } catch(e) {}
+
+        this.loading(true);
+        SDK.materials.get(this.material, function(resp){
+          this.loading(false);
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+
+          this._material = new SDK.Material(resp);
+          this.render();
+        }.bind(this));
+      },
+
+      render : function() {
+        var m = this._material;
+
+        var unitLabel =  SDK.units.invertAndRemoveDollars(m.getUnits());
+
+        this.$.name.innerHTML =
+            '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +
+            m.getName()+
+            (m.getType() === 'simple' || this.budgetView ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '')
+            + '<small>/'+unitLabel+'</small>';
+
+        this.$.description.innerHTML = m.getDescription();
+        this.$.descriptionRow.style.display = m.getDescription() ? 'block' : 'none';
+
+        this.$.locality.innerHTML = m.getLocality().join(', ');
+        this.$.authority.innerHTML = m.getAuthority();
+
+        if( m.getClass() ) {
+          this.$.classRow.style.display = 'block';
+          this.$.class.innerHTML = m.getClass();
+        } else {
+          this.$.classRow.style.display = 'none';
+        }
+
+        if( m.getSource() ) {
+          this.$.sourcePanel.style.display = 'block';
+          this.$.sourceContent.innerHTML = marked(m.getSource());
+        } else {
+          this.$.sourcePanel.style.display = 'none';
+        }
+
+        if( this.budgetView ) {
+          this.setUsedBy();
+        } else {
+          this.$.usedBy.style.display = 'none';
+          this.$.requiredBy.style.display = 'none';
+        }
+
+        var errors = m.getErrors();
+
+        if( errors.errors && errors.errors.length > 0 && this.budgetView ) {
+          this.$.errorsRow.style.display = 'block';
+          this.$.errors.innerHTML = '<ul><li>'+errors.errors.join('</li><li>')+'</li></ul>';
+        } else {
+          this.$.errorsRow.style.display = 'none';
+        }
+
+        if( m.getType() === 'simple' ) {
+          this.$.year.innerHTML = m.getYear() || '';
+          this.$.yearRow.style.display = m.getYear() ? 'block' : 'none';
+          this.$.requiredRow.style.display = 'none';
+        } else {
+          this.$.yearRow.style.display = 'none';
+          this.$.requiredRow.style.display = 'block';
+
+          var unique = m.getUniqueMaterials();
+          var materials = m.getRequiredMaterials();
+          var list = '<table class="table">'+
+            '<tr><th>Material</th>'+
+              '<th>Amount</th>'+
+              '<th>Units</th>'+
+              (this.budgetView ? '<th>Price</th>' : '')+
+            '</tr>';
+
+
+
+          var chartData = [['Material','%']];
+
+          for( var key in materials ) {
+            var rm = materials[key];
+
+            var name;
+            if( unique[key] ) {
+              name = '*<b>'+key+'</b>';
+            } else if( this.budgetView ) {
+              name = '<material-label material="'+key+'" parent-units="'+unitLabel+'"></material-label>';
+            } else {
+              name = key;
+            }
+
+            list += '<tr>'+
+                    '<td>'+name+'</td>'+
+                    '<td>'+rm.amount+'</td>'+
+                    '<td><span class="label label-default">'+rm.units+'</span></td>'+
+                    (this.budgetView ? '<td><ahb-dollar-label value="'+rm.price+'"></ahb-dollar-label><span style="color:#888">/'+unitLabel+'</span>' : '')+
+                  '</tr>';
+
+            if( this.budgetView ) {
+              chartData.push([key, parseInt(100*(rm.price / m.getPrice())) ]);
+            }
+
+            if( errors && errors.materials && errors.materials[key] ) {
+              list += '<tr><td colspan="'+(this.budgetView ? 4 : 3)+'" style="border:none">' +
+                        '<ul class="text text-danger"><li>'+errors.materials[key].join('</li><li>')+'</li></ul>'+
+                      '</td></tr>';
+            }
+          }
+          list += '</table>';
+          if( Object.keys(unique).length > 0 ) {
+            list += '<div class="help-block">*Unique Material</div>';
+          }
+
+          this.$.required.innerHTML = list;
+
+          var eles = $(this.$.required).find('material-label');
+          for( var i = 0; i < eles.length; i++ ) {
+            eles[i].impl = m.getRequiredMaterial(eles[i].getAttribute('material'));
+            eles[i].update();
+          }
+
+
+          if( this.budgetView ) {
+            var chart = new google.visualization.PieChart(this.$.chart);
+            var s = $(window).width() / 8;
+            this.$.chart.style.width = s+'px';
+            this.$.chart.style.height = s+'px';
+            chart.draw(google.visualization.arrayToDataTable(chartData), {legend: 'none'});
+          }
+        }
+      },
+
+      setUsedBy : function() {
+        this.$.usedBy.style.display = 'block';
+        var operations = SDK.controllers.operation.get();
+        var usedBy = [];
+
+        for( var name in operations ) {
+          for( var j = 0; j < operations[name].materials.length; j++ ) {
+            if( operations[name].materials[j].name == this._material.getName() ) {
+              usedBy.push('<a href="/#budget/operations/'+encodeURIComponent(name)+'">'+name+'</a>');
+              break;
+            }
+          }
+        }
+        this.$.usedBy.innerHTML = usedBy.length > 0 ? ('Used in Operation(s): '+usedBy.join(', ')) : '';
+
+        this.$.requiredBy.style.display = 'block';
+        var materials = SDK.controllers.material.get();
+        var requiredBy = [];
+
+        for( var name in materials ) {
+          if( !materials[name].materials ) continue;
+          if( materials[name].materials[this._material.getName()] ) {
+            requiredBy.push('<a href="/#budget/materials/'+encodeURIComponent(name)+'">'+name+'</a>');
+          }
+        }
+        this.$.requiredBy.innerHTML = requiredBy.length > 0 ? ('Required By Material(s): '+requiredBy.join(', ')) : '';
+
+        if( usedBy.length === 0 && requiredBy.length === 0 ) {
+          this.$.usedBy.innerHTML = '<span class="text text-warning">This material is not currently used in this budget</span>';
+        }
+      },
+
+      loading : function(loading) {
+        this.$.loading.style.display = loading ? 'block' : 'none';
+        this.$.loaded.style.display = !loading ? 'block' : 'none';
+      }
+    });
+  </script>
+</dom-module>

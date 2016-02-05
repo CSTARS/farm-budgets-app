@@ -1,0 +1,93 @@
+<link rel="import" href="complex-material-label.html">
+<link rel="import" href="simple-material-label.html">
+
+<dom-module id="material-label">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+      }
+    </style>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'material-label',
+
+      properties : {
+        material : {
+          type : String,
+          observer : 'update'
+        },
+        type : {
+          type : String,
+          value : function() {
+            return 'unknown';
+          }
+        },
+        impl : {
+          type : Object,
+          value : function() {
+            return null;
+          }
+        },
+        parentUnits : {
+          type : String,
+          value : function() {
+            return '';
+          }
+        }
+      },
+
+      attached : function() {
+        SDK.controllers.material.on('material-update', this.onMaterialUpdateEvent.bind(this));
+        this.update();
+      },
+
+      detached : function() {
+        SDK.controllers.material.removeListener('material-update', this.onMaterialUpdateEvent);
+      },
+
+      onUpdate : function() {
+        if( !this.material ) return;
+        this.update();
+      },
+
+      onMaterialUpdateEvent : function(e) {
+        if( !this._material ) return;
+        if( e.material.name != this._material.getName() ) return;
+        this.update();
+      },
+
+      update : function() {
+        if( this.material === '' ) return;
+
+        this._material = SDK.getMaterial(this.material);
+
+        if( this.type !== this._material.getType() ) {
+          this.innerHTML = '';
+          this.ele = null;
+          this.type = this._material.getType();
+
+          if( !this._material.exists() ) {
+            this.innerHTML = '<span class="text text-danger"><i class="fa fa-warning"></i> <b>' +
+              this._material.getName()+'</b> not found.</span> <a class="btn btn-link" href="#material/search/'+encodeURIComponent(this.material)+'"><i class="fa fa-search"></i></a>';
+          } else if( this._material.getType() === 'complex' ) {
+            this.ele = document.createElement('complex-material-label');
+            this.appendChild(this.ele);
+          } else {
+            this.ele = document.createElement('simple-material-label');
+            this.appendChild(this.ele);
+          }
+        }
+
+        if( !this.ele ) return;
+
+        this.ele.onMaterialUpdate(this._material, this.impl, this.parentUnits);
+      }
+
+
+    });
+  </script>
+</dom-module>

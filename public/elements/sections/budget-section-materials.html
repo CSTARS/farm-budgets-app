@@ -40,15 +40,23 @@
 
     <div id="errorMessage" class="text text-danger">
       <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of your materials have errors.</div>
-      <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filter" /> Only Show Materials With Errors</span>
+      <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors" /> Only Show Materials With Errors</span>
     </div>
 
-    <div style="text-align: center; padding: 25px 0 15px 0">
-      <a class="btn btn-primary btn-lg" on-click="showCreate"><i class="fa fa-cube"></i> Create Material</a>
-      &nbsp;&nbsp;
-      <a class="btn btn-primary btn-lg" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a>
-    </div>
+    <h4 class="page-header">
+      <div class="btn-group pull-right" style="margin-top:-10px" role="group">
+        <a class="btn btn-primary" href="#material/create"><i class="fa fa-plus"></i> Create</a>
+        <a class="btn btn-primary" href="#material/search"><i class="fa fa-search"></i> Find</a>
+      </div>
 
+      <i class="fa fa-cube"></i> Budget Materials List
+    </h4>
+
+    <div class="help-block">
+      Below is a list of all materials currently available for this budget.  You can
+      find and add materials to this budget using the 'Find' button or create a new material
+      using the 'Create' button.
+    </div>
 
 
     <div class="row">
@@ -58,19 +66,29 @@
           <div class="form-group">
             <label for="filterInput" class="col-sm-2 control-label">Filter</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="filterInput" placeholder="Filter Text" on-input="filter">
-              <a class="btn btn-link" on-click="showSimpleTable">Simple Material Table</a>
+              <input type="text" class="form-control" id="filterInput" placeholder="Filter By Name" on-input="filter">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="sortInput" class="col-sm-2 control-label">Sort</label>
+            <div class="col-sm-10">
+              <select type="text" class="form-control" id="sortInput" on-change="filter">
+                <option value="name" selected>Name</option>
+                <option value="type">Type</option>
+                <option value="authority">Authority</option>
+                <option value="price">Price</option>
+              </select>
             </div>
           </div>
         </div>
 
+        <budget-material-table id="table" on-error-update="onErrorUpdate"></budget-material-table>
+
         <div id="searchMsg"></div>
-        <div id="root"></div>
 
       </div>
     </div>
 
-    <budget-simple-material-popup id="simpleTable"></budget-simple-material-popup>
   </template>
 </dom-module>
 
@@ -81,99 +99,42 @@
     ready : function() {
       this.filterTimer = -1;
       this.updateTimer = -1;
-      FB.materialController.on('material-update', this.onMaterialsUpdated.bind(this));
-      FB.operationController.on('material-added', this.onMaterialAdded.bind(this));
-      FB.materialController.on('material-removed', function(e) {
+      SDK.controllers.material.on('material-update', this.onMaterialsUpdated.bind(this));
+      SDK.controllers.operation.on('material-added', this.onMaterialAdded.bind(this));
+      SDK.controllers.material.on('material-removed', function(e) {
+        this.$.table.onMaterialsUpdated();
         $(this.$.root).find('[material="'+e.material.name+'"]').remove();
         this.filter();
-        FB.changes.checkMaterials(FB.materialController.asArray());
       }.bind(this));
 
-      document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkChanges.bind(this));
-
-      FB.changes.on('material-diff', this.onMaterialDiff.bind(this));
+      SDK.changes.on('material-state-update', this.onSaveStateUpdate.bind(this));
     },
 
-    attached : function() {
-      this.popup = document.querySelector('budget-material-popup');
-    },
-
-    import : function() {
-      document.querySelector('budget-import-material-popup').show();
-    },
-
-    onMaterialDiff : function(diff) {
-      if( diff.length > 0 || Object.keys(FB.changes.getUnsaved()).length ) {
+    onSaveStateUpdate : function(e) {
+      if( e.changes ) {
         this.$.warningMessage.style.display = 'block';
         this.$.unsavedFilterOuter.style.display = 'inline-block';
-        this.fire('unsaved-update', true);
       } else {
         this.$.unsavedFilter.checked = false;
         this.$.warningMessage.style.display = 'none';
         this.$.unsavedFilterOuter.style.display = 'none';
-        this.fire('unsaved-update', false);
 
         // make sure we are not filtering to unsaved if there are no unsaved
         this.filter();
       }
     },
 
-    checkChanges : function() {
-      FB.changes.checkMaterials(FB.materialController.asArray());
-    },
-
     onMaterialAdded : function(e) {
-      this.updateMaterialPanel(e.material, false);
-      FB.changes.checkMaterials(FB.materialController.asArray());
+      this.$.table.onMaterialsUpdated();
     },
 
     onMaterialsUpdated : function(e) {
-      var all = FB.materialController.get();
-
-      for( var key in all ) {
-        if( all[key].type === 'simple' && key === e.replaced || key === e.material.name ) {
-          this.updateMaterialPanel(e.material.name, e.replaced);
-          break;
-        }
-
-        if( all[key].type === 'complex' && FB.materialController.contains(all[key], e.material.name, e.replaced) ) {
-          var replaced = null;
-          if( key === e.replaced ) {
-            replaced = e.replaced;
-          }
-          this.updateMaterialPanel(key, replaced);
-        }
-      }
-
-      this.filter();
-      this.checkChanges();
+      this.$.table.onMaterialsUpdated();
     },
 
-    updateMaterialPanel : function(name, replaced) {
-      var current = $(this.$.root).find('[material-name="'+(replaced || name)+'"]');
-      var div = $(this.createTable(name));
-
-      if( current.length == 0 ) {
-        $(this.$.root).append(div);
-      } else {
-        div.insertAfter(current);
-        current.remove();
-      }
-    },
-
-    setData : function(data) {
-      this.$.root.innerHTML = '';
-      this.data = data;
-
-      this.$.root.innerHTML = '';
-
-      var materials = FB.materialController.get();
-      for( var name in materials ) {
-        var material = materials[name];
-        var div = this.createTable(material);
-        this.$.root.appendChild(div);
-      }
-
+    setData : function() {
+      var materials = SDK.controllers.material.get();
+      this.$.table.update(materials);
       this._filter();
     },
 
@@ -183,10 +144,6 @@
       }
 
       this._filter();
-    },
-
-    showCreate : function() {
-      this.popup.create();
     },
 
     filter : function() {
@@ -200,159 +157,32 @@
     _filter : function() {
       var txt = this.$.filterInput.value;
 
-      var matched = [], showAll = false;
-      if( txt == '' && !$(this.$.thisBudgetInput).is(':checked') ) {
-        showAll = true;
-      } else {
-        matched = this.toNameArray(FB.materialController.find(txt));
-      }
+      var matched = this.$.table.setFiltersAndSort(txt, this.$.sortInput.value);
 
-      var opEles = this.querySelectorAll('budget-material-list-item');
-      var errorCount = 0;
-      for( var i = 0; i < opEles.length; i++ ) {
-        errorCount += opEles[i].errorCount;
-      }
 
-      if( errorCount > 0 ) {
-        this.$.errorCount.innerHTML = errorCount;
-        this.$.errorMessage.style.display = 'block';
-      } else {
-        this.$.errorFilter.checked = false;
-        this.$.errorMessage.style.display = 'none';
-      }
-
-      var onlyUnsaved = $(this.$.unsavedFilter).is(':checked');
-      var onlyErrors = $(this.$.errorFilter).is(':checked');
-
-      for( var i = 0; i < opEles.length; i++ ) {
-        var ele = opEles[i];
-        if( showAll || matched.indexOf(ele.getAttribute('material-name')) > -1 ) {
-          if( onlyUnsaved && !ele.hasAttribute('has-changes') ) {
-            ele.style.display = 'none';
-          } else if( onlyErrors && !ele.hasAttribute('has-errors') ) {
-            ele.style.display = 'none';
-          } else {
-            ele.style.display = 'block';
-          }
-        } else {
-          ele.style.display = 'none';
-        }
-      };
-
-      if( matched.length == 0 && !showAll ) {
+      if( matched == 0 && txt.length > 0 ) {
         this.$.searchMsg.innerHTML = '<div class="alert alert-warning">No results found for: '+txt +
-        '. <a style="cursor: pointer"><i class="fa fa-plus"></i> Create</a></div>';
-
-        $(this.$.searchMsg)
-          .find('a')
-          .on('click', function() {
-            document.querySelector('budget-material-popup').create(txt);
-          });
+        '.<div style="text-align:center"><a href="#material/create/'+encodeURIComponent(txt)+'"><i class="fa fa-plus"></i> Create "'+txt+'"</a>&nbsp;&nbsp;|&nbsp;&nbsp;'+
+        '<a href="#material/search/'+encodeURIComponent(txt)+'"><i class="fa fa-search"></i> Find "'+txt+'"</a>'+
+        '</div></div>';
       } else {
         this.$.searchMsg.innerHTML = '';
       }
-
-      this.fire('error-update', errorCount > 0 ? true : false);
     },
 
-    toNameArray : function(materials) {
-      var arr = [], include;
-      var thisBudget = $(this.$.thisBudgetInput).is(':checked');
-
-      if( thisBudget ) {
-        include = FB.utils.getActiveMaterials();
+    onErrorUpdate : function(e) {
+      var errors = e.detail;
+      if( errors === 0 ) {
+        this.$.errorMessage.style.display = 'none';
+      } else {
+        this.$.errorMessage.style.display = 'block';
       }
-
-      materials.forEach(function(material){
-        if( thisBudget ) {
-          if( include.indexOf(material.name) > -1 ) {
-            arr.push(material.name);
-          }
-        } else {
-          arr.push(material.name);
-        }
-
-      });
-      return arr;
+      this.$.errorCount.innerHTML = errors;
     },
 
-    createTable : function(material) {
-      if( typeof material === 'string' ) {
-        material = FB.materialController.get(material);
-
-        if( material.error ) {
-          console.log('Unabled to show material in list');
-          console.log(material);
-          return;
-        }
-      }
-
-      var ele = document.createElement('budget-material-list-item');
-      ele.material = material;
-      ele.addEventListener('edit-material', function(){
-        document.querySelector('budget-material-popup').edit(material);
-      });
-
-      return ele;
-    },
-
-    updateFromEvent : function(ele) {
-      if( this.updateTimer != -1 ) clearTimeout(this.updateTimer);
-
-      this.updateTimer = setTimeout(function(){
-        this.updateTimer = -1;
-        this._updateFromEvent(ele);
-      }.bind(this), 300);
-    },
-
-    _updateFromEvent : function(ele) {
-      var m = FB.materialController.get(ele.attr('material-name'));
-
-      if( m.error ) {
-        return console.log('Error updating material');
-      }
-
-
-      m.price = parseFloat(ele.find('.material-price').val());
-      m.units = ele.find('budget-unit-selector')[0].getUnits();
-
-      FB.materialController.add(m, {replace: true});
-    },
-
-    showReviewPopup : function() {
-      if( !ExpressAuth.user ) {
-        document.querySelector('budget-login-popup').show();
-        return;
-      }
-      document.querySelector('budget-material-review-popup').show();
-    },
-
-    showSimpleTable : function() {
-      this.$.simpleTable.show();
-    },
-
-    undo : function() {
-      if( !confirm('Are you sure you want to discard your changes?') ) {
-        return;
-      }
-
-      var budget = FB.getBudget();
-      $.get('/budget/get?id='+budget.id, function(resp){
-        FB.changes.setOriginal(budget, resp.materials);
-        FB.changes.setUnsaved({});
-        window.localStorage.setItem('unsaved-materials', '{}');
-
-        if( resp.error ) {
-          return alert('Error reloading budget data: '+resp.message);
-        }
-
-        var data = {
-          budget : budget,
-          materials : resp.materials
-        }
-
-        document.querySelector('ahb-budget').load(data);
-      }.bind(this));
-    },
+    filterErrors : function(e) {
+      this.$.filterInput.value = '';
+      this.$.table.filterErrors($(e.currentTarget).is(':checked'));
+    }
   });
 </script>

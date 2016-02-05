@@ -85,7 +85,7 @@
           return this.done();
         }
 
-        $.get('/materials/delete',{id: this.materials[index].id}, function(resp){
+        SDK.materials.delete(this.materials[index].id, function(resp){
           var ele = this.$.q2.querySelector('#status-'+index);
 
           if( ele ) {

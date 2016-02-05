@@ -31,49 +31,38 @@
   </style>
 
   <template>
-    <budget-search-panel id="searchPanel" style="display:none" class="animated zoomIn" on-select="onBudgetSelect" on-back="onSearchBack"></budget-search-panel>
-
     <div id="mainPanel">
     <div class="layout horizontal center" style="border-bottom: 1px solid #ccc">
-      <div>
+      <div class="flex">
         <h5>
-          Farm Budgets <small>Advanced Hardwood Biofuels</small>
+          Farm Budgets <small class="hidden-xs">Advanced Hardwood Biofuels</small>
+          <small class="visible-xs"> AHB</small>
         </h5>
       </div>
 
-      <div class="flex" style="padding:5px; min-width: 92px">
-        <div class="btn-group" style="display:none; white-space:nowrap" id="saveBudgetBtn">
-          <button type="button" class="btn btn-warning" on-click="save" id="saveBudgetBtnInner">
-            <i class="fa fa-save"></i><span class="hidden-xs"> Save Budget Changes</span>
-          </button>
-          <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li id="saveBtn"><a on-click="save"><i class="fa fa-save"></i> Save</a></li>
-            <li id="saveNewBtn"><a on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
-            <li id="undoBtn"><a on-click="undo"><i class="fa fa-undo"></i> Discard All Changes</a></li>
-
-            <li id="loginTopBtn" style="display:none"><a href="/login.html"><i class="fa fa-sign-in"></i> Login to Save Changes</a></li>
-          </ul>
-        </div>
-      </div>
       <div style="padding:10px">
-        <ahb-account-login></ahb-account-login>
+        <ahb-account-login id="loginBtn"></ahb-account-login>
       </div>
+
+      <div style="padding:5px">
+        <budget-save-btn id="saveBtn"></budget-save-btn>
+      </div>
+
       <div>
         <div class="btn-group">
-          <a class="btn btn-default dropdown-toggle" style="border:none;box-shadow:none" data-toggle="dropdown">
+          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-ellipsis-v"></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-right">
-            <li><a class="btn btn-link" on-click="find"><i class="fa fa-search"></i> Find Budget</a></li>
+            <li class="dropdown-header">Budgets</li>
+            <li><a class="btn btn-link" href="#search"><i class="fa fa-search"></i> Find Budget</a></li>
             <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start from Scratch</a></li>
             <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
             <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
-            <li><a class="btn btn-link" on-click="import"><i class="fa fa-cloud-download"></i> Import Material</a></li>
-            <li><a class="btn btn-link" href="/materialEditor.html"><i class="fa fa-pencil"></i> Material Editor</a></li>
+            <li class="dropdown-header">Materials</li>
+            <li><a class="btn btn-link" href="#material/create"><i class="fa fa-plus"></i> Create Material</a></li>
+            <li><a class="btn btn-link" href="#material/search"><i class="fa fa-search"></i> Find Material</a></li>
+            <li class="dropdown-header">Other</li>
             <li id="signOutBtn" style="display:none"><a class="btn btn-link" href="/auth/signoutRedirect"><i class="fa fa-sign-out"></i> Sign Out</a></li>
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
@@ -84,21 +73,21 @@
 
     <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
-        <a href="#budget/overview"><i class="fa fa-dashboard"></i> Overview</a>
+        <a href="#budget/overview"><i class="fa fa-dashboard"></i><span class="hidden-xs"> Overview</span></a>
       </li>
       <li role="presentation" id="btn-operations">
-        <a href="#budget/operations"><i class="fa fa-cogs"></i> Operations</a>
+        <a href="#budget/operations"><i class="fa fa-cogs"></i><span class="hidden-xs"> Operations</span></a>
       </li>
       <li role="presentation" id="btn-materials">
         <a href="#budget/materials">
-          <i class="fa fa-warning text text-warning" id="unsavedWarning" style="display:none"></i>
+          <i class="fa fa-warning text text-warning" id="unsavedMaterialWarning" style="display:none"></i>
           <i class="fa fa-warning text text-danger" id="errorWarning" style="display:none"></i>
           <i class="fa fa-cube"></i>
-          Materials List
+          <span class="hidden-xs"> Materials List</span>
         </a>
       </li>
       <li role="presentation" id="btn-setup">
-        <a href="#budget/setup"><i class="fa fa-sliders"></i> My Setup</a>
+        <a href="#budget/setup"><i class="fa fa-sliders"></i><span class="hidden-xs"> My Setup</span></a>
       </li>
     </ul>
 
@@ -113,7 +102,7 @@
     <budget-section-setup id="setup" class="section"></budget-section-setup>
   </div>
 
-    <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="displayNone">
+    <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="display:none">
       <i class="fa fa-warning"></i> You have unsaved changes.
     </div>
 
@@ -125,35 +114,21 @@
     is : 'budget-sections',
 
     ready : function() {
-      $(window).on('hashchange', this.setSection.bind(this));
-
-      document.querySelector('ahb-budget').addEventListener('budget-loaded', this.checkForChanges.bind(this));
-      document.querySelector('budget-farm-editor').addEventListener('editor-close', this.checkForChanges.bind(this));
-
-      // TODO: shouldn't we only need to check material add/remove for a budget?
-      FB.materialController.on('material-update', this.checkForChanges.bind(this));
-      FB.materialController.on('material-removed', this.checkForChanges.bind(this));
-
-      FB.operationController.on('operation-update', this.checkForChanges.bind(this));
-      FB.operationController.on('operation-remove', this.checkForChanges.bind(this));
-
-      FB.changes.on('budget-diff', this.onDiffCheckComplete.bind(this));
-
       if( ExpressAuth && ExpressAuth.user ) {
         this.$.signOutBtn.style.display = 'block';
       }
 
       this.changesTimer = -1;
       this.setSection();
+      $(window).on('hashchange', this.setSection.bind(this));
+      SDK.changes.on('save-state-update', this.onSaveStateUpdate.bind(this));
+      SDK.changes.on('material-state-update', this.onMaterialSaveStateUpdate.bind(this));
     },
 
     attached : function() {
-      this.checkForChanges();
-
       if( !ExpressAuth.user ) {
         this.$.saveBtn.style.display = 'none';
-        this.$.saveNewBtn.style.display = 'none';
-        this.$.loginTopBtn.style.display = 'block';
+        this.$.loginBtn.style.display = 'block';
       }
     },
 
@@ -161,11 +136,19 @@
       $('html, body').animate({ scrollTop: '0px' });
     },
 
-    onUnsavedUpdate : function(e) {
-      if( e.detail === true ) {
-        this.$.unsavedWarning.style.display = 'inline-block';
+    onMaterialSaveStateUpdate : function(e) {
+      if( e.changes ) {
+        this.$.unsavedMaterialWarning.style.display = 'inline-block';
       } else {
-        this.$.unsavedWarning.style.display = 'none';
+        this.$.unsavedMaterialWarning.style.display = 'none';
+      }
+    },
+
+    onSaveStateUpdate : function(e) {
+      if( e.changes ) {
+        this.$.unsavedMessage.style.display = 'block';
+      } else {
+        this.$.unsavedMessage.style.display = 'none';
       }
     },
 
@@ -177,56 +160,6 @@
       }
     },
 
-    checkForChanges : function() {
-      if( this.changesTimer != -1 ) clearTimeout(this.changesTimer);
-      this.changesTimer = setTimeout(function(){
-        this.changesTimer = -1;
-        this._checkForChanges();
-      }.bind(this), 100);
-    },
-
-    _checkForChanges : function() {
-      FB.changes.checkBudget(FB.getBudget(), FB.materialController.asArray());
-    },
-
-    onDiffCheckComplete : function(diff) {
-
-      if( diff.budget.length > 0 || diff.materialIds.length > 0 ) {
-        this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
-        this.$.saveBudgetBtnInner.removeAttribute('disabled');
-        this.$.saveBudgetBtn.style.display = 'inline-block';
-        this.$.unsavedMessage.style.display = 'block';
-        this.$.overview.showChangesWarning(true);
-        return true;
-      }
-
-      this.$.saveBudgetBtn.style.display = 'none';
-      this.$.unsavedMessage.style.display = 'none';
-      this.$.overview.showChangesWarning(false);
-      return false;
-    },
-
-    save : function() {
-      if( !ExpressAuth.user ) {
-        document.querySelector('budget-login-popup').show();
-        return;
-      }
-
-      this.$.saveBudgetBtnInner.innerHTML = 'Saving...';
-      this.$.saveBudgetBtnInner.setAttribute('disabled', 'disabled');
-      FB.saveBudget(function(resp){
-        this.$.saveBudgetBtnInner.innerHTML = 'Save Budget Changes';
-        this.$.saveBudgetBtnInner.removeAttribute('disabled');
-
-        if( resp.error ) {
-          alert(resp.message);
-        } else {
-          this.$.saveBudgetBtn.style.display = 'none';
-          this.$.unsavedMessage.style.display = 'none';
-        }
-      }.bind(this));
-    },
-
     find : function() {
       this.$.mainPanel.style.display = 'none';
       this.$.searchPanel.style.display = 'block';
@@ -235,11 +168,6 @@
     onSearchBack : function() {
       this.$.mainPanel.style.display = 'block';
       this.$.searchPanel.style.display = 'none';
-    },
-
-    onBudgetSelect : function(e) {
-      document.querySelector('ahb-budget').reload(e.detail.id);
-      this.onSearchBack();
     },
 
     setSection : function() {
@@ -258,7 +186,12 @@
         window.location = '#budget/overview';
       }
 
-      if( parts[0] != 'budget' ) return;
+      if( parts[0] != 'budget' ) {
+        this.style.display = 'none';
+        return;
+      }
+      this.style.display = 'block';
+
 
       $(this).find('.section').hide();
       $(this.$.tabs).find('li').removeClass('active');
@@ -273,7 +206,14 @@
       }
 
       section.style.display = 'block';
-      if( section.onShow ) section.onShow(parts.splice(2, parts.length-1));
+
+      var params = parts
+        .splice(2, parts.length-1)
+        .map(function(param){
+          return decodeURIComponent(param);
+        });
+
+      if( section.onShow ) section.onShow(params);
     },
 
     setData : function(data) {
@@ -291,32 +231,12 @@
       document.querySelector('budget-create-reference').show();
     },
 
-    undo : function() {
-      if( !confirm('Are you sure you want to discard your changes?') ) {
-        return;
-      }
-      document.querySelector('ahb-budget').reload(FB.getBudget().id, true);
-    },
-
     clone : function() {
-      if( FB.changes.hasChanges() && !confirm('Are you sure you want to clone this budget and save as new?') ) return;
-
-      var data = {
-        budget : FB.getBudget(),
-        materials : FB.materialController.asArray()
-      }
-      data.budget.name = '';
-      data.budget.id = FB.utils.guid();
-
-      window.location = '#budget/overview';
-
-      document.querySelector('ahb-budget').load(data);
-      document.querySelector('budget-farm-editor').show(true);
-      this.$.overview.updateTotal();
+      SDK.app.cloneBudget();
     },
 
     startNew : function() {
-      if( FB.changes.hasChanges() && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
+      if( SDK.changes.hasChanges() && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
       document.querySelector('ahb-budget').createNew();
       document.querySelector('budget-farm-editor').show();
       this.$.overview.updateTotal();

@@ -39,7 +39,7 @@ BudgetMaterialPopup.edit = function(material) {
     this.materialUnits = this.data.units;
 
   } else {
-    this.$.unitsInput.setUnits(FB.units.invert(this.data.units));
+    this.$.unitsInput.setUnits(SDK.units.invert(this.data.units));
     this.$.priceInput.value = this.data.price;
     this.setComplex(false);
   }

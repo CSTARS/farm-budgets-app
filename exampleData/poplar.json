@@ -460,14 +460,14 @@
 
       "class": "equipment",
       "name": "Small Tractor",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 1.98,
           "units": "[gal_us]"
         },
-        "Small Tractor--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -488,14 +488,14 @@
 
       "class": "equipment",
       "name": "FR 6080 FH",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 13.2,
           "units": "[gal_us]"
         },
-        "FR 6080 FH--Labor": {
+        "FR 6080 FH Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -504,7 +504,7 @@
           "units": "us$"
         },
         "Labor": {
-          "amount": 2,
+          "amount": 3,
           "units": "h"
         }
       },
@@ -516,7 +516,7 @@
       ],
       "id": "2a59e52c-b088-43b0-bc42-e76af751acc3",
       "unique": {
-        "Labor": {
+        "FR 6080 FH Labor": {
           "units": "us$/h",
           "price": 12
         }
@@ -526,7 +526,7 @@
 
       "class": "labor",
       "name": "hoeing",
-      "units": "[acr_us]",
+      "units": "us$/[acr_us]",
       "type": "complex",
       "materials": {
         "Laborer": {
@@ -561,7 +561,7 @@
 
       "class": "equipment",
       "name": "Tandem Axle Truck",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
@@ -572,7 +572,7 @@
           "amount": 25,
           "units": "us$"
         },
-        "Labor": {
+        "Tandem Axle Truck Labor": {
           "amount": 1,
           "units": "h"
         }
@@ -585,7 +585,7 @@
       ],
       "id": "582a165a-01f4-4e3c-8bbc-fce267f462f6",
       "unique": {
-        "Labor": {
+        "Tandem Axle Truck Labor": {
           "units": "us$/h",
           "price": 12
         }
@@ -595,14 +595,14 @@
 
       "class": "equipment",
       "name": "Large Tractor",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 13.2,
           "units": "[gal_us]"
         },
-        "Large Tractor--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -623,14 +623,14 @@
 
       "class": "equipment",
       "name": "Tractor and sprayer",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 3.96,
           "units": "[gal_us]"
         },
-        "Tractor and sprayer--labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -651,7 +651,7 @@
 
       "class": "equipment",
       "name": "Cooler/van",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
@@ -680,7 +680,7 @@
       "description": "Poplar cutting for planting",
       "class": "seed",
       "name": "Poplar Cutting",
-      "units": "us$/1",
+      "units": "us$",
       "price": 2,
       "type": "simple",
       "authority": "AHB",
@@ -695,14 +695,14 @@
 
       "class": "equipment",
       "name": "Challenger Tractor",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 19.36,
           "units": "[gal_us]"
         },
-        "Challenger Tractor--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -723,10 +723,10 @@
 
       "type": "complex",
       "name": "3-Wheel Ag Sprayer",
-      "units": "h",
+      "units": "us$/h",
       "description": "",
       "materials": {
-        "3-Wheel Ag Sprayer--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -782,10 +782,10 @@
 
       "class": "equipment",
       "name": "Support Truck",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
-        "Support Truck--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -810,14 +810,14 @@
 
       "class": "equipment",
       "name": "Mid-size Tractor",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 3.96,
           "units": "[gal_us]"
         },
-        "Mid-size Tractor--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },
@@ -839,7 +839,7 @@
       "description": "'Manual Application of herbicide'",
       "class": "herbicide",
       "name": "herbicide - manual",
-      "units": "[acr_us]",
+      "units": "us$/[acr_us]",
       "type": "complex",
       "materials": {
         "Glyphosate": {
@@ -893,14 +893,14 @@
 
       "class": "equipment",
       "name": "Semi-Tractor trailer",
-      "units": "h",
+      "units": "us$/h",
       "type": "complex",
       "materials": {
         "Equipment Fuel": {
           "amount": 6.5,
           "units": "[gal_us]"
         },
-        "Semi-Tractor trailer--Labor": {
+        "Labor": {
           "amount": 1,
           "units": "h"
         },

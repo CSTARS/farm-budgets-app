@@ -31,7 +31,7 @@
                     <div style="padding:10px 0">
                       <a class="btn btn-primary" on-click="grantAccess" index$="{{index}}"><i class="fa fa-user-plus"></i></a>
                       <span>{{item.email}}</span>
-                      (<span>{{item.name}}</span>)
+                      (<span>{{item.display_name}}</span>)
                     </div>
                   </template>
                 </div>
@@ -90,13 +90,18 @@
       },
 
       update : function() {
-        $.get('/authority/get?name='+this.authority, this.onResponse.bind(this));
+        SDK.authorities.get(this.authority, this.onResponse.bind(this));
       },
 
       updateBudgets : function() {
-        var query = JSON.stringify({"authority": this.authority});
-        $.get('/budget/find?query='+query, function(resp){
-          this.budgets = resp;
+        var query = {
+          query : {
+            authority: this.authority
+          }
+        };
+
+        SDK.budgets.search(query, function(resp){
+          this.budgets = resp.results;
         }.bind(this));
       },
 
@@ -107,7 +112,7 @@
           description : this.$.descriptionInput.value
         };
 
-        $.post('/authority/update', authority, function(resp){
+        SDK.authorities.update(authority, function(resp){
           $(this.$.createBtn).removeAttr('disabled').html('Update Description');
 
           if( resp.error ) {
@@ -142,7 +147,7 @@
           return;
         }
 
-        $.get('/members/search/?q='+query, function(resp) {
+        SDK.members.search(query, function(resp) {
           if( resp.error ) {
             alert(resp.error);
           }
@@ -163,7 +168,7 @@
         this.searchResults = [];
         this.$.newMemeberSearch.value = '';
 
-        $.get('/authority/grantAccess',{name : this.authority, email: user.email}, function(resp){
+        SDK.authorities.grantAccess(this.authority, user.email, function(resp){
           if( resp.error ) {
             alert(resp.message);
             return;
@@ -176,14 +181,14 @@
       removeAccess : function(e) {
         var index = parseInt(e.currentTarget.getAttribute('index'));
         var user = this.users[index];
-
+        
         if( !confirm('Are you sure you want to remove user: '+user) ) {
           return;
         }
 
         this.splice('users', index);
 
-        $.get('/authority/removeAccess',{name : this.authority, email: user.email}, function(resp){
+        SDK.authorities.removeAccess(this.authority, user, function(resp){
           if( resp.error ) {
             alert(resp.message);
             return;

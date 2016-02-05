@@ -118,7 +118,7 @@
 
     checkError : function() {
       try {
-        FB.units.ucumParse(FB.units.cleanDollars(this.$.input.value));
+        SDK.units.ucumParse(SDK.units.cleanDollars(this.$.input.value));
       } catch(e) {
         $(this).addClass('has-error');
         $(this.$.input).addClass('text-danger');
@@ -197,16 +197,16 @@
         if( parts[i] == '' ) continue;
         var re = new RegExp('.*'+parts[i].trim()+'.*','i');
 
-        for( var key in FB.units.lookup ) {
-          if( key.match(re) && used.indexOf(key) == -1 && used.indexOf(FB.units.lookup[key].symbol) == -1 ) {
-            if( FB.units.lookup[key].symbol != key ) {
-              reminders.push('<b>'+key+'</b> = <a style="cursor:pointer">'+FB.units.lookup[key].symbol+'</a>');
+        for( var key in SDK.units.lookup ) {
+          if( key.match(re) && used.indexOf(key) == -1 && used.indexOf(SDK.units.lookup[key].symbol) == -1 ) {
+            if( SDK.units.lookup[key].symbol != key ) {
+              reminders.push('<b>'+key+'</b> = <a style="cursor:pointer">'+SDK.units.lookup[key].symbol+'</a>');
             } else {
-              reminders.push('<a style="cursor:pointer">'+FB.units.lookup[key].symbol+'</a>');
+              reminders.push('<a style="cursor:pointer">'+SDK.units.lookup[key].symbol+'</a>');
             }
 
             used.push(key);
-            used.push(FB.units.lookup[key].symbol);
+            used.push(SDK.units.lookup[key].symbol);
           }
         }
       }

@@ -1,0 +1,89 @@
+<!-- Assumes nested in table cell -->
+
+<dom-module id="budget-material-info-row">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <button type="button" class="close" aria-hidden="true" on-click="hide">×</button>
+        <budget-material-info
+          material="{{material}}"
+          errors="{{errors}}"
+          notUsed="{{notUsed}}"
+          id="info"
+          budget-view$="{{budgetView}}">
+        </budget-material-info>
+      </div>
+    </div>
+
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-material-info-row',
+
+      properties : {
+        material : {
+          type : 'string',
+          value : function() {
+            return ''
+          }
+        },
+        budgetView : {
+          type : Boolean,
+          value : function() {
+            return false
+          }
+        },
+        errors : {
+          type : Boolean,
+          value : function() {
+            return false
+          },
+          observer : 'updateFilterAttributes'
+        },
+        notUsed : {
+          type : Boolean,
+          value : function() {
+            return false
+          },
+          observer : 'updateFilterAttributes'
+        }
+      },
+
+      updateFilterAttributes : function() {
+        if( this.errors ) {
+          $(this).parent().parent()[0].setAttribute('errors','true')
+        } else {
+          $(this).parent().parent()[0].removeAttribute('errors');
+        }
+
+        if( this.notUsed ) {
+          debugger;
+          $(this).parent().parent()[0].setAttribute('notUsed','true')
+        } else {
+          $(this).parent().parent()[0].removeAttribute('notUsed');
+        }
+      },
+
+      show : function() {
+        if( this.$.info.showing ) {
+          return this.hide();
+        }
+
+        $(this).parent().parent().show();
+        this.$.info.show();
+      },
+
+      hide : function() {
+        $(this).parent().parent().hide();
+        this.$.info.hide();
+      }
+    });
+  </script>
+</dom-module>

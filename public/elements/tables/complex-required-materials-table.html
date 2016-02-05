@@ -1,0 +1,59 @@
+<link rel="import" href="complex-required-materials-row.html">
+
+<dom-module id="complex-required-materials-table">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <table class="table" id="table"></table>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'complex-required-materials-table',
+
+      properties : {
+        readonly : {
+          type : Boolean,
+          value : function() {
+            return false
+          }
+        }
+      },
+
+      update : function(operation) {
+        if( operation ) {
+          this.operation = operation;
+        }
+
+        this.$.table.innerHTML = '<tr>'+
+          '<th>Material</th>'+
+          '<th>Amount</th>'+
+          '<th>Units</th>'+
+          '<th>Price</th>'+
+          '<th>Sub Total</th>'+
+          '<th></th></tr>';
+
+        var body = this.$.table.querySelector('tbody');
+
+
+        var materials = this.operation.getRequiredMaterials();
+        for( var i = 0; i < materials.length; i++ ) {
+          var impl = materials[i];
+
+          var rowController = document.createElement('complex-required-materials-row');
+          rowController.create({
+            table : body ? body : this.$.table,
+            impl : impl,
+            readonly : this.readonly
+          });
+        }
+      }
+
+
+    });
+  </script>
+</dom-module>

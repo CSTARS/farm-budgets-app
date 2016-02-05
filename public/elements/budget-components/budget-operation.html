@@ -21,18 +21,45 @@
     <h4 class="page-header" style="margin-top: 5px; text-transform: capitalize">
       <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
 
-      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="saveNewName" />
+      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="rename" />
       <span id="nameLabel" style="cursor:pointer" on-mouseenter="onMouseEnterName" on-mouseleave="onMouseLeaveName" on-click="editName" ></span>
       <span id="nameMsg" class="text text-danger" style="font-size: 14px"></span>
       <i class="fa fa-pencil" style="display:none" id="renameIcon"></i>
 
-      <i class="fa fa-warning text text-danger" style="display:none" id="errorIcon"></i>
+      <div class="btn-group pull-right" id="errorIcon" style="display:none">
+        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          <i class="fa fa-warning text text-danger"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right" id="errors"></ul>
+      </div>
     </h4>
+
+    <div id="content" style="display:none">
+      <div class="form-horizontal" style="margin: 25px 0 " id="addMaterialForm">
+        <div class="form-group">
+          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
+          <div class="col-sm-9">
+            <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
+          </div>
+        </div>
+      </div>
+
+      <operation-materials-table
+        id="materialTable"
+        readonly$="{{readonly}}"
+        on-price-change="updateTotals"
+        on-delete="onMaterialDelete">
+      </operation-materials-table>
+    </div>
 
     <div class="row">
       <div class="col-sm-8">
         <h5>
-          <budget-operation-scheduler on-schedule-update="onScheduleUpdate" readonly$="{{readonly}}" id="schedule"></budget-operation-scheduler>
+          <budget-operation-scheduler
+            id="schedule"
+            on-schedule-update="onScheduleUpdate"
+            readonly$="{{readonly}}">
+          </budget-operation-scheduler>
         </h5>
       </div>
       <div class="col-sm-4">
@@ -52,19 +79,7 @@
       </div>
     </div>
 
-    <div id="content" style="display:none" class="animated zoomIn">
-      <div class="form-horizontal" style="margin: 25px 0 " id="addMaterialForm">
-        <div class="form-group">
-          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
-          <div class="col-sm-9">
-            <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
-          </div>
-        </div>
-      </div>
-
-      <budget-materials-table id="materialTable" readonly$="{{readonly}}" on-price-change="updateTotals" on-delete="onMaterialDelete"></budget-materials-table>
-
-
+    <div id="footer" style="display:none">
       <a class="btn btn-link" on-click="toggleAddition" id="sourceBtn"><i class="fa fa-shield"></i> Operation Authorities</a>
       <a class="btn btn-link" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete Operation</a>
 
@@ -93,12 +108,14 @@
 
     ready : function() {
       this.firstScheduleEvent = true;
-      this.renderTimer = -1;
+
+      // buffer all renders
+      this.render = new SDK.app.UiBuffer(this._render.bind(this), 100);
     },
 
     attached : function() {
-      FB.operationController.on('operation-update', this.onOperationUpdate.bind(this));
-      FB.materialController.on('material-update', this.onMaterialUpdate.bind(this));
+      SDK.controllers.operation.on('operation-update', this.onOperationUpdate.bind(this));
+      SDK.controllers.material.on('material-update', this.onMaterialUpdate.bind(this));
 
       if( this.operation ) this.update();
 
@@ -109,31 +126,39 @@
     },
 
     detached : function() {
-      FB.operationController.removeListener('operation-update', this.onOperationUpdate);
-      FB.materialController.removeListener('material-update', this.onMaterialUpdate);
+      SDK.controllers.operation.removeListener('operation-update', this.onOperationUpdate);
+      SDK.controllers.material.removeListener('material-update', this.onMaterialUpdate);
     },
 
     toggleAddition : function() {
       $(this.$.sources).toggle('show');
     },
 
-    // fired from operation controller
-    onOperationUpdate : function(operation) {
+    // fired from operation controller, so just raw data object passed
+    onOperationUpdate : function(e) {
       if( !this.operation ) return;
-      if( operation.name != this.operation.name ) return;
+      if( e.operation.name != this.operation.getName() ) return;
 
       this.render();
     },
 
+    // does the updated material effect this operation?
     onMaterialUpdate : function(e) {
       if( !this.operation ) return;
-      if( !this.operation.materials ) return;
 
-      for( var i = 0; i < this.operation.materials.length; i++ ) {
-        var m = FB.materialController.get(this.operation.materials[i].name);
-        if( m.error ) continue;
+      var materials = this.operation.getRequiredMaterials();
+      if( materials.length === 0 ) return;
 
-        if( FB.materialController.contains(m, e.material.name, e.replaced) ) {
+      for( var i = 0; i < materials.length; i++ ) {
+        // using raw data access as we only care about name and type
+        var m;
+        try {
+          m = SDK.controllers.material.get(materials[i].name);
+        } catch(e) {
+          continue;
+        }
+
+        if( SDK.controllers.material.contains(m, e.material.name, e.replaced) ) {
           this.render();
           return;
         }
@@ -144,21 +169,31 @@
     onScheduleUpdate : function(e) {
       if( !this.operation ) return;
 
-      this.operation.schedule = e.detail;
-      FB.operationController.add(this.operation, {replace: true});
+      // TODO: the operation scheduler should really have the operation class
+      // and interact with the classes api, no this anymore...
+      // this.operation.data.schedule = e.detail;
+      // this.operation.update();
+
       this.updateTotals();
     },
 
     update : function() {
-      this.operation = FB.operationController.get(this.operationname);
-      this.$.schedule.set(this.operation.schedule, this.operation.name, this.readonly);
+      var operations = SDK.getBudget().getOperation();
+      var index = 0;
+      for( ; index < operations.length; index++ ) {
+        if( operations[index].getName() === this.operationname ) {
+          this.operation = operations[index];
+          break;
+        }
+      }
+
+      this.$.schedule.set(index);
       this.render();
     },
 
     delete : function() {
       if( !confirm('Are your sure you want to delete this operation?') ) return;
-      FB.operationController.remove(this.operation.name);
-      FB.operationController.recalc();
+      SDK.getBudget().removeOperation(this.operation.getName());
     },
 
     showError : function(show) {
@@ -167,46 +202,44 @@
     },
 
     checkError : function() {
-      for( var i = 0; i < this.operation.materials.length; i++ ) {
-        if( this.operation.materials[i].error ) {
-          this.showError(true);
-          return;
-        }
+      var result = this.operation.getErrors();
 
-        var m = FB.materialController.get(this.operation.materials[i].name);
-        if (m.recalcErrors && m.recalcErrors.length > 0) {
-          this.showError(true);
-          return;
-        }
+      var html = '';
+      if( result.errors.length > 0 ) {
+        html += '<li class="dropdown-header">Operation</li>';
+        html += '<li><a>'+result.errors.join('</li><li>')+'</a></li>';
+      }
 
-        if (m.deleted) {
-          this.showError(true);
-          return;
+      var used = {}; // lets not show repeats
+      if( result.materials ) {
+        for( var key in result.materials ) {
+          var name = this.operation.getRequiredMaterials()[key].name;
+          if( used[name] ) continue;
+          else used[name] = 1;
+
+          html += '<li class="dropdown-header">'+name+'</li>';
+          html += '<li><a>&nbsp;&nbsp;'+result.materials[key].join('/li><li>')+'</a></li>';
         }
       }
-      this.showError(false);
-    },
+      this.$.errors.innerHTML = html;
 
-    render : function() {
-      if( this.renderTimer != -1 ) clearTimeout(this.renderTimer);
-      this.renderTimer = setTimeout(function(){
-        this.renderTimer = -1;
-        this._render();
-      }.bind(this), 100);
+      this.showError(this.operation.hasErrors());
     },
 
     _render : function() {
-      if( !this.$.materialTable.setMaterials ) return;
+      if( !this.operation ) return;
 
-      this.$.nameLabel.innerHTML = this.operation.name;
+      this.$.nameLabel.innerHTML = this.operation.getName();
 
-      if( !this.operation.materials ) {
+      var materials = this.operation.getRequiredMaterials();
+      if( materials.length === 0 ) {
         this.$.sourceBtn.style.display = 'none';
         this.$.sources.style.display = 'none';
         return;
       }
 
-      this.$.materialTable.setMaterials(this.operation, {isOperation : true});
+      this.$.materialTable.update(this.operation);
+
       this.updateTotals();
       this.checkError();
       this.updateSources();
@@ -215,11 +248,14 @@
     updateSources : function() {
       var hash = {};
       var c = 0;
-      for( var i = 0; i < this.operation.materials.length; i++ ) {
-        var m = FB.materialController.get(this.operation.materials[i].name);
-        if( m.error || !m.authority || !m.locality ) continue;
 
-        var key = m.authority+m.locality.join('');
+      var materials = this.operation.getRequiredMaterials();
+      for( var i = 0; i < materials.length; i++ ) {
+        var m = SDK.getMaterial(materials[i].name);
+
+        if( !m.exists() || !m.getAuthority() || !m.getLocality().length === 0 ) continue;
+
+        var key = m.getAuthority()+m.getLocality().join('');
         if( hash[key] ) {
           hash[key].push(m);
         } else {
@@ -236,13 +272,17 @@
         if( hash[key].length != c ) {
           materials = [];
           for( var i = 0; i < hash[key].length; i++ ) {
-            materials.push('<a href="'+FB.materialLink(hash[key][i].name)+'">'+FB.materialIcon(hash[key][i].type)+' '+hash[key][i].name+'</a>');
+            materials.push(
+              '<a href="' + SDK.app.getMaterialLink(hash[key][i].getName())+'">' +
+              SDK.app.getMaterialIconHTML(hash[key][i].getType()) +
+              ' '+hash[key][i].getName()+'</a>'
+            );
           }
           materials = materials.join(',&nbsp;&nbsp;');
         }
 
-        html += '<tr><td style="white-space:nowrap">'+hash[key][0].authority+
-          '</td><td style="white-space:nowrap;text-transform:capitalize">'+hash[key][0].locality.join(', ')+
+        html += '<tr><td style="white-space:nowrap">'+hash[key][0].getAuthority()+
+          '</td><td style="white-space:nowrap;text-transform:capitalize">'+hash[key][0].getLocality().join(', ')+
           '</td><td>'+materials+'</td></tr>';
       }
 
@@ -250,52 +290,39 @@
     },
 
     updateTotals : function() {
-      var scheduled = this.operation.schedule ? this.operation.schedule.length : 0;
-      $(this.$.total).attr('value', this.operation.total);
-      $(this.$.subtotal).attr('value', this.operation.subtotal);
+      var scheduled = this.operation.getSchedule().length;
+
+      var result = this.operation.getTotal();
+      $(this.$.total).attr('value', result.total);
+      $(this.$.subtotal).attr('value', result.subtotal);
       $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
     },
 
-    updateUnit : function() {
-      this.operation.perAcre = $(this.$.radioPerAcre).is(':checked') ? true : false;
-      FB.operationController.add(this.operation, {replace: true});
-      this.updateTotals();
-    },
-
+    // TODO: use API class
     onMaterialDelete : function(e) {
-      FB.operationController.add(this.operation, {replace: true});
+      SDK.controllers.operation.add(this.operation, {replace: true});
       this.updateTotals();
     },
 
     onMaterialSelect : function(e) {
-      var materialDef = e.detail;
+      var material = new SDK.Material(e.detail);
 
-      var units;
-      if( materialDef.type == 'complex' ) {
-        units = materialDef.units;
-      } else {
-        units = FB.units.invert(materialDef.units);
-      }
+      var units = SDK.units.invertAndRemoveDollars(material.getUnits());
 
-      FB.operationController.addUpdateMaterial(
-        this.operation,
-        {
-          id : materialDef.id,
-          name : materialDef.name,
-          amount : 1,
-          units : units
-        }
-      );
-
-      FB.operationController.add(this.operation, {replace: true});
-      this.render();
+      this.operation.addRequiredMaterial({
+        name : material.getName(),
+        amount : 1,
+        units : units
+      });
     },
 
     toggleContent : function() {
       if( this.$.content.style.display == 'block' ) {
+        this.$.footer.style.display = 'none'
         this.$.content.style.display = 'none'
         this.$.icon.className = 'fa fa-toggle-right';
       } else {
+        this.$.footer.style.display = 'block'
         this.$.content.style.display = 'block'
         this.$.icon.className = 'fa fa-toggle-down';
       }
@@ -315,7 +342,7 @@
       if( this.readonly ) return;
       this.$.nameLabel.style.display = 'none';
       this.$.nameInput.style.display = 'inline-block';
-      this.$.nameInput.value = this.operation.name;
+      this.$.nameInput.value = this.operation.getName();
       this.$.nameInput.focus();
     },
 
@@ -323,32 +350,22 @@
       if( e.which == 13 ) this.$.nameInput.blur();
     },
 
-    saveNewName : function() {
-      if( this.$.nameInput.value.replace(/\s/g, '') == '' ) {
-        this.$.nameMsg.innerHTML = 'Invalid Name.';
-        return;
-      }
+    rename : function() {
+      var newname = this.$.nameInput.value.replace(/\s/g, '');
 
-      var op = FB.operationController.get(this.$.nameInput.value);
-      if( !op.error && this.operation.name !== this.$.nameInput.value ) {
-        this.$.nameMsg.innerHTML = 'Invalid Name. An operation with this name already exists';
-        return;
+      if( newname !== this.operation.getName() ) {
+        try {
+          this.operation.rename(newname);
+        } catch(e) {
+          this.$.nameMsg.innerHTML = e.message;
+          return;
+        }
       }
 
       this.$.nameMsg.innerHTML = '';
-      var oldName = this.operation.name;
-      this.operation.name = this.$.nameInput.value;
-      this.$.nameLabel.innerHTML = this.operation.name;
+      this.$.nameLabel.innerHTML = newname;
       this.$.nameLabel.style.display = 'inline-block';
       this.$.nameInput.style.display = 'none';
-
-      FB.operationController.add(this.operation,
-          {
-            noRecalc: true,
-            noEvents: true,
-            rename : oldName
-          }
-      );
     }
 
   });

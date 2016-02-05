@@ -34,7 +34,7 @@
         if( !this.original ) return;
         if( !this.original.id ) return;
 
-        var materials = FB.materialController.get();
+        var materials = SDK.controllers.material.get();
 
         for( var type in materials ) {
           for( var i = 0; i < materials[type].length; i++ ) {
