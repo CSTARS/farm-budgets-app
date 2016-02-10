@@ -1,0 +1,123 @@
+<dom-module id="budget-alias-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #add > div {
+        padding: 10px;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="title"><i class="fa fa-tag"></i> Budget Material Alias Tags</h4>
+          </div>
+          <div class="modal-body">
+            <div class="help-block">
+              Set aliases names (AKA) for your budgets materials.  This is useful
+              when using peoples complex materials that might not have the exact
+              same name as you use.  Ex: (Labor instead of Laborer).
+            </div>
+
+            <div class="layout horizontal center" id="add">
+              <div class="flex">
+                <select id="material" class="form-control"></select>
+              </div>
+              <div class="flex">
+                <input type="text" class="form-control" placeholder="Alias" id="alias" />
+              </div>
+              <div>
+                <a class="btn btn-primary" on-click="add"><i class="fa fa-plus"></i> Add</a>
+              </div>
+            </div>
+
+            <div>
+              <template is="dom-repeat" items="{{currentList}}">
+                <div class="layout horizontal center">
+                  <div class="flex">{{item.material}}</div>
+                  <div class="flex">
+                    <span class="label label-primary"><i class="fa fa-flag"></i> <span>{{item.alias}}</span></span>
+                  </div>
+                  <div>
+                    <a class="btn btn-link" material$="{{item.material}}" on-click="remove"><i class="fa fa-times"></i></a>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-alias-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup
+          .modal({show: false});
+        this.currentList = [];
+      },
+
+      show : function(alias) {
+        this.$.alias.value = alias || '';
+        this.render();
+        this.popup.modal('show');
+      },
+
+      render : function() {
+        var materials = Object.keys(SDK.controllers.material.get());
+        var budget = SDK.getBudget();
+
+        var html = '<option></option>';
+        materials.forEach(function(m){
+          if( budget.hasAlias(m) ) {
+            return;
+          }
+
+          html += '<option value="'+m+'">'+m+'</option>';
+        });
+        this.$.material.innerHTML = html;
+
+        var list = [];
+        var aliases = budget.getAlias();
+        for( var key in aliases ) {
+          list.push({
+            material: key,
+            alias : aliases[key]
+          });
+        }
+        this.currentList = list;
+      },
+
+      add : function() {
+        var material = this.$.material.value;
+        var alias = this.$.alias.value;
+        if( !material || !alias ) {
+          return;
+        }
+
+        SDK.getBudget().addAlias(alias, material);
+        this.$.alias.value = '';
+        this.render();
+      },
+
+      remove : function(e) {
+        var material = e.currentTarget.getAttribute('material');
+        SDK.getBudget().removeAlias(material);
+        this.render();
+      }
+    });
+  </script>
+</dom-module>

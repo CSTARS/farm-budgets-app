@@ -52,6 +52,15 @@ SDK.app = {
     return '<i class="fa fa-cube'+(type === 'complex' ? 's' : '')+'"></i>';
   },
 
+  getAliasIconHTML : function(m) {
+    if( m instanceof SDK.Material ) {
+      m = m.data;
+    }
+
+    if( !m.alias ) return '';
+    return ' <span class="label label-primary"><i class="fa fa-tag"></i> '+m.alias+'</span>';
+  },
+
   hasAccess : function(object) {
     var user = ExpressAuth.user;
 

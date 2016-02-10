@@ -67,6 +67,10 @@
                 <td>Material Authorities</td>
                 <td id="materialAuthorityLabel"></td>
               </tr>
+              <tr>
+                <td>Material Aliases</td>
+                <td><a style="cursor:pointer" on-click="showAliasPopup"><i class="fa fa-tag"></i> Edit Aliases</a></td>
+              </tr>
               <tr id="reference" style="display:none">
                 <td>Referenced Budget</td>
                 <td id="referenceLabel"></td>
@@ -291,6 +295,10 @@
         ' <b><i class="fa fa-shield"></i> '+SDK.changes.getOriginal().budget.authority+'</b>.'+
           '  You will need to save as new budget.';
       }
+    },
+
+    showAliasPopup : function() {
+      document.querySelector('budget-alias-popup').show();
     }
   });
 </script>

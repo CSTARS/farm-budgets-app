@@ -88,7 +88,7 @@
     // render display. type
     render : function(type) {
       this.renderType = type;
-      this.$.nameLabel.innerHTML = this.material.getName();
+      this.$.nameLabel.innerHTML = this.material.getName()+SDK.app.getAliasIconHTML(this.material);
 
       var table = '<table class="table">';
       var requireMaterials = this.material.getRequiredMaterials();
