@@ -1,6 +1,6 @@
 {
   "name": "farm-budgets-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "App for viewing farm budget data",
   "author": "jrmerz@gmail.com",
   "main": "index.js",
@@ -22,7 +22,7 @@
     "express": "^4.12.2",
     "express-auth": "ucd-cws/express-auth",
     "extend": "^3.0.0",
-    "farm-budgets-sdk": "0.0.3",
+    "farm-budgets-sdk": "0.0.4",
     "kraken-js": "^2.1.0",
     "minimist": "^1.2.0",
     "mongo-object-history": "0.0.1",
