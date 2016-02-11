@@ -77,8 +77,14 @@
           this.$.form.style.display = 'none';
           this.$.find.style.display = 'none';
 
-          if( parts.length > 2 ) {
+          if( parts.length === 3 ) {
             this.$.search.setText(decodeURIComponent(parts[2]));
+          } else if( parts.length > 3 ) {
+            var query = JSON.parse(decodeURIComponent(parts[3]));
+            query.$text = {
+              $search : decodeURIComponent(parts[2])
+            }
+            this.$.search.setQuery(query);
           }
 
         } else {

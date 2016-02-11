@@ -75,10 +75,11 @@
         this.itemsPerPage = 10;
         this.page = 0;
         this.q = {};
-
-        //this.setEmptyQuery();
-
         this.queryTimer = -1;
+
+        SDK.on('budget-load', function(){
+          this.render();
+        }.bind(this));
       },
 
       attached : function() {
@@ -88,6 +89,13 @@
       setText : function(value) {
         this.$.textInput.value = value;
         this.updateTextFilter(value);
+      },
+
+      setQuery : function(query) {
+        this.q = query;
+        this.$.textInput.value = this.q.$text ? this.q.$text.$search : '';
+        this.bufferedQuery();
+        this.renderFilters();
       },
 
       updateTextFilter : function(value) {
@@ -141,6 +149,10 @@
         }
 
         SDK.materials.search(params, function(resp){
+          if( resp.error ) {
+            return alert(typeof resp.message === 'string' ? resp.message : resp.message.message);
+          }
+
           this.resp = resp;
           this.results = resp.results;
 
@@ -177,6 +189,8 @@
       },
 
       render : function() {
+        if( !this.resp ) return;
+
         var html = '<table class="table style-scope material-editor-table">', m;
 
         html += '<tr>'+

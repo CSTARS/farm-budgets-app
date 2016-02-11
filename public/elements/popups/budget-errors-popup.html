@@ -1,0 +1,94 @@
+<dom-module id="budget-errors-popup">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      a {
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title text text-danger" id="title"><i class="fa fa-warning"></i> Budget Errors</h4>
+          </div>
+          <div class="modal-body">
+            <div class="help-block">The follow materials and/or operations have errors.  Note,
+              many operation errors can be caused by material errors.  It is recommended
+              to fix all material errors first.</div>
+
+            <div id="materials">
+              <h4 class="page-header">Materials</h4>
+              <template is="dom-repeat" items="{{materialErrors}}">
+                <div>
+                  <span>{{item}}</span>
+                  <span class="pull-right"><a on-click="viewMaterial" material$="{{item}}">View</a></span>
+                </div>
+              </template>
+            </div>
+
+            <div id="operations">
+              <h4 class="page-header">Operations</h4>
+              <template is="dom-repeat" items="{{operationErrors}}">
+                <div>
+                  <span>{{item}}</span>
+                  <span class="pull-right"><a on-click="viewOperation" operation$="{{item}}">View</a></span>
+                </div>
+              </template>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'budget-errors-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup
+          .modal({show: false});
+
+        this.operationErrors = [];
+        this.materialErrors = [];
+      },
+
+      show : function() {
+        var mErrors = SDK.controllers.material.getErrors();
+        var opErrors = SDK.controllers.operation.getErrors();
+
+        this.operationErrors = Object.keys(opErrors);
+        this.materialErrors = Object.keys(mErrors);
+
+        this.$.operations.style.display = this.operationErrors.length > 0 ? 'block' : 'none';
+        this.$.materials.style.display = this.materialErrors.length > 0 ? 'block' : 'none';
+
+        this.popup.modal('show');
+      },
+
+      viewMaterial : function(e) {
+        this.popup.modal('hide');
+        window.location.hash = 'budget/materials/'+encodeURIComponent(e.currentTarget.getAttribute('material'));
+      },
+
+      viewOperation : function(e) {
+        this.popup.modal('hide');
+        window.location.hash = 'budget/operations/'+encodeURIComponent(e.currentTarget.getAttribute('operation'));
+      }
+
+
+    });
+  </script>
+</dom-module>

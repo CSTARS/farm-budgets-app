@@ -214,7 +214,7 @@
             if( unique[key] ) {
               name = '*<b>'+key+'</b>';
             } else if( this.budgetView ) {
-              name = '<material-label material="'+key+'" parent-units="'+unitLabel+'"></material-label>';
+              name = '<material-label material="'+key+'" parent-units="'+unitLabel+'" parent-authority="'+m.getAuthority()+'" parent-locality="'+m.getLocality().join()+'"></material-label>';
             } else {
               name = key;
             }

@@ -79,6 +79,12 @@
                 <td>Budget URL</td>
                 <td><a id="link" target="_blank"><i class="fa fa-globe"></i> Link</a></td>
               </tr>
+              <tr id="errors" style="display:none">
+                <td class="text text-danger"><i class="fa fa-warning"></i> Budget Errors</td>
+                <td>
+                  <a class="btn btn-danger" on-click="showErrorsPopup">View Budget Errors</a>
+                </td>
+              </tr>
             </tbody>
           </table>
 
@@ -150,6 +156,9 @@
       SDK.controllers.material.on('material-update', this.updateMaterialAuthorties.bind(this));
       SDK.controllers.material.on('material-removed', this.updateMaterialAuthorties.bind(this));
       SDK.changes.on('save-state-update', this.showChangesWarning.bind(this));
+
+      var buffer = new SDK.app.UiBuffer(this.onTotalUpdate, 100, this);
+      SDK.controllers.operation.on('total-update', buffer);
     },
 
     attached : function() {
@@ -169,6 +178,18 @@
 
     updateTotal : function() {
       this.$.total.onTotalUpdate();
+    },
+
+    // check for errors
+    onTotalUpdate : function() {
+      var mErrors = SDK.controllers.material.getErrors();
+      var opErrors = SDK.controllers.operation.getErrors();
+
+      if( Object.keys(mErrors).length > 0 || Object.keys(opErrors).length > 0 ) {
+        this.$.errors.style.display = 'table-row';
+      } else {
+        this.$.errors.style.display = 'none';
+      }
     },
 
     setData : function(data) {
@@ -299,6 +320,10 @@
 
     showAliasPopup : function() {
       document.querySelector('budget-alias-popup').show();
+    },
+
+    showErrorsPopup : function() {
+      document.querySelector('budget-errors-popup').show();
     }
   });
 </script>

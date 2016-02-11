@@ -37,6 +37,18 @@
           value : function() {
             return '';
           }
+        },
+        parentAuthority : {
+          type : String,
+          value : function() {
+            return '';
+          }
+        },
+        parentLocality : {
+          type : String,
+          value : function() {
+            return '';
+          }
         }
       },
 
@@ -71,10 +83,15 @@
           this.type = this._material.getType();
 
           if( !this._material.exists() ) {
-            this.innerHTML = '<span class="text text-danger"><i class="fa fa-warning"></i> <b>' +
-              this._material.getName()+'</b> not found.</span> <a class="btn btn-link" href="#material/search/'+encodeURIComponent(this.material)+
-              '"><i class="fa fa-search"></i></a> '+
-              '<a tag><i class="fa fa-tag"></i></a>';
+
+            this.innerHTML =
+              '<span class="text text-danger">'+
+                '<i class="fa fa-warning"></i> <b>' +this._material.getName()+'</b> not found.'+
+              '</span>'+
+              '<div class="btn-group" role="group">'+
+                '<a class="btn btn-default" href="'+this.getMaterialSearchLink()+'"><i class="fa fa-search"></i></a> '+
+                '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>'
+              '</div>';
 
             $(this).find('a[tag]').on('click', function(){
               document.querySelector('budget-alias-popup').show(this.material);
@@ -91,6 +108,35 @@
         if( !this.ele ) return;
 
         this.ele.onMaterialUpdate(this._material, this.impl, this.parentUnits);
+      },
+
+      getMaterialSearchLink : function() {
+        var query = {};
+
+        if( this.parentAuthority ) {
+          query.$and = [
+            {authority : this.parentAuthority}
+          ]
+        }
+        if( this.parentLocality ) {
+          if( !query.$and ) {
+            query.$and = [];
+          }
+
+          this.parentLocality
+              .split(',')
+              .forEach(function(l){
+                query.$and.push({locality : l});
+              });
+        }
+
+        if( Object.keys(query) === 0 ) {
+          query = '';
+        } else {
+          query = '/'+encodeURIComponent(JSON.stringify(query));
+        }
+
+        return '#material/search/'+encodeURIComponent(this.material)+query;
       }
 
 
