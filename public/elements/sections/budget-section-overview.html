@@ -182,8 +182,8 @@
 
     // check for errors
     onTotalUpdate : function() {
-      var mErrors = SDK.controllers.material.getErrors();
-      var opErrors = SDK.controllers.operation.getErrors();
+      var mErrors = SDK.controllers.material.getErrors() || {};
+      var opErrors = SDK.controllers.operation.getErrors() || {};
 
       if( Object.keys(mErrors).length > 0 || Object.keys(opErrors).length > 0 ) {
         this.$.errors.style.display = 'table-row';
