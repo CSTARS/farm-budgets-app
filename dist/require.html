@@ -63768,10 +63768,10 @@ The `google-map` element renders a Google Map.
       },
 
       toggleComplex : function() {
-        if( this.material.type === 'complex' ) {
-          this.material.type = 'simple';
+        if( this.material.getType() === 'complex' ) {
+          this.material.setType('simple');
         } else {
-          this.material.type = 'complex';
+          this.material.setType('complex');
           this.renderMaterials();
         }
         this.renderComplex();
