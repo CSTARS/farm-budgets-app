@@ -82,13 +82,20 @@
         var budget = SDK.getBudget();
 
         var html = '<option></option>';
+
+        var list = [];
         materials.forEach(function(m){
           if( budget.hasAlias(m) ) {
             return;
           }
-
-          html += '<option value="'+m+'">'+m+'</option>';
+          list.push(m);
         });
+
+        list.sort();
+        html += list.map(function(m){
+          return '<option value="'+m+'">'+m+'</option>';
+        }).join('');
+
         this.$.material.innerHTML = html;
 
         var list = [];
