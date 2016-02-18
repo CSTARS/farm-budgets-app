@@ -4,16 +4,25 @@
       :host {
         display: block;
       }
+      #accessMessage {
+        display : none;
+      }
+      #deletedMessage {
+        display: none;
+      }
     </style>
+
+
 
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h4 id="title">Edit Material</h4>
+        <span id="deletedMessage" class="text text-danger pull-right"><i class="fa fa-warning"></i> Deleted</span>
+        <h4>
+          <a class="btn btn-link pull-right" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i></a>
+          <span id="title">Edit Material</span>
+        </h4>
       </div>
       <div class="panel-body">
-
-
-
 
     <ul class="nav nav-tabs nav-justified" style="margin-bottom: 15px" id="tabs">
       <li class="active"><a href="#basic" data-toggle="tab">Basic Info</a></li>
@@ -159,11 +168,16 @@
       <div>
         <a class="btn btn-default" id="cancel" href="#material/search">Cancel</a>
         <a class="btn btn-primary" on-click="save" id="saveBtn">Save</a>
+        <a class="btn btn-primary" on-click="saveNew" id="saveNewBtn">Save As New</a>
       </div>
     </div>
   </div>
 
 </div>
+
+  <div style="padding: 20px 10px; text-align: center" class="text text-warning" id="accessMessage">
+    <i class="fa fa-warning"></i> You do not have access to this material. Please change the authority, then click 'Save as New' to save changes.
+  </div>
 
     <material-editor-new-required id="popup" on-add="addRequiredMaterial"></material-editor-new-required>
 
@@ -198,12 +212,18 @@
           year : new Date().getFullYear()
         });
         this.$.title.innerHTML = 'Create Material';
+        this.$.saveNewBtn.style.display = 'none';
+        this.$.deleteBtn.style.display = 'none';
+        this.$.deletedMessage.style.display = 'none';
+        this.$.accessMessage.style.display = 'none';
         this.setInputs();
         this.renderAddRemoveBtn();
       },
 
       edit : function(id) {
         this.creating = false;
+        this.$.saveNewBtn.style.display = 'inline-block';
+
         try {
           var m = SDK.controllers.material.getById(id);
           this.material = new SDK.Material(m);
@@ -222,6 +242,21 @@
       onEditReady : function() {
         this.$.title.innerHTML = 'Edit Material';
 
+        var hasAccess = SDK.app.hasAccess(this.material);
+        if( hasAccess && !this.material.isDeleted() ) {
+          this.$.saveBtn.style.display = 'inline-block';
+          this.$.deleteBtn.style.display = 'inline-block';
+          this.$.accessMessage.style.display = 'none';
+        } else {
+          this.$.saveBtn.style.display = 'none';
+          this.$.deleteBtn.style.display = 'none';
+          if( !hasAccess ) {
+            this.$.accessMessage.style.display = 'block';
+          }
+        }
+
+        this.$.deletedMessage.style.display = this.material.isDeleted() ? 'inline-block' : 'none'
+
         this.setInputs();
         this.renderAddRemoveBtn();
       },
@@ -234,7 +269,7 @@
         var units = SDK.units.invertAndRemoveDollars(this.material.getUnits());
 
         this.$.unitsInput.setUnits(units);
-        this.$.authorityInput.value = this.material.getAuthority();
+        this.$.authorityInput.default = this.material.getAuthority();
         this.$.locationInput.setValue(this.material.getLocality());
         this.$.yearInput.value = this.material.getYear() || '';
         this.$.sourceInput.value = this.material.getSource() || '';
@@ -256,10 +291,7 @@
         this.fire('done', this.original);
       },
 
-      save : function() {
-        this.$.saveBtn.innerHTML = 'Saving...';
-        this.$.saveBtn.setAttribute('disabled', 'disabled');
-
+      savePrep : function() {
         this.material.setName(this.$.nameInput.value);
         this.material.setDescription(this.$.descriptionInput.value);
         this.material.setPrice(parseFloat(this.$.priceInput.value));
@@ -274,11 +306,48 @@
         this.material.setYear(this.$.yearInput.value);
         this.material.setSource(this.$.sourceInput.value);
         this.material.setClass(this.$.classInput.value);
+      },
+
+      saveNew : function() {
+        this.$.saveNewBtn.innerHTML = 'Saving...';
+        this.$.saveNewBtn.setAttribute('disabled', 'disabled');
+
+        this.savePrep();
+        this.material.data.id = SDK.utils.guid();
+        if( this.material.data.deleted ) {
+          delete this.material.data.deleted;
+        }
+
+        this.material.save(function(resp){
+          this.$.saveNewBtn.innerHTML = 'Save As New';
+          this.$.saveNewBtn.removeAttribute('disabled');
+
+          if( resp.error ) {
+            alert('Error creating new material: '+resp.message);
+            this.fire('error', resp);
+            return;
+          } else {
+            this.$.savedMsg.style.display = 'inline-block';
+            setTimeout(function() {
+              this.$.savedMsg.style.display = 'none';
+            }.bind(this), 2000);
+          }
+
+          this.fire('done', this.material);
+          window.location = '#material/edit/'+this.material.getId();
+        }.bind(this));
+      },
+
+      save : function() {
+        this.$.saveBtn.innerHTML = 'Saving...';
+        this.$.saveBtn.setAttribute('disabled', 'disabled');
+
+        this.savePrep();
 
         // only update the material controller if the material is already
         // in the controller
         var update = SDK.getBudget().hasMaterial(this.material.getName());
-        debugger;
+
         this.material.save(update, function(resp){
           this.$.saveBtn.innerHTML = 'Save';
           this.$.saveBtn.removeAttribute('disabled');
@@ -286,6 +355,7 @@
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
             this.fire('error', resp);
+            return;
           } else {
             this.$.savedMsg.style.display = 'inline-block';
             setTimeout(function() {
@@ -368,7 +438,6 @@
         $(this.$.materialsList)
           .find('input[amount]')
           .on('change', function(e){
-            debugger;
             var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
             m.amount = parseInt(e.currentTarget.value);
             this.material.addRequiredMaterial(m);
@@ -435,7 +504,7 @@
       renderAddRemoveBtn : function() {
         this.$.addBtn.style.display = 'none';
         this.$.removeBtn.style.display = 'none';
-        if( this.creating ) {
+        if( this.creating || this.material.isDeleted() ) {
           return;
         }
 
@@ -457,6 +526,17 @@
       removeMaterial : function() {
         SDK.getBudget().removeMaterial(this.material.getName());
         this.renderAddRemoveBtn();
+      },
+
+      delete : function() {
+        if( !confirm('Are you sure you want to completely delete this material: '+this.material.getName()+'?') ) return;
+
+        this.material.delete(function(resp){
+          if( resp.error ) {
+            return alert(resp.message);
+          }
+          window.location = '#material/search';
+        }.bind(this));
       },
 
       toggleUses : function() {

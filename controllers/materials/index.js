@@ -118,7 +118,7 @@ module.exports = function (router) {
             return res.send({error:true, message: err});
           }
 
-          model.delete(id, req.user, function(err, resp){
+          model.delete(id, req.user.email, function(err, resp){
             if( err ) {
               return res.send({error:true, message: err});
             }

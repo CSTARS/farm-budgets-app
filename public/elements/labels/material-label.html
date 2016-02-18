@@ -90,7 +90,8 @@
               '</span>'+
               '<div class="btn-group" role="group">'+
                 '<a class="btn btn-default" href="'+this.getMaterialSearchLink()+'"><i class="fa fa-search"></i></a> '+
-                '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>'
+                '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>'+
+                '<a class="btn btn-default" href="'+this.getMaterialCreateLink()+'"><i class="fa fa-plus"></i></a>'
               '</div>';
 
             $(this).find('a[tag]').on('click', function(){
@@ -137,6 +138,10 @@
         }
 
         return '#material/search/'+encodeURIComponent(this.material)+query;
+      },
+
+      getMaterialCreateLink : function() {
+        return '#material/create/'+encodeURIComponent(this.material);
       }
 
 

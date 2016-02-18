@@ -67,6 +67,7 @@
       updateMaterial : function() {
         try {
           this.operation.updateRequiredMaterial(this.impl);
+          this.$.label.update();
         } catch(e) {
           debugger;
           console.log(e);
@@ -79,7 +80,7 @@
       },
 
       setAmount : function(e) {
-        this.impl.amount = parseInt(e.currentTarget.value);
+        this.impl.amount = parseFloat(e.currentTarget.value);
         this.updateMaterial();
       },
 

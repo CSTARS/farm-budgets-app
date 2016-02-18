@@ -96,8 +96,9 @@
         this.$.isUniqueInput.checked = false;
         this.$.priceInputGroup.style.display = 'none';
         this.$.priceInputGroup.value = '';
-        this.$.unitsInput.value = '';
+        this.$.unitsInput.setUnits('');
         this.$.amountInput.value = '';
+        this.$.nameInput.value = '';
       },
 
       add : function() {

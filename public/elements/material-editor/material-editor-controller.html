@@ -12,8 +12,9 @@
           <div class="flex">
             Farm Budget <small>Materials</small>
           </div>
-          <div>
-            <a class="btn btn-default" href="#budget/overview" id="back"><i class="fa fa-dollar"></i> Budget</a>
+          <div class="btn-group">
+            <a class="btn btn-default" href="#budget/overview"><i class="fa fa-dashboard"></i> Budget Overview</a>
+            <a class="btn btn-default" href="#budget/materials"><i class="fa fa-list"></i> Budget Materials</a>
             <a class="btn btn-default" href="#material/search" id="find"><i class="fa fa-search"></i> Find</a>
             <a class="btn btn-default" href="#material/create" id="create"><i class="fa fa-plus"></i> Create</a>
           </div>
@@ -42,14 +43,6 @@
       },
 
       setPage : function() {
-        if( SDK.app.history && SDK.app.history.match(/#budget/) ) {
-          this.$.back.setAttribute('href', SDK.app.history);
-          this.$.back.innerHTML = '<i class="fa fa-arrow-left"></i> Back';
-        } else {
-          this.$.back.setAttribute('href', '#budget/overview');
-          this.$.back.innerHTML = '<i class="fa fa-dollar"></i> Budget';
-        }
-
         var parts = window.location.hash.replace(/#/,'').split('/');
 
         if( parts[0] !== 'material' ) {

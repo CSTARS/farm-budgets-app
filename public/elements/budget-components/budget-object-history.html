@@ -33,9 +33,18 @@
             '</tr>';
 
         for( var i = 0; i < resp.length; i++ ) {
+          var label;
+          if( resp[i].created ) {
+            label = '<span class="label label-success">Created</span>';
+          } else if( resp[i].deleted ) {
+            label = '<span class="label label-danger">Deleted</span>'
+          } else {
+            label = '<span class="label label-warning">Updated</span>'
+          }
+
           table +=
             '<tr>'+
-              '<td>'+(resp[i].created ? '<span class="label label-success">Created</span>' : '<span class="label label-warning">Updated</span>')+'</td>'+
+              '<td>'+label+'</td>'+
               '<td>'+resp[i].user+'</td>'+
               '<td>'+(new Date(resp[i].datetime).toLocaleString())+'</td>'+
             '</tr>';
