@@ -30,6 +30,7 @@ function search(query, start, stop, includeFilters, callback) {
         'name':1,
         'authority':1,
         'locality':1,
+        'reference' : 1,
         score: {
           $meta: 'textScore'
         }
@@ -59,7 +60,7 @@ function search(query, start, stop, includeFilters, callback) {
 }
 
 function loadReferences() {
-  
+
 }
 
 function searchFilters(q, includeFilters, callback) {

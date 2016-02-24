@@ -75,6 +75,10 @@
                 <td>Referenced Budget</td>
                 <td id="referenceLabel"></td>
               </tr>
+              <tr id="childReferences" style="display:none">
+                <td>Referenced By</td>
+                <td><a style="cursor:pointer" on-click="showChildReferences"><i class="fa fa-sitemap"></i> View budgets referencing this budget.</a></td>
+              </tr>
               <tr>
                 <td>Budget URL</td>
                 <td><a id="link" target="_blank"><i class="fa fa-globe"></i> Link</a></td>
@@ -211,6 +215,7 @@
 
       if( data.reference ) {
         this.$.aliasesRow.style.display = 'none';
+        this.$.childReferences.style.display = 'none';
         this.$.reference.style.display = 'table-row';
         console.log(data.referenceInfo);
         this.$.referenceLabel.innerHTML =
@@ -222,6 +227,12 @@
       } else {
         this.$.aliasesRow.style.display = 'table-row';
         this.$.reference.style.display = 'none';
+
+        if( data.childReferences ) {
+          this.$.childReferences.style.display = 'table-row';
+        } else {
+          this.$.childReferences.style.display = 'none';
+        }
       }
 
       this.updateMaterialAuthorties();
@@ -328,6 +339,10 @@
 
     showErrorsPopup : function() {
       document.querySelector('budget-errors-popup').show();
+    },
+
+    showChildReferences : function() {
+      document.querySelector('budget-child-reference-popup').show();
     }
   });
 </script>

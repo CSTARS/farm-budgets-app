@@ -245,11 +245,28 @@ function get(id, callback) {
         if( budget.reference ) {
           loadReference(result, callback);
         } else {
-          callback(null, result);
+          getChildReferences(result, callback);
         }
       });
   });
 }
+
+function getChildReferences(result, callback) {
+  collection
+    .find({reference : result.budget.id}, {_id: 0, id: 1, authority: 1, locality: 1, commodity: 1, name: 1})
+    .toArray(function(err, resp){
+      if( err ){
+        return callback(err);
+      }
+
+      if( resp && resp.length > 0 ) {
+        result.budget.childReferences = resp;
+      }
+
+      callback(null, result);
+    });
+}
+
 
 function loadReference(result, callback) {
   collection.findOne({id: result.budget.reference}, {_id: 0}, function(err, reference){

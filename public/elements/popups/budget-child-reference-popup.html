@@ -1,0 +1,54 @@
+<dom-module id="budget-child-reference-popup">
+  <template>
+    <div class="modal fade" id="popup">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-label="Close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-sitemap"></i> Budget References</h4>
+          </div>
+          <div class="modal-body" id="body">
+
+
+
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  </template>
+
+  <script>
+    Polymer({
+      is : 'budget-child-reference-popup',
+
+      ready : function() {
+        this.popup = $(this.$.popup).remove();
+        $('body').append(this.popup);
+        this.popup.modal({show: false});
+      },
+
+      show : function() {
+        var html = '<table class="table">';
+        var children = SDK.getBudget().data.childReferences;
+        if( !children ) {
+          this.$.body.innerHTML = '';
+          return;
+        }
+
+        children.forEach(function(child){
+          html += '<tr>'+
+            '<td><a href="#link/'+child.id+'"><i class="fa fa-code-fork"></i> '+child.name+'</a></td>' +
+            '<td><i class="fa fa-leaf"></i> '+child.commodity+'</td>' +
+            '<td><i class="fa fa-shield"></i> '+child.authority+'</td>' +
+            '<td><i class="fa fa-marker"></i> '+child.locality.join(', ')+'</td>' +
+            '</tr>'
+        });
+
+        this.$.body.innerHTML = html+'</table>';
+
+        this.popup.modal('show');
+      }
+
+    });
+  </script>
+</dom-modle>
