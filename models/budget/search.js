@@ -1,5 +1,6 @@
 'use strict';
-var collection;
+
+var collection, loadReference;
 
 function search(query, start, stop, includeFilters, callback) {
 
@@ -57,6 +58,10 @@ function search(query, start, stop, includeFilters, callback) {
   });
 }
 
+function loadReferences() {
+  
+}
+
 function searchFilters(q, includeFilters, callback) {
   if( !includeFilters ) {
     return callback(null, {});
@@ -87,7 +92,8 @@ function searchFilters(q, includeFilters, callback) {
   });
 }
 
-module.exports = function(co) {
+module.exports = function(co, lr) {
   collection = co;
+  loadReference = loadReference;
   return search;
 };

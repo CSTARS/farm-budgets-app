@@ -46,10 +46,16 @@
 
       <operation-materials-table
         id="materialTable"
-        readonly$="{{readonly}}"
+        style="display:none"
         on-price-change="updateTotals"
         on-delete="onMaterialDelete">
       </operation-materials-table>
+
+      <reference-operation-materials-table
+        id="referenceMaterialTable"
+        style="display:none"
+        on-price-change="updateTotals">
+      </reference-operation-materials-table>
     </div>
 
     <div class="row">
@@ -238,7 +244,16 @@
         return;
       }
 
-      this.$.materialTable.update(this.operation);
+      if( !this.readonly ) {
+        this.$.materialTable.style.display = 'block';
+        this.$.referenceMaterialTable.style.display = 'none';
+        this.$.materialTable.update(this.operation);
+      } else {
+        this.$.materialTable.style.display = 'none';
+        this.$.referenceMaterialTable.style.display = 'block';
+        this.$.referenceMaterialTable.update(this.operation);
+      }
+
 
       this.updateTotals();
       this.checkError();
@@ -311,6 +326,7 @@
 
       this.operation.addRequiredMaterial({
         name : material.getName(),
+        uid : SDK.utils.guid(),
         amount : 1,
         units : units
       });

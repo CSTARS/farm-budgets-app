@@ -90,7 +90,7 @@
               '</span>'+
               '<div class="btn-group" role="group">'+
                 '<a class="btn btn-default" href="'+this.getMaterialSearchLink()+'"><i class="fa fa-search"></i></a> '+
-                '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>'+
+                (SDK.getBudget().isReference() ? '' : '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>')+
                 '<a class="btn btn-default" href="'+this.getMaterialCreateLink()+'"><i class="fa fa-plus"></i></a>'
               '</div>';
 

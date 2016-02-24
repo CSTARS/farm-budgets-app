@@ -129,8 +129,13 @@
 
       if( this.impl ) {
         var conversion = '';
+
+        if( this.impl.scale !== undefined && this.impl.scale !== 1 ) {
+          conversion += ' x '+this.impl.scale+' <span style="color:#888">(scaling factor)</span> ';
+        }
+
         if( this.impl.conversion && this.impl.conversion !== 1 ) {
-          conversion = ' x '+this.impl.conversion.toFixed(3)+' <span style="color:#888">'+SDK.units.invertAndRemoveDollars(this.material.getUnits())+'/'+this.impl.units+'</span> ';
+          conversion += ' x '+this.impl.conversion.toFixed(3)+' <span style="color:#888">'+SDK.units.invertAndRemoveDollars(this.material.getUnits())+'/'+this.impl.units+'</span> ';
         }
 
         table += '<div style="text-align:right;border-top:1px solid #ccc">'+

@@ -70,6 +70,7 @@
           data.reference = data.id;
           data.referenceInfo = {
             name : data.name,
+            commodity : data.commodity,
             authority : data.authority,
             locality : data.locality
           }
@@ -91,7 +92,7 @@
         this.hide();
 
         setTimeout(function(){
-          document.querySelector('budget-farm-editor').show();
+          document.querySelector('budget-farm-editor').show(true);
         }, 500);
     }
   })

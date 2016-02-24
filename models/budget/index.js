@@ -24,7 +24,7 @@ module.exports = function() {
       name: 'Budget',
       find: find,
       findCount : findCount,
-      search : require('./search')(collection),
+      search : require('./search')(collection, loadReference),
       save: save,
       get : get,
       delete : remove,
@@ -177,7 +177,39 @@ function cleanBudget(budget) {
   strip(schema.budget, budget);
 
   if( budget.reference ) {
+    // we need to store the scale factors
+    var scales = {};
+    if( budget.operations )  {
+      budget.operations.forEach(function(op){
+        if( !op.materials ) {
+          return;
+        }
+
+        op.materials.forEach(function(impl){
+          if( impl.scale !== undefined ) {
+            scales[impl.uid] = impl.scale;
+          }
+        });
+      });
+    }
+
+    budget.scales = scales;
     budget.operations = [];
+  } else {
+    // make sure all impl's have uids
+    if( budget.operations ) {
+      budget.operations.forEach(function(op){
+        if( !op.materials ) {
+          return;
+        }
+
+        op.materials.forEach(function(impl){
+          if( impl.uid === undefined ) {
+            impl.uid = uuid.v4();
+          }
+        });
+      });
+    }
   }
 }
 
@@ -241,6 +273,7 @@ function loadReference(result, callback) {
     }
     result.budget.farm.size = reference.farm.size;
     result.budget.farm.unit = reference.farm.unit;
+    result.budget.aliases = reference.aliases;
 
     result.budget.referenceInfo = {
       name : reference.name,
@@ -249,6 +282,23 @@ function loadReference(result, callback) {
       locality : reference.locality,
       deleted : reference.deleted ? true : false
     };
+
+    // now attach scale factors
+    if( result.budget.scales ) {
+      result.budget.operations.forEach(function(op){
+        if( !op.materials ) {
+          return;
+        }
+        op.materials.forEach(function(impl){
+          if( result.budget.scales[impl.uid] !== undefined ) {
+            impl.scale = result.budget.scales[impl.uid];
+          }
+        });
+      });
+
+      delete result.budget.scale;
+    }
+
 
     callback(null, result);
   });

@@ -1,4 +1,4 @@
-<dom-module id="operation-materials-row">
+<dom-module id="reference-operation-materials-row">
   <template>
     <style>
       :host {
@@ -10,25 +10,20 @@
       <td>
         <material-label id="label" material$="{{mname}}" impl="{{impl}}"></material-label>
       </td>
-      <td style="padding: 0 3px">
-        <input type="text" class="form-control" value="{{note}}" placeholder="Notes" on-change="setNote"/>
-      </td>
-      <td style="padding: 0 3px">
-        <input type="number" class="form-control" value="{{amount}}" style="max-width: 100px"  placeholder="Amount" on-change="setAmount"/>
+      <td style="padding: 0 3px; vertical-align:middle">{{note}}</td>
+      <td style="padding: 0 3px; vertical-align:middle">
+        <span>{{amount}}</span> <span>{{units}}</span>
       </td>
       <td>
-        <budget-unit-selector units="{{units}}" on-units-change="setUnits"></budget-unit-selector>
+        x<input type="number" style="width: 50px; display: inline-block" class="form-control" value="{{scaleFactor}}" on-change="setScaleFactor" />
       </td>
       <td><ahb-dollar-label id="total"></ahb-dollar-label></td>
-      <td>
-        <a class="btn btn-link" on-click="remove"><i class="fa fa-trash"></i></a>
-      </td>
     </tr>
 
   </template>
   <script>
     Polymer({
-      is: 'operation-materials-row',
+      is: 'reference-operation-materials-row',
 
       ready : function() {
         this.impl = null;
@@ -36,6 +31,7 @@
         this.notes = '';
         this.units = '';
         this.amount = 0;
+        this.scaleFactor = 1;
       },
 
       create : function(options) {
@@ -58,6 +54,7 @@
         this.note = this.impl.note || '';
         this.amount = this.impl.amount || 0;
         this.units = this.impl.units || '';
+        this.scaleFactor = this.impl.scale || 1;
         this.$.total.value = this.impl.price || 0;
       },
 
@@ -71,26 +68,10 @@
         }
       },
 
-      setNote : function(e) {
-        this.impl.note = e.currentTarget.value;
+      setScaleFactor : function(e) {
+        this.impl.scale = parseFloat(e.currentTarget.value);
         this.updateMaterial();
-      },
-
-      setAmount : function(e) {
-        this.impl.amount = parseFloat(e.currentTarget.value);
-        this.updateMaterial();
-      },
-
-      setUnits : function(e) {
-        if( e.detail.value === undefined  || e.detail.error ) return;
-        this.impl.units = e.detail.value;
-        this.updateMaterial();
-      },
-
-      remove : function() {
-        this.operation.removeRequiredMaterial(this.impl.id);
       }
-
     });
   </script>
 </dom-module>
