@@ -85,7 +85,8 @@
       },
 
       applyValueChanges : function(operation) {
-        var newMaterials = operation.getRequiredMaterials();
+        this.operation = operation;
+        var newMaterials = this.operation.getRequiredMaterials();
         for( var i = 0; i < this.rows.length; i++ ) {
           this.rows[i].applyUpdate(newMaterials[i], this.operation);
         }

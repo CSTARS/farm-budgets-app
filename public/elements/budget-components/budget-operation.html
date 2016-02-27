@@ -116,12 +116,13 @@
       this.firstScheduleEvent = true;
 
       // buffer all renders
-      this.render = new SDK.app.UiBuffer(this._render.bind(this), 100);
+      this.render = new SDK.app.UiBuffer(this._render, 100, this);
     },
 
     attached : function() {
       SDK.controllers.operation.on('operation-update', this.onOperationUpdate.bind(this));
       SDK.controllers.material.on('material-update', this.onMaterialUpdate.bind(this));
+      SDK.controllers.material.on('material-removed', this.onMaterialUpdate.bind(this));
 
       if( this.operation ) this.update();
 
@@ -134,6 +135,7 @@
     detached : function() {
       SDK.controllers.operation.removeListener('operation-update', this.onOperationUpdate);
       SDK.controllers.material.removeListener('material-update', this.onMaterialUpdate);
+      SDK.controllers.material.removeListener('material-removed', this.onMaterialUpdate);
     },
 
     toggleAddition : function() {
@@ -156,6 +158,11 @@
       if( materials.length === 0 ) return;
 
       for( var i = 0; i < materials.length; i++ ) {
+        if( materials[i].name === e.material.name ) {
+          this.render();
+          return;
+        }
+
         // using raw data access as we only care about name and type
         var m;
         try {
@@ -234,6 +241,9 @@
 
     _render : function() {
       if( !this.operation ) return;
+
+      // make sure we have the latest copy
+      this.operation = SDK.getBudget().getOperation(this.operation.getName());
 
       this.$.nameLabel.innerHTML = this.operation.getName();
 

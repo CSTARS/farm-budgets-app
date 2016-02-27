@@ -214,7 +214,7 @@
             if( unique[key] ) {
               name = '*<b>'+key+'</b>';
             } else if( this.budgetView ) {
-              name = '<material-label material="'+key+'" parent-units="'+unitLabel+'" parent-authority="'+m.getAuthority()+'" parent-locality="'+m.getLocality().join()+'"></material-label>';
+              name = '<material-label material="'+key+'"></material-label>';
             } else {
               name = key;
             }
@@ -244,8 +244,9 @@
           this.$.required.innerHTML = list;
 
           var eles = $(this.$.required).find('material-label');
+          // TODO, switch to new parent refernce stratedgy
           for( var i = 0; i < eles.length; i++ ) {
-            eles[i].impl = m.getRequiredMaterial(eles[i].getAttribute('material'));
+            eles[i].parent = m.data;
             eles[i].update();
           }
 

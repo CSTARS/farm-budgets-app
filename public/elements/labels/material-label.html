@@ -26,7 +26,13 @@
             return 'unknown';
           }
         },
-        impl : {
+        impluid : {
+          type : String,
+          value : function() {
+            return '';
+          }
+        },
+        parent : {
           type : Object,
           value : function() {
             return null;
@@ -38,13 +44,13 @@
             return '';
           }
         },
-        parentAuthority : {
+        parentLocality : {
           type : String,
           value : function() {
             return '';
           }
         },
-        parentLocality : {
+        parentAuthority : {
           type : String,
           value : function() {
             return '';
@@ -52,13 +58,19 @@
         }
       },
 
+      ready : function() {
+        this.onMaterialUpdateEvent = new SDK.app.UiBuffer(this._onMaterialUpdateEvent, 100, this);
+      },
+
       attached : function() {
         SDK.controllers.material.on('material-update', this.onMaterialUpdateEvent.bind(this));
+        SDK.controllers.material.on('material-removed', this.onMaterialUpdateEvent.bind(this));
         this.update();
       },
 
       detached : function() {
         SDK.controllers.material.removeListener('material-update', this.onMaterialUpdateEvent);
+        SDK.controllers.material.removeListener('material-removed', this.onMaterialUpdateEvent);
       },
 
       onUpdate : function() {
@@ -66,7 +78,7 @@
         this.update();
       },
 
-      onMaterialUpdateEvent : function(e) {
+      _onMaterialUpdateEvent : function(e) {
         if( !this._material ) return;
         if( e.material.name != this._material.getName() ) return;
         this.update();
@@ -76,6 +88,18 @@
         if( this.material === '' ) return;
 
         this._material = SDK.getMaterial(this.material);
+
+        if( this.parent ) {
+          if( this.parent.units ) {
+            this.parentUnits = this.parent.units;
+          }
+          if( this.parent.authority ) {
+            this.parentAuthority = this.parent.authority;
+          }
+          if( this.parent.locality ) {
+            this.parentLocality = this.parent.locality.join(', ');
+          }
+        }
 
         if( this.type !== this._material.getType() ) {
           this.innerHTML = '';
@@ -108,7 +132,28 @@
 
         if( !this.ele ) return;
 
-        this.ele.onMaterialUpdate(this._material, this.impl, this.parentUnits);
+        this.impl = null;
+        if( this.parent && this.parent.materials ) {
+          if( this.impluid && Array.isArray(this.parent.materials) ) {
+            for( var i = 0; i < this.parent.materials.length; i++ ) {
+              if( this.impluid === this.parent.materials[i].uid ) {
+                this.impl = this.parent.materials[i];
+                break;
+              }
+            }
+          } else if( this.parent.materials[this.material] ) {
+            this.impl = this.parent.materials[this.material];
+          }
+        }
+
+        var units = '';
+        if( this.parent ) {
+          units = this.parent.units || '';
+        } else if( this.parentUnits ) {
+          units = this.parentUnits || '';
+        }
+
+        this.ele.onMaterialUpdate(this._material, this.impl, units);
       },
 
       getMaterialSearchLink : function() {

@@ -8,7 +8,7 @@
 
     <tr id="row">
       <td>
-        <material-label id="label" material$="{{mname}}" impl="{{impl}}"></material-label>
+        <material-label id="label" material$="{{mname}}" parent="{{operationdata}}" impluid$="{{impluid}}"></material-label>
       </td>
       <td style="padding: 0 3px">
         <input type="text" class="form-control" value="{{note}}" placeholder="Notes" on-change="setNote"/>
@@ -32,6 +32,8 @@
 
       ready : function() {
         this.impl = null;
+        this.operationdata = null;
+        this.impluid = '';
         this.mname = '';
         this.notes = '';
         this.units = '';
@@ -42,13 +44,17 @@
         this.removeChild(this.$.row);
         options.table.appendChild(this.$.row);
         this.impl = options.impl;
+        this.impluid = options.impl.uid;
         this.operation = options.operation;
+        this.operationdata = options.operation.data;
         this.update();
       },
 
       applyUpdate : function(impl, operation) {
         this.operation = operation;
+        this.operationdata = operation.data;
         this.impl = impl;
+        this.impluid = impl.uid;
         this.update();
       },
 

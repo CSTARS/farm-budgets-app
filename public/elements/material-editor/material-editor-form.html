@@ -504,13 +504,17 @@
       renderAddRemoveBtn : function() {
         this.$.addBtn.style.display = 'none';
         this.$.removeBtn.style.display = 'none';
+
         if( this.creating || this.material.isDeleted() ) {
           return;
         }
 
-        if( SDK.getBudget().hasMaterial(this.material.getName()) ) {
+
+
+        try {
+          SDK.controllers.material.getById(this.material.getId());
           this.$.removeBtn.style.display = 'inline-block';
-        } else {
+        } catch(e) {
           this.$.addBtn.style.display = 'inline-block';
         }
       },
