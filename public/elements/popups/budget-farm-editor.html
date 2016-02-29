@@ -18,9 +18,28 @@
             <div class="form-horizontal">
 
               <div class="form-group">
+                <label for="draftInput" class="col-sm-3 control-label">Status</label>
+                <div class="col-sm-9">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" id="draftInput" on-change="onDraftChange" /> Draft
+                    </label>
+                    <div class="help-block">Is this budget a working draft?</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
                 <label for="budgetNameInput" class="col-sm-3 control-label">Budget Name</label>
                 <div class="col-sm-9">
                   <input type="text" id="budgetNameInput" class="form-control" on-input="onBudgetNameInput"  placeholder="Budget Name"/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="budgetDescriptionInput" class="col-sm-3 control-label">Budget Description</label>
+                <div class="col-sm-9">
+                  <textarea id="budgetDescriptionInput" class="form-control" on-change="onBudgetDescriptionInput" ></textarea>
                 </div>
               </div>
 
@@ -124,6 +143,8 @@
         this.$.locationInput.setValue(this.data.locality);
         this.$.authorityInput.value = this.data.authority || '';
         this.$.authorityInput.default = this.data.authority || '';
+        this.$.budgetDescriptionInput.value = this.data.description || '';
+        this.$.draftInput.checked = this.data.draft !== false ? true : false;
 
         if( this.data.reference ) {
           this.$.referenceMsg.style.display = 'block';
@@ -162,6 +183,14 @@
 
       onAuthoritySelect : function() {
         this.data.authority = this.$.authorityInput.value;
+      },
+
+      onBudgetDescriptionInput : function() {
+        this.data.description = this.$.budgetDescriptionInput.value;
+      },
+
+      onDraftChange : function() {
+        this.data.draft = this.$.draftInput.checked;
       }
     });
   </script>

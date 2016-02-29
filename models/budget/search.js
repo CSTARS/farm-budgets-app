@@ -5,7 +5,7 @@ var collection, loadReference;
 function search(query, start, stop, includeFilters, callback) {
 
   query.deleted = {$ne: true};
-  var q = {
+  /*var q = {
     $and : [
       {$or : [
         {fixed : {'$exists' : false}},
@@ -13,15 +13,15 @@ function search(query, start, stop, includeFilters, callback) {
       ]},
       query
     ]
-  };
+  };*/
 
-  searchFilters(q, includeFilters, function(err, filters){
+  searchFilters(query, includeFilters, function(err, filters){
     if( err ) {
       return callback(err);
     }
 
     var cursor = collection.find(
-      q,
+      query,
       {
         _id: 0,
         id:1,
@@ -30,6 +30,7 @@ function search(query, start, stop, includeFilters, callback) {
         'name':1,
         'authority':1,
         'locality':1,
+        draft : 1,
         'reference' : 1,
         score: {
           $meta: 'textScore'

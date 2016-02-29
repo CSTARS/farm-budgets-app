@@ -69,6 +69,14 @@
         </div>
 
         <div id="table"></div>
+
+        <div class="help-block">
+          <div><b>*Status</b></div>
+          <div>
+            <span class="text text-success"><i class="fa fa-circle-o"></i></span> = Published,
+            <span class="text text-warning"><i class="fa fa-circle-o"></i></span> = Working Draft,
+            <i class="fa fa-code-fork" style="color: #333"></i> = Reference Budget
+        </div>
       </div>
     </div>
 
@@ -214,6 +222,7 @@
         html += '<tr>'+
           '<th></th>'+
           '<th><i class="fa fa-leaf"></i> Crop</th>'+
+          '<th>Status*</th>'+
           '<th>Budget Name</th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
@@ -228,8 +237,19 @@
 
           html += '<td>'+m.commodity+'</td>';
 
+          var status = '';
+          if( m.draft !== false ) {
+            status = '<span class="text text-warning"><i class="fa fa-circle-o"></i></span>';
+          } else {
+            status = '<span class="text text-success"><i class="fa fa-circle"></i></span>';
+          }
+          if( m.reference ) {
+            status += ' <i class="fa fa-code-fork"></i>';
+          }
+          html += '<td>'+status+'</td>';
+
           // set row name
-          html += '<td>'+(m.reference ? '<i class="fa fa-code-fork"></i> ' : '')+m.name+'</td>';
+          html += '<td>'+m.name+'</td>';
 
           // set authority
           html += '<td>'+m.authority+'</td>';

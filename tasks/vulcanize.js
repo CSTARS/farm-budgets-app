@@ -14,9 +14,6 @@ module.exports = function(grunt) {
       files: {
         'dist/require.html': [
         	'public/require.html'
-        ],
-				'dist/materialEditor-require.html': [
-        	'public/materialEditor-require.html'
         ]
       }
     },

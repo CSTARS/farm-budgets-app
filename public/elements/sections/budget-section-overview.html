@@ -50,17 +50,23 @@
           <table class="table">
             <tbody>
               <tr>
-                <td>Budget Name</td>
+                <td>Status</td>
+                <td id="draft"></td>
+              </tr>
+              <tr>
+                <td>Name</td>
                 <td id="budgetNameLabel"></td>
               </tr>
               <tr>
-                <td>Farm Name</td>
-                <td id="farmNameLabel"></td>
+                <td>Description</td>
+                <td id="budgetDescriptionLabel"></td>
               </tr>
               <tr>
-                <td>Farm Size</td>
+                <td>Farm</td>
                 <td>
-                  <span id="farmSizeLabel"></span>&nbsp;&nbsp;<span id="farmUnitsLabel"></span>
+                  <span id="farmNameLabel"></span>,&nbsp;&nbsp;
+                  <span id="farmSizeLabel"></span>
+                  <span id="farmUnitsLabel"></span>
                 </td>
               </tr>
               <tr>
@@ -205,13 +211,21 @@
       this.$.total.setData(data.farm);
       this.data = data;
 
-      this.$.budgetNameLabel.innerHTML = data.name;
-      this.$.farmNameLabel.innerHTML = data.farm.name;
-      this.$.farmSizeLabel.innerHTML = data.farm.size;
-      this.$.farmUnitsLabel.innerHTML = data.farm.units;
-      this.$.cropLabel.innerHTML = data.commodity;
+      this.$.budgetNameLabel.innerHTML = data.name || '';
+      this.$.farmNameLabel.innerHTML = data.farm.name || '';
+      this.$.farmSizeLabel.innerHTML = data.farm.size || 0;
+      this.$.farmUnitsLabel.innerHTML = data.farm.units || '';
+      this.$.cropLabel.innerHTML = data.commodity || '';
       this.$.localityLabel.innerHTML = data.locality.join(', ');
-      this.$.authorityLabel.innerHTML = data.authority;
+      this.$.authorityLabel.innerHTML = data.authority || '';
+      this.$.budgetDescriptionLabel.innerHTML = data.description || '';
+
+
+      if( data.draft !== false ) {
+        this.$.draft.innerHTML = '<span class="text text-warning"><i class="fa fa-circle-o"></i> Working Draft</span>';
+      } else {
+        this.$.draft.innerHTML = '<span class="text text-success"><i class="fa fa-circle"></i> Published</span>';
+      }
 
       if( data.reference ) {
         this.$.aliasesRow.style.display = 'none';

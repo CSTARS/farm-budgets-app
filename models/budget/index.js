@@ -253,7 +253,19 @@ function get(id, callback) {
 
 function getChildReferences(result, callback) {
   collection
-    .find({reference : result.budget.id}, {_id: 0, id: 1, authority: 1, locality: 1, commodity: 1, name: 1})
+    .find(
+      {
+        reference : result.budget.id,
+        deleted : {$ne : true}
+      },
+      {
+        _id: 0,
+        id: 1,
+        authority: 1,
+        locality: 1,
+        commodity: 1,
+        name: 1
+    })
     .toArray(function(err, resp){
       if( err ){
         return callback(err);
