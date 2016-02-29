@@ -94,14 +94,18 @@
          conversion += ' x '+this.impl.scale+' <span style="color:#888">(scaling factor)</span> ';
        }
 
+       var parentUnits = '';
+       if( this.parentUnits ) {
+         parentUnits = '/'+SDK.units.invert(this.parentUnits);
+       }
+
        if( this.impl.conversion && this.impl.conversion !== 1 ) {
          conversion += ' x '+this.impl.conversion.toFixed(3)+' '+this.material.getUnits()+'/'+this.impl.units+' ';
        }
 
        html += '<div style="border-top:1px solid #ccc">'+
-        conversion+'x '+this.impl.amount+' '+this.impl.units+
-        (this.parentUnits ? '/'+this.parentUnits : '')+
-        ' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+(this.parentUnits ? '/'+this.parentUnits : '')+
+        conversion+'x '+this.impl.amount+' '+this.impl.units+parentUnits+
+        ' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+parentUnits+
       '</div>';
      }
      this.$.info.innerHTML = html;
