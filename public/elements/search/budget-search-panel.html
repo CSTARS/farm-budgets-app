@@ -217,11 +217,11 @@
       },
 
       render : function() {
-        var html = '<table class="table">', m;
+        var html = '<table class="table style-scope budget-search-panel">', m;
 
         html += '<tr>'+
           '<th></th>'+
-          '<th><i class="fa fa-leaf"></i> Crop</th>'+
+          '<th class="text text-success"><i class="fa fa-leaf"></i> Crop</th>'+
           '<th>Status*</th>'+
           '<th>Budget Name</th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
@@ -233,9 +233,9 @@
           var m = this.results[i];
           html += '<tr>';
 
-          html += '<td><a style="cursor:pointer" index="'+i+'" select>Load</a></td>';
+          html += '<td><a class="btn btn-default" index="'+i+'" select>Load</a></td>';
 
-          html += '<td>'+m.commodity+'</td>';
+          html += '<td class="text text-success" style="text-transform: capitalize">'+m.commodity+'</td>';
 
           var status = '';
           if( m.draft !== false ) {
@@ -265,13 +265,19 @@
         this.$.table.innerHTML = html+'</table>';
 
         // wire events
-        $(this.$.table)
+        var table = $(this.$.table);
+
+        table
           .find('a[select]')
           .on('click', function(e){
             var index = parseInt(e.currentTarget.getAttribute('index'));
             this.fire('select', this.results[index]);
             this.onSelect(this.results[index]);
           }.bind(this));
+
+        table
+          .find('td')
+          .css('vertical-align', 'middle');
 
         this.renderControls();
       },
