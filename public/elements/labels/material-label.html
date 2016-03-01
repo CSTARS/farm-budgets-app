@@ -153,6 +153,11 @@
           units = this.parentUnits || '';
         }
 
+        // HACK
+        if( this.parent.schedule ) {
+          units = SDK.units.invert(units);
+        }
+
         this.ele.onMaterialUpdate(this._material, this.impl, units);
       },
 

@@ -11,14 +11,46 @@
     </style>
 
     <div style="padding: 10px;">
-      <keyword-search-input id="input" type="materials" on-set-search="setSearch" on-set-filter="setFilter"></keyword-search-input>
+      <div class="row">
+        <div class="col-sm-6">
+
+
+          <div class="form-horizontal">
+            <div class="form-group" id="complexGroup">
+              <label class="col-sm-3 control-label">Search Text</label>
+              <div class="col-sm-9">
+                <keyword-search-input id="input"
+                  type="materials"
+                  on-set-search="setSearch"
+                  on-set-filter="setFilter">
+                </keyword-search-input>
+              </div>
+            </div>
+
+
+            <div class="form-group" id="complexGroup">
+              <label class="col-sm-3 control-label"></label>
+              <div class="col-sm-9">
+                <div class="checkbox" style="display:inline-block">
+                  <label>
+                    <input type="checkbox" id="hasAccess" on-click="toggleWriteAccess"> Write Access
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div> <!-- end form -->
+
+        </div>
+        <div class="col-sm-6">
+          <div id="filters" style="padding: 10px"></div>
+        </div>
+      </div> <!-- end row -->
     </div>
 
-    <div id="filters" style="padding: 10px"></div>
 
-    <div style="border-top: 1px solid #eee">
+    <div>
 
-      <div style="padding: 20px">
+      <div style="padding: 10px 20px">
 
         <div class="layout horizontal center">
           <div class="flex" id="totalLabel">
@@ -334,7 +366,6 @@
           return;
         }
 
-
         var html = '';
         if( this.q.$and ) {
           for( var i = 0; i < this.q.$and.length; i++ ) {
@@ -344,7 +375,9 @@
         }
 
         if( this.q.authority ) {
-          html += ' <a index="access" class="btn btn-primary"><i class="fa fa-times"></i> Edit Permissions</a> ';
+          this.$.hasAccess.checked = true;
+        } else {
+          this.$.hasAccess.checked = false;
         }
 
         this.$.filters.innerHTML = html;
@@ -392,6 +425,16 @@
       onNumPerPageChange : function(e) {
         this.itemsPerPage = parseInt(e.currentTarget.value);
         this.query();
+      },
+
+      toggleWriteAccess : function() {
+        if( this.$.hasAccess.checked ) {
+          this.setHasAccessQuery();
+        } else if( this.q.authority && this.q.authority.$in ) {
+          delete this.q.authority;
+          this.renderFilters();
+          this.query();
+        }
       },
 
       setHasAccessQuery : function() {

@@ -20,10 +20,47 @@
     </div>
 
     <div style="padding: 10px;">
-      <keyword-search-input type="budget" on-set-search="setSearch" on-set-filter="setFilter"></keyword-search-input>
-    </div>
+      <div class="row">
+        <div class="col-sm-6">
 
-    <div id="filters" style="padding: 10px"></div>
+
+          <div class="form-horizontal">
+            <div class="form-group" id="complexGroup">
+              <label class="col-sm-3 control-label">Search Text</label>
+              <div class="col-sm-9">
+                <keyword-search-input id="input"
+                  type="budget"
+                  on-set-search="setSearch"
+                  on-set-filter="setFilter">
+                </keyword-search-input>
+              </div>
+            </div>
+
+
+            <div class="form-group" id="complexGroup">
+              <label class="col-sm-3 control-label"></label>
+              <div class="col-sm-9">
+                <div class="checkbox" style="display:inline-block">
+                  <label>
+                    <input type="checkbox" id="isPublished" on-click="toggleDraft"> Published
+                  </label>
+                </div>
+                &nbsp;&nbsp;
+                <div class="checkbox" style="display:inline-block">
+                  <label>
+                    <input type="checkbox" id="hasAccess" on-click="toggleWriteAccess"> Write Access
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div> <!-- end form -->
+
+        </div>
+        <div class="col-sm-6">
+          <div id="filters" style="padding: 10px"></div>
+        </div>
+      </div> <!-- end row -->
+    </div>
 
     <div style="border-top: 1px solid #eee">
       <div cstyle="padding: 20px">
@@ -264,6 +301,18 @@
         }
         this.$.filters.innerHTML = html;
 
+        if( this.q.draft === false ) {
+          this.$.isPublished.checked = true;
+        } else {
+          this.$.isPublished.checked = false;
+        }
+
+        if( this.q.authority && this.q.authority.$in ) {
+          this.$.hasAccess.checked = true;
+        } else {
+          this.$.hasAccess.checked = false;
+        }
+
         $(this.$.filters)
           .find('a')
           .on('click', function(e){
@@ -315,14 +364,44 @@
         this.q = {};
       },
 
-      setMyBudgets : function() {
+      toggleDraft : function() {
+        if( this.$.isPublished.checked ) {
+          this.q.draft = false;
+        } else {
+          delete this.q.draft;
+        }
+
+        this.renderFilters();
+        this.query();
+      },
+
+      toggleWriteAccess : function() {
+        if( this.$.hasAccess.checked ) {
+          this.setHasAccessQuery();
+        } else if( this.q.authority && this.q.authority.$in ) {
+          delete this.q.authority;
+          this.renderFilters();
+          this.query();
+        }
+      },
+
+      setHasAccessQuery : function() {
+        if( !this.q ) this.q = {};
+
+        if( !ExpressAuth.user ) {
+          return alert('You must login first');
+        }
+
         if( ExpressAuth.user ) {
           this.q.authority = {
             $in : $.extend(true, [], ExpressAuth.user.authorities)
           }
           this.q.authority.$in.push(ExpressAuth.user.email);
         };
-      }
+
+        this.renderFilters();
+        this.query();
+      },
 
     });
   </script>

@@ -89,7 +89,7 @@ function save(budget, username, callback) {
           }
           callback(null, budget);
 
-          mapreduceAttributes.run(collection, 'budgetKeywords');
+          mapreduceAttributes.run(collection, 'budgetKeywords', {keys: ['commodity', 'authority', 'locality']});
         });
       });
     });

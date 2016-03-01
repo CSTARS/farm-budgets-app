@@ -138,10 +138,15 @@
           conversion += ' x '+this.impl.conversion.toFixed(3)+' <span style="color:#888">'+SDK.units.invertAndRemoveDollars(this.material.getUnits())+'/'+this.impl.units+'</span> ';
         }
 
+        var parentUnits = '';
+        if( this.parentUnits ) {
+          parentUnits = '/'+SDK.units.invert(this.parentUnits);
+        }
+
         table += '<div style="text-align:right;border-top:1px solid #ccc">'+
-         conversion+'x '+this.impl.amount+' <span style="color:#888">'+this.impl.units+(this.parentUnits ? '/'+this.parentUnits : '')+'</span>'+
+         conversion+'x '+this.impl.amount+' <span style="color:#888">'+this.impl.units+parentUnits+'</span>'+
          ' = <ahb-dollar-label value="'+this.impl.price+'"></ahb-dollar-label>'+
-         (this.parentUnits ? '<span style="color:#888">/'+this.parentUnits+'</span>' : '');
+         '<span style="color:#888">'+parentUnits+'</span>';
        '</div>';
       }
 

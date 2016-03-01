@@ -361,7 +361,8 @@ function mapReduceMaterial(name, callback) {
       finalize : MapReduce.finalize
     },
     function(err, resp){
-      mapreduceAttributes.run(collection, 'materialKeywords');
+      var keys = ['authority', 'locality', 'class'];
+      mapreduceAttributes.run(collection, 'materialKeywords', {keys: keys});
 
       if( !callback ) {
         return;
