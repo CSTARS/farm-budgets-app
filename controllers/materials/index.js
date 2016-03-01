@@ -64,8 +64,19 @@ module.exports = function (router) {
         stop = 100;
       }
 
-
       model.search(query, start, stop, function(err, response){
+        if( err ) {
+          return res.send({error:true, message: err});
+        }
+
+        res.send(response);
+      });
+    });
+
+    router.get('/keywords', cors(), function (req, res) {
+      var q = req.query.q || '';
+
+      model.keywordSearch(q, function(err, response){
         if( err ) {
           return res.send({error:true, message: err});
         }

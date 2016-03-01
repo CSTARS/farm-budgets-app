@@ -8,13 +8,15 @@ var sdk = require('../lib/sdk');
 var history = require('mongo-object-history');
 var async = require('async');
 var extend = require('extend');
+var mapreduceAttributes = require('../lib/mapreduceAttributes');
+var keywordSearch = require('./utils/keywordSearch');
 
 var init = true;
 var schema = sdk.schema();
 var strip = sdk.utils.strip;
 
 var materialGroupCollection = 'materialNameGrouping';
-var collection, suggestCollection;
+var collection, suggestCollection, keywordCollection;
 // units can be an empty string, just not undefined or null
 var required = ['price', 'units', 'type'];
 
@@ -22,6 +24,7 @@ module.exports = function() {
   if( init ) {
     collection = db.collection('material');
     suggestCollection = db.collection(materialGroupCollection);
+    keywordCollection = db.collection('materialKeywords');
     authorityModel = new authorityModel();
     init = false;
   }
@@ -30,6 +33,9 @@ module.exports = function() {
       name: 'Material',
       find : find,
       search : search,
+      keywordSearch : function(query, callback) {
+        keywordSearch(keywordCollection, query, callback);
+      },
       save : save,
       get : get,
       delete : remove,
@@ -212,69 +218,35 @@ function search(query, start, stop, callback) {
     ]
   };
 
-  searchFilters(q, function(err, filters){
-    if( err ) {
-      return callback(err);
-    }
 
-    var cursor = collection.find(
-      q,
-      {
-        _id: 0,
-        score: {
-          $meta: 'textScore'
-        }
-      });
-    cursor.count(function(err, count){
-      cursor.sort({
-        score: { $meta: 'textScore' }
-      })
-      .skip(start)
-      .limit(start-stop)
-      .toArray(function(err, results){
-        if( err ) {
-          return callback(err);
-        }
-
-        var response = {
-          total : count,
-          start : start,
-          stop : count < stop ? count : stop,
-          results : results,
-          filters : filters,
-        };
-        callback(null, response);
-      });
+  var cursor = collection.find(
+    q,
+    {
+      _id: 0,
+      score: {
+        $meta: 'textScore'
+      }
     });
-  });
-}
-
-function searchFilters(q, callback) {
-  //collection.count(q, function(err, count){
-  //  if( err ) {
-  //    return callback(err);
-  //  }
-
-    collection.distinct('locality', q, function(err, localityFilters){
+  cursor.count(function(err, count){
+    cursor.sort({
+      score: { $meta: 'textScore' }
+    })
+    .skip(start)
+    .limit(start-stop)
+    .toArray(function(err, results){
       if( err ) {
         return callback(err);
       }
 
-      collection.distinct('authority', q, function(err, authorityFilters){
-        if( err ) {
-          return callback(err);
-        }
-
-        callback(null,{
-          //total : count,
-          //filters : {
-            authority : authorityFilters,
-            locality : localityFilters
-          //}
-        });
-      });
+      var response = {
+        total : count,
+        start : start,
+        stop : count < stop ? count : stop,
+        results : results
+      };
+      callback(null, response);
     });
-  //});
+  });
 }
 
 function find(query, callback) {
@@ -389,6 +361,8 @@ function mapReduceMaterial(name, callback) {
       finalize : MapReduce.finalize
     },
     function(err, resp){
+      mapreduceAttributes.run(collection, 'materialKeywords');
+
       if( !callback ) {
         return;
       }

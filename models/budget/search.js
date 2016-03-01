@@ -2,94 +2,43 @@
 
 var collection, loadReference;
 
-function search(query, start, stop, includeFilters, callback) {
-
+function search(query, start, stop, callback) {
   query.deleted = {$ne: true};
-  /*var q = {
-    $and : [
-      {$or : [
-        {fixed : {'$exists' : false}},
-        {fixed : false},
-      ]},
-      query
-    ]
-  };*/
 
-  searchFilters(query, includeFilters, function(err, filters){
-    if( err ) {
-      return callback(err);
-    }
-
-    var cursor = collection.find(
-      query,
-      {
-        _id: 0,
-        id:1,
-        'farm.name':1,
-        'commodity':1,
-        'name':1,
-        'authority':1,
-        'locality':1,
-        draft : 1,
-        'reference' : 1,
-        score: {
-          $meta: 'textScore'
-        }
-      });
-    cursor.count(function(err, count){
-      cursor.sort({
-        score: { $meta: 'textScore' }
-      })
-      .skip(start)
-      .limit(start-stop)
-      .toArray(function(err, results){
-        if( err ) {
-          return callback(err);
-        }
-
-        var response = {
-          total : count,
-          start : start,
-          stop : count < stop ? count : stop,
-          results : results,
-          filters : filters,
-        };
-        callback(null, response);
-      });
+  var cursor = collection.find(
+    query,
+    {
+      _id: 0,
+      id:1,
+      'farm.name':1,
+      'commodity':1,
+      'name':1,
+      'authority':1,
+      'locality':1,
+      draft : 1,
+      'reference' : 1,
+      score: {
+        $meta: 'textScore'
+      }
     });
-  });
-}
-
-function loadReferences() {
-
-}
-
-function searchFilters(q, includeFilters, callback) {
-  if( !includeFilters ) {
-    return callback(null, {});
-  }
-
-  collection.distinct('commodity', q, function(err, commodityFilters){
-    if( err ) {
-      return callback(err);
-    }
-
-    collection.distinct('locality', q, function(err, localityFilters){
+  cursor.count(function(err, count){
+    cursor.sort({
+      score: { $meta: 'textScore' }
+    })
+    .skip(start)
+    .limit(start-stop)
+    .toArray(function(err, results){
       if( err ) {
         return callback(err);
       }
 
-      collection.distinct('authority', q, function(err, authorityFilters){
-        if( err ) {
-          return callback(err);
-        }
-
-        callback(null,{
-          authority : authorityFilters,
-          locality : localityFilters,
-          commodity: commodityFilters
-        });
-      });
+      var response = {
+        total : count,
+        start : start,
+        stop : count < stop ? count : stop,
+        results : results
+      };
+      callback(null, response);
     });
   });
 }

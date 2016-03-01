@@ -11,28 +11,14 @@
     </style>
 
     <div style="padding: 10px;">
-      <input type="text" class="form-control" placeholder="Search Text" id="textInput" on-keyup="onKeyUp"/>
+      <keyword-search-input id="input" type="materials" on-set-search="setSearch" on-set-filter="setFilter"></keyword-search-input>
     </div>
 
     <div id="filters" style="padding: 10px"></div>
 
-    <div class="layout horizontal" style="border-top: 1px solid #eee">
-      <div class="well">
-        <h4 class="page-header" style="margin-top:5px">Filters</h4>
+    <div style="border-top: 1px solid #eee">
 
-        <h5>Authority</h5>
-        <template is="dom-repeat" items="{{authorityFilters}}">
-          <div><a class="btn btn-link" on-click="addFilter" filter="authority">{{item}}</a></div>
-        </template>
-
-        <h5>Location</h5>
-        <template is="dom-repeat" items="{{locationFilters}}">
-          <div><a class="btn btn-link" on-click="addFilter" filter="locality">{{item}}</a></div>
-        </template>
-
-        <a class="btn btn-default" on-click="setHasAccessQuery">Edit Permissions</a>
-      </div>
-      <div class="flex" style="padding: 20px">
+      <div style="padding: 20px">
 
         <div class="layout horizontal center">
           <div class="flex" id="totalLabel">
@@ -70,8 +56,6 @@
 
       ready : function() {
         this.results = [];
-        this.locationFilters = [];
-        this.authorityFilters = [];
         this.itemsPerPage = 10;
         this.page = 0;
         this.q = {};
@@ -87,7 +71,7 @@
       },
 
       setText : function(value) {
-        this.$.textInput.value = value;
+        this.$.input.setText(value);
         this.updateTextFilter(value);
       },
 
@@ -96,6 +80,10 @@
         this.$.textInput.value = this.q.$text ? this.q.$text.$search : '';
         this.bufferedQuery();
         this.renderFilters();
+      },
+
+      setSearch : function(e) {
+        this.updateTextFilter(e.detail);
       },
 
       updateTextFilter : function(value) {
@@ -155,11 +143,6 @@
 
           this.resp = resp;
           this.results = resp.results;
-
-          this.cleanFilters(resp.filters);
-
-          this.locationFilters = resp.filters.locality.sort();
-          this.authorityFilters = resp.filters.authority.sort();
 
           this.selected = [];
 
@@ -386,12 +369,15 @@
           }.bind(this));
       },
 
-      addFilter : function(e) {
+      setFilter : function(e) {
+        var key = e.detail.key;
+        var value = e.detail.value;
+
         if( !this.q.$and ) {
           this.q.$and = [];
         }
         var f = {};
-        f[e.currentTarget.getAttribute('filter')] = e.currentTarget.innerHTML;
+        f[key] = value;
         this.q.$and.push(f);
         this.page = 0;
 
@@ -401,31 +387,6 @@
 
       getFilter : function(obj) {
         return Object.keys(obj)[0];
-      },
-
-      cleanFilters : function(filters) {
-        if( !this.q.$and ) return;
-
-        for( var i = filters.locality.length-1; i >= 0; i-- ) {
-          if( this._isActive('locality', filters.locality[i]) ) {
-            filters.locality.splice(i, 1);
-          }
-        }
-
-        for( var i = filters.authority.length-1; i >= 0; i-- ) {
-          if( this._isActive('authority', filters.authority[i]) ) {
-            filters.authority.splice(i, 1);
-          }
-        }
-      },
-
-      _isActive : function(type, filter) {
-        for( var i = 0; i < this.q.$and.length; i++ ) {
-          if( this.q.$and[i][type] === filter ) {
-            return true;
-          }
-        }
-        return false;
       },
 
       onNumPerPageChange : function(e) {

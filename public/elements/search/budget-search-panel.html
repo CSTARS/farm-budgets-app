@@ -20,31 +20,13 @@
     </div>
 
     <div style="padding: 10px;">
-      <input type="text" class="form-control" placeholder="Search Text" id="textInput" on-keyup="onKeyUp">
+      <keyword-search-input type="budget" on-set-search="setSearch" on-set-filter="setFilter"></keyword-search-input>
     </div>
 
     <div id="filters" style="padding: 10px"></div>
 
-    <div class="layout horizontal" style="border-top: 1px solid #eee">
-      <div class="well">
-        <h4 class="page-header" style="margin-top:5px">Filters</h4>
-
-        <h5>Commodity</h5>
-        <template is="dom-repeat" items="{{commodityFilters}}">
-          <div><a class="btn btn-link" on-click="addFilter" filter="commodity">{{item}}</a></div>
-        </template>
-
-        <h5>Location</h5>
-        <template is="dom-repeat" items="{{locationFilters}}">
-          <div><a class="btn btn-link" on-click="addFilter" filter="locality">{{item}}</a></div>
-        </template>
-
-        <h5>Authority</h5>
-        <template is="dom-repeat" items="{{authorityFilters}}">
-          <div><a class="btn btn-link" on-click="addFilter" filter="authority">{{item}}</a></div>
-        </template>
-      </div>
-      <div class="flex" style="padding: 20px">
+    <div style="border-top: 1px solid #eee">
+      <div cstyle="padding: 20px">
 
         <div class="layout horizontal center">
           <div class="flex" id="totalLabel">
@@ -79,6 +61,7 @@
         </div>
       </div>
     </div>
+  </div>
 
   </template>
   <script>
@@ -117,8 +100,8 @@
         }
       },
 
-      onKeyUp : function() {
-        var value = this.$.textInput.value;
+      setSearch : function(e) {
+        var value = e.detail;
 
         this.page = 0;
 
@@ -167,33 +150,10 @@
         SDK.budgets.search(params, function(resp){
           this.resp = resp;
           this.results = resp.results;
-
-          this.cleanFilters(resp.filters);
-
-          this.locationFilters = this.prepLocalityFilters(resp.filters.locality);
-          this.authorityFilters = resp.filters.authority.sort();
-          this.commodityFilters = resp.filters.commodity.sort();
-
           this.selected = [];
 
           this.render();
         }.bind(this));
-      },
-
-      prepLocalityFilters : function(filters) {
-        if( this.q.$and || this.q.$text ) {
-          return filters;
-        }
-
-        var states = [];
-        for( var i = 0; i < filters.length; i++ ) {
-          if( SDK.utils.states[filters[i].toLowerCase()] ) {
-            states.push(filters[i].toLowerCase());
-          }
-        }
-
-        states.sort();
-        return states;
       },
 
       update : function(material) {
@@ -317,12 +277,15 @@
           }.bind(this));
       },
 
-      addFilter : function(e) {
+      setFilter : function(e) {
+        var key = e.detail.key;
+        var value = e.detail.value;
+
         if( !this.q.$and ) {
           this.q.$and = [];
         }
         var f = {};
-        f[e.currentTarget.getAttribute('filter')] = e.currentTarget.innerHTML;
+        f[key] = value;
         this.q.$and.push(f);
         this.page = 0;
 
@@ -332,28 +295,6 @@
 
       getFilter : function(obj) {
         return Object.keys(obj)[0];
-      },
-
-      cleanFilters : function(filters) {
-        if( !this.q.$and ) return;
-
-        for( var i = filters.locality.length-1; i >= 0; i-- ) {
-          if( this._isActive('locality', filters.locality[i]) ) {
-            filters.locality.splice(i, 1);
-          }
-        }
-
-        for( var i = filters.authority.length-1; i >= 0; i-- ) {
-          if( this._isActive('authority', filters.authority[i]) ) {
-            filters.authority.splice(i, 1);
-          }
-        }
-
-        for( var i = filters.commodity.length-1; i >= 0; i-- ) {
-          if( this._isActive('commodity', filters.commodity[i]) ) {
-            filters.commodity.splice(i, 1);
-          }
-        }
       },
 
       _isActive : function(type, filter) {

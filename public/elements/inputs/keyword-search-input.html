@@ -1,0 +1,118 @@
+<dom-module id="keyword-search-input">
+  <template>
+    <style>
+     :host {
+       display: block;
+     }
+      #popup {
+        display: none;
+        position: absolute;
+        background-color: white;
+        padding: 10px;
+        box-shadow: 0 0 10px #888;
+        z-index: 1000;
+      }
+    </style>
+
+    <input
+      type="text"
+      placeholder="Search Text"
+      class="form-control"
+      id="input"
+      on-blur="hide"
+      on-focus="_search"
+      on-keyup="search"
+      on-keypress="checkEnter" />
+
+    <div id="popup">
+      <div class="help-block">Filter Suggestions</div>
+      <template is="dom-repeat" items="{{results}}">
+        <div style="padding: 5px">
+          <a style="cursor:pointer; margin-right: 50px" on-click="setValue" key$="{{item.key}}">{{item.value}}</a>
+          <span class="label label-default pull-right">{{item.key}}</span>
+        </div>
+      </template>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+
+      properties : {
+        type : {
+          type : String
+        }
+      },
+
+      is: 'keyword-search-input',
+
+      ready : function() {
+        this.results = [];
+        this.timer = -1;
+        this.hideTimer = -1;
+      },
+
+      show : function() {
+        if( this.hideTimer != -1 ) {
+          clearTimeout(this.hideTimer);
+        }
+        this.$.popup.style.display = 'block';
+      },
+
+      hide : function() {
+        this.hideTimer = setTimeout(function(){
+          this.hideTimer = -1;
+          this.$.popup.style.display = 'none';
+        }.bind(this), 200);
+      },
+
+      search : function() {
+        if( this.timer !== -1 ) {
+          clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(function(){
+          this.timer = -1;
+          this._search();
+        }.bind(this), 200);
+      },
+
+      _search : function() {
+        if( this.current == this.$.input.value ) {
+          return;
+        }
+        this.hide();
+        if( this.$.input.value === '' ) {
+          this.results = [];
+          return;
+        }
+        this.current = this.$.input.value;
+        $.get('/'+this.type+'/keywords', {q: this.$.input.value}, function(resp){
+          this.results = resp;
+          if( this.results.length > 0 ) {
+            this.show();
+          }
+        }.bind(this));
+      },
+
+      setText : function(text) {
+        this.$.input.value = text;
+      },
+
+      setValue : function(e) {
+        var value = e.currentTarget.innerHTML;
+        var key = e.currentTarget.getAttribute('key');
+
+        this.fire('set-filter', {
+          key : key,
+          value : value
+        });
+      },
+
+      checkEnter : function(e) {
+        if( e.which === 13 ) {
+          this.fire('set-search', this.$.input.value);
+        }
+      }
+    });
+  </script>
+</dom-module>

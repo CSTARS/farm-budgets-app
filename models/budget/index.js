@@ -3,6 +3,7 @@
 var db = require('../../lib/mongo').get();
 var sdk = require('../../lib/sdk');
 var utils = require('../../lib/modelUtils');
+var mapreduceAttributes = require('../../lib/mapreduceAttributes');
 var authorityModel = require('../authority');
 var materialModel = require('../materials');
 var uuid = require('node-uuid');
@@ -12,9 +13,11 @@ var schema = sdk.schema();
 var strip = sdk.utils.strip;
 
 var collection = db.collection('budget');
+var keywordCollection = db.collection('budgetKeywords');
 var materialCollection = db.collection('material');
 var historyCollection = db.collection('history');
 var history = require('mongo-object-history');
+var keywordSearch = require('../utils/keywordSearch');
 
 authorityModel = new authorityModel();
 materialModel = new materialModel();
@@ -25,6 +28,9 @@ module.exports = function() {
       find: find,
       findCount : findCount,
       search : require('./search')(collection, loadReference),
+      keywordSearch : function(query, callback) {
+        keywordSearch(keywordCollection, query, callback);
+      },
       save: save,
       get : get,
       delete : remove,
@@ -82,6 +88,8 @@ function save(budget, username, callback) {
             return callback(err);
           }
           callback(null, budget);
+
+          mapreduceAttributes.run(collection, 'budgetKeywords');
         });
       });
     });
