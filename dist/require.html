@@ -68733,7 +68733,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="col-md-6">
 
         <div class="card" id="infoCard">
-          <h4 style="line-height:45px;margin-top: 0" class="page-header"><i class="fa fa-info-circle"></i> Budget Information
+          <h4 style="line-height:45px;margin-top: 0" class="page-header"><i class="fa fa-info-circle"></i> <span id="budgetNameLabel">Budget Information</span>
           <a class="btn btn-link btn-lg" id="editBtn" style="display:none" on-click="edit"><i class="fa fa-pencil"></i></a></h4>
 
           <table id="mainTable">
@@ -68756,10 +68756,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <tr>
                 <td>Status</td>
                 <td id="draft"></td>
-              </tr>
-              <tr>
-                <td>Name</td>
-                <td id="budgetNameLabel"></td>
               </tr>
               <tr>
                 <td>Description</td>
@@ -68915,7 +68911,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       this.$.total.setData(data.farm);
       this.data = data;
 
-      this.$.budgetNameLabel.innerHTML = data.name || '';
+      this.$.budgetNameLabel.innerHTML = data.name || 'Budget Information';
       this.$.farmNameLabel.innerHTML = data.farm.name || '';
       this.$.farmSizeLabel.innerHTML = data.farm.size || 0;
       this.$.farmUnitsLabel.innerHTML = data.farm.units || '';
