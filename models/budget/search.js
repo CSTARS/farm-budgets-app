@@ -13,6 +13,7 @@ function search(query, start, stop, callback) {
       'farm.name':1,
       'commodity':1,
       'name':1,
+      'description':1,
       'authority':1,
       'locality':1,
       draft : 1,
