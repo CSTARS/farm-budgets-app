@@ -62385,6 +62385,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     attached : function() {
+      if( window.location.hash.match(/link/) ) {
+        return;
+      }
+
       var id = window.localStorage.getItem('current-budget');
 
       if( id ) {
@@ -62496,8 +62500,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         SDK.changes.setOriginal(resp.budget, resp.materials);
         SDK.changes.setUnsaved({});
-        window.localStorage.setItem('unsaved-materials', '{}');
 
+        window.localStorage.setItem('unsaved-materials', '{}');
         window.localStorage.clear();
 
         this.load(resp);
