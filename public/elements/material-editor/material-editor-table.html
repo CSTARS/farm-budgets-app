@@ -370,7 +370,8 @@
         if( this.q.$and ) {
           for( var i = 0; i < this.q.$and.length; i++ ) {
             var filter = this.q.$and[i];
-            html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+filter[this.getFilter(filter)]+'</a> ';
+            var key = this.getFilter(filter);
+            html += ' <a index="'+i+'" class="btn btn-primary"><i class="fa fa-times"></i> '+key+' = '+filter[key]+'</a> ';
           }
         }
 
@@ -409,6 +410,7 @@
         if( !this.q.$and ) {
           this.q.$and = [];
         }
+
         var f = {};
         f[key] = value;
         this.q.$and.push(f);

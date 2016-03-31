@@ -19,6 +19,7 @@
       placeholder="Search Text"
       class="form-control"
       id="input"
+      on-blur="hide"
       on-focus="_search"
       on-keyup="search"
       on-keypress="checkEnter" />
@@ -48,29 +49,21 @@
       ready : function() {
         this.results = [];
         this.timer = -1;
-      },
-
-      attached : function() {
-        document.addEventListener('click', this.domClickHandler.bind(this));
-      },
-
-      detached : function() {
-        document.removeEventListener('click', this.domClickHandler.bind(this));
-      },
-
-      domClickHandler : function() {
-        if( !this.showing ) return;
-        this.hide();
+        this.hideTimer = -1;
       },
 
       show : function() {
-        this.showing = true;
+        if( this.hideTimer != -1 ) {
+          clearTimeout(this.hideTimer);
+        }
         this.$.popup.style.display = 'block';
       },
 
       hide : function() {
-        this.showing = true;
-        this.$.popup.style.display = 'none';
+        this.hideTimer = setTimeout(function(){
+          this.hideTimer = -1;
+          this.$.popup.style.display = 'none';
+        }.bind(this), 200);
       },
 
       search : function() {
@@ -87,26 +80,17 @@
         if( this.current == this.$.input.value ) {
           return;
         }
-
+        this.hide();
         if( this.$.input.value === '' ) {
           this.results = [];
           return;
         }
-
         this.current = this.$.input.value;
         $.get('/'+this.type+'/keywords', {q: this.$.input.value}, function(resp){
           this.results = resp;
-
           if( this.results.length > 0 ) {
             this.show();
           }
-
-          var arr = [];
-          this.results.forEach(function(item){
-            arr.push(item.value);
-          });
-          this.testing = arr;
-
         }.bind(this));
       },
 
@@ -115,14 +99,8 @@
       },
 
       setValue : function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
         var value = e.currentTarget.innerHTML;
         var key = e.currentTarget.getAttribute('key');
-
-        this.$.input.value = '';
-        this.hide();
 
         this.fire('set-filter', {
           key : key,

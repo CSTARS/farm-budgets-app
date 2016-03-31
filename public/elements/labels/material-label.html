@@ -154,7 +154,7 @@
         }
 
         // HACK
-        if( this.parent.schedule ) {
+        if( this.parent && this.parent.schedule ) {
           units = SDK.units.invert(units);
         }
 

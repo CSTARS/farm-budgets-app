@@ -40,7 +40,7 @@
                 <div class="form-group">
                   <label for="budgetNameInput" class="col-sm-3 control-label">Name</label>
                   <div class="col-sm-9">
-                    <input type="text" id="nameInput" class="form-control" placeholder="Material Name" on-keyup="suggest" on-blur="onSuggestBlur" on-focus="suggest"/>
+                    <input type="text" id="nameInput" class="form-control" placeholder="Material Name" on-keyup="suggest" on-focus="suggest"/>
                     <div id="suggestResults"></div>
                   </div>
                 </div>
@@ -155,9 +155,11 @@
 
       renderSuggest : function() {
         if( this.suggestResults.length === 0 ) {
-          this.$.suggestResults.style.display = 'none';
+          this.hideSuggest();
           return;
         }
+
+        this.suggestshowing = true;
 
         var html = '';
         for( var i = 0; i < this.suggestResults.length; i++ ) {
@@ -188,22 +190,36 @@
         $(this.$.suggestResults)
           .find('a')
           .on('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+
             this.$.nameInput.value = e.currentTarget.innerHTML;
 
             var units = e.currentTarget.getAttribute('units');
             try {
               units = SDK.units.invertAndRemoveDollars(units);
             } catch(e) {}
+
             this.$.unitsInput.setUnits(units);
             this.hideSuggest();
           }.bind(this));
       },
 
-      onSuggestBlur : function() {
-        setTimeout(this.hideSuggest.bind(this), 120);
+      attached : function() {
+        document.addEventListener('click', this.domClickHandler.bind(this));
+      },
+
+      detached : function() {
+        document.removeEventListener('click', this.domClickHandler.bind(this));
+      },
+
+      domClickHandler : function() {
+        if( !this.suggestshowing ) return;
+        this.hideSuggest();
       },
 
       hideSuggest : function() {
+        this.suggestshowing = false;
         this.$.suggestResults.style.display = 'none';
       }
     });

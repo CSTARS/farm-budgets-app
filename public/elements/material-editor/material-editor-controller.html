@@ -4,13 +4,26 @@
       :host {
         display: block;
       }
+
+      .material-title {
+        background-color: #03A9F4;
+        padding: 5px 10px;
+        color: white;
+        border-bottom: 1px solid #795548;
+      }
+      .material-title h5 small {
+        color: #795548;
+      }
+      .material-title .btn.btn-default {
+        color: #795548;
+      }
     </style>
 
-    <div style="border-bottom: 1px solid #ccc">
+    <div class="material-title">
       <h5>
         <div class="layout horizontal center">
-          <div class="flex">
-            Farm Budget <small>Materials</small>
+          <div class="flex" style="color: white">
+            <i class="fa fa-cube"></i> Farm Budget <small>Materials</small>
           </div>
           <div class="btn-group">
             <a class="btn btn-default" href="#budget/overview"><i class="fa fa-dashboard"></i> Budget Overview</a>

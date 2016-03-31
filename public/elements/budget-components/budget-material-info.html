@@ -245,10 +245,13 @@
 
           var eles = $(this.$.required).find('material-label');
           // TODO, switch to new parent refernce stratedgy
-          for( var i = 0; i < eles.length; i++ ) {
-            eles[i].parent = m.data;
-            eles[i].update();
-          }
+          setTimeout(function(){ // FF HACK
+            for( var i = 0; i < eles.length; i++ ) {
+              eles[i].parent = m.data;
+              eles[i].update();
+            }
+          }.bind(this), 100);
+
 
 
           if( this.budgetView ) {

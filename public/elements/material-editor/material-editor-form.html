@@ -18,7 +18,6 @@
       <div class="panel-heading">
         <span id="deletedMessage" class="text text-danger pull-right"><i class="fa fa-warning"></i> Deleted</span>
         <h4>
-          <a class="btn btn-link pull-right" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i></a>
           <span id="title">Edit Material</span>
         </h4>
       </div>
@@ -160,15 +159,18 @@
     <div class="layout horizontal">
       <div class="flex">
         <span>
-          <a class="btn btn-link" id="addBtn" on-click="addMaterial"><i class="fa fa-plus"></i> Add to current Budget</a>
-          <a class="btn btn-link" id="removeBtn" on-click="removeMaterial"><i class="fa fa-times"></i> Remove from current Budget</a>
+          <a class="btn btn-default" id="addBtn" on-click="addMaterial"><i class="fa fa-plus"></i> Add to current Budget</a>
+          <a class="btn btn-default" id="removeBtn" on-click="removeMaterial"><i class="fa fa-times"></i> Remove from current Budget</a>
         </span>
         <span class="label label-success" id="savedMsg" style="display:none" >Saved.</span>
       </div>
-      <div>
-        <a class="btn btn-default" id="cancel" href="#material/search">Cancel</a>
-        <a class="btn btn-primary" on-click="save" id="saveBtn">Save</a>
-        <a class="btn btn-primary" on-click="saveNew" id="saveNewBtn">Save As New</a>
+      <div class="flex" style="text-align:center">
+        <a class="btn btn-default" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete</a>
+        <a class="btn btn-default" on-click="saveNew" id="saveNewBtn"><i class="fa fa-copy"></i> Copy</a>
+      </div>
+      <div class="flex" style="text-align:right">
+        <a class="btn btn-default" id="cancel" href="#material/search"><i class="fa fa-times"></i> Cancel</a>
+        <a class="btn btn-primary" on-click="save" id="saveBtn"><i class="fa fa-save"></i> Save</a>
       </div>
     </div>
   </div>
