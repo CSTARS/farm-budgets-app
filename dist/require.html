@@ -62385,7 +62385,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     attached : function() {
-      if( window.location.hash.match(/link/) ) {
+      // check both for race condition
+      if( window.location.hash.match(/link/) || this.loadedFromLink ) {
         console.log('ignoring default load... loading from link');
         return;
       }
