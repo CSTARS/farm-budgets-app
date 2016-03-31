@@ -62386,6 +62386,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     attached : function() {
       if( window.location.hash.match(/link/) ) {
+        console.log('ignoring default load... loading from link');
         return;
       }
 
@@ -62420,6 +62421,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     checkLocal : function(id) {
+      console.log('checking local: '+id);
       try {
         var localdata = window.localStorage.getItem(id);
         if( !localdata ) {
@@ -62454,6 +62456,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     load : function(data) {
+      console.log('loading...');
       SDK.reset(true);
 
       if( !data.budget.materials ) {
@@ -62487,6 +62490,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     reload : function(id, force) {
+      console.log('Reloading');
       if( SDK.changes.hasChanges() && !force ) {
         if( !confirm('Are you sure you want to load this budget?  You have unsaved changes') ) {
           return;
@@ -70595,6 +70599,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         budget.loadedFromLink = true;
         budget.reload(parts[1]);
         window.location = '#budget/overview';
+        console.log('Running load from link...');
         return;
       }
 

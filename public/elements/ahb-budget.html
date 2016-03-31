@@ -34,6 +34,7 @@
 
     attached : function() {
       if( window.location.hash.match(/link/) ) {
+        console.log('ignoring default load... loading from link');
         return;
       }
 
@@ -68,6 +69,7 @@
     },
 
     checkLocal : function(id) {
+      console.log('checking local: '+id);
       try {
         var localdata = window.localStorage.getItem(id);
         if( !localdata ) {
@@ -102,6 +104,7 @@
     },
 
     load : function(data) {
+      console.log('loading...');
       SDK.reset(true);
 
       if( !data.budget.materials ) {
@@ -135,6 +138,7 @@
     },
 
     reload : function(id, force) {
+      console.log('Reloading');
       if( SDK.changes.hasChanges() && !force ) {
         if( !confirm('Are you sure you want to load this budget?  You have unsaved changes') ) {
           return;
