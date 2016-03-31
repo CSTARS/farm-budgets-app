@@ -33,7 +33,8 @@
     },
 
     attached : function() {
-      if( window.location.hash.match(/link/) ) {
+      // check both for race condition
+      if( window.location.hash.match(/link/) || this.loadedFromLink ) {
         console.log('ignoring default load... loading from link');
         return;
       }
