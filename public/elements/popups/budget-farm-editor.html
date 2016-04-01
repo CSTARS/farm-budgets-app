@@ -110,13 +110,7 @@
         this.popup
           .modal({show: false})
           .on('hidden.bs.modal', function(){
-            if( this.saveOnClose ) {
-              SDK.app.saveBudget();
-            } else {
-              SDK.app.localsave();
-            }
-
-            SDK.app.checkForChanges();
+            SDK.app.saveBudget();
             this.fire('editor-close');
           }.bind(this));
       },

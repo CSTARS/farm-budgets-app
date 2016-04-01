@@ -65,14 +65,14 @@
           <ul class="dropdown-menu dropdown-menu-right">
             <li class="dropdown-header">Budgets</li>
             <li><a class="btn btn-link" href="#search"><i class="fa fa-search"></i> Find Budget</a></li>
-            <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start from Scratch</a></li>
-            <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Save as New Budget</a></li>
+            <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start New Budget</a></li>
+            <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Copy Budget</a></li>
             <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
             <li class="dropdown-header">Materials</li>
             <li><a class="btn btn-link" href="#material/create"><i class="fa fa-plus"></i> Create Material</a></li>
             <li><a class="btn btn-link" href="#material/search"><i class="fa fa-search"></i> Find Material</a></li>
             <li class="dropdown-header">Other</li>
-            <li id="signOutBtn" style="display:none"><a class="btn btn-link" href="/auth/signoutRedirect"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+            <li id="signOutBtn" style="display:none"><a class="btn btn-link" on-click="signout"><i class="fa fa-sign-out"></i> Sign Out</a></li>
             <li><a class="btn btn-link" href="https://www.youtube.com/channel/UCa0NSsim30r17VZ33ja8Gsw" target="_blank"><i class="fa fa-youtube-play"></i> Screencasts/Tutorials</a></li>
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
            </ul>
@@ -83,13 +83,13 @@
 
     <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
-        <a href="#budget/overview"><i class="fa fa-dashboard"></i><span class="hidden-xs"> Overview</span></a>
+        <a on-click="show" show="overview"><i class="fa fa-dashboard"></i><span class="hidden-xs"> Overview</span></a>
       </li>
       <li role="presentation" id="btn-operations">
-        <a href="#budget/operations"><i class="fa fa-cogs"></i><span class="hidden-xs"> Operations</span></a>
+        <a on-click="show" show="operations"><i class="fa fa-cogs"></i><span class="hidden-xs"> Operations</span></a>
       </li>
       <li role="presentation" id="btn-materials">
-        <a href="#budget/materials">
+        <a on-click="show" show="materials">
           <i class="fa fa-warning text text-warning" id="unsavedMaterialWarning" style="display:none"></i>
           <i class="fa fa-warning text text-danger" id="errorWarning" style="display:none"></i>
           <i class="fa fa-cube"></i>
@@ -129,10 +129,11 @@
       }
 
       this.changesTimer = -1;
-      this.setSection();
-      $(window).on('hashchange', this.setSection.bind(this));
+      //this.setSection();
+      //$(window).on('hashchange', this.setSection.bind(this));
       SDK.changes.on('save-state-update', this.onSaveStateUpdate.bind(this));
       SDK.changes.on('material-state-update', this.onMaterialSaveStateUpdate.bind(this));
+      this.show();
     },
 
     attached : function() {
@@ -180,37 +181,22 @@
       this.$.searchPanel.style.display = 'none';
     },
 
-    setSection : function() {
-      var parts = window.location.hash.replace(/#/,'').split('/');
+    signout : function() {
+      window.location = "/auth/signoutRedirect?redirect="+encodeURIComponent('/'+window.location.hash);
+    },
 
-      if( parts[0].toLowerCase() === 'link' && parts.length > 1 ) {
-        var budget = document.querySelector('ahb-budget');
-        budget.loadedFromLink = true;
-        budget.reload(parts[1]);
-        window.location = '#budget/overview';
-        console.log('Running load from link...');
-        return;
+    show : function(e) {
+      var section = '';
+      if( e ) {
+        section = e.currentTarget.getAttribute('show');
       }
-
-      // TODO: remove later
-      if( parts.length == 1 && parts[0] == '' ) {
-        window.location = '#budget/overview';
-      }
-
-      if( parts[0] != 'budget' ) {
-        this.style.display = 'none';
-        return;
-      }
-      this.style.display = 'block';
-
 
       $(this).find('.section').hide();
       $(this.$.tabs).find('li').removeClass('active');
 
-      var section;
-      if( this.$[parts[1]] ) {
-        section = this.$[parts[1]];
-        $(this.$.tabs).find('#btn-'+parts[1]).addClass('active');
+      if( this.$[section] ) {
+        $(this.$.tabs).find('#btn-'+section).addClass('active');
+        section = this.$[section];
       } else {
         section = this.$.overview;
         $(this.$.tabs).find('#btn-overview').addClass('active');
@@ -218,14 +204,61 @@
 
       section.style.display = 'block';
 
-      var params = parts
-        .splice(2, parts.length-1)
-        .map(function(param){
-          return decodeURIComponent(param);
-        });
+      // var params = parts
+      //   .splice(2, parts.length-1)
+      //   .map(function(param){
+      //     return decodeURIComponent(param);
+      //   });
 
-      if( section.onShow ) section.onShow(params);
+      if( section.onShow ) section.onShow();
     },
+    //
+    // setSection : function() {
+    //   var parts = window.location.hash.replace(/#/,'').split('/');
+    //
+    //   if( parts[0].toLowerCase() === 'link' && parts.length > 1 ) {
+    //     window.location = '#budget/overview/'+parts[1];
+    //     return;
+    //   }
+    //
+    //   // TODO: remove later
+    //   if( parts.length == 1 && parts[0] == '' ) {
+    //     window.location = '#search';
+    //   }
+    //
+    //   if( parts[0] != 'budget' ) {
+    //     this.style.display = 'none';
+    //     return;
+    //   }
+    //
+    //   if( parts.length >= 3 ) {
+    //     document.querySelector('ahb-budget').reload(parts[2]);
+    //   }
+    //
+    //   this.style.display = 'block';
+    //
+    //   $(this).find('.section').hide();
+    //   $(this.$.tabs).find('li').removeClass('active');
+    //
+    //   var section;
+    //   if( this.$[parts[1]] ) {
+    //     section = this.$[parts[1]];
+    //     $(this.$.tabs).find('#btn-'+parts[1]).addClass('active');
+    //   } else {
+    //     section = this.$.overview;
+    //     $(this.$.tabs).find('#btn-overview').addClass('active');
+    //   }
+    //
+    //   section.style.display = 'block';
+    //
+    //   var params = parts
+    //     .splice(2, parts.length-1)
+    //     .map(function(param){
+    //       return decodeURIComponent(param);
+    //     });
+    //
+    //   if( section.onShow ) section.onShow(params);
+    // },
 
     setData : function(data) {
       var sections = this.querySelectorAll('.section');

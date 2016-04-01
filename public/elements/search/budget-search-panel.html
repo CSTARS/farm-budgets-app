@@ -13,7 +13,7 @@
             Farm Budgets <small><i class="fa fa-search"></i> Find Budget</small>
           </div>
           <div>
-            <a class="btn btn-default" href="#budget/overview"><i class="fa fa-arrow-leaf"></i> Back</a>
+
           </div>
         </div>
       </h5>
@@ -63,7 +63,7 @@
     </div>
 
     <div style="border-top: 1px solid #eee">
-      <div cstyle="padding: 20px">
+      <div class="content">
 
         <div class="layout horizontal center">
           <div class="flex" id="totalLabel">
@@ -106,7 +106,7 @@
       is: 'budget-search-panel',
 
       ready : function() {
-        $(window).on('hashchange', this.updateVisible.bind(this));
+        //$(window).on('hashchange', this.updateVisible.bind(this));
 
         this.results = [];
         this.locationFilters = [];
@@ -118,27 +118,31 @@
         this.setEmptyQuery();
 
         this.queryTimer = -1;
+        this.setSearch();
       },
 
-      attached : function() {
-        this.updateVisible();
-      },
+      //attached : function() {
+      //  this.updateVisible();
+      //},
 
-      updateVisible : function() {
-        var hash = window.location.hash.replace(/#/,'');
-        if( hash === 'search' ) {
-          this.style.display = 'block';
-          if( !this.init ) {
-            this.query();
-            this.init = true;
-          }
-        } else {
-          this.style.display = 'none';
-        }
-      },
+      // updateVisible : function() {
+      //   var hash = window.location.hash.replace(/#/,'');
+      //   if( hash === 'search' ) {
+      //     this.style.display = 'block';
+      //     if( !this.init ) {
+      //       this.query();
+      //       this.init = true;
+      //     }
+      //   } else {
+      //     this.style.display = 'none';
+      //   }
+      // },
 
       setSearch : function(e) {
-        var value = e.detail;
+        var value = '';
+        if( e ) {
+          value = e.detail;
+        }
 
         this.page = 0;
 
@@ -230,7 +234,7 @@
           var m = this.results[i];
           html += '<tr>';
 
-          html += '<td><a class="btn btn-default" index="'+i+'" select>Load</a></td>';
+          html += '<td><a class="btn btn-default" index="'+i+'" href="/#'+m.id+'">Load</a></td>';
 
           html += '<td class="text text-success" style="text-transform: capitalize">'+m.commodity+'</td>';
 
@@ -263,14 +267,6 @@
 
         // wire events
         var table = $(this.$.table);
-
-        table
-          .find('a[select]')
-          .on('click', function(e){
-            var index = parseInt(e.currentTarget.getAttribute('index'));
-            this.fire('select', this.results[index]);
-            this.onSelect(this.results[index]);
-          }.bind(this));
 
         table
           .find('td')

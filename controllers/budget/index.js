@@ -135,7 +135,7 @@ module.exports = function (router) {
           if( typeof err === 'object' ) {
             return res.send(err);
           } else {
-            return res.send({error:true, message: err});
+            return res.send({error:true, message: err, code: 1});
           }
         }
 
@@ -167,7 +167,11 @@ function checkAccess(user, newbudget, callback) {
           return callback(err);
         }
         if( !hasRole ) {
-          return callback('You do not have access to authority: '+newbudget.authority);
+          return callback({
+            error: true,
+            message : 'You do not have access to authority: '+newbudget.authority,
+            code : 2
+          });
         }
 
         callback(null, true);
@@ -181,7 +185,7 @@ function checkAccess(user, newbudget, callback) {
         return callback(err);
       }
       if( !hasRole ) {
-        return callback({error: true, message: 'You do not have access to authority: '+budget.authority, code: 10});
+        return callback({error: true, message: 'You do not have access to authority: '+budget.authority, code: 2});
       }
 
       authUtils.hasAccessObject(user, newbudget, function(err, hasRole){
@@ -189,7 +193,7 @@ function checkAccess(user, newbudget, callback) {
           return callback(err);
         }
         if( !hasRole ) {
-          return callback('You do not have access to authority: '+newbudget.authority);
+          return callback({error: true, message: 'You do not have access to authority: '+newbudget.authority, code: 2});
         }
 
         callback(null, true);

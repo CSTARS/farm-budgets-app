@@ -1,0 +1,26 @@
+<dom-module id="app-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+    </style>
+
+    <div class="layout horizontal center main-title">
+      <div class="flex">
+        <h5><content select=".app-title"></content></h5>
+      </div>
+
+      <div>
+        <content select=".app-menu"></content>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'app-header'
+    });
+  </script>
+</dom-module>

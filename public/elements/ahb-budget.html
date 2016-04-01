@@ -21,6 +21,7 @@
     ready : function() {
       this.renameList = {};
       this.renameTimer = -1;
+      this.currentBudgetId = '';
 
       SDK.app.init();
 
@@ -30,43 +31,46 @@
       if( ExpressAuth.user && !ExpressAuth.user.verified ) {
         window.location = '/auth/verifyPage';
       }
+
+      var parts = window.location.hash.replace('#','').split('/');
+      if( parts[0] === '' ) {
+        window.location = '/search';
+        return;
+      }
+      this.currentBudgetId = parts[0];
     },
 
     attached : function() {
-      // check both for race condition
-      if( window.location.hash.match(/link/) || this.loadedFromLink ) {
-        console.log('ignoring default load... loading from link');
-        return;
-      }
+      this.reload(this.currentBudgetId);
 
-      var id = window.localStorage.getItem('current-budget');
-
-      if( id ) {
-        SDK.budgets.get(id, function(resp){
-          if( resp.error ) {
-
-            // check local data if error (probably new, unsaved budget)
-            var localdata = window.localStorage.getItem(id);
-            if( localdata ) {
-              try {
-                localdata = JSON.parse(localdata);
-                this.load(localdata);
-                return;
-              } catch(e) {}
-            }
-
-            return;
-          }
-
-          SDK.changes.setOriginal(resp.budget, resp.materials);
-          if( !this.checkLocal(id) ) {
-            this.load(resp);
-          }
-        }.bind(this));
-      } else {
-        this.createNew();
-        window.location = '#search'
-      }
+      // //var id = window.localStorage.getItem('current-budget');
+      //
+      // if( id ) {
+      //   SDK.budgets.get(id, function(resp){
+      //     if( resp.error ) {
+      //
+      //       // check local data if error (probably new, unsaved budget)
+      //       var localdata = window.localStorage.getItem(id);
+      //       if( localdata ) {
+      //         try {
+      //           localdata = JSON.parse(localdata);
+      //           this.load(localdata);
+      //           return;
+      //         } catch(e) {}
+      //       }
+      //
+      //       return;
+      //     }
+      //
+      //     SDK.changes.setOriginal(resp.budget, resp.materials);
+      //     if( !this.checkLocal(id) ) {
+      //       this.load(resp);
+      //     }
+      //   }.bind(this));
+      // } else {
+      //   this.createNew();
+      //   window.location = '#search'
+      // }
     },
 
     checkLocal : function(id) {
@@ -115,11 +119,11 @@
         data.budget.operations = [];
       }
 
-      if( data.budget.id ) {
+      /*if( data.budget.id ) {
         window.localStorage.setItem('current-budget', data.budget.id);
       } else {
         window.localStorage.setItem('current-budget', '');
-      }
+      }*/
 
       // TODO: should be looking to switch to SDK.load which returns the budget class
       SDK.setBudget(data);
@@ -139,13 +143,6 @@
     },
 
     reload : function(id, force) {
-      console.log('Reloading');
-      if( SDK.changes.hasChanges() && !force ) {
-        if( !confirm('Are you sure you want to load this budget?  You have unsaved changes') ) {
-          return;
-        }
-      }
-
       SDK.budgets.get(id, function(resp){
         if( resp.error ) {
           return alert('Error reloading budget data: '+resp.message);

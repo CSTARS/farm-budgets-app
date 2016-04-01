@@ -3,7 +3,7 @@ var auth = require('express-auth');
 
 function middleware(req, res, next) {
   if( !req.user && !req.query.key ) {
-    return res.send({error:true, message: 'login required'});
+    return res.send({error:true, message: 'login required', code: 1});
   }
 
   //if( !req.user && req.query.key ) {
