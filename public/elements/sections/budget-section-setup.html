@@ -6,7 +6,6 @@
   <style>
     :host {
       display: block;
-      padding-top: 25px;
     }
     .card {
       padding: 15px;
@@ -19,8 +18,56 @@
         margin: 5px 0px;
       }
     }
+
+    .main-title {
+      padding: 5px 10px;
+      color: white;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 35px;
+    }
+    .main-title h5 {
+      line-height: 36px; /* match the material section */
+    }
+
+    .dropdown-menu.dropdown-menu-right a {
+      text-align: left !important;
+    }
   </style>
   <template>
+
+    <div class="layout horizontal center main-title">
+      <div class="flex">
+        <h5>
+          Farm Budgets <small>Settings</small>
+        </h5>
+      </div>
+
+      <div style="padding:10px">
+        <ahb-account-login id="loginBtn"></ahb-account-login>
+      </div>
+
+      <div style="padding:5px">
+        <budget-save-btn id="saveBtn"></budget-save-btn>
+      </div>
+
+      <div>
+        <div class="btn-group">
+          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-ellipsis-v"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li class="dropdown-header">Budgets</li>
+            <li><a class="btn btn-link" href="/search"><i class="fa fa-search"></i> Find Budget</a></li>
+            <li class="dropdown-header">Materials</li>
+            <li><a class="btn btn-link" href="/materials"><i class="fa fa-pencil"></i> Material Editor</a></li>
+            <li class="dropdown-header">Other</li>
+            <li id="signOutBtn" style="display:none"><a class="btn btn-link" on-click="signout"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+            <li><a class="btn btn-link" href="https://www.youtube.com/channel/UCa0NSsim30r17VZ33ja8Gsw" target="_blank"><i class="fa fa-youtube-play"></i> Screencasts/Tutorials</a></li>
+            <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
+           </ul>
+        </div>
+      </div>
+    </div>
 
     <div id="noAccess" style="text-align center">
 
@@ -34,13 +81,13 @@
       <div class="col-sm-3">
         <ul class="list-group">
           <li class="list-group-item">
-            <a href="#budget/setup/account">My Account</a>
+            <a href="#account">My Account</a>
           </li>
           <li class="list-group-item">
-            <a href="#budget/setup/authorities">My Authorities</a>
+            <a href="#authorities">My Authorities</a>
           </li>
           <li class="list-group-item">
-            <a href="#budget/setup/budgets">My Budgets</a>
+            <a href="#budgets">My Budgets</a>
           </li>
         </ul>
       </div>
@@ -59,6 +106,15 @@
   Polymer({
     is : 'budget-section-setup',
 
+    ready : function() {
+      $(window).on('hashchange', this.setPage.bind(this));
+      this.setPage();
+    },
+
+    setPage : function() {
+      this.onShow(window.location.hash.replace('#','').split('/'));
+    },
+
     onShow : function(params) {
       if( !ExpressAuth.user ) {
         this.$.noAccess.style.display = 'block';
@@ -70,7 +126,7 @@
       }
 
       if( params.length == 0 ) {
-        return window.location = '#budget/setup/authorities';
+        return window.location = '#authorities';
       }
 
       var page = params[0];

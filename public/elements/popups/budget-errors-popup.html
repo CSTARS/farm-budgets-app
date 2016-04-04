@@ -80,12 +80,12 @@
 
       viewMaterial : function(e) {
         this.popup.modal('hide');
-        window.location.hash = 'budget/materials/'+encodeURIComponent(e.currentTarget.getAttribute('material'));
+        document.querySelector('budget-sections').show('materials', e.currentTarget.getAttribute('material'));
       },
 
       viewOperation : function(e) {
         this.popup.modal('hide');
-        window.location.hash = 'budget/operations/'+encodeURIComponent(e.currentTarget.getAttribute('operation'));
+        document.querySelector('budget-sections').show('operations', e.currentTarget.getAttribute('operation'));
       }
 
 

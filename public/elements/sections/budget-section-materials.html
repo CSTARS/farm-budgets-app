@@ -32,59 +32,90 @@
 
   <template>
 
-    <div id="warningMessage" class="text text-warning">
-      <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.</div>
-      <span id="unsavedFilterOuter"><input type="checkbox" id="unsavedFilter" on-click="filter" /> Only Show Unsaved Materials</span>
-      <a class="btn btn-link" on-click="undo">Revert All Changes</a>
-    </div>
-
-    <div id="errorMessage" class="text text-danger">
-      <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of your materials have errors.</div>
-      <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors" /> Only Show Materials With Errors</span>
-    </div>
-
-    <h4 class="page-header">
-      <div class="btn-group pull-right" style="margin-top:-10px" role="group">
-        <a class="btn btn-primary" href="#material/create"><i class="fa fa-plus"></i> Create</a>
-        <a class="btn btn-primary" href="#material/search"><i class="fa fa-search"></i> Find</a>
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="list-group" id="nav" style="padding-left: 15px; padding-top: 15px">
+          <a on-click="onNavClick" show="list" class="list-group-item active">Budget Materials List</a>
+          <a on-click="onNavClick" show="find" class="list-group-item">Add Materials to Budget</a>
+          <a on-click="onNavClick" show="create" class="list-group-item">Create Material</a>
+        </div>
       </div>
 
-      <i class="fa fa-cube"></i> Budget Materials List
-    </h4>
-
-    <div class="help-block">
-      Below is a list of all materials currently available for this budget.  You can
-      find and add materials to this budget using the 'Find' button or create a new material
-      using the 'Create' button.
-    </div>
+      <div class="col-sm-9">
 
 
-    <div class="row">
-      <div class="col-md-10 col-md-offset-1">
+        <div id="list" class="material-panel">
 
-        <div class="form-horizontal" style="margin: 25px 0">
-          <div class="form-group">
-            <label for="filterInput" class="col-sm-2 control-label">Filter</label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" id="filterInput" placeholder="Filter By Name" on-input="filter">
+          <div id="warningMessage" class="text text-warning">
+            <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.</div>
+            <span id="unsavedFilterOuter"><input type="checkbox" id="unsavedFilter" on-click="filter" /> Only Show Unsaved Materials</span>
+            <a class="btn btn-link" on-click="undo">Revert All Changes</a>
+          </div>
+
+          <div id="errorMessage" class="text text-danger">
+            <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of your materials have errors.</div>
+            <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors" /> Only Show Materials With Errors</span>
+          </div>
+
+          <div class="help-block">
+            Below is a list of all materials currently available for this budget.  You can
+            find and add materials to this budget using the 'Find' button or create a new material
+            using the 'Create' button.
+          </div>
+
+
+          <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+
+              <div class="form-horizontal" style="margin: 25px 0">
+                <div class="form-group">
+                  <label for="filterInput" class="col-sm-2 control-label">Filter</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="filterInput" placeholder="Filter By Name" on-input="filter">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="sortInput" class="col-sm-2 control-label">Sort</label>
+                  <div class="col-sm-10">
+                    <select type="text" class="form-control" id="sortInput" on-change="filter">
+                      <option value="name" selected>Name</option>
+                      <option value="type">Type</option>
+                      <option value="authority">Authority</option>
+                      <option value="price">Price</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <budget-material-table
+                  id="table"
+                  on-edit-material="editMaterial"
+                  on-error-update="onErrorUpdate">
+                </budget-material-table>
+
+              <div id="searchMsg"></div>
+
             </div>
           </div>
-          <div class="form-group">
-            <label for="sortInput" class="col-sm-2 control-label">Sort</label>
-            <div class="col-sm-10">
-              <select type="text" class="form-control" id="sortInput" on-change="filter">
-                <option value="name" selected>Name</option>
-                <option value="type">Type</option>
-                <option value="authority">Authority</option>
-                <option value="price">Price</option>
-              </select>
-            </div>
-          </div>
+        </div> <!-- end list -->
+
+        <div id="find" class="material-panel">
+          <material-editor-table
+            id="search"
+            mode="budgetEditor"
+            on-edit="onTableEdit"
+            style="margin-top: 25px">
+          </material-editor-table>
         </div>
 
-        <budget-material-table id="table" on-error-update="onErrorUpdate"></budget-material-table>
-
-        <div id="searchMsg"></div>
+        <div id="edit" class="material-panel">
+          <material-editor-form
+            id="form"
+            style="margin-top: 25px"
+            on-cancel="cancelEdit"
+            mode="budgetEditor">
+          </material-editor-form>
+        </div>
 
       </div>
     </div>
@@ -108,6 +139,8 @@
       }.bind(this));
 
       SDK.changes.on('material-state-update', this.onSaveStateUpdate.bind(this));
+
+      this.show('list');
     },
 
     onSaveStateUpdate : function(e) {
@@ -122,6 +155,35 @@
         // make sure we are not filtering to unsaved if there are no unsaved
         this.filter();
       }
+    },
+
+    cancelEdit : function() {
+      this.show('list');
+    },
+
+    onNavClick : function(e) {
+      var panel = e.currentTarget.getAttribute('show');
+
+      if( panel === 'create' ) {
+        this.$.form.create('', SDK.getBudget());
+        panel = 'edit';
+      }
+
+      this.show(panel);
+    },
+
+    show : function(panel, edit) {
+      $(this).find('.material-panel').hide();
+      this.$[panel].style.display = 'block';
+
+      $(this.$.nav).find('a').removeClass('active');
+
+      var ele = panel;
+      if( ele === 'edit' && !edit ) {
+        ele = 'create';
+      }
+
+      $(this.$.nav).find('[show="'+ele+'"]').addClass('active');
     },
 
     onMaterialAdded : function(e) {
@@ -144,6 +206,11 @@
       //}
 
       this._filter();
+    },
+
+    editMaterial : function(e) {
+      this.show('edit', true);
+      this.$.form.edit(e.detail);
     },
 
     filter : function() {

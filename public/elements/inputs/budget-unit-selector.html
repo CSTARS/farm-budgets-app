@@ -16,7 +16,8 @@
   </style>
 
   <template>
-    <i id="icon" class="text text-danger fa fa-warning"></i><input id="input" type="text" class="form-control text" on-keyup="onChange" on-blur="onBlur" on-focus="onFocus">
+    <i id="icon" class="text text-danger fa fa-warning"></i>
+    <input id="input" type="text" class="form-control text" on-keyup="onChange" on-blur="onBlur" on-focus="onFocus" on-click="onClick">
 
   </template>
 </dom-module>
@@ -57,6 +58,7 @@
         if( !this.showing ) return;
         this.positionMessage();
       }.bind(this));
+
       $('.modal').on('scroll', function(){
         if( !this.showing ) return;
         this.positionMessage();
@@ -65,7 +67,11 @@
 
     attached : function() {
       this.checkError();
-      //this.onBlur();
+      document.addEventListener('click', this.hidePopup.bind(this));
+    },
+
+    detached : function() {
+      document.removeEventListener('click', this.hidePopup.bind(this));
     },
 
     setDisplayBlock : function() {
@@ -157,6 +163,20 @@
       this.message.style.left = (offset.left)+'px';
     },
 
+    hidePopup : function() {
+      $(this.message).remove();
+      if( this.block ) return;
+
+      this.style.width = '100px';
+      this.$.input.style.width = '100px';
+      this.showing = false;
+    },
+
+    onClick : function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+
     onFocus : function() {
       this.positionMessage();
       $('body').append($(this.message));
@@ -177,14 +197,6 @@
         error : this.error,
         onblur : true
       });
-
-      setTimeout(function(){
-        $(this.message).remove();
-        if( this.block ) return;
-        this.style.width = '100px';
-        this.$.input.style.width = '100px';
-        this.showing = false;
-      }.bind(this), 150);
     },
 
     getReminders : function() {

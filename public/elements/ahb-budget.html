@@ -2,15 +2,6 @@
   <template>
     <!-- main budget panel -->
     <budget-sections id="sections"></budget-sections>
-
-    <!-- find budget search panel -->
-    <budget-search-panel id="searchPanel"
-      style="display:none"
-      class="animated fadeIn"
-      on-select="onBudgetSelect">
-    </budget-search-panel>
-
-    <material-editor></material-editor>
   </template>
 </dom-module>
 
@@ -32,11 +23,20 @@
         window.location = '/auth/verifyPage';
       }
 
+      // check if we just logged in
+      var loginRedirectUrl = window.localStorage.getItem('login-redirect');
+      if( loginRedirectUrl ) {
+         window.localStorage.removeItem('login-redirect');
+         window.location = loginRedirectUrl;
+      }
+
+      // now has set
       var parts = window.location.hash.replace('#','').split('/');
       if( parts[0] === '' ) {
         window.location = '/search';
         return;
       }
+
       this.currentBudgetId = parts[0];
     },
 

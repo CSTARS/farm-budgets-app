@@ -10,6 +10,14 @@
       }
     </style>
 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4>
+          <span id="title">Find Materials</span>
+        </h4>
+      </div>
+      <div class="panel-body">
+
     <div style="padding: 10px;">
       <div class="row">
         <div class="col-sm-6">
@@ -79,12 +87,22 @@
       </div>
     </div>
 
+  </div>
+</div>
+
     <material-editor-delete-popup id="deletePopup" on-complete="query"></material-editor-delete-popup>
 
   </template>
   <script>
     Polymer({
       is: 'material-editor-table',
+
+      properties : {
+        mode : {
+          type : String,
+          value : ''
+        }
+      },
 
       ready : function() {
         this.results = [];
@@ -208,11 +226,17 @@
 
         var html = '<table class="table style-scope material-editor-table">', m;
 
-        html += '<tr>'+
-          '<th><a style="cursor:pointer" all>All</a> | <a style="cursor:pointer" none>None</a></th>'+
+        html += '<tr>';
+
+        if( this.mode === 'budgetEditor' ) {
+          html += '<th></th>';
+        } else {
+          html += '<th><a style="cursor:pointer" all>All</a> | <a style="cursor:pointer" none>None</a></th>';
+        }
+
+        html +=
           '<th>Type</th>'+
           '<th>Name</th>'+
-          '<th></th>'+
           '<th><i class="fa fa-shield"></i> Authority</th>'+
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
           '<th><i class="fa fa-dollar"></i> Price</th>'+
@@ -235,19 +259,34 @@
           html += '<tr>';
 
           // row selector
-          if( hasAccess ) {
-            html += '<td><input type="checkbox" index="'+i+'" /></td>';
+          if( this.mode === 'budgetEditor' ) {
+            if( !nameInBudget ) {
+              html += '<td><a class="btn btn-link" add="'+i+'"><i class="fa fa-plus"></i></a></td>';
+            } else if( idInBudget ) {
+              html += '<td>'+
+                        '<span class="btn btn-link">'+
+                          '<a class="popover-item text text-success" tabindex="0" role="button" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="Used in current budget.">'+
+                            '<i class="fa fa-check"></i>'+
+                          '</a>'+
+                        '</span>'
+                      '</td>';
+            } else {
+              html += '<td><a class="btn btn-link" add="'+i+'"><i class="fa fa-plus"></i></a></td>';
+            }
           } else {
-            html += '<td></td>';
+            if( hasAccess ) {
+              html += '<td><input type="checkbox" index="'+i+'" /></td>';
+            } else {
+              html += '<td></td>';
+            }
           }
+
 
           // set row icon
           html += '<td><i class="fa fa-cube'+(m.type === 'complex' ? 's' : '')+'"></i></td>';
 
           // set row name
           html += '<td info="'+i+'" class="style-scope material-editor-table">'+m.name+'</td>';
-
-          html += '<td>'+(idInBudget ? '<a class="popover-item text text-success" tabindex="0" role="button" data-trigger="focus" data-container="body" data-toggle="popover" data-placement="right" data-content="Used in current budget."><i class="fa fa-check"></i></a>' : '')+'</td>';
 
           // set authority
           html += '<td>'+m.authority+'</td>';
@@ -271,19 +310,21 @@
 
           html += '<li><a style="cursor:pointer" info="'+i+'"><i class="fa fa-info"></i> More Info</a></li>';
 
-          //if( hasAccess ) {
-            html += '<li><a href="#material/edit/'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
-          //}
-
-          if( !nameInBudget ) {
-            html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-plus"></i> Add to Current Budget</a></li>';
-          } else if( idInBudget ) {
-            html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Current Budget</a></li>';
-          } else {
-            html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-undo"></i> Replace in Current Budget</a></li>';
+          if( this.mode !== 'budgetEditor' ) {
+            html += '<li><a href="#edit/'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
           }
 
-          if( hasAccess ) {
+          if( this.mode === 'budgetEditor' ) {
+            if( !nameInBudget ) {
+              html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-plus"></i> Add to Current Budget</a></li>';
+            } else if( idInBudget ) {
+              html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Current Budget</a></li>';
+            } else {
+              html += '<li><a style="cursor:pointer" add="'+i+'"><i class="fa fa-undo"></i> Replace in Current Budget</a></li>';
+            }
+          }
+
+          if( this.mode !== 'budgetEditor' && hasAccess ) {
             html += '<li><a delete="'+i+'"><i class="fa fa-trash"></i> Delete</a></li>';
           }
 

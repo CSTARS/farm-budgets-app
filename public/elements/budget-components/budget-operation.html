@@ -4,96 +4,101 @@
   <style>
     :host {
       display: block;
-      padding: 15px;
-      margin: 15px;
-      box-shadow: 0 0 8px #ccc;
     }
     @media(max-width: 768px) {
       :host {
-        padding: 5px;
-        margin: 5px 0px;
       }
     }
   </style>
 
   <template>
 
-    <h4 class="page-header" style="margin-top: 5px; text-transform: capitalize">
-      <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
 
-      <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="rename" />
-      <span id="nameLabel" style="cursor:pointer" on-mouseenter="onMouseEnterName" on-mouseleave="onMouseLeaveName" on-click="editName" ></span>
-      <span id="nameMsg" class="text text-danger" style="font-size: 14px"></span>
-      <i class="fa fa-pencil" style="display:none" id="renameIcon"></i>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 style="text-transform: capitalize">
+          <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
 
-      <div class="btn-group pull-right" id="errorIcon" style="display:none">
-        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          <i class="fa fa-warning text text-danger"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-right" id="errors"></ul>
+          <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="rename" />
+          <span id="nameLabel" style="cursor:pointer" on-mouseenter="onMouseEnterName" on-mouseleave="onMouseLeaveName" on-click="editName" ></span>
+          <span id="nameMsg" class="text text-danger" style="font-size: 14px"></span>
+          <i class="fa fa-pencil" style="display:none" id="renameIcon"></i>
+
+          <div class="btn-group pull-right" id="errorIcon" style="display:none">
+            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-warning text text-danger"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right" id="errors"></ul>
+          </div>
+        </h4>
       </div>
-    </h4>
+      <div class="panel-body">
+        <div id="content" style="display:none">
+          <div class="form-horizontal" style="margin: 25px 0 " id="addMaterialForm">
+            <div class="form-group">
+              <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
+              <div class="col-sm-9">
+                <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
+              </div>
+            </div>
+          </div>
 
-    <div id="content" style="display:none">
-      <div class="form-horizontal" style="margin: 25px 0 " id="addMaterialForm">
-        <div class="form-group">
-          <label for="materialSearchInput" class="col-sm-3 control-label">Add Materials</label>
-          <div class="col-sm-9">
-            <budget-material-search on-material-select="onMaterialSelect"></budget-material-search>
+          <operation-materials-table
+            id="materialTable"
+            style="display:none"
+            on-price-change="updateTotals"
+            on-delete="onMaterialDelete">
+          </operation-materials-table>
+
+          <reference-operation-materials-table
+            id="referenceMaterialTable"
+            style="display:none"
+            on-price-change="updateTotals">
+          </reference-operation-materials-table>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-8">
+            <h5>
+              <budget-operation-scheduler
+                id="schedule"
+                on-schedule-update="onScheduleUpdate"
+                readonly$="{{readonly}}">
+              </budget-operation-scheduler>
+            </h5>
+          </div>
+          <div class="col-sm-4">
+            <table class="padding: 15px">
+              <tr>
+                <td><h4>Subtotal</h4></td>
+                <td style="padding-left: 10px ">
+                  <h4 class="text text-success"><ahb-dollar-label id="subtotal"></ahb-dollar-label>
+                  <span id="subtotalInfo"></span></h4>
+                </td>
+              </tr>
+              <tr>
+                <td><h4>Total</h4></td>
+                <td style="padding-left: 10px "><h4 class="text text-success" ><ahb-dollar-label id="total"></ahb-dollar-label></h4></td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
 
-      <operation-materials-table
-        id="materialTable"
-        style="display:none"
-        on-price-change="updateTotals"
-        on-delete="onMaterialDelete">
-      </operation-materials-table>
+      <div class="panel-footer" id="footer" style="display:none">
+        <a class="btn btn-link" on-click="toggleAddition" id="sourceBtn"><i class="fa fa-shield"></i> Operation Authorities</a>
+        <a class="btn btn-link" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete Operation</a>
 
-      <reference-operation-materials-table
-        id="referenceMaterialTable"
-        style="display:none"
-        on-price-change="updateTotals">
-      </reference-operation-materials-table>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-8">
-        <h5>
-          <budget-operation-scheduler
-            id="schedule"
-            on-schedule-update="onScheduleUpdate"
-            readonly$="{{readonly}}">
-          </budget-operation-scheduler>
-        </h5>
-      </div>
-      <div class="col-sm-4">
-        <table class="padding: 15px">
-          <tr>
-            <td><h4>Subtotal</h4></td>
-            <td style="padding-left: 10px ">
-              <h4 class="text text-success"><ahb-dollar-label id="subtotal"></ahb-dollar-label>
-              <span id="subtotalInfo"></span></h4>
-            </td>
-          </tr>
-          <tr>
-            <td><h4>Total</h4></td>
-            <td style="padding-left: 10px "><h4 class="text text-success" ><ahb-dollar-label id="total"></ahb-dollar-label></h4></td>
-          </tr>
-        </table>
+        <div class="well" id="sources" style="display:none">
+          <div class="help-block">This operation is using the following authorities and locations:</div>
+          <div id="additionalTable"></div>
+        </div>
       </div>
     </div>
 
-    <div id="footer" style="display:none">
-      <a class="btn btn-link" on-click="toggleAddition" id="sourceBtn"><i class="fa fa-shield"></i> Operation Authorities</a>
-      <a class="btn btn-link" on-click="delete" id="deleteBtn"><i class="fa fa-trash"></i> Delete Operation</a>
 
-      <div class="well" id="sources" style="display:none">
-        <div class="help-block">This operation is using the following authorities and locations:</div>
-        <div id="additionalTable"></div>
-      </div>
-    </div>
+
+
 
   </template>
 </dom-module>

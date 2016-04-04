@@ -171,9 +171,9 @@
 
           html += '<li><a style="cursor:pointer" info="'+i+'"><i class="fa fa-info"></i> More Info</a></li>';
           html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Budget</a></li>';
-          if( hasAccess ) {
-            html += '<li><a href="#material/edit/'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
-          }
+
+          html += '<li><a edit="'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
+
 
           html += '</ul></div></td>';
           html += '</tr>';
@@ -193,6 +193,13 @@
             $(this)
               .find('budget-material-info-row[index="'+index+'"]')[0]
               .show();
+          }.bind(this));
+
+        $(this)
+          .find('[edit]')
+          .on('click', function(e){
+            var id = e.currentTarget.getAttribute('edit');
+            this.fire('edit-material', id);
           }.bind(this));
 
 

@@ -44,6 +44,11 @@ SDK.app = {
     }, 1000*30);
   },
 
+  login : function() {
+    window.localStorage.setItem('login-redirect', window.location.pathname+window.location.hash);
+    window.location = '/auth/signin';
+  },
+
   getMaterialLink : function(name) {
     return '#budget/materials/'+encodeURIComponent(name);
   },

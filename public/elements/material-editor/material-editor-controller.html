@@ -17,27 +17,47 @@
       .material-title .btn.btn-default {
         color: #795548;
       }
+
+      .dropdown-menu.dropdown-menu-right a {
+        text-align: left !important;
+      }
     </style>
 
     <div class="material-title">
       <h5>
         <div class="layout horizontal center">
           <div class="flex" style="color: white">
-            <i class="fa fa-cube"></i> Farm Budget <small>Materials</small>
+            Farm Budget <small><i class="fa fa-cube"></i> Material Editor</small>
           </div>
-          <div class="btn-group">
-            <a class="btn btn-default" href="#budget/overview"><i class="fa fa-dashboard"></i> Budget Overview</a>
-            <a class="btn btn-default" href="#budget/materials"><i class="fa fa-list"></i> Budget Materials</a>
-            <a class="btn btn-default" href="#material/search" id="find"><i class="fa fa-search"></i> Find</a>
-            <a class="btn btn-default" href="#material/create" id="create"><i class="fa fa-plus"></i> Create</a>
+          <div>
+            <div class="btn-group">
+              <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-ellipsis-v"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li class="dropdown-header">Materials</li>
+                <li><a class="btn btn-link" href="#search" id="find"><i class="fa fa-search"></i> Find</a></li>
+                <li><a class="btn btn-link" href="#create" id="create"><i class="fa fa-plus"></i> Create</a></li>
+
+                <li class="dropdown-header">Budgets</li>
+                <li><a class="btn btn-link" href="/search"><i class="fa fa-search"></i> Find Budget</a></li>
+
+                <li class="dropdown-header">Other</li>
+                <li id="signOutBtn" style="display:none"><a class="btn btn-link" on-click="signout"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+                <li><a class="btn btn-link" href="https://www.youtube.com/channel/UCa0NSsim30r17VZ33ja8Gsw" target="_blank"><i class="fa fa-youtube-play"></i> Screencasts/Tutorials</a></li>
+                <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
+               </ul>
+            </div>
           </div>
         </div>
       </h5>
     </div>
 
-    <material-editor-table id="search" on-edit="onTableEdit"></material-editor-table>
     <div class="container">
-      <material-editor-form id="form" style="display:none;margin-top: 25px"></material-editor-form>
+      <material-editor-table id="search" on-edit="onTableEdit" style="margin-top: 25px"></material-editor-table>
+    </div>
+    <div class="container">
+      <material-editor-form id="form" style="display:none;margin-top: 25px" mode="materialEditor"></material-editor-form>
     </div>
 
   </template>
@@ -57,25 +77,18 @@
 
       setPage : function() {
         var parts = window.location.hash.replace(/#/,'').split('/');
-
-        if( parts[0] !== 'material' ) {
-          this.style.display = 'none';
-          return;
-        }
-
-        var page = 'search';
-        if( parts.length > 1 ) page = parts[1];
+        var page = parts[0] || 'search';
 
         if( this.allowed.indexOf(page) === -1 ) {
-          return window.location = '#material/search';
+          return window.location = '#search';
         }
 
-        if( page === 'edit' && parts.length <= 2 ) {
-          return window.location = '#material/search';
+        if( page === 'edit' && parts.length <= 1 ) {
+          return window.location = '#search';
         }
 
-        this.$.create.style.display = 'inline-block';
-        this.$.find.style.display = 'inline-block';
+        this.$.create.style.display = 'block';
+        this.$.find.style.display = 'block';
 
         this.style.display = 'block';
         if( page === 'search' ) {
@@ -84,11 +97,11 @@
           this.$.find.style.display = 'none';
 
           if( parts.length === 3 ) {
-            this.$.search.setText(decodeURIComponent(parts[2]));
+            this.$.search.setText(decodeURIComponent(parts[1]));
           } else if( parts.length > 3 ) {
-            var query = JSON.parse(decodeURIComponent(parts[3]));
+            var query = JSON.parse(decodeURIComponent(parts[2]));
             query.$text = {
-              $search : decodeURIComponent(parts[2])
+              $search : decodeURIComponent(parts[1])
             }
             this.$.search.setQuery(query);
           }
@@ -98,10 +111,10 @@
           this.$.search.style.display = 'none';
 
           if( page === 'edit' ) {
-            this.$.form.edit(parts[2]);
+            this.$.form.edit(parts[1]);
           } else {
             var name = '';
-            if( parts.length > 2 ) {
+            if( parts.length > 1 ) {
               name = decodeURIComponent(parts[2]);
             }
 

@@ -4,100 +4,148 @@
       :host {
         display: block;
       }
+
+      .main-title {
+        padding: 5px 10px;
+        color: white;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 35px;
+      }
+      .main-title h5 {
+        line-height: 36px; /* match the material section */
+      }
+
+      .dropdown-menu.dropdown-menu-right a {
+        text-align: left !important;
+      }
     </style>
 
-    <div style="border-bottom: 1px solid #ccc">
-      <h5>
-        <div class="layout horizontal center">
-          <div class="flex">
-            Farm Budgets <small><i class="fa fa-search"></i> Find Budget</small>
-          </div>
-          <div>
 
-          </div>
-        </div>
-      </h5>
-    </div>
+    <div class="layout horizontal center main-title">
+      <div class="flex">
+        <h5>
+          Farm Budgets <small><i class="fa fa-search"></i> Find Budget</small>
+        </h5>
+      </div>
 
-    <div style="padding: 10px;">
-      <div class="row">
-        <div class="col-sm-6">
+      <div style="padding:10px">
+        <ahb-account-login id="loginBtn"></ahb-account-login>
+      </div>
 
-
-          <div class="form-horizontal">
-            <div class="form-group" id="complexGroup">
-              <label class="col-sm-3 control-label">Search Text</label>
-              <div class="col-sm-9">
-                <keyword-search-input id="input"
-                  type="budget"
-                  on-set-search="setSearch"
-                  on-set-filter="setFilter">
-                </keyword-search-input>
-              </div>
-            </div>
-
-
-            <div class="form-group" id="complexGroup">
-              <label class="col-sm-3 control-label"></label>
-              <div class="col-sm-9">
-                <div class="checkbox" style="display:inline-block">
-                  <label>
-                    <input type="checkbox" id="isPublished" on-click="toggleDraft"> Published
-                  </label>
-                </div>
-                &nbsp;&nbsp;
-                <div class="checkbox" style="display:inline-block">
-                  <label>
-                    <input type="checkbox" id="hasAccess" on-click="toggleWriteAccess"> Write Access
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div> <!-- end form -->
-
-        </div>
-        <div class="col-sm-6">
-          <div id="filters" style="padding: 10px"></div>
-        </div>
-      </div> <!-- end row -->
-    </div>
-
-    <div style="border-top: 1px solid #eee">
-      <div class="content">
-
-        <div class="layout horizontal center">
-          <div class="flex" id="totalLabel">
-
-          </div>
-          <div class="flex" style="text-align: center">
-            <select class="form-control" style="display:inline-block; width: 65px" on-change="onNumPerPageChange" value="10">
-              <option value="5">5</option>
-              <option value="10" selected="">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select> Per Page
-          </div>
-          <div class="flex" style="text-align:right">
-            <span class="btn-group">
-              <a class="btn btn-default" on-click="previous"><i class="fa fa-arrow-left"></i></a>
-              <a class="btn btn-default" on-click="next"><i class="fa fa-arrow-right"></i></a>
-            </span>
-
-          </div>
-        </div>
-
-        <div id="table"></div>
-
-        <div class="help-block">
-          <div><b>*Status</b></div>
-          <div>
-            <span class="text text-success"><i class="fa fa-circle"></i></span> = Published,
-            <span class="text text-warning"><i class="fa fa-circle-o"></i></span> = Working Draft,
-            <i class="fa fa-code-fork" style="color: #333"></i> = Reference Budget
+      <div>
+        <div class="btn-group">
+          <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-ellipsis-v"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li class="dropdown-header">Materials</li>
+            <li><a class="btn btn-link" href="/materials"><i class="fa fa-pencil"></i> Material Editor</a></li>
+            <li class="dropdown-header">Other</li>
+            <li id="signOutBtn" style="display:none"><a class="btn btn-link" on-click="signout"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+            <li><a class="btn btn-link" href="https://www.youtube.com/channel/UCa0NSsim30r17VZ33ja8Gsw" target="_blank"><i class="fa fa-youtube-play"></i> Screencasts/Tutorials</a></li>
+            <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
+           </ul>
         </div>
       </div>
     </div>
+
+    <div class="container">
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4>
+              <span id="title">Search</span>
+            </h4>
+          </div>
+          <div class="panel-body">
+
+            <div style="padding: 10px;">
+              <div class="row">
+                <div class="col-sm-6">
+
+
+                  <div class="form-horizontal">
+                    <div class="form-group" id="complexGroup">
+                      <label class="col-sm-3 control-label">Search Text</label>
+                      <div class="col-sm-9">
+                        <keyword-search-input id="input"
+                          type="budget"
+                          on-set-search="setSearch"
+                          on-set-filter="setFilter">
+                        </keyword-search-input>
+                      </div>
+                    </div>
+
+
+                    <div class="form-group" id="complexGroup">
+                      <label class="col-sm-3 control-label"></label>
+                      <div class="col-sm-9">
+                        <div class="checkbox" style="display:inline-block">
+                          <label>
+                            <input type="checkbox" id="isPublished" on-click="toggleDraft"> Published
+                          </label>
+                        </div>
+                        &nbsp;&nbsp;
+                        <div class="checkbox" style="display:inline-block">
+                          <label>
+                            <input type="checkbox" id="hasAccess" on-click="toggleWriteAccess"> Write Access
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div> <!-- end form -->
+
+                </div>
+                <div class="col-sm-6">
+                  <div id="filters" style="padding: 10px"></div>
+                </div>
+              </div> <!-- end row -->
+            </div>
+
+            <div style="border-top: 1px solid #eee">
+              <div class="content">
+
+                <div class="layout horizontal center">
+                  <div class="flex" id="totalLabel">
+
+                  </div>
+                  <div class="flex" style="text-align: center">
+                    <select class="form-control" style="display:inline-block; width: 65px" on-change="onNumPerPageChange" value="10">
+                      <option value="5">5</option>
+                      <option value="10" selected="">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select> Per Page
+                  </div>
+                  <div class="flex" style="text-align:right">
+                    <span class="btn-group">
+                      <a class="btn btn-default" on-click="previous"><i class="fa fa-arrow-left"></i></a>
+                      <a class="btn btn-default" on-click="next"><i class="fa fa-arrow-right"></i></a>
+                    </span>
+
+                  </div>
+                </div>
+
+                <div id="table"></div>
+
+
+            </div>
+          </div>
+
+        </div> <!-- end body -->
+
+        <div class="panel-footer">
+          <div class="help-block">
+            <div><b>*Status</b></div>
+            <div>
+              <span class="text text-success"><i class="fa fa-circle"></i></span> = Published,
+              <span class="text text-warning"><i class="fa fa-circle-o"></i></span> = Working Draft,
+              <i class="fa fa-code-fork" style="color: #333"></i> = Reference Budget
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 
   </template>

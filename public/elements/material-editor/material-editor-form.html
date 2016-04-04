@@ -12,7 +12,9 @@
       }
     </style>
 
-
+    <div style="padding: 20px 10px; text-align: center" class="text text-warning" id="accessMessage">
+      <i class="fa fa-warning"></i> You do not have access to this material. Click 'Copy' to make a copy and save changes.
+    </div>
 
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -55,21 +57,21 @@
         <div class="form-group">
           <label for="nameInput" class="col-sm-2 control-label">Name</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="nameInput" placeholder="Material Name">
+            <input type="text" class="form-control" id="nameInput" on-change="autoSave" placeholder="Material Name">
           </div>
         </div>
 
         <div class="form-group">
           <label for="nameInput" class="col-sm-2 control-label">Description</label>
           <div class="col-sm-10">
-            <textarea id="descriptionInput" class="form-control"></textarea>
+            <textarea id="descriptionInput" class="form-control" on-change="autoSave"></textarea>
           </div>
         </div>
 
         <div class="form-group" id="priceGroup">
           <label for="priceInput" class="col-sm-2 control-label" id="priceLabel">Price</label>
           <div class="col-sm-10">
-            <input type="number" id="priceInput" class="form-control" />
+            <input type="number" id="priceInput" class="form-control" on-change="autoSave" />
           </div>
         </div>
 
@@ -79,7 +81,7 @@
             <div class="layout horizontal center">
               <div>us$/</div>
               <div class="flex">
-                <budget-unit-selector id="unitsInput" block></budget-unit-selector>
+                <budget-unit-selector id="unitsInput" block units-change="autoSave"></budget-unit-selector>
               </div>
             </div>
 
@@ -110,28 +112,28 @@
         <div class="form-group">
           <label for="authorityInput" class="col-sm-2 control-label"><i class="fa fa-shield"></i> Authority</label>
           <div class="col-sm-10">
-            <budget-authority-selector id="authorityInput" ></budget-authority-selector>
+            <budget-authority-selector id="authorityInput" on-authority-select="autoSave"></budget-authority-selector>
           </div>
         </div>
 
         <div class="form-group">
           <label for="locationInput" class="col-sm-2 control-label"><i class="fa fa-map-marker"></i> Location</label>
           <div class="col-sm-10">
-            <budget-location-selector id="locationInput"></budget-location-selector>
+            <budget-location-selector id="locationInput" on-location-update="autoSave"></budget-location-selector>
           </div>
         </div>
 
         <div class="form-group">
           <label for="yearInput" class="col-sm-2 control-label"><i class="fa fa-hourglass-o"></i> Year</label>
           <div class="col-sm-10">
-            <input type="number" id="yearInput" class="form-control"/>
+            <input type="number" id="yearInput" class="form-control" on-change="autoSave"/>
           </div>
         </div>
 
         <div class="form-group">
           <label for="sourceInput" class="col-sm-2 control-label"><i class="fa fa-book"></i> Source</label>
           <div class="col-sm-10">
-            <budget-markdown-input id="sourceInput"></budget-markdown-input>
+            <budget-markdown-input id="sourceInput" on-change="autoSave"></budget-markdown-input>
             <div class="help-block">Add any source (where the data came from) information for this material.
               <a href="https://help.github.com/articles/markdown-basics/" target="_blank">Markdown</a>
                is encouraged.  External links are encouraged.
@@ -142,7 +144,7 @@
         <div class="form-group" id="classGroup">
           <label for="optionInput" class="col-sm-2 control-label">Class</label>
           <div class="col-sm-10">
-            <budget-class-selector id="classInput"></budget-class-selector>
+            <budget-class-selector id="classInput" on-change="autoSave"></budget-class-selector>
           </div>
         </div>
 
@@ -158,7 +160,7 @@
   <div class="panel-footer">
     <div class="layout horizontal">
       <div class="flex">
-        <span>
+        <span id="budgetControls">
           <a class="btn btn-default" id="addBtn" on-click="addMaterial"><i class="fa fa-plus"></i> Add to current Budget</a>
           <a class="btn btn-default" id="removeBtn" on-click="removeMaterial"><i class="fa fa-times"></i> Remove from current Budget</a>
         </span>
@@ -169,7 +171,7 @@
         <a class="btn btn-default" on-click="saveNew" id="saveNewBtn"><i class="fa fa-copy"></i> Copy</a>
       </div>
       <div class="flex" style="text-align:right">
-        <a class="btn btn-default" id="cancel" href="#material/search"><i class="fa fa-times"></i> Cancel</a>
+        <a class="btn btn-default" id="cancel" on-click="cancel"><i class="fa fa-times"></i> Cancel</a>
         <a class="btn btn-primary" on-click="save" id="saveBtn"><i class="fa fa-save"></i> Save</a>
       </div>
     </div>
@@ -177,16 +179,19 @@
 
 </div>
 
-  <div style="padding: 20px 10px; text-align: center" class="text text-warning" id="accessMessage">
-    <i class="fa fa-warning"></i> You do not have access to this material. Please change the authority, then click 'Save as New' to save changes.
-  </div>
-
     <material-editor-new-required id="popup" on-add="addRequiredMaterial"></material-editor-new-required>
 
   </template>
   <script>
     Polymer({
       is: 'material-editor-form',
+
+      properties : {
+        mode : {
+          type : String,
+          value : ''
+        }
+      },
 
       ready : function() {
         $(this).find('#tabs a').click(function (e) {
@@ -202,17 +207,32 @@
             this.$.cancel.setAttribute('href', SDK.app.history);
           }
         }.bind(this));
+
+        if( this.mode === 'materialEditor' ) {
+          this.$.budgetControls.style.display = 'none';
+        }
       },
 
-      create : function(name) {
+      create : function(name, budget) {
         this.creating = true;
-        this.material = new SDK.Material({
+
+        var data = {
           name : name || '',
           type : 'simple',
           price : 1,
           authority : ExpressAuth.user ? ExpressAuth.user.email : '',
           year : new Date().getFullYear()
-        });
+        };
+
+        if( budget ) {
+          if( budget.getAuthority() ) {
+            data.authority = budget.getAuthority();
+          }
+          data.locality = budget.getLocality()
+        }
+
+        this.material = new SDK.Material(data);
+
         this.$.title.innerHTML = 'Create Material';
         this.$.saveNewBtn.style.display = 'none';
         this.$.deleteBtn.style.display = 'none';
@@ -244,10 +264,22 @@
       onEditReady : function() {
         this.$.title.innerHTML = 'Edit Material';
 
+        // disable auto save
+        this.settingFields = true;
+
         var hasAccess = SDK.app.hasAccess(this.material);
         if( hasAccess && !this.material.isDeleted() ) {
-          this.$.saveBtn.style.display = 'inline-block';
-          this.$.deleteBtn.style.display = 'inline-block';
+          // switching to auto-save
+          //this.$.saveBtn.style.display = 'inline-block';
+          this.$.saveBtn.style.display = 'none';
+
+          // don't have users deleting materials from budgets
+          if( this.mode === 'budgetEditor' ) {
+            this.$.deleteBtn.style.display = 'none';
+          } else {
+            this.$.deleteBtn.style.display = 'inline-block';
+          }
+
           this.$.accessMessage.style.display = 'none';
         } else {
           this.$.saveBtn.style.display = 'none';
@@ -261,6 +293,11 @@
 
         this.setInputs();
         this.renderAddRemoveBtn();
+
+        // re-enable auto save
+        setTimeout(function(){
+          this.settingFields = false;
+        }.bind(this), 200);
       },
 
       setInputs : function() {
@@ -340,9 +377,26 @@
         }.bind(this));
       },
 
-      save : function() {
-        this.$.saveBtn.innerHTML = 'Saving...';
-        this.$.saveBtn.setAttribute('disabled', 'disabled');
+      autoSave : function() {
+        if( this.creating ) return;
+        if( this.settingFields ) return;
+
+        this.save(true);
+      },
+
+      save : function(autoSave) {
+        if( autoSave && typeof autoSave !== 'boolean' ) {
+          autoSave = false;
+        }
+
+        if( autoSave ) {
+          this.$.savedMsg.style.display = 'inline-block';
+          this.$.savedMsg.className = 'label label-primary';
+          this.$.savedMsg.innerHTML = 'Saving...';
+        } else {
+          this.$.saveBtn.setAttribute('disabled', 'disabled');
+          this.$.saveBtn.innerHTML = 'Saving...';
+        }
 
         this.savePrep();
 
@@ -351,22 +405,32 @@
         var update = SDK.getBudget().hasMaterial(this.material.getName());
 
         this.material.save(update, function(resp){
-          this.$.saveBtn.innerHTML = 'Save';
-          this.$.saveBtn.removeAttribute('disabled');
+          if( !autoSave ) {
+            this.$.saveBtn.removeAttribute('disabled');
+            this.$.saveBtn.innerHTML = 'Save';
+          }
+
 
           if( resp.error ) {
             alert('Error saving material: '+resp.message);
             this.fire('error', resp);
+            this.$.savedMsg.style.display = 'none';
             return;
           } else {
             this.$.savedMsg.style.display = 'inline-block';
+            this.$.savedMsg.className = 'label label-success';
+            this.$.savedMsg.innerHTML = 'Saved';
             setTimeout(function() {
               this.$.savedMsg.style.display = 'none';
             }.bind(this), 2000);
           }
 
           this.fire('done', this.material);
-          window.location = '#material/edit/'+this.material.getId();
+
+          if( this.mode === 'materialEditor' ) {
+            window.location = '#edit/'+this.material.getId();
+          }
+
         }.bind(this));
       },
 
@@ -374,6 +438,7 @@
         var material = e.detail;
         this.material.addRequiredMaterial(material);
         this.renderMaterials();
+        this.autoSave();
       },
 
       toggleComplex : function() {
@@ -383,7 +448,9 @@
           this.material.setType('complex');
           this.renderMaterials();
         }
+
         this.renderComplex();
+        this.autoSave();
       },
 
       renderMaterials : function() {
@@ -443,6 +510,7 @@
             var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
             m.amount = parseInt(e.currentTarget.value);
             this.material.addRequiredMaterial(m);
+            this.autoSave();
           }.bind(this));
 
         $(this.$.materialsList)
@@ -451,6 +519,7 @@
             var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
             m.price = parseInt(e.currentTarget.value);
             this.material.addRequiredMaterial(m);
+            this.autoSave();
           }.bind(this));
 
         $(this.$.materialsList)
@@ -459,6 +528,7 @@
             var m = this.material.getRequiredMaterial(e.currentTarget.getAttribute('material'));
             m.units = parseInt(e.originalEvent.detail.value);
             this.material.addRequiredMaterial(m);
+            this.autoSave();
           }.bind(this));
 
         $(this.$.materialsList)
@@ -467,6 +537,7 @@
             var name = e.currentTarget.getAttribute('material');
             this.material.removeRequiredMaterial(name);
             this.renderMaterials();
+            this.autoSave();
           }.bind(this));
       },
 
@@ -551,6 +622,14 @@
 
       showHistory : function() {
         this.$.history.show(this.material.getId());
+      },
+
+      cancel : function() {
+        if( this.mode === 'materialEditor' ) {
+          window.location = '#search'
+        } else {
+          this.fire('cancel');
+        }
       },
 
       goToBudget : function(e) {

@@ -64,14 +64,14 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-right">
             <li class="dropdown-header">Budgets</li>
-            <li><a class="btn btn-link" href="#search"><i class="fa fa-search"></i> Find Budget</a></li>
+            <li><a class="btn btn-link" href="/search"><i class="fa fa-search"></i> Find Budget</a></li>
             <li><a class="btn btn-link" on-click="startNew"><i class="fa fa-plus-circle"></i> Start New Budget</a></li>
             <li><a class="btn btn-link" on-click="clone"><i class="fa fa-clone"></i> Copy Budget</a></li>
             <li><a class="btn btn-link" on-click="reference"><i class="fa fa-code-fork"></i> Create Reference Budget</a></li>
             <li class="dropdown-header">Materials</li>
-            <li><a class="btn btn-link" href="#material/create"><i class="fa fa-plus"></i> Create Material</a></li>
-            <li><a class="btn btn-link" href="#material/search"><i class="fa fa-search"></i> Find Material</a></li>
+            <li><a class="btn btn-link" href="/materials"><i class="fa fa-pencil"></i> Material Editor</a></li>
             <li class="dropdown-header">Other</li>
+            <li><a class="btn btn-link" href="/settings/#account"><i class="fa fa-sliders"></i> Settings</a></li>
             <li id="signOutBtn" style="display:none"><a class="btn btn-link" on-click="signout"><i class="fa fa-sign-out"></i> Sign Out</a></li>
             <li><a class="btn btn-link" href="https://www.youtube.com/channel/UCa0NSsim30r17VZ33ja8Gsw" target="_blank"><i class="fa fa-youtube-play"></i> Screencasts/Tutorials</a></li>
             <li><a class="btn btn-link" href="https://github.com/CSTARS/farm-budgets-app/issues" target="_blank"><i class="fa fa-bug"></i> Report Bug/Issue</a></li>
@@ -83,21 +83,18 @@
 
     <ul class="nav nav-tabs nav-justified" id="tabs">
       <li role="presentation" class="active" id="btn-overview">
-        <a on-click="show" show="overview"><i class="fa fa-dashboard"></i><span class="hidden-xs"> Overview</span></a>
+        <a on-click="onTabClick" show="overview"><i class="fa fa-dashboard"></i><span class="hidden-xs"> Overview</span></a>
       </li>
       <li role="presentation" id="btn-operations">
-        <a on-click="show" show="operations"><i class="fa fa-cogs"></i><span class="hidden-xs"> Operations</span></a>
+        <a on-click="onTabClick" show="operations"><i class="fa fa-cogs"></i><span class="hidden-xs"> Operations</span></a>
       </li>
       <li role="presentation" id="btn-materials">
-        <a on-click="show" show="materials">
+        <a on-click="onTabClick" show="materials">
           <i class="fa fa-warning text text-warning" id="unsavedMaterialWarning" style="display:none"></i>
           <i class="fa fa-warning text text-danger" id="errorWarning" style="display:none"></i>
           <i class="fa fa-cube"></i>
-          <span class="hidden-xs"> Materials List</span>
+          <span class="hidden-xs"> Materials</span>
         </a>
-      </li>
-      <li role="presentation" id="btn-setup">
-        <a href="#budget/setup"><i class="fa fa-sliders"></i><span class="hidden-xs"> My Setup</span></a>
       </li>
     </ul>
 
@@ -109,7 +106,6 @@
       on-unsaved-update="onUnsavedUpdate"
       on-error-update="onErrorUpdate">
     </budget-section-materials>
-    <budget-section-setup id="setup" class="section"></budget-section-setup>
   </div>
 
     <div id="unsavedMessage" class="text text-warning animated flipInX" on-click="scrollTop" style="display:none">
@@ -185,12 +181,15 @@
       window.location = "/auth/signoutRedirect?redirect="+encodeURIComponent('/'+window.location.hash);
     },
 
-    show : function(e) {
+    onTabClick : function(e) {
       var section = '';
       if( e ) {
         section = e.currentTarget.getAttribute('show');
       }
+      this.show(section)
+    },
 
+    show : function(section, searchTxt) {
       $(this).find('.section').hide();
       $(this.$.tabs).find('li').removeClass('active');
 
@@ -204,61 +203,8 @@
 
       section.style.display = 'block';
 
-      // var params = parts
-      //   .splice(2, parts.length-1)
-      //   .map(function(param){
-      //     return decodeURIComponent(param);
-      //   });
-
-      if( section.onShow ) section.onShow();
+      if( section.onShow ) section.onShow(searchTxt);
     },
-    //
-    // setSection : function() {
-    //   var parts = window.location.hash.replace(/#/,'').split('/');
-    //
-    //   if( parts[0].toLowerCase() === 'link' && parts.length > 1 ) {
-    //     window.location = '#budget/overview/'+parts[1];
-    //     return;
-    //   }
-    //
-    //   // TODO: remove later
-    //   if( parts.length == 1 && parts[0] == '' ) {
-    //     window.location = '#search';
-    //   }
-    //
-    //   if( parts[0] != 'budget' ) {
-    //     this.style.display = 'none';
-    //     return;
-    //   }
-    //
-    //   if( parts.length >= 3 ) {
-    //     document.querySelector('ahb-budget').reload(parts[2]);
-    //   }
-    //
-    //   this.style.display = 'block';
-    //
-    //   $(this).find('.section').hide();
-    //   $(this.$.tabs).find('li').removeClass('active');
-    //
-    //   var section;
-    //   if( this.$[parts[1]] ) {
-    //     section = this.$[parts[1]];
-    //     $(this.$.tabs).find('#btn-'+parts[1]).addClass('active');
-    //   } else {
-    //     section = this.$.overview;
-    //     $(this.$.tabs).find('#btn-overview').addClass('active');
-    //   }
-    //
-    //   section.style.display = 'block';
-    //
-    //   var params = parts
-    //     .splice(2, parts.length-1)
-    //     .map(function(param){
-    //       return decodeURIComponent(param);
-    //     });
-    //
-    //   if( section.onShow ) section.onShow(params);
-    // },
 
     setData : function(data) {
       var sections = this.querySelectorAll('.section');

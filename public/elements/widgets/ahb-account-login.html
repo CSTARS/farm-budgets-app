@@ -5,6 +5,12 @@
         display: block;
       }
     </style>
+
+    <span class="hidden-xs" id="loggedIn" style="display:none">Hello, <span>{{name}}</span></span>
+    <a on-click="login" class="btn btn-default" id="login" style="display:none">
+      <i class="fa fa-sign-in"></i><span class="hidden-xs"> Login</span>
+    </a>
+
   </template>
   <script>
     Polymer({
@@ -12,10 +18,15 @@
 
       ready : function() {
         if( ExpressAuth.user ) {
-          this.innerHTML = '<span class="hidden-xs">Hello, '+(ExpressAuth.user.display_name || ExpressAuth.user.email)+'</span>';
+          this.name = ExpressAuth.user.display_name || ExpressAuth.user.email;
+          this.$.loggedIn.style.display = 'inline-block';
         } else {
-          this.innerHTML = '<a href="/auth/signin" class="btn btn-default"><i class="fa fa-sign-in"></i><span class="hidden-xs"> Login</span></a>';
+          this.$.login.style.display = 'inline-block';
         }
+      },
+
+      login : function() {
+        SDK.app.login();
       }
     });
   </script>
