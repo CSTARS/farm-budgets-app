@@ -34167,7 +34167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="layout horizontal center">
               <div>us$/</div>
               <div class="flex">
-                <budget-unit-selector id="unitsInput" block="" units-change="autoSave"></budget-unit-selector>
+                <budget-unit-selector id="unitsInput" block="" on-change="autoSave"></budget-unit-selector>
               </div>
             </div>
 
@@ -34280,6 +34280,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       ready : function() {
+        this.saveTimer = -1;
+
         $(this).find('#tabs a').click(function (e) {
           e.preventDefault()
           $(this).tab('show');
@@ -34321,6 +34323,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         this.$.title.innerHTML = 'Create Material';
         this.$.saveNewBtn.style.display = 'none';
+        this.$.saveBtn.style.display = 'inline-block';
         this.$.deleteBtn.style.display = 'none';
         this.$.deletedMessage.style.display = 'none';
         this.$.accessMessage.style.display = 'none';
@@ -34417,20 +34420,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       savePrep : function() {
+        try {
+          var units = this.$.unitsInput.getUnits();
+          if( units.length > 0 ) units = 'us$/('+units+')';
+          else units = 'us$';
+
+          this.material.setUnits(units);
+        } catch(e) {
+          return false;
+        }
+
         this.material.setName(this.$.nameInput.value);
         this.material.setDescription(this.$.descriptionInput.value);
         this.material.setPrice(parseFloat(this.$.priceInput.value));
 
-        var units = this.$.unitsInput.getUnits();
-        if( units.length > 0 ) units = 'us$/('+units+')';
-        else units = 'us$';
-
-        this.material.setUnits(units);
         this.material.setAuthority(this.$.authorityInput.value);
         this.material.setLocality(this.$.locationInput.value);
         this.material.setYear(this.$.yearInput.value);
         this.material.setSource(this.$.sourceInput.value);
         this.material.setClass(this.$.classInput.value);
+
+        return true;
       },
 
       saveNew : function() {
@@ -34459,7 +34469,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
 
           this.fire('done', this.material);
-          window.location = '#material/edit/'+this.material.getId();
+          //window.location = '#material/edit/'+this.material.getId();
         }.bind(this));
       },
 
@@ -34471,6 +34481,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       save : function(autoSave) {
+        if( !this.savePrep() ) {
+          return;
+        }
+
         if( autoSave && typeof autoSave !== 'boolean' ) {
           autoSave = false;
         }
@@ -34484,8 +34498,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.saveBtn.innerHTML = 'Saving...';
         }
 
-        this.savePrep();
+        if( this.saveTimer !== -1 ) {
+          clearTimeout(this.saveTimer);
+        }
 
+        this.saveTimer = setTimeout(function(){
+          this.saveTimer = -1;
+          this._save();
+        }.bind(this), 300);
+      },
+
+      _save : function(autoSave) {
         // only update the material controller if the material is already
         // in the controller
         var update = SDK.getBudget().hasMaterial(this.material.getName());
@@ -34512,6 +34535,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
 
           this.fire('done', this.material);
+
+          if( !autoSave ) {
+            this.fire('save-complete', this.material);
+          }
 
           if( this.mode === 'materialEditor' ) {
             window.location = '#edit/'+this.material.getId();
@@ -35969,11 +35996,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     rename : function() {
-      var newname = this.$.nameInput.value.replace(/\s/g, '');
+      var newname = this.$.nameInput.value.trim();
 
       if( newname !== this.operation.getName() ) {
         try {
           this.operation.rename(newname);
+          this.operationname = newname;
         } catch(e) {
           this.$.nameMsg.innerHTML = e.message;
           return;
@@ -37154,11 +37182,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       render : function() {
         var m = this._material;
 
+        var aliases = SDK.getBudget().getAlias();
+        this.alias = '';
+        for( var key in aliases ) {
+          if( aliases[key] === m.getName() ) {
+            this.alias = key;
+            break;
+          }
+        }
+
         var unitLabel =  SDK.units.invertAndRemoveDollars(m.getUnits());
 
         this.$.name.innerHTML =
             '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +
             m.getName()+
+            (this.alias ? ' <small>(alias: '+this.alias+')</small> ' : '')+
             (m.getType() === 'simple' || this.budgetView ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '')
             + '<small>/'+unitLabel+'</small>';
 
@@ -37282,7 +37320,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for( var name in operations ) {
           for( var j = 0; j < operations[name].materials.length; j++ ) {
             if( operations[name].materials[j].name == this._material.getName() ) {
-              usedBy.push('<a href="/#budget/operations/'+encodeURIComponent(name)+'">'+name+'</a>');
+              usedBy.push('<a>'+name+'</a>');
+              break;
+            } else if( this.alias && operations[name].materials[j].name === this.alias ) {
+              usedBy.push('<a>'+name+'</a>');
               break;
             }
           }
@@ -37296,7 +37337,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for( var name in materials ) {
           if( !materials[name].materials ) continue;
           if( materials[name].materials[this._material.getName()] ) {
-            requiredBy.push('<a href="/#budget/materials/'+encodeURIComponent(name)+'">'+name+'</a>');
+            requiredBy.push('<a>'+name+'</a>');
+          } else if( this.alias &&  materials[name].materials[this.alias] ) {
+            requiredBy.push('<a>'+name+'</a>');
           }
         }
         this.$.requiredBy.innerHTML = requiredBy.length > 0 ? ('Required By Material(s): '+requiredBy.join(', ')) : '';
@@ -39636,7 +39679,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
 
         <div id="edit" class="material-panel">
-          <material-editor-form id="form" style="margin-top: 25px" on-cancel="cancelEdit" mode="budgetEditor">
+          <material-editor-form id="form" style="margin-top: 25px" on-cancel="cancelEdit" on-done="onMaterialUpdated" on-save-complete="onMaterialCreated" mode="budgetEditor">
           </material-editor-form>
         </div>
 
@@ -39747,6 +39790,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     editMaterial : function(e) {
       this.show('edit', true);
       this.$.form.edit(e.detail);
+    },
+
+    onMaterialUpdated : function(e) {
+      // trigger update
+      if( SDK.getBudget().hasMaterial(e.detail.getName()) ) {
+        SDK
+          .getBudget()
+          .addMaterial(e.detail);
+      }
+    },
+
+    onMaterialCreated : function(e) {
+      SDK
+        .getBudget()
+        .addMaterial(e.detail);
+
+      this.show('edit', true);
+      this.$.form.edit(e.detail.getId());
     },
 
     filter : function() {
@@ -40468,12 +40529,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="text text-warning" id="warning" style="text-align:center"></div>
       </div>
 
-      <div style="padding:10px">
-        <ahb-account-login id="loginBtn"></ahb-account-login>
-      </div>
-
       <div style="padding:5px">
         <budget-save-btn id="saveBtn"></budget-save-btn>
+      </div>
+
+      <div style="padding:10px">
+        <ahb-account-login id="loginBtn"></ahb-account-login>
       </div>
 
       <div>
@@ -40779,6 +40840,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           .on('click', function(e){
             this.$.input.value = e.currentTarget.innerHTML;
             this.onChange(true);
+            this.fire('change');
           }.bind(this));
         return;
       }

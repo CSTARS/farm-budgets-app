@@ -81,7 +81,7 @@
             <div class="layout horizontal center">
               <div>us$/</div>
               <div class="flex">
-                <budget-unit-selector id="unitsInput" block units-change="autoSave"></budget-unit-selector>
+                <budget-unit-selector id="unitsInput" block on-change="autoSave"></budget-unit-selector>
               </div>
             </div>
 
@@ -194,6 +194,8 @@
       },
 
       ready : function() {
+        this.saveTimer = -1;
+
         $(this).find('#tabs a').click(function (e) {
           e.preventDefault()
           $(this).tab('show');
@@ -235,6 +237,7 @@
 
         this.$.title.innerHTML = 'Create Material';
         this.$.saveNewBtn.style.display = 'none';
+        this.$.saveBtn.style.display = 'inline-block';
         this.$.deleteBtn.style.display = 'none';
         this.$.deletedMessage.style.display = 'none';
         this.$.accessMessage.style.display = 'none';
@@ -331,20 +334,27 @@
       },
 
       savePrep : function() {
+        try {
+          var units = this.$.unitsInput.getUnits();
+          if( units.length > 0 ) units = 'us$/('+units+')';
+          else units = 'us$';
+
+          this.material.setUnits(units);
+        } catch(e) {
+          return false;
+        }
+
         this.material.setName(this.$.nameInput.value);
         this.material.setDescription(this.$.descriptionInput.value);
         this.material.setPrice(parseFloat(this.$.priceInput.value));
 
-        var units = this.$.unitsInput.getUnits();
-        if( units.length > 0 ) units = 'us$/('+units+')';
-        else units = 'us$';
-
-        this.material.setUnits(units);
         this.material.setAuthority(this.$.authorityInput.value);
         this.material.setLocality(this.$.locationInput.value);
         this.material.setYear(this.$.yearInput.value);
         this.material.setSource(this.$.sourceInput.value);
         this.material.setClass(this.$.classInput.value);
+
+        return true;
       },
 
       saveNew : function() {
@@ -373,7 +383,7 @@
           }
 
           this.fire('done', this.material);
-          window.location = '#material/edit/'+this.material.getId();
+          //window.location = '#material/edit/'+this.material.getId();
         }.bind(this));
       },
 
@@ -385,6 +395,10 @@
       },
 
       save : function(autoSave) {
+        if( !this.savePrep() ) {
+          return;
+        }
+
         if( autoSave && typeof autoSave !== 'boolean' ) {
           autoSave = false;
         }
@@ -398,8 +412,17 @@
           this.$.saveBtn.innerHTML = 'Saving...';
         }
 
-        this.savePrep();
+        if( this.saveTimer !== -1 ) {
+          clearTimeout(this.saveTimer);
+        }
 
+        this.saveTimer = setTimeout(function(){
+          this.saveTimer = -1;
+          this._save();
+        }.bind(this), 300);
+      },
+
+      _save : function(autoSave) {
         // only update the material controller if the material is already
         // in the controller
         var update = SDK.getBudget().hasMaterial(this.material.getName());
@@ -426,6 +449,10 @@
           }
 
           this.fire('done', this.material);
+
+          if( !autoSave ) {
+            this.fire('save-complete', this.material);
+          }
 
           if( this.mode === 'materialEditor' ) {
             window.location = '#edit/'+this.material.getId();

@@ -123,6 +123,8 @@
             id="form"
             style="margin-top: 25px"
             on-cancel="cancelEdit"
+            on-done="onMaterialUpdated"
+            on-save-complete="onMaterialCreated"
             mode="budgetEditor">
           </material-editor-form>
         </div>
@@ -234,6 +236,24 @@
     editMaterial : function(e) {
       this.show('edit', true);
       this.$.form.edit(e.detail);
+    },
+
+    onMaterialUpdated : function(e) {
+      // trigger update
+      if( SDK.getBudget().hasMaterial(e.detail.getName()) ) {
+        SDK
+          .getBudget()
+          .addMaterial(e.detail);
+      }
+    },
+
+    onMaterialCreated : function(e) {
+      SDK
+        .getBudget()
+        .addMaterial(e.detail);
+
+      this.show('edit', true);
+      this.$.form.edit(e.detail.getId());
     },
 
     filter : function() {

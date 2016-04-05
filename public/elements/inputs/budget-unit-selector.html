@@ -139,6 +139,7 @@
           .on('click', function(e){
             this.$.input.value = e.currentTarget.innerHTML;
             this.onChange(true);
+            this.fire('change');
           }.bind(this));
         return;
       }

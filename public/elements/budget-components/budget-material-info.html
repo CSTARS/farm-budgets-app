@@ -144,11 +144,21 @@
       render : function() {
         var m = this._material;
 
+        var aliases = SDK.getBudget().getAlias();
+        this.alias = '';
+        for( var key in aliases ) {
+          if( aliases[key] === m.getName() ) {
+            this.alias = key;
+            break;
+          }
+        }
+
         var unitLabel =  SDK.units.invertAndRemoveDollars(m.getUnits());
 
         this.$.name.innerHTML =
             '<i class="fa fa-cube' + (m.getType() === 'complex' ? 's' : '') + '"></i> ' +
             m.getName()+
+            (this.alias ? ' <small>(alias: '+this.alias+')</small> ' : '')+
             (m.getType() === 'simple' || this.budgetView ? ' <small><ahb-dollar-label value="'+m.getPrice()+'"></ahb-dollar-label></small>' : '')
             + '<small>/'+unitLabel+'</small>';
 
@@ -272,7 +282,10 @@
         for( var name in operations ) {
           for( var j = 0; j < operations[name].materials.length; j++ ) {
             if( operations[name].materials[j].name == this._material.getName() ) {
-              usedBy.push('<a href="/#budget/operations/'+encodeURIComponent(name)+'">'+name+'</a>');
+              usedBy.push('<a>'+name+'</a>');
+              break;
+            } else if( this.alias && operations[name].materials[j].name === this.alias ) {
+              usedBy.push('<a>'+name+'</a>');
               break;
             }
           }
@@ -286,7 +299,9 @@
         for( var name in materials ) {
           if( !materials[name].materials ) continue;
           if( materials[name].materials[this._material.getName()] ) {
-            requiredBy.push('<a href="/#budget/materials/'+encodeURIComponent(name)+'">'+name+'</a>');
+            requiredBy.push('<a>'+name+'</a>');
+          } else if( this.alias &&  materials[name].materials[this.alias] ) {
+            requiredBy.push('<a>'+name+'</a>');
           }
         }
         this.$.requiredBy.innerHTML = requiredBy.length > 0 ? ('Required By Material(s): '+requiredBy.join(', ')) : '';

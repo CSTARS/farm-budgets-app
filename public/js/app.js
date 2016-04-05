@@ -117,7 +117,7 @@ SDK.app = {
   function autoSave() {
     var budget = $.extend(true,{}, SDK.getBudget().getData());
 
-    if( !SDK.app.hasAccess(budget.budget) ) {
+    if( !SDK.app.hasAccess(budget) ) {
       document.querySelector('ahb-budget').showWarning();
       return;
     }

@@ -385,11 +385,12 @@
     },
 
     rename : function() {
-      var newname = this.$.nameInput.value.replace(/\s/g, '');
+      var newname = this.$.nameInput.value.trim();
 
       if( newname !== this.operation.getName() ) {
         try {
           this.operation.rename(newname);
+          this.operationname = newname;
         } catch(e) {
           this.$.nameMsg.innerHTML = e.message;
           return;
