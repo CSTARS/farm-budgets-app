@@ -15,6 +15,12 @@
     Polymer({
       is: 'budget-material-table',
 
+      properties : {
+        noAccess : {
+          type : Boolean
+        }
+      },
+
       ready : function() {
         this.materials = {};
 
@@ -170,11 +176,12 @@
             '<ul class="dropdown-menu dropdown-menu-right">';
 
           html += '<li><a style="cursor:pointer" info="'+i+'"><i class="fa fa-info"></i> More Info</a></li>';
-          html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Budget</a></li>';
 
-          html += '<li><a edit="'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
-
-
+          if( !this.noAccess ) {
+            html += '<li><a style="cursor:pointer" remove="'+i+'"><i class="fa fa-times"></i> Remove from Budget</a></li>';
+            html += '<li><a edit="'+m.id+'"><i class="fa fa-pencil"></i> Edit</a></li>';
+          }
+          
           html += '</ul></div></td>';
           html += '</tr>';
           html += '<tr id="'+i+'-info-row" style="display:none"><td colspan="8" style="border:none">'+

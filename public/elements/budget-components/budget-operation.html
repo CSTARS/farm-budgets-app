@@ -16,7 +16,7 @@
 
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h4 style="text-transform: capitalize">
+        <h4 style="text-transform: capitalize; margin-top: 5px">
           <div style="margin-bottom: 5px"><a on-click="toggleContent" class="btn btn-default" style="font-size:17px"><i class="fa fa-toggle-right" id="icon"></i></a>
 
           <input type="text" class="form-control" style="display:none; width: 300px" id="nameInput" on-keyup="onNameInputKeyUp" on-blur="rename" />
@@ -113,6 +113,9 @@
         observer : 'update'
       },
       readonly : {
+        type : Boolean
+      },
+      noAccess : {
         type : Boolean
       }
     },
@@ -266,7 +269,7 @@
       } else {
         this.$.materialTable.style.display = 'none';
         this.$.referenceMaterialTable.style.display = 'block';
-        this.$.referenceMaterialTable.update(this.operation);
+        this.$.referenceMaterialTable.update(this.operation, this.noAccess);
       }
 
 

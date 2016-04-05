@@ -42,11 +42,15 @@
   <template>
     <div id="mainPanel">
     <div class="layout horizontal center main-title">
-      <div class="flex">
+      <div>
         <h5>
           Farm Budgets <small class="hidden-xs">Advanced Hardwood Biofuels</small>
           <small class="visible-xs"> AHB</small>
         </h5>
+      </div>
+
+      <div class="flex">
+        <div class="text text-warning" id="warning" style="text-align:center"></div>
       </div>
 
       <div style="padding:10px">
@@ -124,12 +128,12 @@
         this.$.signOutBtn.style.display = 'block';
       }
 
-      this.changesTimer = -1;
-      //this.setSection();
-      //$(window).on('hashchange', this.setSection.bind(this));
-      SDK.changes.on('save-state-update', this.onSaveStateUpdate.bind(this));
-      SDK.changes.on('material-state-update', this.onMaterialSaveStateUpdate.bind(this));
-      this.show();
+      SDK.on('budget-load', function(){
+        this.show('overview');
+        this.$.warning.innerHTML = '';
+      }.bind(this));
+
+      this.show('overview');
     },
 
     attached : function() {
@@ -141,22 +145,6 @@
 
     scrollTop : function() {
       $('html, body').animate({ scrollTop: '0px' });
-    },
-
-    onMaterialSaveStateUpdate : function(e) {
-      if( e.changes ) {
-        this.$.unsavedMaterialWarning.style.display = 'inline-block';
-      } else {
-        this.$.unsavedMaterialWarning.style.display = 'none';
-      }
-    },
-
-    onSaveStateUpdate : function(e) {
-      if( e.changes ) {
-        this.$.unsavedMessage.style.display = 'block';
-      } else {
-        this.$.unsavedMessage.style.display = 'none';
-      }
     },
 
     onErrorUpdate : function(e) {
@@ -226,10 +214,16 @@
     },
 
     startNew : function() {
-      if( SDK.changes.hasChanges() && !confirm('Are you sure you want to start a new budget?  Any unsaved changes will be lost.') ) return;
-      document.querySelector('ahb-budget').createNew();
-      document.querySelector('budget-farm-editor').show();
-      this.$.overview.updateTotal();
+      SDK.app.createNew();
+    },
+
+    showWarning : function() {
+      if( !ExpressAuth.user ) {
+        this.$.warning.innerHTML = '<i class="fa fa-warning"></i> You are not logged in.  Changes not saved.';
+      } else {
+        this.$.warning.innerHTML = '<i class="fa fa-warning"></i> You do not have access to this budget.  Changes not saved.';
+      }
+
     }
   });
 </script>

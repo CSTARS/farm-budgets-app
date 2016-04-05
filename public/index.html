@@ -9,6 +9,13 @@
 
   <meta name="theme-color" content="#ffffff">
 
+  <script>
+    var parts = window.location.hash.replace('#','').split('/');
+    if( parts[0] === '' ) {
+      window.location = '/search';
+    }
+  </script>
+
   <script src="/js/webcomponents.js"></script>
   <link rel="stylesheet" href="/font-awesome/css/font-awesome.css">
 

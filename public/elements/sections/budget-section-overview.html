@@ -81,10 +81,6 @@
                 <td>Referenced By</td>
                 <td><a style="cursor:pointer" on-click="showChildReferences"><i class="fa fa-sitemap"></i> View budgets referencing this budget.</a></td>
               </tr>
-              <tr>
-                <td>Budget URL</td>
-                <td><a id="link" target="_blank"><i class="fa fa-globe"></i> Link</a></td>
-              </tr>
               <tr id="errors" style="display:none">
                 <td class="text text-danger"><i class="fa fa-warning"></i> Budget Errors</td>
                 <td>
@@ -152,8 +148,10 @@
 
     ready : function() {
       this.showingHistory = false;
+      this.readonly = false;
 
       this.$.infoCard.addEventListener('mouseenter', function(){
+        if( this.readonly ) return;
         this.$.editBtn.style.display = 'inline-block';
       }.bind(this));
       this.$.infoCard.addEventListener('mouseleave', function(){
@@ -162,24 +160,19 @@
 
       SDK.controllers.material.on('material-update', this.updateMaterialAuthorties.bind(this));
       SDK.controllers.material.on('material-removed', this.updateMaterialAuthorties.bind(this));
-      SDK.changes.on('save-state-update', this.showChangesWarning.bind(this));
 
       var buffer = new SDK.app.UiBuffer(this.onTotalUpdate, 100, this);
       SDK.controllers.operation.on('total-update', buffer);
+
+      SDK.on('budget-load', this.setData.bind(this));
     },
 
     attached : function() {
       document
         .querySelector('budget-farm-editor')
         .addEventListener('editor-close', function(){
-          this.setData(SDK.getBudget().getData());
+          this.setData();
           this.$.total.onTotalUpdate(); // right now  just assuming farm size changed
-        }.bind(this));
-
-      document
-        .querySelector('ahb-budget')
-        .addEventListener('budget-loaded', function(){
-          this.$.link.setAttribute('href', '#link/'+SDK.getBudget().data.id);
         }.bind(this));
     },
 
@@ -199,8 +192,15 @@
       }
     },
 
-    setData : function(data) {
-      if( data.budget ) data = data.budget;
+    setData : function() {
+      var data = SDK.getBudget().getData();
+
+      if( !SDK.app.hasAccess(data) ) {
+        this.readonly = true;
+      } else {
+        this.readonly = false;
+      }
+
       if( !data.farm ) return;
 
       this.budgetId = data.id;
@@ -227,7 +227,7 @@
         this.$.aliasesRow.style.display = 'none';
         this.$.childReferences.style.display = 'none';
         this.$.reference.style.display = 'table-row';
-        console.log(data.referenceInfo);
+
         this.$.referenceLabel.innerHTML =
           '<div><a href="/#link/'+data.reference+'"><i class="fa fa-code-fork"></i> '+data.referenceInfo.name+'</a></div>'+
           '<div class="help-block">'+
@@ -235,7 +235,7 @@
           '<i class="fa fa-shield"></i> '+data.referenceInfo.authority+' | '+
           '<i class="fa fa-map-marker"></i> '+data.referenceInfo.locality.join(', ')+'</div>';
       } else {
-        this.$.aliasesRow.style.display = 'table-row';
+        this.$.aliasesRow.style.display = this.readonly ? 'none' : 'table-row';
         this.$.reference.style.display = 'none';
 
         if( data.childReferences ) {

@@ -36,8 +36,8 @@
       <div class="col-sm-3">
         <div class="list-group" id="nav" style="padding-left: 15px; padding-top: 15px">
           <a on-click="onNavClick" show="list" class="list-group-item active">Budget Materials List</a>
-          <a on-click="onNavClick" show="find" class="list-group-item">Add Materials to Budget</a>
-          <a on-click="onNavClick" show="create" class="list-group-item">Create Material</a>
+          <a on-click="onNavClick" id="findBtn" show="find" class="list-group-item">Add Materials to Budget</a>
+          <a on-click="onNavClick" id="createBtn" show="create" class="list-group-item">Create Material</a>
         </div>
       </div>
 
@@ -46,21 +46,14 @@
 
         <div id="list" class="material-panel">
 
-          <div id="warningMessage" class="text text-warning">
-            <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, you have unsaved changes to your materials.</div>
-            <span id="unsavedFilterOuter"><input type="checkbox" id="unsavedFilter" on-click="filter" /> Only Show Unsaved Materials</span>
-            <a class="btn btn-link" on-click="undo">Revert All Changes</a>
-          </div>
-
           <div id="errorMessage" class="text text-danger">
-            <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of your materials have errors.</div>
+            <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of the materials has errors.</div>
             <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors" /> Only Show Materials With Errors</span>
           </div>
 
           <div class="help-block">
             Below is a list of all materials currently available for this budget.  You can
-            find and add materials to this budget using the 'Find' button or create a new material
-            using the 'Create' button.
+            find and add materials to this budget using the navigation to the left.
           </div>
 
 
@@ -90,6 +83,7 @@
               <budget-material-table
                   id="table"
                   on-edit-material="editMaterial"
+                  no-access="{{noAccess}}"
                   on-error-update="onErrorUpdate">
                 </budget-material-table>
 
@@ -138,7 +132,7 @@
         this.filter();
       }.bind(this));
 
-      SDK.changes.on('material-state-update', this.onSaveStateUpdate.bind(this));
+      SDK.on('budget-load', this.setData.bind(this));
 
       this.show('list');
     },
@@ -162,6 +156,10 @@
     },
 
     onNavClick : function(e) {
+      if( e.currentTarget.classList.contains('disabled') ) {
+        return;
+      }
+
       var panel = e.currentTarget.getAttribute('show');
 
       if( panel === 'create' ) {
@@ -195,16 +193,25 @@
     },
 
     setData : function() {
+      this.updateAccess();
+
       var materials = SDK.controllers.material.get();
       this.$.table.update(materials);
       this._filter();
     },
 
-    onShow : function(params) {
-      //if( params.length > 0 ) {
-      //  this.$.filterInput.value = decodeURIComponent(params.join('/'));
-      //}
+    updateAccess : function() {
+      if( SDK.app.hasAccess(SDK.getBudget().data) ) {
+        this.noAccess = false;
+      } else {
+        this.noAccess = true;
+      }
 
+      this.$.findBtn.className = 'list-group-item '+(this.noAccess ? 'disabled' : '');
+      this.$.createBtn.className = 'list-group-item '+(this.noAccess ? 'disabled' : '');
+    },
+
+    onShow : function() {
       this._filter();
     },
 

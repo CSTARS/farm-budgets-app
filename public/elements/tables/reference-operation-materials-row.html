@@ -8,13 +8,19 @@
 
     <tr id="row">
       <td>
-        <material-label id="label" material$="{{mname}}" parent="{{operationdata}}" impluid$="{{impluid}}"></material-label>
+        <material-label
+          id="label"
+          material$="{{mname}}"
+          parent="{{operationdata}}"
+          impluid$="{{impluid}}"
+          no-access$="{{noAccess}}">
+        </material-label>
       </td>
       <td style="padding: 0 3px; vertical-align:middle">{{note}}</td>
       <td style="padding: 0 3px; vertical-align:middle">
         <span>{{amount}}</span> <span>{{units}}</span>
       </td>
-      <td>
+      <td id="scaleFactorRow">
         x<input type="number" style="width: 50px; display: inline-block" class="form-control" value="{{scaleFactor}}" on-change="setScaleFactor" />
       </td>
       <td><ahb-dollar-label id="total"></ahb-dollar-label></td>
@@ -33,6 +39,7 @@
         this.notes = '';
         this.units = '';
         this.amount = 0;
+        this.noAccess = false;
         this.scaleFactor = 1;
       },
 
@@ -43,6 +50,7 @@
         this.impluid = options.impl.uid;
         this.operation = options.operation;
         this.operationdata = options.operation.data;
+        this.noAccess = options.noAccess;
         this.update();
       },
 
@@ -56,6 +64,13 @@
 
       update : function() {
         var material = SDK.getMaterial(this.impl.name);
+
+        if( this.noAccess ) {
+          this.$.scaleFactorRow.style.display = 'none';
+        } else {
+          this.$.scaleFactorRow.style.display = 'table-cell';
+        }
+
         this.mname = this.impl.name;
         this.note = this.impl.note || '';
         this.amount = this.impl.amount || 0;

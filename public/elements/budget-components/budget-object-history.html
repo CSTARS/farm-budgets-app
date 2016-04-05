@@ -32,24 +32,49 @@
               '<th>Date & Time</th>'+
             '</tr>';
 
-        for( var i = 0; i < resp.length; i++ ) {
-          var label;
-          if( resp[i].created ) {
-            label = '<span class="label label-success">Created</span>';
-          } else if( resp[i].deleted ) {
-            label = '<span class="label label-danger">Deleted</span>'
-          } else {
-            label = '<span class="label label-warning">Updated</span>'
+        var date = new Date(resp[0].datetime);
+        var citem = resp[0];
+
+
+        var tdate, c = 1;
+
+        for( var i = 1; i < resp.length; i++ ) {
+          tdate = new Date(resp[i].datetime);
+
+
+          if( date.getTime() - tdate.getTime() < 60000 && resp[i].user === citem.user && !resp[i].created && !resp[i].deleted ) {
+            c++;
+            continue;
           }
 
-          table +=
-            '<tr>'+
-              '<td>'+label+'</td>'+
-              '<td>'+resp[i].user+'</td>'+
-              '<td>'+(new Date(resp[i].datetime).toLocaleString())+'</td>'+
-            '</tr>';
+          table += this.applyRow(citem, table, c);
+
+          date = tdate;
+          citem = resp[i];
+          c = 1;
         }
+
+        table += this.applyRow(citem, table, c);
+
         this.$.root.innerHTML = table+'</table>';
+      },
+
+      applyRow : function(resp, table, count) {
+        var label;
+        if( resp.created ) {
+          label = '<span class="label label-success">Created</span>';
+        } else if( resp.deleted ) {
+          label = '<span class="label label-danger">Deleted</span>'
+        } else {
+          label = '<span class="label label-warning">Updated ('+count+')</span>'
+        }
+
+
+        return '<tr>'+
+            '<td>'+label+'</td>'+
+            '<td>'+resp.user+'</td>'+
+            '<td>'+(new Date(resp.datetime).toLocaleString())+'</td>'+
+          '</tr>';
       }
     });
   </script>

@@ -55,6 +55,9 @@
           value : function() {
             return '';
           }
+        },
+        noAccess : {
+          type : Boolean
         }
       },
 
@@ -112,11 +115,12 @@
               '<span class="text text-danger">'+
                 '<i class="fa fa-warning"></i> <b>' +this._material.getName()+'</b> not found.'+
               '</span>'+
-              '<div class="btn-group" role="group">'+
-                '<a class="btn btn-default" href="'+this.getMaterialSearchLink()+'"><i class="fa fa-search"></i></a> '+
-                (SDK.getBudget().isReference() ? '' : '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>')+
-                '<a class="btn btn-default" href="'+this.getMaterialCreateLink()+'"><i class="fa fa-plus"></i></a>'
-              '</div>';
+              (this.noAccess ? '' :
+                          '<div class="btn-group" role="group">'+
+                            '<a class="btn btn-default" href="'+this.getMaterialSearchLink()+'"><i class="fa fa-search"></i></a> '+
+                            (SDK.getBudget().isReference() ? '' : '<a class="btn btn-default" tag><i class="fa fa-tag"></i></a>')+
+                            '<a class="btn btn-default" href="'+this.getMaterialCreateLink()+'"><i class="fa fa-plus"></i></a>'+
+                          '</div>');
 
             $(this).find('a[tag]').on('click', function(){
               document.querySelector('budget-alias-popup').show(this.material);

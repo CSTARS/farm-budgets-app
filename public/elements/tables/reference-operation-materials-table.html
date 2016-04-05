@@ -28,7 +28,7 @@
         this.rows = [];
       },
 
-      update : function(operation) {
+      update : function(operation, noAccess) {
         if( operation ) {
           if( this.valueChanges(operation) ) {
             this.applyValueChanges(operation);
@@ -42,7 +42,7 @@
           '<th>Material</th>'+
           '<th>Notes</th>'+
           '<th>Amount</th>'+
-          '<th>Scale</th>'+
+          (noAccess ? '' : '<th>Scale</th>')+
           '<th>Sub Total</th>'+
           '<th></th></tr>';
 
@@ -59,7 +59,8 @@
             table : body ? body : this.$.table,
             impl : impl,
             operation : this.operation,
-            readonly : this.readonly
+            readonly : this.readonly,
+            noAccess : noAccess
           });
           this.rows.push(rowController);
         }

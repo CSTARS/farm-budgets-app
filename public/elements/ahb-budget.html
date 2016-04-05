@@ -14,10 +14,11 @@
       this.renameTimer = -1;
       this.currentBudgetId = '';
 
-      SDK.app.init();
+      $(window).on('hashchange', this.setPage.bind(this));
+      this.setPage();
+    },
 
-      SDK.controllers.operation.on('operation-material-rename', this.onMaterialAutoRename.bind(this));
-
+    setPage : function() {
       // if user does not have a verified email, redirect them
       if( ExpressAuth.user && !ExpressAuth.user.verified ) {
         window.location = '/auth/verifyPage';
@@ -38,157 +39,32 @@
       }
 
       this.currentBudgetId = parts[0];
-    },
 
-    attached : function() {
-      this.reload(this.currentBudgetId);
-
-      // //var id = window.localStorage.getItem('current-budget');
-      //
-      // if( id ) {
-      //   SDK.budgets.get(id, function(resp){
-      //     if( resp.error ) {
-      //
-      //       // check local data if error (probably new, unsaved budget)
-      //       var localdata = window.localStorage.getItem(id);
-      //       if( localdata ) {
-      //         try {
-      //           localdata = JSON.parse(localdata);
-      //           this.load(localdata);
-      //           return;
-      //         } catch(e) {}
-      //       }
-      //
-      //       return;
-      //     }
-      //
-      //     SDK.changes.setOriginal(resp.budget, resp.materials);
-      //     if( !this.checkLocal(id) ) {
-      //       this.load(resp);
-      //     }
-      //   }.bind(this));
-      // } else {
-      //   this.createNew();
-      //   window.location = '#search'
-      // }
-    },
-
-    checkLocal : function(id) {
-      console.log('checking local: '+id);
-      try {
-        var localdata = window.localStorage.getItem(id);
-        if( !localdata ) {
-          return false;
-        }
-
-        localdata = JSON.parse(localdata);
-        SDK.app.localdata = localdata;
-
-        if( !localdata.materials ) {
-          localdata.materials = [];
-        }
-
-        var hasChanges = false;
-        if( localdata ) {
-          hasChanges = SDK.changes.checkAll(localdata.budget, localdata.materials);
-        }
-
-        if( localdata && !ExpressAuth.user ) {
-          this.load(localdata);
-          return true;
-        } else if( localdata && hasChanges ) {
-          this.load(localdata);
-          return true;
-        }
-      } catch(e) {
-        debugger;
-        console.log(e);
-        alert('Failed to load from local storage :(');
-      }
-      return false;
-    },
-
-    load : function(data) {
-      console.log('loading...');
-      SDK.reset(true);
-
-      if( !data.budget.materials ) {
-        data.budget.materials = [];
-      }
-      if( !data.budget.operations ) {
-        data.budget.operations = [];
+      if( this.currentBudgetId === '' ) {
+        return;
       }
 
-      /*if( data.budget.id ) {
-        window.localStorage.setItem('current-budget', data.budget.id);
-      } else {
-        window.localStorage.setItem('current-budget', '');
-      }*/
-
-      // TODO: should be looking to switch to SDK.load which returns the budget class
-      SDK.setBudget(data);
-
-      this.$.sections.setData(data);
-
-      if( this.saveElement ) {
-        this.saveElement.onBudgetLoad(data);
-      }
-
-      SDK.app.localsave();
-      SDK.changes.setOriginal(data.budget, data.materials);
-      SDK.app.checkForChanges();
-      SDK.app.checkForMaterialChanges();
-
-      this.fire('budget-loaded');
+      this.load(this.currentBudgetId);
     },
 
-    reload : function(id, force) {
-      SDK.budgets.get(id, function(resp){
+    load : function(id, force) {
+      // assume the budget was already initialized locality
+      // either clone or create
+      if( SDK.app.creating ) {
+        return;
+      }
+
+      this.currentBudgetId = id;
+
+      SDK.loadBudget(id, function(resp){
         if( resp.error ) {
           return alert('Error reloading budget data: '+resp.message);
         }
-
-        SDK.changes.setOriginal(resp.budget, resp.materials);
-        SDK.changes.setUnsaved({});
-
-        window.localStorage.setItem('unsaved-materials', '{}');
-        window.localStorage.clear();
-
-        this.load(resp);
       }.bind(this));
     },
 
-    createNew : function() {
-      var newData = {
-        budget : {
-          id : SDK.utils.guid(),
-          authority : ExpressAuth.user ? ExpressAuth.user.email : '',
-          locality : [],
-          name : '',
-          commodity : '',
-          farm : {
-            name : '',
-            units : '[acr_us]',
-            size : 1
-          },
-          operations : [],
-        },
-        materials : []
-      };
-
-      SDK.changes.setOriginal(newData.budget, newData.materials);
-      this.load(newData);
-    },
-
-    onMaterialAutoRename : function(e) {
-      console.log(e);
-      this.renameList[e.detail.id] = e.detail;
-      this.showRenameList();
-    },
-
-    showRenameList : function() {
-      // TODO: maybe move this to the operations section and a panel instead of a popup.
+    showWarning : function() {
+      this.$.sections.showWarning();
     }
-
   });
 </script>
