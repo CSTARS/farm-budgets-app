@@ -10,8 +10,23 @@ module.exports = function copyto(grunt) {
         build: {
             files: [{
                 cwd: 'public',
-                src: ['index.html','login.html','createAccount.html','materialEditor.html'],
+                src: ['index.html'],
                 dest: 'dist/'
+            },
+            {
+                cwd: 'public/materials',
+                src: ['index.html'],
+                dest: 'dist/materials/'
+            },
+            {
+                cwd: 'public/search',
+                src: ['index.html'],
+                dest: 'dist/search/'
+            },
+            {
+                cwd: 'public/settings',
+                src: ['index.html'],
+                dest: 'dist/settings/'
             },
             {
                 cwd: 'public/js',

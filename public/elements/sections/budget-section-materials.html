@@ -28,6 +28,10 @@
       text-align: center;
       background-color: #f8f8f8;
     }
+
+    .material-panel {
+      padding: 0 15px;
+    }
   </style>
 
   <template>
@@ -45,6 +49,15 @@
 
 
         <div id="list" class="material-panel">
+
+
+        <div class="panel panel-default" style="margin-top:25px">
+          <div class="panel-heading">
+            <h4>
+              <span id="title">Material List</span>
+            </h4>
+          </div>
+          <div class="panel-body">
 
           <div id="errorMessage" class="text text-danger">
             <div style="padding: 10px"><i class="fa fa-warning"></i> Warning, <span id="errorCount"></span> of the materials has errors.</div>
@@ -90,6 +103,9 @@
               <div id="searchMsg"></div>
 
             </div>
+          </div>
+
+          </div>
           </div>
         </div> <!-- end list -->
 

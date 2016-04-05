@@ -169,23 +169,6 @@
         this.setSearch();
       },
 
-      //attached : function() {
-      //  this.updateVisible();
-      //},
-
-      // updateVisible : function() {
-      //   var hash = window.location.hash.replace(/#/,'');
-      //   if( hash === 'search' ) {
-      //     this.style.display = 'block';
-      //     if( !this.init ) {
-      //       this.query();
-      //       this.init = true;
-      //     }
-      //   } else {
-      //     this.style.display = 'none';
-      //   }
-      // },
-
       setSearch : function(e) {
         var value = '';
         if( e ) {
@@ -270,11 +253,11 @@
 
         html += '<tr>'+
           '<th></th>'+
-          '<th class="text text-success"><i class="fa fa-leaf"></i> Crop</th>'+
           '<th>Status*</th>'+
-          '<th>Budget Name</th>'+
-          '<th><i class="fa fa-shield"></i> Authority</th>'+
+          '<th class="text text-success"><i class="fa fa-leaf"></i> Crop</th>'+
           '<th><i class="fa fa-map-marker"></i> Locality</th>'+
+          '<th><i class="fa fa-shield"></i> Authority</th>'+
+          '<th>Budget Name</th>'+
           '<th>Farm Name</th>'+
         '</tr>';
 
@@ -283,8 +266,6 @@
           html += '<tr>';
 
           html += '<td><a class="btn btn-default" index="'+i+'" href="/#'+m.id+'">Load</a></td>';
-
-          html += '<td class="text text-success" style="text-transform: capitalize">'+m.commodity+'</td>';
 
           var status = '';
           if( m.draft !== false ) {
@@ -297,14 +278,16 @@
           }
           html += '<td>'+status+'</td>';
 
-          // set row name
-          html += '<td>'+m.name+'</td>';
+          html += '<td class="text text-success" style="text-transform: capitalize">'+m.commodity+'</td>';
+
+          // set locality
+          html += '<td>'+m.locality.join(', ')+'</td>';
 
           // set authority
           html += '<td>'+m.authority+'</td>';
 
-          // set locality
-          html += '<td>'+m.locality.join(', ')+'</td>';
+          // set row name
+          html += '<td>'+m.name+'</td>';
 
           html += '<td>'+m.farm.name+'</td>';
 

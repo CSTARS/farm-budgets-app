@@ -14,17 +14,18 @@ module.exports = function(grunt) {
       files: {
         'dist/require.html': [
         	'public/require.html'
-        ]
-      }
-    },
-		prototype: {
-      options: {
-        inlineCss : true,
-				inlineScripts : true
-      },
-      files: {
-        'dist/prototype/require.html': [
-        'public/prototype/require.html'
+        ],
+				'dist/search/require.html': [
+        	'public/search/require.html'
+        ],
+				'dist/materials/require.html': [
+        	'public/materials/require.html'
+        ],
+				'dist/settings/require.html': [
+        	'public/settings/require.html'
+        ],
+				'dist/js/js.html': [
+        	'public/js/js.html'
         ]
       }
     }
