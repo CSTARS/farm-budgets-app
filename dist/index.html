@@ -12,7 +12,14 @@
   <script>
     var parts = window.location.hash.replace('#','').split('/');
     if( parts[0] === '' ) {
-      window.location = '/search';
+      var loginRedirectUrl = window.localStorage.getItem('login-redirect');
+      
+      if( loginRedirectUrl ) {
+         window.localStorage.removeItem('login-redirect');
+         window.location = loginRedirectUrl;
+      } else{
+        window.location = '/search';
+      }
     }
   </script>
 
