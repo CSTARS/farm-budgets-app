@@ -29317,6 +29317,35 @@ SDK.app = {
     return true;
   },
 
+  createReferenceBudget : function() {
+      var data = {
+        budget : SDK.getBudget().getData(),
+        materials : SDK.controllers.material.asArray()
+      }
+
+      // otherwise this data is already set
+      if( !data.budget.reference ) {
+        data.budget.reference = data.budget.id;
+        data.budget.referenceInfo = {
+          name : data.budget.name,
+          commodity : data.budget.commodity,
+          authority : data.budget.authority,
+          locality : data.budget.locality
+        }
+      }
+
+      data.budget.name = data.budget.name+' - Reference';
+      data.budget.id = SDK.utils.guid();
+
+      SDK.app.creating = true;
+      SDK.setBudget(data);
+
+      window.location = '#'+data.budget.id;
+      setTimeout(function(){
+        document.querySelector('budget-farm-editor').show(true);
+      }, 500);
+  },
+
   cloneBudget : function() {
     var data = {
       budget : SDK.getBudget().getData(),

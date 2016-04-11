@@ -55,45 +55,8 @@
     },
 
     create : function() {
-        if( SDK.changes.hasChanges() && !confirm('Are you sure you want to continue this budget?  Your unsaved changes will be lost.') ) return;
-
-        var data = $.extend(true, {}, this.budget);
-
-        data.name = data.name+' Reference';
-
-        if( !SDK.app.hasAccess(data) ) {
-          data.authority = ExpressAuth.user ? ExpressAuth.user.email : '';
-        }
-
-        // otherwise this data is already set
-        if( !this.budget.reference ) {
-          data.reference = data.id;
-          data.referenceInfo = {
-            name : data.name,
-            commodity : data.commodity,
-            authority : data.authority,
-            locality : data.locality
-          }
-        }
-
-        data.id = SDK.utils.guid();
-
-        data = {
-          budget : data,
-          materials : SDK.controllers.material.asArray()
-        };
-
-        SDK.changes.setOriginal({
-          authority: ExpressAuth.user ? ExpressAuth.user.email : ''
-        }, []);
-
-        window.location = '#budget/overview';
-        document.querySelector('ahb-budget').load(data);
-        this.hide();
-
-        setTimeout(function(){
-          document.querySelector('budget-farm-editor').show(true);
-        }, 500);
+      SDK.app.createReferenceBudget();
+      this.hide();
     }
   })
 </script>

@@ -37,7 +37,7 @@
   <template>
 
     <div class="row">
-      <div class="col-sm-3">
+      <div class="col-sm-3" id="leftPanel">
         <div class="list-group" id="nav" style="padding-left: 15px; padding-top: 15px">
           <a on-click="onNavClick" show="list" class="list-group-item active">Budget Materials List</a>
           <a on-click="onNavClick" id="findBtn" show="find" class="list-group-item">Add Materials to Budget</a>
@@ -45,9 +45,7 @@
         </div>
       </div>
 
-      <div class="col-sm-9">
-
-
+      <div class="col-sm-9" id="rightPanel">
         <div id="list" class="material-panel">
 
 
@@ -64,7 +62,7 @@
             <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors" /> Only Show Materials With Errors</span>
           </div>
 
-          <div class="help-block">
+          <div class="help-block" id="helpText">
             Below is a list of all materials currently available for this budget.  You can
             find and add materials to this budget using the navigation to the left.
           </div>
@@ -225,8 +223,14 @@
         this.noAccess = true;
       }
 
-      this.$.findBtn.className = 'list-group-item '+(this.noAccess ? 'disabled' : '');
-      this.$.createBtn.className = 'list-group-item '+(this.noAccess ? 'disabled' : '');
+      if( this.noAccess ) {
+        this.show('list');
+      }
+
+      this.$.nav.style.display = (this.noAccess ? 'none' : 'block');
+      this.$.helpText.style.display = (this.noAccess ? 'none' : 'block');
+      this.$.leftPanel.className = (this.noAccess ? '' : 'col-sm-3');
+      this.$.rightPanel.className = (this.noAccess ? 'col-sm-10 col-sm-offset-1' : 'col-sm-9');
     },
 
     onShow : function() {

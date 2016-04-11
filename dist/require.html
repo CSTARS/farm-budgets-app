@@ -38134,45 +38134,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     },
 
     create : function() {
-        if( SDK.changes.hasChanges() && !confirm('Are you sure you want to continue this budget?  Your unsaved changes will be lost.') ) return;
-
-        var data = $.extend(true, {}, this.budget);
-
-        data.name = data.name+' Reference';
-
-        if( !SDK.app.hasAccess(data) ) {
-          data.authority = ExpressAuth.user ? ExpressAuth.user.email : '';
-        }
-
-        // otherwise this data is already set
-        if( !this.budget.reference ) {
-          data.reference = data.id;
-          data.referenceInfo = {
-            name : data.name,
-            commodity : data.commodity,
-            authority : data.authority,
-            locality : data.locality
-          }
-        }
-
-        data.id = SDK.utils.guid();
-
-        data = {
-          budget : data,
-          materials : SDK.controllers.material.asArray()
-        };
-
-        SDK.changes.setOriginal({
-          authority: ExpressAuth.user ? ExpressAuth.user.email : ''
-        }, []);
-
-        window.location = '#budget/overview';
-        document.querySelector('ahb-budget').load(data);
-        this.hide();
-
-        setTimeout(function(){
-          document.querySelector('budget-farm-editor').show(true);
-        }, 500);
+      SDK.app.createReferenceBudget();
+      this.hide();
     }
   })
 </script>
@@ -39011,8 +38974,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         alert('Budget Deleted.');
 
-        // TODO: should proly centerialize this call
-        document.querySelector('budget-sections').startNew();
+        window.location = '/search';
       }.bind(this));
     },
 
@@ -39082,15 +39044,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
     </div>
 
-    <div class="alert alert-warning" id="referenceMsg" style="display:none; text-align:center">
-      <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
-      <br>
-      You can set a scaling factor for each material amount, adjusting for any differences
-      in quantity from one region to another.
-    </div>
-
     <div class="container">
 
+      <div class="alert alert-warning" id="referenceMsg" style="display:none; text-align:center;margin-top: 20px">
+        <i class="fa fa-warning"></i> This is a reference budget.  You can view the operations but not edit them.
+        <br>
+        You can set a scaling factor for each material amount, adjusting for any differences
+        in quantity from one region to another.
+      </div>
 
         <div class="layout horizontal">
           <div class="flex">
@@ -39182,7 +39143,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     setReferenced : function() {
       if( this.referenced ) {
-        this.$.referenceMsg.style.display = 'block';
+        if( this.noAccess ) {
+          this.$.referenceMsg.style.display = 'none';
+        } else {
+          this.$.referenceMsg.style.display = 'block';
+        }
+
         this.$.createBtn.style.display = 'none';
       } else {
         this.$.referenceMsg.style.display = 'none';
@@ -39605,7 +39571,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
 
     <div class="row">
-      <div class="col-sm-3">
+      <div class="col-sm-3" id="leftPanel">
         <div class="list-group" id="nav" style="padding-left: 15px; padding-top: 15px">
           <a on-click="onNavClick" show="list" class="list-group-item active">Budget Materials List</a>
           <a on-click="onNavClick" id="findBtn" show="find" class="list-group-item">Add Materials to Budget</a>
@@ -39613,9 +39579,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </div>
 
-      <div class="col-sm-9">
-
-
+      <div class="col-sm-9" id="rightPanel">
         <div id="list" class="material-panel">
 
 
@@ -39632,7 +39596,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <span id="errorFilterOuter"><input type="checkbox" id="errorFilter" on-click="filterErrors"> Only Show Materials With Errors</span>
           </div>
 
-          <div class="help-block">
+          <div class="help-block" id="helpText">
             Below is a list of all materials currently available for this budget.  You can
             find and add materials to this budget using the navigation to the left.
           </div>
@@ -39779,8 +39743,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.noAccess = true;
       }
 
-      this.$.findBtn.className = 'list-group-item '+(this.noAccess ? 'disabled' : '');
-      this.$.createBtn.className = 'list-group-item '+(this.noAccess ? 'disabled' : '');
+      if( this.noAccess ) {
+        this.show('list');
+      }
+
+      this.$.nav.style.display = (this.noAccess ? 'none' : 'block');
+      this.$.helpText.style.display = (this.noAccess ? 'none' : 'block');
+      this.$.leftPanel.className = (this.noAccess ? '' : 'col-sm-3');
+      this.$.rightPanel.className = (this.noAccess ? 'col-sm-10 col-sm-offset-1' : 'col-sm-9');
     },
 
     onShow : function() {
