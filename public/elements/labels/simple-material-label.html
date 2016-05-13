@@ -29,7 +29,7 @@
           <div id="otherInfo" class="help-block" style="white-space: nowrap"></div>
         </div>
         <div>
-          <a class="btn btn-default" id="edit" style="margin:-3px 0 0 10px"><i class="fa fa-pencil"></i></a>
+          <a class="btn btn-default" on-click="editMaterial" id="edit" style="margin:-3px 0 0 10px"><i class="fa fa-pencil"></i></a>
         </div>
       </div>
 
@@ -54,12 +54,13 @@
       this.parentUnits = parentUnits;
       this.render();
     },
+    
+    editMaterial : function() {
+      document.querySelector('budget-sections').editMaterial(this.material.getId());
+    },
 
     render : function() {
       if( !this.material ) return;
-
-
-      this.$.edit.setAttribute('href', '#material/edit/'+this.material.getId());
 
       var otherInfo = '';
       if( this.material.getAuthority() ) {

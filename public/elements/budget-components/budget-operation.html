@@ -70,6 +70,12 @@
           <div class="col-sm-4">
             <table class="padding: 15px">
               <tr>
+                <td><h5>Per Acre</h5></td>
+                <td style="padding-left: 10px ">
+                  <h5 class="text text-success"><ahb-dollar-label id="perAcreTotal"></ahb-dollar-label></h5>
+                </td>
+              </tr>
+              <tr>
                 <td><h4>Subtotal</h4></td>
                 <td style="padding-left: 10px ">
                   <h4 class="text text-success"><ahb-dollar-label id="subtotal"></ahb-dollar-label>
@@ -328,6 +334,7 @@
       var result = this.operation.getTotal();
       $(this.$.total).attr('value', result.total);
       $(this.$.subtotal).attr('value', result.subtotal);
+      $(this.$.perAcreTotal).attr('value', result.subtotal / (parseFloat(SDK.getBudget().getFarm().size) || 1) );
       $(this.$.subtotalInfo).html('<span style="color:#888">x'+scheduled+'</span>');
     },
 

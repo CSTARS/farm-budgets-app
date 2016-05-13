@@ -176,6 +176,11 @@
       }
       this.show(section)
     },
+    
+    editMaterial : function(id) {
+      this.show('materials');
+      this.$.materials.editMaterial({detail: id});
+    },
 
     show : function(section, searchTxt) {
       $(this).find('.section').hide();

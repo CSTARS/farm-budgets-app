@@ -5,6 +5,7 @@ var collection, loadReference;
 function search(query, start, stop, callback) {
   query.deleted = {$ne: true};
 
+
   var cursor = collection.find(
     query,
     {
