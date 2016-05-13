@@ -76,7 +76,8 @@
 
       google.visualization.events.addListener(chart, 'select', function(){
         try {
-          window.location = '#budget/operations/'+arr[chart.getSelection()[0].row][0];
+          var name = arr[chart.getSelection()[0].row][0];
+          document.querySelector('budget-sections').show('operations', name);
         } catch(e) {
           console.log(e);
         }
