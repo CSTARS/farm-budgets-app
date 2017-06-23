@@ -1,0 +1,17 @@
+
+version: '3'
+
+services:
+  webapp:
+    build: ../appcontainer
+    ports:
+      - 8000:8000
+    volumes:
+      - ../..:/farm-budgets-app
+      - ../../server-config:/etc/farm-budgets-app
+    command: bash -c "cd farm-budgets-app && node server --dev --docker"
+
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ../../data:/data/db
