@@ -4,7 +4,7 @@ services:
   webapp:
     build: ../appcontainer
     ports:
-      - 8000:8000
+      - 3021:8000
     volumes:
       - ../../server-config:/etc/farm-budgets-app
     command: bash -c "cd farm-budgets-app && node server --docker"
